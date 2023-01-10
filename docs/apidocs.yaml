@@ -1,0 +1,729 @@
+openapi: 3.0.2
+info:
+  title: IUDX Data marketplace APIs
+  version: 4.5.0
+  description: >-
+    The data marketplace is IUDX's platform that enables data Providers to host
+    their datasets as a product. Likewise, data consumers can buy the products
+    listed by various providers
+  contact:
+    email: support@iudx.org.in
+    name: For support contact IUDX team at
+paths:
+  /provider/product:
+    summary: >-
+      Manage marketplace products and perform Create/Update/Delete
+      operations on them. These apis are intended to be used by IUDX data
+      providers
+    post:
+      tags:
+        - provider
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/exampleProductPostBody'
+      parameters:
+        -
+          name: token
+          description: IUDX Auth token to process the request
+          schema:
+            maxLength: 512
+            minLength: 0
+            pattern: '^[a-zA-Z0-9\/\@\.]*$'
+            type: string
+          in: header
+          required: true
+      responses:
+        '200':
+          description: success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/successResponseWithObjects'
+              examples:
+                Create product success:
+                  value:
+                    type: 'urn:dx:dm:Sucess'
+                    results:
+                      name: urn:datakaveri.org:iisc.ac.in/123qwerty:zxcvb
+        '400':
+          description: invalid document
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/errorResponseWithObjects'
+              examples:
+                Already exists:
+                  value:
+                    type: 'urn:dx:dm:AlreadyExists'
+                    results:
+                      name: urn:datakaveri.org:iisc.ac.in/123qwerty:zxcvb
+                      method: insert
+                      title: failed
+                      detail: 'Fail: Doc exists'
+                    title: Product already exists
+                Invalid productID:
+                  value:
+                    type: 'urn:dx:dm:InvalidProductIDValue'
+                    title: Bad request
+                    detail: 'Invalid ProductID [ abc&23? ]'
+        '401':
+          description: Unauthorized access
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/errorResponseWithObjects'
+              examples:
+                Unauthorized:
+                  value:
+                    type: 'urn:dx:cat:InvalidAuthorizationToken'
+                    title: Token is invalid
+                    detail: failed
+      description: >-
+        Create a product where the body contains the name, description, price and duration for which the product access is allowed. The price will be in INR and duration will be in months.
+        
+        The name cannot be updated once the product is created as it is a unique identifier for a product of a provider. The name is stored as a URN(for eg: a product named flood-sensors hosted by the provider iisc.ac.in/123qwerty is represented as urn:datakaveri.org:iisc.ac.in/123qwerty:flood-sensors)
+    delete:
+      tags:
+        - provider
+      parameters:
+        -
+          name: token
+          description: IUDX Auth token to process the request
+          schema:
+            maxLength: 512
+            minLength: 0
+            pattern: '^[a-zA-Z0-9\/\@\.]*$'
+            type: string
+          in: header
+          required: true
+        -
+          name: productID
+          description: urn name of the product
+          schema:
+            maxLength: 150
+            minLength: 3
+            pattern: '^[a-zA-Z0-9/.:-]{3,150}$'
+          in: query
+          required: true
+      responses:
+        '200':
+          description: success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/successResponseWithObjects'
+        '400':
+          description: invalid document
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/errorResponseWithObjects'
+              examples:
+                Doesn't Exist:
+                  value:
+                    type: 'urn:dx:dm:DocDoesNotExist'
+                    results:
+                      name: urn:datakaveri.org:iisc.ac.in/123qwerty:zxcvb
+                      method: delete
+                      title: failed
+                      detail: 'Fail: Cannot delete, Doc does not exist'
+                    title: Product does not exist
+                Invalid productID:
+                  value:
+                    type: 'urn:dx:dm:InvalidProductIDValue'
+                    title: Bad request
+                    detail: 'Invalid productID [ abc&23? ]'
+        '401':
+          description: Unauthorized access
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/errorResponseWithObjects'
+              examples:
+                Unauthorized:
+                  value:
+                    type: 'urn:dx:cat:InvalidAuthorizationToken'
+                    title: Token is invalid
+                    detail: failed
+  /provider/list/products:
+    summary: >-
+      List API for provider to view all the products listed by them, or a subset of the products based on the datasets they contain.
+    get:
+      tags:
+        - provider
+      parameters:
+        -
+          name: token
+          description: IUDX Auth token to process the request
+          schema:
+            maxLength: 512
+            minLength: 0
+            pattern: '^[a-zA-Z0-9\/\@\.]*$'
+            type: string
+          in: header
+          required: true
+        -
+          name: datasetID
+          description: >-
+            If datasetID is provided for listing, then products are filtered to show products only for that dataset
+          in: query
+          schema:
+            type: string
+          required: false
+      responses:
+        '200':
+          description: success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/successResponseWithObjects'
+        '204':
+          description: no content
+        '400':
+          description: invalid document
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/errorResponseWithObjects'
+              examples:
+                Invalid ID:
+                  value:
+                    type: 'urn:dx:dm:InvalidDatasetIDValue'
+                    title: Bad request
+                    detail: 'Invalid dataset ID'
+        '401':
+          description: Unauthorized access
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/errorResponseWithObjects'
+              examples:
+                Unauthorized:
+                  value:
+                    type: 'urn:dx:cat:InvalidAuthorizationToken'
+                    title: Token is invalid
+                    detail: failed
+  /provider/list/purchases:
+    summary: >-
+      List API for the provider to view all the purchases made on the products listed by them, or a subset of the purchases based on the product name.
+    get:
+      tags:
+        - provider
+      parameters:
+        -
+          name: token
+          description: IUDX Auth token to process the request
+          schema:
+            maxLength: 512
+            minLength: 0
+            pattern: '^[a-zA-Z0-9\/\@\.]*$'
+            type: string
+          in: header
+          required: true
+        -
+          name: productID
+          description: urn name of the product
+          schema:
+            maxLength: 150
+            minLength: 3
+            pattern: '^[a-zA-Z0-9/.:-]{3,150}$'
+          in: query
+          required: false
+        -
+          name: datasetID
+          description: >-
+            If datasetID is provided for listing, then purchases are filtered to show purchases against that dataset
+          in: query
+          schema:
+            type: string
+          required: false
+      responses:
+        '200':
+          description: success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/successResponseWithObjects'
+        '204':
+          description: no content
+        '400':
+          description: invalid document
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/errorResponseWithObjects'
+              examples:
+                Doesn't Exist:
+                  value:
+                    type: 'urn:dx:dm:DocDoesNotExist'
+                    results:
+                      name: urn:datakaveri.org:iisc.ac.in/123qwerty:zxcvb
+                      method: list
+                      title: failed
+                      detail: 'Fail: Doc does not exist'
+                    title: Product does not exist
+                Invalid name:
+                  value:
+                    type: 'urn:dx:dm:InvalidNameValue'
+                    title: Bad request
+                    detail: 'Invalid name [ abc&23? ]'
+        '401':
+          description: Unauthorized access
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/errorResponseWithObjects'
+              examples:
+                Unauthorized:
+                  value:
+                    type: 'urn:dx:cat:InvalidAuthorizationToken'
+                    title: Token is invalid
+                    detail: failed
+
+  /consumer/list/datasets:
+    summary: >-
+      List API for the consumer to view the datasets available on the marketplace.
+    get:
+      tags:
+        - consumer
+      parameters:
+        -
+          name: token
+          description: IUDX Auth token to process the request
+          schema:
+            maxLength: 512
+            minLength: 0
+            pattern: '^[a-zA-Z0-9\/\@\.]*$'
+            type: string
+          in: header
+          required: true
+        -
+          name: providerID
+          description: Id of the provider for listing their datasets
+          schema:
+            type: string
+          in: query
+          required: false
+        -
+          name: datasetID
+          description: Id of the dataset for its details
+          schema:
+            type: string
+          in: query
+          required: false
+      responses:
+        '200':
+          description: success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/successResponseWithObjects'
+        '204':
+          description: no content
+        '400':
+          description: invalid document
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/errorResponseWithObjects'
+              examples:
+                Doesn't Exist:
+                  value:
+                    type: 'urn:dx:dm:DocDoesNotExist'
+                    detail: 'Fail: provider does not exist'
+                    title: Provider does not exist
+                Invalid name:
+                  value:
+                    type: 'urn:dx:dm:InvalidNameValue'
+                    title: Bad request
+                    detail: 'Invalid provider id value [ abc&23? ]'
+        '401':
+          description: Unauthorized access
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/errorResponseWithObjects'
+              examples:
+                Unauthorized:
+                  value:
+                    type: 'urn:dx:cat:InvalidAuthorizationToken'
+                    title: Token is invalid
+                    detail: failed
+  /consumer/list/providers:
+    summary: >-
+      List API for consumers to view the providers enlisted on the marketplace.
+    get:
+      tags:
+        - consumer
+      parameters:
+        -
+          name: token
+          description: IUDX Auth token to process the request
+          schema:
+            maxLength: 512
+            minLength: 0
+            pattern: '^[a-zA-Z0-9\/\@\.]*$'
+            type: string
+          in: header
+          required: true
+        -
+          name: providerID
+          description: Id of the provider for its details
+          schema:
+            type: string
+          in: query
+          required: false
+      responses:
+        '200':
+          description: success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/successResponseWithObjects'
+        '204':
+          description: no content
+        '401':
+          description: Unauthorized access
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/errorResponseWithObjects'
+              examples:
+                Unauthorized:
+                  value:
+                    type: 'urn:dx:cat:InvalidAuthorizationToken'
+                    title: Token is invalid
+                    detail: failed
+  /consumer/list/purchases:
+    summary: >-
+      List API for the consumer to view all the past purchases made by them. They can also see  the status of the payment on each
+    get:
+      tags:
+        - consumer
+      parameters:
+        -
+          name: token
+          description: IUDX Auth token to process the request
+          schema:
+            maxLength: 512
+            minLength: 0
+            pattern: '^[a-zA-Z0-9\/\@\.]*$'
+            type: string
+          in: header
+          required: true
+      responses:
+        '200':
+          description: success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/successResponseWithObjects'
+        '204':
+          description: no content
+        '401':
+          description: Unauthorized access
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/errorResponseWithObjects'
+              examples:
+                Unauthorized:
+                  value:
+                    type: 'urn:dx:cat:InvalidAuthorizationToken'
+                    title: Token is invalid
+                    detail: failed
+  /consumer/list/products:
+    summary: >-
+      List API for the comsumer to view all the products available against a dataset.
+    get:
+      tags:
+        - consumer
+      parameters:
+        -
+          name: token
+          description: IUDX Auth token to process the request
+          schema:
+            maxLength: 512
+            minLength: 0
+            pattern: '^[a-zA-Z0-9\/\@\.]*$'
+            type: string
+          in: header
+          required: true
+        -
+          name: datasetID
+          description: >-
+            ID of the dataset for listing products that contain it.
+          in: query
+          schema:
+            type: string
+          required: false
+        -
+          name: providerID
+          description: Id of the provider for listing their products
+          schema:
+            type: string
+          in: query
+          required: false
+      responses:
+        '200':
+          description: success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/successResponseWithObjects'
+        '204':
+          description: no content
+        '400':
+          description: invalid document
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/errorResponseWithObjects'
+              examples:
+                Invalid ID:
+                  value:
+                    type: 'urn:dx:dm:InvalidDatasetIDValue'
+                    title: Bad request
+                    detail: 'Invalid dataset ID'
+        '401':
+          description: Unauthorized access
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/errorResponseWithObjects'
+              examples:
+                Unauthorized:
+                  value:
+                    type: 'urn:dx:cat:InvalidAuthorizationToken'
+                    title: Token is invalid
+                    detail: failed
+
+  /product/usermaps:
+    summary: >-
+      CRUD APIs to map a consumer to a product after purchase is successful.
+    post:
+      tags:
+        - admin
+      parameters:
+        -
+          name: token
+          description: IUDX Auth token to process the request
+          schema:
+            maxLength: 512
+            minLength: 0
+            pattern: '^[a-zA-Z0-9\/\@\.]*$'
+            type: string
+          in: header
+          required: true
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/exampleUsermapsPostBody'
+      responses:
+        '200':
+          description: success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/successResponseWithObjects'
+        '400':
+          description: bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/errorResponseWithObjects'
+              examples:
+                Doesn't Exist:
+                  value:
+                    type: 'urn:dx:dm:DocDoesNotExist'
+                    results:
+                      name: urn:datakaveri.org:iisc.ac.in/123qwerty:zxcvb
+                      method: delete
+                      title: failed
+                      detail: 'Fail: Cannot delete, Doc does not exist'
+                    title: Product does not exist
+                Invalid productID:
+                  value:
+                    type: 'urn:dx:dm:InvalidProductIDValue'
+                    title: Bad request
+                    detail: 'Invalid productID [ abc&23? ]'
+                Invalid Syntax:
+                  value:
+                    type: 'urn:dx:dm:InvalidSyntax'
+                    title: Invalid syntax
+                    detail: 'Invalid format for time'
+        '401':
+          description: Unauthorized access
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/errorResponseWithObjects'
+              examples:
+                Unauthorized:
+                  value:
+                    type: 'urn:dx:cat:InvalidAuthorizationToken'
+                    title: Token is invalid
+                    detail: failed
+  /verify:
+    post:
+      tags:
+        - admin
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/exampleVerifyRequestBody'
+      responses:
+        '200':
+          description: success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/successResponseWithObjects'
+        '403':
+          description: forbidden
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/exampleVerifyFailResponse'
+
+
+components:
+  schemas:
+    successResponseWithObjects:
+      title: Root Type for standardResponse
+      description: example Response for get products request
+      required:
+        - type
+      type: object
+      properties:
+        totalHits:
+          format: int32
+          description: Total number of documents which matched the query.
+          type: integer
+        results:
+          description: Results which matched the query. This is an array of objects.
+          type: array
+          items:
+            type: object
+        detail:
+          description: Detailed description of the type or response
+          type: string
+        type:
+          description: >-
+            URN type of the response indicating if the query was successful or if any errors have
+            been triggered.
+          type: string
+        title:
+          description: A human readable title to the message response.
+      example:
+        totalHits: 10
+        results:
+          - products:
+              - name: the role name formatted as a URN - URN would be based on the APD URL (e.g. urn:apd.datakaveri.org:student)
+                description: some text description for the product (e.g. a student associated in DataKaveri)
+
+        type: 'urn:dx:dm:Success'
+        title: Success
+    exampleProductPostBody:
+      title: Root type for product body
+      description: example request for creating product
+      type: object
+      properties:
+        name:
+          type: string
+        description:
+          type: string
+        price:
+          type: number
+        duration:
+          type: integer
+        datasets:
+          type: array
+          items:
+            type: "object"
+            properties:
+              datasetID:
+                type: "string"
+      example:
+        name: flood-sensors
+        description: some description for flod-sensors
+        price: 50.0
+        duration: 12
+        datasets: ['pune-env-flood','stqc-flood-sensors']
+    exampleUsermapsPostBody:
+      title: Root type for usermaps body
+      description: example request for creating user map to product
+      type: object
+      properties:
+        productID:
+          type: string
+        consumerID:
+          type: string
+        paymentStatus:
+          type: string
+        paymentTime:
+          type: object
+      example:
+        productID: urn:datakaveri.org:iisc.ac.in/123qwerty:zxcvb
+        consumerID: qwerty987
+        paymentStatus: payment.succeeded
+        paymentTime: 2022-11-23T16:28:00Z
+    exampleVerifyRequestBody:
+      title: Root type for verify API body
+      description: >-
+        example request for verifying if consumer has purchased product, and if the purchase is expired or not
+      type: object
+      properties:
+        consumerID:
+          type: string
+        productID:
+          type: string
+    exampleVerifyFailResponse:
+      title: Root type for verify fail response
+      description: example response for failed verify request
+      type: object
+      properties:
+        type:
+          type: string
+        title:
+          type: string
+        details:
+          type: string
+      example:
+        type: urn:dx:dm:Deny
+        title: Access Denied
+        detail: message to convey to user
+    errorResponseWithObjects:
+      title: Root Type for standardResponse
+      description: example Response for get products request
+      required:
+        - type
+      type: object
+      properties:
+        detail:
+          description: Detailed description of the type or response
+          type: string
+        type:
+          description: >-
+            URN type of the response indicating if the query was successful or if any errors have
+            been triggered.
+          type: string
+        title:
+          description: A human readable title to the message response.
+
+tags:
+  -
+    name: provider
+    description: |
+      Datamarketplace specific data provider APIs.
+    x-displayName: Provider
+
+  -
+    name: consumer
+    description: |
+      Catalogue consumer specific apis.
+    x-displayName: Consumer

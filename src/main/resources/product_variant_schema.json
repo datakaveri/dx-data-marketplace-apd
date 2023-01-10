@@ -1,0 +1,96 @@
+{
+  "$schema": "https://json-schema.org/draft-07/schema",
+  "$id": "http://example.com/example.json",
+  "type": "object",
+  "title": "The root schema",
+  "description": "The root schema comprises the entire JSON document.",
+  "examples": [
+    {
+      "id": "urn:datakaveri.org:iisc.ac.in/123qwerty:flood-sensors",
+      "variant": "sensors-1",
+      "datasets": [
+        {
+          "id": "pune-flood",
+          "capabilities": [
+            "api", "sub"
+          ]
+        },
+        {
+          "id": "stqc-flood",
+          "capabilities": [
+            "sub", "file"
+          ]
+        }
+      ],
+      "price": 100.0,
+      "duration": 12
+    }
+  ],
+  "required": [
+    "id",
+    "variant",
+    "datasets",
+    "price",
+    "duration"
+  ],
+  "properties": {
+    "id": {
+      "$id": "#/properties/id",
+      "type": "string",
+      "title": "Product name schema",
+      "description": "A URN type name for a product",
+      "pattern": "^urn:datakaveri.org:[a-zA-Z0-9/.:-]{3,150}:[a-zA-Z0-9.-]{3,150}$",
+      "maxLength": 512,
+      "additionalItems": false
+    },
+    "variant": {
+      "$id": "#/properties/variant",
+      "type": "string",
+      "title": "Product variant name schema",
+      "description": "An alphanumeric name for a product variant",
+      "pattern": "^[a-zA-Z0-9 .-]{3,256}$"
+    },
+    "datasets": {
+      "$id": "#/properties/datasets",
+      "type": "array",
+      "title": "Datasets schema",
+      "description": "An array of objects describing datasets and their capabilities",
+      "items": {
+        "$id": "#/properties/datasets/items",
+        "title": "Dataset",
+        "type": "object",
+        "default": {},
+        "required": [
+          "id",
+          "capabilities"
+        ],
+        "properties": {
+          "id": {
+            "$id": "#/properties/datasets/items/id",
+            "title": "dataset id",
+            "type": "string",
+            "default": "",
+            "pattern": "^[a-zA-Z0-9.]{4,100}/[a-zA-Z0-9.]{4,100}/[a-zA-Z.]{4,100}/[a-zA-Z-_.]{4,100}$",
+            "maxLength": 512
+          },
+          "capabilities": {
+            "$id": "#/properties/datasets/items/capabilities",
+            "title": "dataset capabilities",
+            "type": "array",
+            "default": [],
+            "items": {
+              "$id": "#/properties/datasets/items/capabilities/items",
+              "title": "items",
+              "type": "string",
+              "default": "",
+              "pattern": "^[a-zA-Z.]{0,50}"
+            }
+          }
+        },
+        "additionalItems": false
+      },
+      "additionalItems": false
+    }
+  },
+  "additionalItems": false
+}

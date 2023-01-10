@@ -1,0 +1,47 @@
+{
+  "$schema": "https://json-schema.org/draft-07/schema",
+  "$id": "http://example.com/example.json",
+  "type": "object",
+  "title": "The root schema",
+  "description": "The root schema comprises the entire JSON document.",
+  "examples": [
+    {
+      "id": "flood-sensors",
+      "datasets": [
+        "pune-env-flood",
+        "stqc-flood-sensors"
+      ]
+    }
+  ],
+  "required": [
+    "id",
+    "datasets"
+  ],
+  "properties": {
+    "id": {
+      "$id": "#/properties/id",
+      "type": "string",
+      "title": "Product name schema",
+      "description": "An alphanumeric name for a product",
+      "pattern": "^[a-zA-Z0-9-]{3,150}$",
+      "minLength": 3,
+      "maxLength": 150,
+      "additionalItems": false
+    },
+    "datasets": {
+      "$id": "#/properties/datasets",
+      "type": "array",
+      "title": "Datasets schema",
+      "description": "An array of datasets belonging to a product",
+      "items": {
+        "$id": "#/properties/datasets/items",
+        "title": "Items",
+        "type": "string",
+        "default": "",
+        "pattern": "^[a-zA-Z0-9.]{4,100}/[a-zA-Z0-9.]{4,100}/[a-zA-Z.]{4,100}/[a-zA-Z-_.]{4,100}$",
+        "maxLength": 512
+      }
+    }
+  },
+  "additionalProperties": false
+}
