@@ -29,10 +29,10 @@ public class ProviderAuthStatergy implements AuthorizationStatergy {
 
   @Override
   public boolean isAuthorized(AuthorizationRequest authorizationRequest, JwtData jwtData) {
-    JsonArray access = jwtData.getCons() != null ? jwtData.getCons().getJsonArray("access") : null;
-    if (access == null) {
-      return false;
-    }
+    // JsonArray access = jwtData.getCons() != null ? jwtData.getCons().getJsonArray("access") : null;
+//    if (access == null) {
+//      return false;
+//    }
     String endpoint = authorizationRequest.getApi().getEndpoint();
     Method method = authorizationRequest.getMethod();
     LOGGER.info("authorization request for : " + endpoint + " with method : " + method.name());

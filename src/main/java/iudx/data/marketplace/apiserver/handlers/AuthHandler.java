@@ -13,6 +13,8 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import static iudx.data.marketplace.apiserver.util.Constants.*;
+import static iudx.data.marketplace.common.Constants.AUTH_INFO;
+import static iudx.data.marketplace.common.Constants.AUTH_SERVICE_ADDRESS;
 import static iudx.data.marketplace.common.ResponseUrn.INVALID_TOKEN_URN;
 import static iudx.data.marketplace.common.ResponseUrn.RESOURCE_NOT_FOUND_URN;
 
@@ -21,7 +23,6 @@ public class AuthHandler implements Handler<RoutingContext> {
   private static final Logger LOGGER = LogManager.getLogger(AuthHandler.class);
 
   static AuthenticationService authenticator;
-  private final String AUTH_INFO = "authInfo";
   private HttpServerRequest request;
 
   public static AuthHandler create(Vertx vertx) {

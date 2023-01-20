@@ -107,25 +107,25 @@ $$ language 'plpgsql';
 ---
 
 -- product table
-CREATE TRIGGER update_ua_created BEFORE INSERT ON product FOR EACH ROW EXECUTE PROCEDURE update_created ();
-CREATE TRIGGER update_ua_modified BEFORE INSERT
+CREATE TRIGGER update_product_created BEFORE INSERT ON product FOR EACH ROW EXECUTE PROCEDURE update_created ();
+CREATE TRIGGER update_product_modified BEFORE INSERT
 OR UPDATE ON
    product FOR EACH ROW EXECUTE PROCEDURE update_modified ();
 
 -- dataset table
-CREATE TRIGGER update_ua_created BEFORE INSERT ON dataset FOR EACH ROW EXECUTE PROCEDURE update_created ();
-CREATE TRIGGER update_ua_modified BEFORE INSERT
+CREATE TRIGGER update_dataset_created BEFORE INSERT ON dataset FOR EACH ROW EXECUTE PROCEDURE update_created ();
+CREATE TRIGGER update_dataset_modified BEFORE INSERT
 OR UPDATE ON
    dataset FOR EACH ROW EXECUTE PROCEDURE update_modified ();
 
 -- product variant table
-CREATE TRIGGER update_ua_created BEFORE INSERT ON product_variant FOR EACH ROW EXECUTE PROCEDURE update_created ();
-CREATE TRIGGER update_ua_modified BEFORE INSERT
+CREATE TRIGGER update_pv_created BEFORE INSERT ON product_variant FOR EACH ROW EXECUTE PROCEDURE update_created ();
+CREATE TRIGGER update_pv_modified BEFORE INSERT
 OR UPDATE ON
    product_variant FOR EACH ROW EXECUTE PROCEDURE update_modified ();
 
 -- purchase table
-CREATE TRIGGER update_ua_created BEFORE INSERT ON purchase FOR EACH ROW EXECUTE PROCEDURE update_created ();
-CREATE TRIGGER update_ua_modified BEFORE INSERT
+CREATE TRIGGER update_purchase_created BEFORE INSERT ON purchase FOR EACH ROW EXECUTE PROCEDURE update_created ();
+CREATE TRIGGER update_purchase_modified BEFORE INSERT
 OR UPDATE ON
    purchase FOR EACH ROW EXECUTE PROCEDURE update_modified ();

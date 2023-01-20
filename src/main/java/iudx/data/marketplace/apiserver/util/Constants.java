@@ -26,8 +26,6 @@ public class Constants {
   public static final String HEADER_REFERER = "Referer";
   public static final String HEADER_ALLOW_ORIGIN = "Access-Control-Allow-Origin";
 
-  // Service addresses
-  public static final String AUTH_SERVICE_ADDRESS = "iudx.data.marketplace.authentication.service";
 
   // request/response params
   public static final String CONTENT_TYPE = "content-type";

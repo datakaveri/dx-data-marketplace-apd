@@ -87,7 +87,7 @@
         <dependency>
             <groupId>io.vertx</groupId>
             <artifactId>vertx-auth-jwt</artifactId>
-            <version>4.0.3</version>
+            <version>4.3.2</version>
         </dependency>
         <!-- log4j2 logging dependencies-->
         <dependency>
