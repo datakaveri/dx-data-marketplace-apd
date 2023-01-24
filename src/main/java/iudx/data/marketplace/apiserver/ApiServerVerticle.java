@@ -1,0 +1,171 @@
+package iudx.data.marketplace.apiserver;
+
+import io.vertx.core.AbstractVerticle;
+import io.vertx.core.http.HttpMethod;
+import io.vertx.core.http.HttpServer;
+import io.vertx.core.http.HttpServerOptions;
+import io.vertx.core.http.HttpServerResponse;
+import io.vertx.core.net.JksOptions;
+import io.vertx.ext.web.Router;
+import io.vertx.ext.web.RoutingContext;
+import io.vertx.ext.web.handler.BodyHandler;
+import io.vertx.ext.web.handler.CorsHandler;
+import iudx.data.marketplace.apiserver.handlers.ExceptionHandler;
+import iudx.data.marketplace.common.HttpStatusCode;
+import iudx.data.marketplace.common.RespBuilder;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
+import java.util.HashSet;
+import java.util.Set;
+import java.util.stream.Stream;
+
+import static iudx.data.marketplace.apiserver.util.Constants.*;
+
+/**
+ * The Data Marketplace API Verticle.
+ *
+ * <h1>Data Marketplace APi Verticle</h1>
+ *
+ * <p>The API Server verticle implements the IUDX Data Marketplace APIs. It handles the API requests
+ * from the clients and interacts with the associated service to respond.
+ *
+ * @version 1.0
+ * @since 2022-08-04
+ */
+public class ApiServerVerticle extends AbstractVerticle {
+
+  private static final Logger LOGGER = LogManager.getLogger(ApiServerVerticle.class);
+
+  private HttpServer server;
+  private Router router;
+
+  private int port;
+  private boolean isSSL;
+  private String keystore;
+  private String keystorePassword;
+
+  /**
+   * This method is used to start the Verticle. It deploys a verticle in a cluster, reads the
+   * configuration, obtains a proxy for the Event Bus services exposed through service discovery,
+   * start an HTTPs server at port //TODO: port number
+   *
+   * @throws Exception which is a startup exception
+   */
+  @Override
+  public void start() throws Exception {
+
+    Set<String> allowedHeaders = new HashSet<>();
+    allowedHeaders.add(HEADER_ACCEPT);
+    allowedHeaders.add(HEADER_TOKEN);
+    allowedHeaders.add(HEADER_CONTENT_LENGTH);
+    allowedHeaders.add(HEADER_CONTENT_TYPE);
+    allowedHeaders.add(HEADER_HOST);
+    allowedHeaders.add(HEADER_ORIGIN);
+    allowedHeaders.add(HEADER_REFERER);
+    allowedHeaders.add(HEADER_ALLOW_ORIGIN);
+
+    Set<HttpMethod> allowedMethods = new HashSet<>();
+    allowedMethods.add(HttpMethod.GET);
+    allowedMethods.add(HttpMethod.POST);
+    allowedMethods.add(HttpMethod.DELETE);
+    allowedMethods.add(HttpMethod.PATCH);
+    allowedMethods.add(HttpMethod.PUT);
+
+    router = Router.router(vertx);
+
+    router
+        .route()
+        .handler(
+            CorsHandler.create("*").allowedHeaders(allowedHeaders).allowedMethods(allowedMethods));
+
+    router
+        .route()
+        .handler(
+            requestHandler -> {
+              requestHandler
+                  .response()
+                  .putHeader("Cache-Control", "no-cache, no-store, must-revalidate, max-age=0")
+                  .putHeader("Pragma", "no-cache")
+                  .putHeader("Expires", "0")
+                  .putHeader("X-Content-Type-Options", "nosniff");
+              requestHandler.next();
+            });
+
+    // attach custom http error responses to router
+    HttpStatusCode[] statusCodes = HttpStatusCode.values();
+    Stream.of(statusCodes)
+        .forEach(
+            code -> {
+              router.errorHandler(
+                  code.getValue(),
+                  errorHandler -> {
+                    HttpServerResponse response = errorHandler.response();
+                    if (response.headWritten()) {
+                      try {
+                        response.close();
+                      } catch (RuntimeException e) {
+                        LOGGER.error("Error : " + e);
+                      }
+                      return;
+                    }
+                    response
+                        .putHeader(CONTENT_TYPE, APPLICATION_JSON)
+                        .setStatusCode(code.getValue())
+                        .end(
+                            new RespBuilder()
+                                .withType(code.getUrn())
+                                .withTitle(code.getDescription())
+                                .withDetail(code.getDescription())
+                                .toString());
+                  });
+            });
+
+    router.route().handler(BodyHandler.create());
+
+    isSSL = config().getBoolean("ssl");
+
+    HttpServerOptions serverOptions = new HttpServerOptions();
+    if (isSSL) {
+      port = config().getInteger("httpPort") == null ? 8443 : config().getInteger("httpPort");
+      keystore = config().getString("keystore");
+      keystorePassword = config().getString("keystorePassword");
+
+      serverOptions
+          .setSsl(true)
+          .setKeyStoreOptions(new JksOptions().setPath(keystore).setPassword(keystorePassword));
+      LOGGER.info("Info: Starting HTTPs server at port " + port);
+    } else {
+      serverOptions.setSsl(false);
+      port = config().getInteger("httpPort") == null ? 8080 : config().getInteger("httpPort");
+      LOGGER.info("Info: Starting HTTP server at port " + port);
+    }
+
+    serverOptions.setCompressionSupported(true).setCompressionLevel(5);
+    server = vertx.createHttpServer(serverOptions);
+    server.requestHandler(router).listen(port);
+
+    router.route(PROVIDER_BASE_PATH + "/*").subRouter(new ProviderApis(vertx, router).init());
+    router.route(CONSUMER_BASE_PATH + "/*").subRouter(new ConsumerApis(vertx, router).init());
+
+    ExceptionHandler exceptionHandler = new ExceptionHandler();
+
+    router
+        .post(USERMAPS_PATH)
+        .handler(this::mapUserToProduct)
+        .failureHandler(exceptionHandler);
+
+    router
+        .post(VERIFY_PATH)
+        .handler(this::handleVerify)
+        .failureHandler(exceptionHandler);
+  }
+
+  private void mapUserToProduct(RoutingContext routingContext) {
+
+  }
+
+  private void handleVerify(RoutingContext routingContext) {
+
+  }
+}
