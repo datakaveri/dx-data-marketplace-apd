@@ -34,7 +34,6 @@ public class PostgresServiceImpl implements PostgresService {
     Collector<Row, ?, List<JsonObject>> rowCollector =
         Collectors.mapping(row -> row.toJson(), Collectors.toList());
 
-    LOGGER.debug("ere 1");
     client
         .withConnection(
             connection ->

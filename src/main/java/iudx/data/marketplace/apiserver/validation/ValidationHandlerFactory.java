@@ -20,14 +20,12 @@ public class ValidationHandlerFactory {
   private static final Logger LOGGER = LogManager.getLogger(ValidationHandlerFactory.class);
 
   public List<Validator> build(
-      final RequestType requestType,
-      final MultiMap parameters,
-      final JsonObject body) {
+      final RequestType requestType, final MultiMap parameters, final JsonObject body) {
     LOGGER.debug("getValidation4Context() started for : " + requestType);
     LOGGER.debug("type : " + requestType);
     List<Validator> validator = null;
 
-    switch(requestType) {
+    switch (requestType) {
       case PRODUCT:
         validator = getProductValidators(parameters, body, requestType);
         break;
@@ -37,10 +35,12 @@ public class ValidationHandlerFactory {
     return validator;
   }
 
-  private List<Validator> getProductValidators(final MultiMap parameters, final JsonObject body, final RequestType requestType) {
+  private List<Validator> getProductValidators(
+      final MultiMap parameters, final JsonObject body, final RequestType requestType) {
     List<Validator> validators = new ArrayList<>();
 
-    if(body.isEmpty()) {
+    LOGGER.debug(parameters.get(PRODUCT_ID));
+    if (body == null || body.isEmpty()) {
       validators.add(new ProductIDTypeValidator(parameters.get(PRODUCT_ID), true));
     } else {
       validators.add(new JsonSchemaTypeValidator(body, requestType));
@@ -49,10 +49,12 @@ public class ValidationHandlerFactory {
     return validators;
   }
 
-  private List<Validator> getProductVariantValidators(final MultiMap parameters, final JsonObject body, final RequestType requestType) {
+  private List<Validator> getProductVariantValidators(
+      final MultiMap parameters, final JsonObject body, final RequestType requestType) {
     List<Validator> validators = new ArrayList<>();
 
-    if(body.isEmpty()) {
+    LOGGER.debug(parameters.get(PRODUCT_ID));
+    if (body == null || body.isEmpty()) {
       validators.add(new ProductIDTypeValidator(parameters.get(PRODUCT_ID), true));
       validators.add(new VariantNameTypeValidator(parameters.get(PRODUCT_VARIANT_NAME), true));
     } else {

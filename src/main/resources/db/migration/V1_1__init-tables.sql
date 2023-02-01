@@ -49,7 +49,7 @@ CREATE TABLE IF NOT EXISTS product_variant
 (
     productVariantName varchar NOT NULL,
     productID varchar NOT NULL,
-    providerName varchar NOT NULL,
+    providerID varchar NOT NULL,
     datasets varchar[] NOT NULL,
     datasetIDs varchar[] NOT NULL,
     datasetCapabilities varchar[][] NOT NULL,

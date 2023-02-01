@@ -10,12 +10,12 @@ import iudx.data.marketplace.apiserver.handlers.ExceptionHandler;
 import iudx.data.marketplace.apiserver.handlers.ValidationHandler;
 import iudx.data.marketplace.apiserver.util.RequestType;
 import iudx.data.marketplace.product.ProductService;
+import iudx.data.marketplace.product.variant.ProductVariantService;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import static iudx.data.marketplace.apiserver.util.Constants.*;
-import static iudx.data.marketplace.common.Constants.AUTH_INFO;
-import static iudx.data.marketplace.common.Constants.PRODUCT_SERVICE_ADDRESS;
+import static iudx.data.marketplace.common.Constants.*;
 
 public class ProviderApis {
   public static final Logger LOGGER = LogManager.getLogger(ProviderApis.class);
@@ -23,6 +23,7 @@ public class ProviderApis {
   private final Vertx vertx;
   private final Router router;
   private ProductService productService;
+  private ProductVariantService variantService;
 
   ProviderApis(Vertx vertx, Router router) {
     this.vertx = vertx;
@@ -37,8 +38,8 @@ public class ProviderApis {
     ExceptionHandler exceptionHandler = new ExceptionHandler();
 
     productService = ProductService.createProxy(vertx, PRODUCT_SERVICE_ADDRESS);
+    variantService = ProductVariantService.createProxy(vertx, PRODUCT_VARIANT_SERVICE_ADDRESS);
 
-    LOGGER.debug("here");
     router
         .post(PROVIDER_BASE_PATH + PRODUCT_PATH)
         .consumes(APPLICATION_JSON)
@@ -130,7 +131,10 @@ public class ProviderApis {
 
   private void listProducts(RoutingContext routingContext) {
     HttpServerRequest request = routingContext.request();
-    JsonObject requestBody = new JsonObject().put(PRODUCT_ID, request.getParam(PRODUCT_ID));
+    JsonObject requestBody = new JsonObject();
+    if (request.getParam(DATASET_ID) != null) {
+      requestBody.put(DATASET_ID, request.getParam(DATASET_ID));
+        }
     JsonObject authInfo = (JsonObject) routingContext.data().get(AUTH_INFO);
     requestBody.put(AUTH_INFO, authInfo);
 
@@ -147,7 +151,19 @@ public class ProviderApis {
 
   private void listPurchases(RoutingContext routingContext) {}
 
-  private void handleCreateProductVariant(RoutingContext routingContext) {}
+  private void handleCreateProductVariant(RoutingContext routingContext) {
+    JsonObject requestBody = routingContext.body().asJsonObject();
+    JsonObject authInfo = (JsonObject) routingContext.data().get(AUTH_INFO);
+    requestBody.put(AUTH_INFO, authInfo);
+
+    variantService.createProductVariant(requestBody, handler -> {
+      if (handler.succeeded()) {
+        handleSuccessResponse(routingContext, handler.result());
+      } else {
+        handleFailureResponse(routingContext, handler.cause());
+      }
+    });
+  }
 
   private void handleUpdateProductVariant(RoutingContext routingContext) {}
 
@@ -155,7 +171,12 @@ public class ProviderApis {
 
   private void handleDeleteProductVariant(RoutingContext routingContext) {}
 
-  private void handleFailureResponse(RoutingContext routingContext, Throwable cause) {}
+  private void handleFailureResponse(RoutingContext routingContext, Throwable cause) {
+    routingContext.response()
+        .putHeader(CONTENT_TYPE, APPLICATION_JSON)
+        .setStatusCode(400)
+        .end(cause.getMessage());
+  }
 
   private void handleSuccessResponse(RoutingContext routingContext, JsonObject result) {
     routingContext
