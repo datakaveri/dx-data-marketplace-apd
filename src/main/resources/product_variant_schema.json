@@ -23,7 +23,7 @@
         }
       ],
       "price": 100.0,
-      "duration": 12
+      "validity": 12
     }
   ],
   "required": [
@@ -31,7 +31,7 @@
     "variant",
     "datasets",
     "price",
-    "duration"
+    "validity"
   ],
   "properties": {
     "id": {

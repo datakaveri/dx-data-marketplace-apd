@@ -39,7 +39,6 @@ public class ValidationHandlerFactory {
       final MultiMap parameters, final JsonObject body, final RequestType requestType) {
     List<Validator> validators = new ArrayList<>();
 
-    LOGGER.debug(parameters.get(PRODUCT_ID));
     if (body == null || body.isEmpty()) {
       validators.add(new ProductIDTypeValidator(parameters.get(PRODUCT_ID), true));
     } else {
@@ -53,7 +52,6 @@ public class ValidationHandlerFactory {
       final MultiMap parameters, final JsonObject body, final RequestType requestType) {
     List<Validator> validators = new ArrayList<>();
 
-    LOGGER.debug(parameters.get(PRODUCT_ID));
     if (body == null || body.isEmpty()) {
       validators.add(new ProductIDTypeValidator(parameters.get(PRODUCT_ID), true));
       validators.add(new VariantNameTypeValidator(parameters.get(PRODUCT_VARIANT_NAME), true));

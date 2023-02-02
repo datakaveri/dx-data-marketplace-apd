@@ -81,7 +81,7 @@ paths:
                     title: Token is invalid
                     detail: failed
       description: >-
-        Create a product where the body contains the name, description, price and duration for which the product access is allowed. The price will be in INR and duration will be in months.
+        Create a product where the body contains the name, description, price and validity for which the product access is allowed. The price will be in INR and validity will be in months.
         
         The name cannot be updated once the product is created as it is a unique identifier for a product of a provider. The name is stored as a URN(for eg: a product named flood-sensors hosted by the provider iisc.ac.in/123qwerty is represented as urn:datakaveri.org:iisc.ac.in/123qwerty:flood-sensors)
     delete:
@@ -639,7 +639,7 @@ components:
           type: string
         price:
           type: number
-        duration:
+        validity:
           type: integer
         datasets:
           type: array
@@ -652,7 +652,7 @@ components:
         name: flood-sensors
         description: some description for flod-sensors
         price: 50.0
-        duration: 12
+        validity: 12
         datasets: ['pune-env-flood','stqc-flood-sensors']
     exampleUsermapsPostBody:
       title: Root type for usermaps body

@@ -8,6 +8,7 @@ import io.vertx.ext.web.RoutingContext;
 import iudx.data.marketplace.apiserver.handlers.AuthHandler;
 import iudx.data.marketplace.apiserver.handlers.ExceptionHandler;
 import iudx.data.marketplace.apiserver.handlers.ValidationHandler;
+import iudx.data.marketplace.apiserver.util.Constants;
 import iudx.data.marketplace.apiserver.util.RequestType;
 import iudx.data.marketplace.product.ProductService;
 import iudx.data.marketplace.product.variant.ProductVariantService;
@@ -15,6 +16,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import static iudx.data.marketplace.apiserver.util.Constants.*;
+import static iudx.data.marketplace.apiserver.util.Constants.PRODUCT_VARIANT_NAME;
 import static iudx.data.marketplace.common.Constants.*;
 
 public class ProviderApis {
@@ -134,7 +136,7 @@ public class ProviderApis {
     JsonObject requestBody = new JsonObject();
     if (request.getParam(DATASET_ID) != null) {
       requestBody.put(DATASET_ID, request.getParam(DATASET_ID));
-        }
+    }
     JsonObject authInfo = (JsonObject) routingContext.data().get(AUTH_INFO);
     requestBody.put(AUTH_INFO, authInfo);
 
@@ -156,23 +158,58 @@ public class ProviderApis {
     JsonObject authInfo = (JsonObject) routingContext.data().get(AUTH_INFO);
     requestBody.put(AUTH_INFO, authInfo);
 
-    variantService.createProductVariant(requestBody, handler -> {
-      if (handler.succeeded()) {
-        handleSuccessResponse(routingContext, handler.result());
-      } else {
-        handleFailureResponse(routingContext, handler.cause());
-      }
-    });
+    variantService.createProductVariant(
+        requestBody,
+        handler -> {
+          if (handler.succeeded()) {
+            handleSuccessResponse(routingContext, handler.result());
+          } else {
+            handleFailureResponse(routingContext, handler.cause());
+          }
+        });
   }
 
-  private void handleUpdateProductVariant(RoutingContext routingContext) {}
+  private void handleUpdateProductVariant(RoutingContext routingContext) {
+    JsonObject requestBody = routingContext.body().asJsonObject();
+    JsonObject authInfo = (JsonObject) routingContext.data().get(AUTH_INFO);
+    requestBody.put(AUTH_INFO, authInfo);
+
+    variantService.updateProductVariant(
+        requestBody,
+        handler -> {
+          if (handler.succeeded()) {
+            handleSuccessResponse(routingContext, handler.result());
+          } else {
+            handleFailureResponse(routingContext, handler.cause());
+          }
+        });
+  }
 
   private void handleGetProductVariants(RoutingContext routingContext) {}
 
-  private void handleDeleteProductVariant(RoutingContext routingContext) {}
+  private void handleDeleteProductVariant(RoutingContext routingContext) {
+    HttpServerRequest request = routingContext.request();
+    JsonObject authInfo = (JsonObject) routingContext.data().get(AUTH_INFO);
+    JsonObject requestBody =
+        new JsonObject()
+            .put(AUTH_INFO, authInfo)
+            .put(PRODUCT_ID, request.getParam(PRODUCT_ID))
+            .put(PRODUCT_VARIANT_NAME, request.getParam(PRODUCT_VARIANT_NAME));
+
+    variantService.deleteProductVariant(
+        requestBody,
+        handler -> {
+          if (handler.succeeded()) {
+            handleSuccessResponse(routingContext, handler.result());
+          } else {
+            handleFailureResponse(routingContext, handler.cause());
+          }
+        });
+  }
 
   private void handleFailureResponse(RoutingContext routingContext, Throwable cause) {
-    routingContext.response()
+    routingContext
+        .response()
         .putHeader(CONTENT_TYPE, APPLICATION_JSON)
         .setStatusCode(400)
         .end(cause.getMessage());

@@ -7,6 +7,7 @@ import org.apache.logging.log4j.Logger;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 import static iudx.data.marketplace.common.Constants.*;
@@ -102,33 +103,51 @@ public class QueryBuilder {
 
     JsonArray datasets = request.getJsonArray(DATASETS);
     String datasetIDs =
-             datasets.stream()
-                .map(JsonObject.class::cast)
-                .map(d -> d.getString("id"))
-                .collect(Collectors.joining("','","'","'"));
+        datasets.stream()
+            .map(JsonObject.class::cast)
+            .map(d -> d.getString(ID))
+            .collect(Collectors.joining("','", "'", "'"));
     String datasetNames =
-             datasets.stream()
-                .map(JsonObject.class::cast)
-                .map(d -> d.getString("name"))
-                .collect(Collectors.joining("','","'","'"));
+        datasets.stream()
+            .map(JsonObject.class::cast)
+            .map(d -> d.getString(NAME))
+            .collect(Collectors.joining("','", "'", "'"));
     String datasetCaps =
-             datasets.stream()
-                .map(JsonObject.class::cast)
-                .map(d -> d.getJsonArray("capabilities").toString().replace("\"","'"))
-                .collect(Collectors.joining(","));
+        datasets.stream()
+            .map(JsonObject.class::cast)
+            .map(d -> d.getJsonArray(CAPABILITIES).toString().replace("\"", "'"))
+            .collect(Collectors.joining(","));
+
+    //UUID for each product variant.
+    String pvID = UUID.randomUUID().toString();
 
     StringBuilder query =
         new StringBuilder(
             INSERT_PV_QUERY
                 .replace("$0", productVariantTable)
-                .replace("$1", request.getString("providerid"))
-                .replace("$2", request.getString("id"))
-                .replace("$3", request.getString("variant"))
-                .replace("$4", datasetNames)
-                .replace("$5", datasetIDs)
-                .replace("$6", datasetCaps)
-                .replace("$7", request.getDouble(PRICE).toString())
-                .replace("$8", request.getInteger("duration").toString()));
+                .replace("$1", pvID)
+                .replace("$2", request.getString("providerid"))
+                .replace("$3", request.getString(ID))
+                .replace("$4", request.getString(VARIANT))
+                .replace("$5", datasetNames)
+                .replace("$6", datasetIDs)
+                .replace("$7", datasetCaps)
+                .replace("$8", request.getDouble(PRICE).toString())
+                .replace("$9", request.getInteger(VALIDITY).toString())
+                .replace("$s", Status.ACTIVE.toString()));
+
+    return query.toString();
+  }
+
+  public String updateProductVariantStatusQuery(String productID, String variant) {
+    StringBuilder query =
+        new StringBuilder(
+            UPDATE_PV_STATUS_QUERY
+                .replace("$0", productVariantTable)
+                .replace("$1", productID)
+                .replace("$2", variant)
+                .replace("$3", Status.ACTIVE.toString())
+                .replace("$4", Status.INACTIVE.toString()));
 
     return query.toString();
   }

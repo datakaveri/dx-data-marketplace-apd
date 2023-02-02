@@ -7,6 +7,7 @@ import io.vertx.core.Promise;
 import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
 import iudx.data.marketplace.apiserver.exceptions.DxRuntimeException;
+import iudx.data.marketplace.common.HttpStatusCode;
 import iudx.data.marketplace.common.RespBuilder;
 import iudx.data.marketplace.common.ResponseUrn;
 import iudx.data.marketplace.postgres.PostgresService;
@@ -48,8 +49,8 @@ public class ProductVariantServiceImpl implements ProductVariantService {
             int i, j;
             for (i = 0; i < datasets.size(); i++) {
               for (j = 0; j < resDatasets.size(); j++) {
-                String reqID = datasets.getJsonObject(i).getString("id");
-                String resID = resDatasets.getJsonObject(j).getString("id");
+                String reqID = datasets.getJsonObject(i).getString(PRODUCT_ID);
+                String resID = resDatasets.getJsonObject(j).getString(PRODUCT_ID);
                 if (reqID.equalsIgnoreCase(resID)) {
                   resDatasets.getJsonObject(j).mergeIn(datasets.getJsonObject(i));
                 }
@@ -67,7 +68,10 @@ public class ProductVariantServiceImpl implements ProductVariantService {
                             .withTitle(ResponseUrn.SUCCESS_URN.getMessage())
                             .withResult(
                                 new JsonArray()
-                                    .add(new JsonObject().put("id", request.getString("id")).put("variant", request.getString("variant"))));
+                                    .add(
+                                        new JsonObject()
+                                            .put(PRODUCT_ID, request.getString(PRODUCT_ID))
+                                            .put(VARIANT, request.getString(VARIANT))));
                     handler.handle(Future.succeededFuture(respBuilder.getJsonResponse()));
                   } else {
                     handler.handle(Future.failedFuture(pgHandler.cause()));
@@ -100,12 +104,71 @@ public class ProductVariantServiceImpl implements ProductVariantService {
   @Override
   public ProductVariantService updateProductVariant(
       JsonObject request, Handler<AsyncResult<JsonObject>> handler) {
-    return null;
+
+    String productID = request.getString(PRODUCT_ID);
+    String variant = request.getString(VARIANT);
+
+    Future<Boolean> updateProductVariantFuture = updateProductVariantStatus(productID, variant);
+    updateProductVariantFuture.onComplete(
+        updateHandler -> {
+          if (updateHandler.result()) {
+            createProductVariant(
+                request,
+                insertHandler -> {
+                  if (insertHandler.succeeded()) {
+                    handler.handle(Future.succeededFuture(insertHandler.result()));
+                  } else {
+                    handler.handle(Future.failedFuture(insertHandler.cause()));
+                  }
+                });
+          } else {
+            throw new DxRuntimeException(
+                500, ResponseUrn.DB_ERROR_URN, ResponseUrn.DB_ERROR_URN.getMessage());
+          }
+        });
+
+    return this;
+  }
+
+  private Future<Boolean> updateProductVariantStatus(String productID, String variant) {
+    Promise<Boolean> promise = Promise.promise();
+    String query = queryBuilder.updateProductVariantStatusQuery(productID, variant);
+
+    LOGGER.debug(query);
+    pgService.executeQuery(
+        query,
+        pgHandler -> {
+          if (pgHandler.succeeded()) {
+            promise.complete(true);
+          } else {
+            promise.fail(pgHandler.cause());
+          }
+        });
+
+    return promise.future();
   }
 
   @Override
   public ProductVariantService deleteProductVariant(
       JsonObject request, Handler<AsyncResult<JsonObject>> handler) {
+    String productID = request.getString(PRODUCT_ID);
+    String variant = request.getString(VARIANT);
+
+    Future<Boolean> updateProductVariantFuture = updateProductVariantStatus(productID, variant);
+    updateProductVariantFuture.onComplete(
+        updateHandler -> {
+          if (updateHandler.result()) {
+            RespBuilder respBuilder =
+                new RespBuilder()
+                    .withType(ResponseUrn.SUCCESS_URN.getUrn())
+                    .withTitle(ResponseUrn.SUCCESS_URN.getMessage())
+                    .withDetail("Successfully deleted");
+            handler.handle(Future.succeededFuture(respBuilder.getJsonResponse()));
+          } else {
+            throw new DxRuntimeException(
+                500, ResponseUrn.DB_ERROR_URN, ResponseUrn.DB_ERROR_URN.getMessage());
+          }
+        });
     return null;
   }
 }

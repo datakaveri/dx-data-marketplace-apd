@@ -12,6 +12,10 @@ public class Constants {
   public static final String RESULTS = "results";
   public static final String PRICE = "price";
   public static final String VALIDITY = "validity";
+  public static final String ID = "id";
+  public static final String VARIANT = "variant";
+  public static final String NAME = "name";
+  public static final String CAPABILITIES = "capabilities";
 
   // database related constants
   public static final String PRODUCT_TABLE_NAME = "productTableName";
@@ -46,5 +50,7 @@ public class Constants {
           + "where pt.productID = '$1' "
           + "group by pt.productID";
 
-  public static final String INSERT_PV_QUERY  = "insert into $0 (providerID, productID, productVariantName, datasets, datasetIDs, datasetCapabilities, price, validity) values ('$1', '$2', '$3', ARRAY[$4], ARRAY[$5], ARRAY[$6], $7, $8)";
+  public static final String INSERT_PV_QUERY  = "insert into $0 (_id, providerID, productID, productVariantName, datasets, datasetIDs, datasetCapabilities, price, validity, status) values ('$1', '$2', '$3', '$4', ARRAY[$5], ARRAY[$6], ARRAY[$7], $8, $9, '$s')";
+
+  public static final String UPDATE_PV_STATUS_QUERY = "update $0 set status='$4' where productID='$1' and productVariantName='$2' and status='$3'";
 }
