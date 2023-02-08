@@ -28,7 +28,7 @@ public class DxRuntimeException extends RuntimeException {
     super(cause);
     this.statusCode = statusCode;
     this.urn = urn;
-    this.message = urn.getMessage();
+    this.message = cause.getMessage();
   }
 
   public int getStatusCode() {

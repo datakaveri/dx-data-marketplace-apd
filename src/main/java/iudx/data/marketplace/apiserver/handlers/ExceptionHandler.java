@@ -28,43 +28,46 @@ public class ExceptionHandler implements Handler<RoutingContext> {
       LOGGER.error(exception.getUrn().getUrn() + " : " + exception.getMessage());
       HttpStatusCode code = HttpStatusCode.getByValue(exception.getStatusCode());
 
-      String response = new RespBuilder()
-          .withType(exception.getUrn().getUrn())
-          .withTitle(code.getDescription())
-          .withDetail(exception.getMessage()).getResponse();
+      String response =
+          new RespBuilder()
+              .withType(exception.getUrn().getUrn())
+              .withTitle(code.getDescription())
+              .withDetail(exception.getMessage())
+              .getResponse();
 
-      routingContext.response()
+      routingContext
+          .response()
           .putHeader(CONTENT_TYPE, APPLICATION_JSON)
           .setStatusCode(exception.getStatusCode())
           .end(response);
-    }
-
-    if (failure instanceof RuntimeException) {
-
-      String validationErrorMessage = MSG_BAD_QUERY;
-      routingContext.response()
-          .putHeader(CONTENT_TYPE, APPLICATION_JSON)
-          .setStatusCode(HttpStatus.SC_BAD_REQUEST)
-          .end(validationFailureReponse(validationErrorMessage).toString());
-
-    }
-
-    if (failure instanceof DecodeException) {
+    } else if (failure instanceof DecodeException) {
       handleDecodeException(routingContext);
       return;
     } else if (failure instanceof ClassCastException) {
       handleClassCastException(routingContext);
       return;
-    } else {
+    } else if (failure instanceof RuntimeException) {
       routingContext
           .response()
-          .setStatusCode(400)
+          .putHeader(CONTENT_TYPE, APPLICATION_JSON)
+          .setStatusCode(HttpStatus.SC_BAD_REQUEST)
+          .end(validationFailureReponse(MSG_BAD_QUERY).toString());
+
+    } else {
+      String INTERNAL_ERROR_RESP =
+        new RespBuilder()
+            .withType(ResponseUrn.INTERNAL_SERVER_ERR_URN.getUrn())
+            .withTitle(ResponseUrn.INTERNAL_SERVER_ERR_URN.getMessage())
+            .getResponse();
+
+      routingContext
+          .response()
+          .setStatusCode(500)
           .putHeader(HEADER_CONTENT_TYPE, APPLICATION_JSON)
-          .end(
-              new RespBuilder()
-                  .withType(ResponseUrn.INVALID_SYNTAX_URN.getUrn())
-                  .withTitle(ResponseUrn.INVALID_SYNTAX_URN.getMessage())
-                  .getResponse());
+          .end(INTERNAL_ERROR_RESP);
+
+      routingContext.next();
+
     }
     routingContext.next();
   }
@@ -83,7 +86,7 @@ public class ExceptionHandler implements Handler<RoutingContext> {
    */
   public void handleDecodeException(RoutingContext routingContext) {
 
-    LOGGER.error("Error: Invalid Json payload; " + routingContext.failure().getLocalizedMessage());
+    LOGGER.error("Error: Invalid Json payload: " + routingContext.failure().getLocalizedMessage());
     String response = "";
 
     if (routingContext.request().uri().startsWith(PROVIDER_BASE_PATH)) {
@@ -105,19 +108,7 @@ public class ExceptionHandler implements Handler<RoutingContext> {
       return;
     }
 
-    String INTERNAL_ERROR_RESP =
-        new RespBuilder()
-            .withType(ResponseUrn.INTERNAL_SERVER_ERR_URN.getUrn())
-            .withTitle(ResponseUrn.INTERNAL_SERVER_ERR_URN.getMessage())
-            .getResponse();
 
-    routingContext
-        .response()
-        .setStatusCode(500)
-        .putHeader(HEADER_CONTENT_TYPE, APPLICATION_JSON)
-        .end(INTERNAL_ERROR_RESP);
-
-    routingContext.next();
   }
 
   /**
