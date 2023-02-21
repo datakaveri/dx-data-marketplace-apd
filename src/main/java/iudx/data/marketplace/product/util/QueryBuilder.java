@@ -118,7 +118,7 @@ public class QueryBuilder {
             .map(d -> d.getJsonArray(CAPABILITIES).toString().replace("\"", "'"))
             .collect(Collectors.joining(","));
 
-    //UUID for each product variant.
+    // UUID for each product variant.
     String pvID = UUID.randomUUID().toString();
 
     StringBuilder query =

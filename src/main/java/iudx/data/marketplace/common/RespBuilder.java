@@ -24,30 +24,8 @@ public class RespBuilder {
     return this;
   }
 
-  public RespBuilder withResult(String id, String method, String status) {
-    JsonObject resultAttrs = new JsonObject().put(ID, id).put(METHOD, method).put(STATUS, status);
-    response.put(RESULTS, new JsonArray().add(resultAttrs));
-    return this;
-  }
-
-  public RespBuilder withResult(String id, String method, String status, String detail) {
-    JsonObject resultAttrs =
-        new JsonObject()
-            .put(ID, id)
-            .put(METHOD, method)
-            .put(STATUS, status)
-            .put(JSON_DETAIL, detail);
-    response.put(RESULTS, new JsonArray().add(resultAttrs));
-    return this;
-  }
-
   public RespBuilder withResult(JsonArray result) {
     response.put(RESULTS, result);
-    return this;
-  }
-
-  public RespBuilder withResult() {
-    response.put(RESULTS, new JsonArray());
     return this;
   }
 
@@ -57,10 +35,5 @@ public class RespBuilder {
 
   public String getResponse() {
     return response.toString();
-  }
-
-  public RespBuilder withResult(JsonObject jsonObject) {
-    response.put(RESULTS, jsonObject);
-    return this;
   }
 }

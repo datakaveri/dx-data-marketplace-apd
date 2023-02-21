@@ -49,8 +49,8 @@ public class ProductVariantServiceImpl implements ProductVariantService {
             int i, j;
             for (i = 0; i < datasets.size(); i++) {
               for (j = 0; j < resDatasets.size(); j++) {
-                String reqID = datasets.getJsonObject(i).getString(PRODUCT_ID);
-                String resID = resDatasets.getJsonObject(j).getString(PRODUCT_ID);
+                String reqID = datasets.getJsonObject(i).getString(ID);
+                String resID = resDatasets.getJsonObject(j).getString(ID);
                 if (reqID.equalsIgnoreCase(resID)) {
                   resDatasets.getJsonObject(j).mergeIn(datasets.getJsonObject(i));
                 }
@@ -85,7 +85,7 @@ public class ProductVariantServiceImpl implements ProductVariantService {
     return this;
   }
 
-  private Future<JsonObject> getProductDetails(String productID) {
+  Future<JsonObject> getProductDetails(String productID) {
     Promise<JsonObject> promise = Promise.promise();
 
     String query = queryBuilder.buildProductDetailsQuery(productID);
@@ -130,11 +130,10 @@ public class ProductVariantServiceImpl implements ProductVariantService {
     return this;
   }
 
-  private Future<Boolean> updateProductVariantStatus(String productID, String variant) {
+  Future<Boolean> updateProductVariantStatus(String productID, String variant) {
     Promise<Boolean> promise = Promise.promise();
     String query = queryBuilder.updateProductVariantStatusQuery(productID, variant);
 
-    LOGGER.debug(query);
     pgService.executeQuery(
         query,
         pgHandler -> {
@@ -169,6 +168,6 @@ public class ProductVariantServiceImpl implements ProductVariantService {
                 500, ResponseUrn.DB_ERROR_URN, ResponseUrn.DB_ERROR_URN.getMessage());
           }
         });
-    return null;
+    return this;
   }
 }

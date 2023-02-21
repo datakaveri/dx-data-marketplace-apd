@@ -2,19 +2,13 @@ openapi: 3.0.2
 info:
   title: IUDX Data marketplace APIs
   version: 4.5.0
-  description: >-
-    The data marketplace is IUDX's platform that enables data Providers to host
-    their datasets as a product. Likewise, data consumers can buy the products
-    listed by various providers
+  description: 'The data marketplace is IUDX''s platform that enables data Providers to host their datasets as a product. Likewise, data consumers can buy the products listed by various providers '
   contact:
     email: support@iudx.org.in
     name: For support contact IUDX team at
 paths:
   /provider/product:
-    summary: >-
-      Manage marketplace products and perform Create/Update/Delete
-      operations on them. These apis are intended to be used by IUDX data
-      providers
+    summary: Manage marketplace products and perform Create/Update/Delete operations on them. These apis are intended to be used by IUDX data providers
     post:
       tags:
         - provider
@@ -23,9 +17,15 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/exampleProductPostBody'
+            examples:
+              Create product body:
+                value:
+                  name: flood-sensors
+                  datasets:
+                    - pune-env-flood
+                    - stqc-flood-sensors
       parameters:
-        -
-          name: token
+        - name: token
           description: IUDX Auth token to process the request
           schema:
             maxLength: 512
@@ -45,8 +45,9 @@ paths:
                 Create product success:
                   value:
                     type: 'urn:dx:dm:Sucess'
+                    title: Success
                     results:
-                      name: urn:datakaveri.org:iisc.ac.in/123qwerty:zxcvb
+                      - productID: 'urn:datakaveri.org:iisc.ac.in/123qwerty:zxcvb'
         '400':
           description: invalid document
           content:
@@ -58,10 +59,10 @@ paths:
                   value:
                     type: 'urn:dx:dm:AlreadyExists'
                     results:
-                      name: urn:datakaveri.org:iisc.ac.in/123qwerty:zxcvb
-                      method: insert
-                      title: failed
-                      detail: 'Fail: Doc exists'
+                      - productID: 'urn:datakaveri.org:iisc.ac.in/123qwerty:zxcvb'
+                        method: insert
+                        title: failed
+                        detail: 'Fail: Doc exists'
                     title: Product already exists
                 Invalid productID:
                   value:
@@ -80,16 +81,14 @@ paths:
                     type: 'urn:dx:cat:InvalidAuthorizationToken'
                     title: Token is invalid
                     detail: failed
-      description: >-
-        Create a product where the body contains the name, description, price and validity for which the product access is allowed. The price will be in INR and validity will be in months.
-        
+      description: |-
+        Create a product where the body contains the name and the array of datasets that will be part of the product. 
         The name cannot be updated once the product is created as it is a unique identifier for a product of a provider. The name is stored as a URN(for eg: a product named flood-sensors hosted by the provider iisc.ac.in/123qwerty is represented as urn:datakaveri.org:iisc.ac.in/123qwerty:flood-sensors)
     delete:
       tags:
         - provider
       parameters:
-        -
-          name: token
+        - name: token
           description: IUDX Auth token to process the request
           schema:
             maxLength: 512
@@ -98,8 +97,7 @@ paths:
             type: string
           in: header
           required: true
-        -
-          name: productID
+        - name: productID
           description: urn name of the product
           schema:
             maxLength: 150
@@ -113,7 +111,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/successResponseWithObjects'
+                $ref: '#/components/schemas/successResponseForDeleteProduct'
         '400':
           description: invalid document
           content:
@@ -125,7 +123,7 @@ paths:
                   value:
                     type: 'urn:dx:dm:DocDoesNotExist'
                     results:
-                      name: urn:datakaveri.org:iisc.ac.in/123qwerty:zxcvb
+                      productID: 'urn:datakaveri.org:iisc.ac.in/123qwerty:zxcvb'
                       method: delete
                       title: failed
                       detail: 'Fail: Cannot delete, Doc does not exist'
@@ -148,14 +146,12 @@ paths:
                     title: Token is invalid
                     detail: failed
   /provider/list/products:
-    summary: >-
-      List API for provider to view all the products listed by them, or a subset of the products based on the datasets they contain.
+    summary: 'List API for provider to view all the products listed by them, or a subset of the products based on the datasets they contain.'
     get:
       tags:
         - provider
       parameters:
-        -
-          name: token
+        - name: token
           description: IUDX Auth token to process the request
           schema:
             maxLength: 512
@@ -164,10 +160,8 @@ paths:
             type: string
           in: header
           required: true
-        -
-          name: datasetID
-          description: >-
-            If datasetID is provided for listing, then products are filtered to show products only for that dataset
+        - name: datasetID
+          description: 'If datasetID is provided for listing, then products are filtered to show products only for that dataset'
           in: query
           schema:
             type: string
@@ -192,7 +186,7 @@ paths:
                   value:
                     type: 'urn:dx:dm:InvalidDatasetIDValue'
                     title: Bad request
-                    detail: 'Invalid dataset ID'
+                    detail: Invalid dataset ID
         '401':
           description: Unauthorized access
           content:
@@ -206,14 +200,12 @@ paths:
                     title: Token is invalid
                     detail: failed
   /provider/list/purchases:
-    summary: >-
-      List API for the provider to view all the purchases made on the products listed by them, or a subset of the purchases based on the product name.
+    summary: 'List API for the provider to view all the purchases made on the products listed by them, or a subset of the purchases based on the product name.'
     get:
       tags:
         - provider
       parameters:
-        -
-          name: token
+        - name: token
           description: IUDX Auth token to process the request
           schema:
             maxLength: 512
@@ -222,8 +214,7 @@ paths:
             type: string
           in: header
           required: true
-        -
-          name: productID
+        - name: productID
           description: urn name of the product
           schema:
             maxLength: 150
@@ -231,10 +222,8 @@ paths:
             pattern: '^[a-zA-Z0-9/.:-]{3,150}$'
           in: query
           required: false
-        -
-          name: datasetID
-          description: >-
-            If datasetID is provided for listing, then purchases are filtered to show purchases against that dataset
+        - name: datasetID
+          description: 'If datasetID is provided for listing, then purchases are filtered to show purchases against that dataset'
           in: query
           schema:
             type: string
@@ -245,7 +234,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/successResponseWithObjects'
+                $ref: '#/components/schemas/exampleResponseListPurchases'
         '204':
           description: no content
         '400':
@@ -259,10 +248,10 @@ paths:
                   value:
                     type: 'urn:dx:dm:DocDoesNotExist'
                     results:
-                      name: urn:datakaveri.org:iisc.ac.in/123qwerty:zxcvb
-                      method: list
-                      title: failed
-                      detail: 'Fail: Doc does not exist'
+                      - productID: 'urn:datakaveri.org:iisc.ac.in/123qwerty:zxcvb'
+                        method: list
+                        title: failed
+                        detail: 'Fail: Doc does not exist'
                     title: Product does not exist
                 Invalid name:
                   value:
@@ -281,16 +270,199 @@ paths:
                     type: 'urn:dx:cat:InvalidAuthorizationToken'
                     title: Token is invalid
                     detail: failed
-
+  /provider/product-variant:
+    post:
+      summary: ''
+      operationId: post-provider-product-variant
+      responses:
+        '200':
+          description: ''
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/successResponseWithObjects'
+              examples:
+                Example 1:
+                  value:
+                    type: 'urn:dx:dm:Success'
+                    title: Success
+                    results: [ ]
+      description: 'Create a product variant where the body contains details about the variant such as price, duration, datasets and their capabilities. Along with the name of the variant and the product it belongs to.'
+      parameters:
+        - schema:
+            type: string
+          in: header
+          name: token
+          description: IUDX Auth token to process the request
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                id:
+                  type: string
+                variant:
+                  type: string
+                datasets:
+                  type: array
+                  items:
+                    type: object
+                    properties:
+                      id:
+                        type: string
+                      capabilities:
+                        type: array
+                        items:
+                          type: string
+                price:
+                  type: integer
+                validity:
+                  type: integer
+              x-examples:
+                Example 1:
+                  id: 'urn:datakaveri.org:iisc.ac.in/123qwerty:flood-sensors'
+                  variant: sensors-1
+                  datasets:
+                    - id: pune-flood
+                      capabilities:
+                        - api
+                        - sub
+                    - id: stqc-flood
+                      capabilities:
+                        - sub
+                        - file
+                  price: 100
+                  validity: 12
+            examples:
+              Example 1:
+                value:
+                  id: 'urn:datakaveri.org:iisc.ac.in/123qwerty:flood-sensors'
+                  variant: sensors-1
+                  datasets:
+                    - id: pune-flood
+                      capabilities:
+                        - api
+                        - sub
+                    - id: stqc-flood
+                      capabilities:
+                        - sub
+                        - file
+                  price: 100
+                  validity: 12
+    get:
+      summary: ''
+      operationId: get-provider-product-variant
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties: { }
+      parameters:
+        - schema:
+            type: string
+          in: header
+          name: token
+          description: IUDX Auth token to process the request
+        - schema:
+            type: string
+          in: query
+          name: id
+        - schema:
+            type: string
+          in: query
+          name: variant
+    parameters: [ ]
+    put:
+      summary: ''
+      operationId: put-provider-product-variant
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/successResponseWithObjects'
+      parameters:
+        - schema:
+            type: string
+          in: header
+          name: token
+          description: IUDX Auth token to process the request
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                id:
+                  type: string
+                variant:
+                  type: string
+                datasets:
+                  type: array
+                  items:
+                    type: object
+                    properties:
+                      id:
+                        type: string
+                      capabilities:
+                        type: array
+                        items:
+                          type: string
+                price:
+                  type: integer
+                validity:
+                  type: integer
+              x-examples:
+                Example 1:
+                  id: 'urn:datakaveri.org:iisc.ac.in/123qwerty:flood-sensors'
+                  variant: sensors-1
+                  datasets:
+                    - id: pune-flood
+                      capabilities:
+                        - api
+                        - sub
+                    - id: stqc-flood
+                      capabilities:
+                        - sub
+                        - file
+                  price: 100
+                  validity: 12
+    delete:
+      summary: ''
+      operationId: delete-provider-product-variant
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/successResponseForDeleteProduct'
+      parameters:
+        - schema:
+            type: string
+          in: query
+          name: id
+        - schema:
+            type: string
+          in: query
+          name: variant
+        - schema:
+            type: string
+          in: header
+          name: token
+          description: IUDX Auth token to process the request
   /consumer/list/datasets:
-    summary: >-
-      List API for the consumer to view the datasets available on the marketplace.
+    summary: List API for the consumer to view the datasets available on the marketplace.
     get:
       tags:
         - consumer
       parameters:
-        -
-          name: token
+        - name: token
           description: IUDX Auth token to process the request
           schema:
             maxLength: 512
@@ -299,15 +471,13 @@ paths:
             type: string
           in: header
           required: true
-        -
-          name: providerID
+        - name: providerID
           description: Id of the provider for listing their datasets
           schema:
             type: string
           in: query
           required: false
-        -
-          name: datasetID
+        - name: datasetID
           description: Id of the dataset for its details
           schema:
             type: string
@@ -319,7 +489,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/successResponseWithObjects'
+                $ref: '#/components/schemas/exampleListDatasetsResponse'
         '204':
           description: no content
         '400':
@@ -352,14 +522,12 @@ paths:
                     title: Token is invalid
                     detail: failed
   /consumer/list/providers:
-    summary: >-
-      List API for consumers to view the providers enlisted on the marketplace.
+    summary: List API for consumers to view the providers enlisted on the marketplace.
     get:
       tags:
         - consumer
       parameters:
-        -
-          name: token
+        - name: token
           description: IUDX Auth token to process the request
           schema:
             maxLength: 512
@@ -368,8 +536,7 @@ paths:
             type: string
           in: header
           required: true
-        -
-          name: providerID
+        - name: providerID
           description: Id of the provider for its details
           schema:
             type: string
@@ -381,7 +548,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/successResponseWithObjects'
+                $ref: '#/components/schemas/exampleListProviderResponse'
         '204':
           description: no content
         '401':
@@ -397,14 +564,12 @@ paths:
                     title: Token is invalid
                     detail: failed
   /consumer/list/purchases:
-    summary: >-
-      List API for the consumer to view all the past purchases made by them. They can also see  the status of the payment on each
+    summary: 'List API for the consumer to view all the past purchases made by them. They can also see  the status of the payment on each '
     get:
       tags:
         - consumer
       parameters:
-        -
-          name: token
+        - name: token
           description: IUDX Auth token to process the request
           schema:
             maxLength: 512
@@ -419,7 +584,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/successResponseWithObjects'
+                $ref: '#/components/schemas/exampleResponseListPurchases'
         '204':
           description: no content
         '401':
@@ -435,14 +600,12 @@ paths:
                     title: Token is invalid
                     detail: failed
   /consumer/list/products:
-    summary: >-
-      List API for the comsumer to view all the products available against a dataset.
+    summary: List API for the comsumer to view all the products available against a dataset.
     get:
       tags:
         - consumer
       parameters:
-        -
-          name: token
+        - name: token
           description: IUDX Auth token to process the request
           schema:
             maxLength: 512
@@ -451,16 +614,13 @@ paths:
             type: string
           in: header
           required: true
-        -
-          name: datasetID
-          description: >-
-            ID of the dataset for listing products that contain it.
+        - name: datasetID
+          description: ID of the dataset for listing products that contain it.
           in: query
           schema:
             type: string
           required: false
-        -
-          name: providerID
+        - name: providerID
           description: Id of the provider for listing their products
           schema:
             type: string
@@ -486,7 +646,7 @@ paths:
                   value:
                     type: 'urn:dx:dm:InvalidDatasetIDValue'
                     title: Bad request
-                    detail: 'Invalid dataset ID'
+                    detail: Invalid dataset ID
         '401':
           description: Unauthorized access
           content:
@@ -499,16 +659,13 @@ paths:
                     type: 'urn:dx:cat:InvalidAuthorizationToken'
                     title: Token is invalid
                     detail: failed
-
   /product/usermaps:
-    summary: >-
-      CRUD APIs to map a consumer to a product after purchase is successful.
+    summary: CRUD APIs to map a consumer to a product after purchase is successful.
     post:
       tags:
         - admin
       parameters:
-        -
-          name: token
+        - name: token
           description: IUDX Auth token to process the request
           schema:
             maxLength: 512
@@ -540,7 +697,7 @@ paths:
                   value:
                     type: 'urn:dx:dm:DocDoesNotExist'
                     results:
-                      name: urn:datakaveri.org:iisc.ac.in/123qwerty:zxcvb
+                      productID: 'urn:datakaveri.org:iisc.ac.in/123qwerty:zxcvb'
                       method: delete
                       title: failed
                       detail: 'Fail: Cannot delete, Doc does not exist'
@@ -554,7 +711,7 @@ paths:
                   value:
                     type: 'urn:dx:dm:InvalidSyntax'
                     title: Invalid syntax
-                    detail: 'Invalid format for time'
+                    detail: Invalid format for time
         '401':
           description: Unauthorized access
           content:
@@ -589,10 +746,30 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/exampleVerifyFailResponse'
-
-
 components:
   schemas:
+    successResponseForDeleteProduct:
+      title: Root Tupe for standard DELETE response
+      description: example response for delete product API
+      required:
+        - type
+      type: object
+      properties:
+        type:
+          description: URN type of the response indicating if the query was successful or if any errors have been triggered.
+          type: string
+        title:
+          description: A human readable title to the message response.
+        results:
+          description: Results which matched the query. This is an array of objects.
+          type: array
+          items:
+            type: object
+      example:
+        type: 'urn:dx:dm:Success'
+        title: Success
+        results:
+          - productID: 'urn:datakaveri.org:iisc.ac.in/123qwerty:zxcvb'
     successResponseWithObjects:
       title: Root Type for standardResponse
       description: example Response for get products request
@@ -613,47 +790,130 @@ components:
           description: Detailed description of the type or response
           type: string
         type:
-          description: >-
-            URN type of the response indicating if the query was successful or if any errors have
-            been triggered.
+          description: URN type of the response indicating if the query was successful or if any errors have been triggered.
           type: string
         title:
           description: A human readable title to the message response.
       example:
-        totalHits: 10
-        results:
-          - products:
-              - name: the role name formatted as a URN - URN would be based on the APD URL (e.g. urn:apd.datakaveri.org:student)
-                description: some text description for the product (e.g. a student associated in DataKaveri)
-
         type: 'urn:dx:dm:Success'
         title: Success
+        totalHits: 1
+        results:
+          - productID: 'the productID formatted as a URN - URN would be based on the APD URL (e.g. urn:datakaveri.org:iisc.ac.in/123qwerty:zxcvb)'
+            description: some text description for the product (e.g. a student associated in DataKaveri)
+            price: 100
+            duration: 12
+            datasets:
+              - pune-env-flood
+              - stqc-flood-sensor
+    exampleResponseListPurchases:
+      title: Root type for purchases API response
+      description: example response for list products
+      type: object
+      properties:
+        type:
+          description: URN type of the response indicating if the query was successful or if any errors have been triggered.
+          type: string
+        title:
+          description: A human readable title to the message response.
+        totalHits:
+          format: int32
+          description: Total number of documents which matched the query.
+          type: integer
+        results:
+          description: Results which matched the query. This is an array of objects.
+          type: array
+          items:
+            type: object
+      example:
+        type: 'urn:dx:dm:Success'
+        title: Success
+        totalHits: 1
+        results:
+          - productID: 'urn:datakaveri.org:iisc.ac.in/123qwerty:zxcvb'
+            consumerID: 89a36273d77dac4cf38114fca1bbe64392547f86
+            paymentStatus: payment.succeeded
+            paymentTime: '2022-11-23T09:00:00Z'
+            expiry: '2023-11-22T09:00:00Z'
+            status: active/expired
+    exampleListDatasetsResponse:
+      title: Root type for list datasets API response
+      description: example response for list datasets
+      type: object
+      properties:
+        type:
+          description: URN type of the response indicating if the query was successful or if any errors have been triggered.
+          type: string
+        title:
+          description: A human readable title to the message response.
+        totalHits:
+          format: int32
+          description: Total number of documents which matched the query.
+          type: integer
+        results:
+          description: Results which matched the query. This is an array of objects.
+          type: array
+          items:
+            type: object
+      example:
+        type: 'urn:dx:rs:success'
+        title: success
+        results:
+          - datasetID: abc1
+            datasetName: abc–flood
+            accessPolicy: secure
+            providerID: iisc.ac.in/123qwerty
+            totalResources: 12
+        totalHits: 1
+    exampleListProviderResponse:
+      title: Root type for list datasets API response
+      description: example response for list datasets
+      type: object
+      properties:
+        type:
+          description: URN type of the response indicating if the query was successful or if any errors have been triggered.
+          type: string
+        title:
+          description: A human readable title to the message response.
+        totalHits:
+          format: int32
+          description: Total number of documents which matched the query.
+          type: integer
+        results:
+          description: Results which matched the query. This is an array of objects.
+          type: array
+          items:
+            type: object
+      example:
+        type: 'urn:dx:rs:success'
+        title: success
+        results:
+          - providerID: abc1
+            providerName: abc–flood
+            totalDatasets: 5
+        totalHits: 1
     exampleProductPostBody:
       title: Root type for product body
       description: example request for creating product
       type: object
-      properties:
-        name:
-          type: string
-        description:
-          type: string
-        price:
-          type: number
-        validity:
-          type: integer
-        datasets:
-          type: array
-          items:
-            type: "object"
-            properties:
-              datasetID:
-                type: "string"
       example:
         name: flood-sensors
         description: some description for flod-sensors
-        price: 50.0
-        validity: 12
-        datasets: ['pune-env-flood','stqc-flood-sensors']
+        price: 50
+        duration: 12
+        datasets:
+          - pune-env-flood
+          - stqc-flood-sensors
+      properties:
+        name:
+          type: string
+        datasets:
+          type: array
+          items:
+            type: object
+            properties:
+              datasetID:
+                type: string
     exampleUsermapsPostBody:
       title: Root type for usermaps body
       description: example request for creating user map to product
@@ -668,14 +928,13 @@ components:
         paymentTime:
           type: object
       example:
-        productID: urn:datakaveri.org:iisc.ac.in/123qwerty:zxcvb
+        productID: 'urn:datakaveri.org:iisc.ac.in/123qwerty:zxcvb'
         consumerID: qwerty987
         paymentStatus: payment.succeeded
-        paymentTime: 2022-11-23T16:28:00Z
+        paymentTime: '2022-11-23T16:28:00Z'
     exampleVerifyRequestBody:
       title: Root type for verify API body
-      description: >-
-        example request for verifying if consumer has purchased product, and if the purchase is expired or not
+      description: 'example request for verifying if consumer has purchased product, and if the purchase is expired or not'
       type: object
       properties:
         consumerID:
@@ -694,7 +953,7 @@ components:
         details:
           type: string
       example:
-        type: urn:dx:dm:Deny
+        type: 'urn:dx:dm:Deny'
         title: Access Denied
         detail: message to convey to user
     errorResponseWithObjects:
@@ -708,22 +967,24 @@ components:
           description: Detailed description of the type or response
           type: string
         type:
-          description: >-
-            URN type of the response indicating if the query was successful or if any errors have
-            been triggered.
+          description: URN type of the response indicating if the query was successful or if any errors have been triggered.
           type: string
         title:
           description: A human readable title to the message response.
-
+    exampleResponseForGetPV:
+      title: exampleResponseForGetPV
+      x-stoplight:
+        id: a1k5kz93pqx26
+      type: object
+      properties:
+        id:
+          type: string
 tags:
-  -
-    name: provider
+  - name: provider
     description: |
       Datamarketplace specific data provider APIs.
     x-displayName: Provider
-
-  -
-    name: consumer
+  - name: consumer
     description: |
       Catalogue consumer specific apis.
     x-displayName: Consumer

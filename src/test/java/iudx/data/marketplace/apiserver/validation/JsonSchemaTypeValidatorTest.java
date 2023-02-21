@@ -1,49 +1,33 @@
-package iudx.data.marketplace.apiserver.handlers;
+package iudx.data.marketplace.apiserver.validation;
 
-import io.vertx.core.MultiMap;
-import io.vertx.core.Vertx;
-import io.vertx.core.http.HttpServerRequest;
 import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
-import io.vertx.ext.web.RequestBody;
-import io.vertx.ext.web.RoutingContext;
 import io.vertx.junit5.VertxExtension;
 import io.vertx.junit5.VertxTestContext;
+import iudx.data.marketplace.apiserver.exceptions.DxRuntimeException;
 import iudx.data.marketplace.apiserver.util.RequestType;
-import org.junit.jupiter.api.BeforeEach;
+import iudx.data.marketplace.apiserver.validation.types.JsonSchemaTypeValidator;
 import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import java.util.HashMap;
-import java.util.Map;
 import java.util.stream.Stream;
 
-import static org.mockito.Mockito.*;
+import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 @ExtendWith(VertxExtension.class)
 @ExtendWith(MockitoExtension.class)
-public class ValidationHandlerTest {
-  RequestType requestType;
-  RoutingContext routingContext;
-  HttpServerRequest httpServerRequest;
-  RequestBody requestBody;
-  MultiMap map;
-  JsonObject jsonObject;
-  ValidationHandler validationHandler;
+public class JsonSchemaTypeValidatorTest {
 
-  @BeforeEach
-  public void setup(VertxTestContext testContext) {
-    routingContext = mock(RoutingContext.class);
-    httpServerRequest = mock(HttpServerRequest.class);
-    requestBody = mock(RequestBody.class);
-    map = mock(MultiMap.class);
-    //    jsonObject = mock(JsonObject.class);
-    testContext.completeNow();
-  }
+  JsonSchemaTypeValidator jsonSchemaTypeValidator;
+  JsonObject body;
+  RequestType requestType;
 
   public static Stream<Arguments> data() {
     return Stream.of(
@@ -75,26 +59,51 @@ public class ValidationHandlerTest {
   }
 
   @ParameterizedTest
-  @DisplayName("Test Handle Method")
   @MethodSource("data")
-  public void testHandleMethod(
-      RequestType value, JsonObject req, Vertx vertx, VertxTestContext testContext) {
-    requestType = value;
-    jsonObject = req;
-    Map<String, String> hashMap = new HashMap<>();
-    hashMap.put("id", "product-id");
+  @DisplayName("Test JsonSchema Validator")
+  public void testJsonSchemaValidator(
+      RequestType type, JsonObject jsonObject, VertxTestContext testContext) {
+    body = jsonObject;
+    requestType = type;
+    jsonSchemaTypeValidator = new JsonSchemaTypeValidator(body, requestType);
 
-    when(routingContext.request()).thenReturn(httpServerRequest);
-    when(routingContext.request().params()).thenReturn(map);
-    when(routingContext.body()).thenReturn(requestBody);
-    when(routingContext.body().asJsonObject()).thenReturn(jsonObject);
-    when(routingContext.pathParams()).thenReturn(hashMap);
-    validationHandler = new ValidationHandler(vertx, requestType);
-    validationHandler.handle(routingContext);
-    verify(routingContext, times(2)).request();
-    verify(httpServerRequest).params();
-    verify(routingContext, times(2)).body();
-    verify(routingContext).pathParams();
+    boolean valid = jsonSchemaTypeValidator.isValid();
+    assertTrue(valid);
+    testContext.completeNow();
+  }
+
+  @Test
+  @DisplayName("Test json invalid")
+  public void testInvalidSchemaOrInput(VertxTestContext testContext) {
+    body = new JsonObject();
+    requestType = RequestType.PRODUCT;
+    jsonSchemaTypeValidator = new JsonSchemaTypeValidator(body, requestType);
+
+    Exception exception =
+        assertThrows(
+            DxRuntimeException.class,
+            () -> {
+              jsonSchemaTypeValidator.isValid();
+            });
+
+    testContext.completeNow();
+  }
+
+  @Test
+  @DisplayName("Test schema read error")
+  public void testSchemaReadError(VertxTestContext testContext) {
+    body = new JsonObject();
+    requestType = mock(RequestType.class);
+    when(requestType.getFilename()).thenReturn("dummyString");
+    jsonSchemaTypeValidator = new JsonSchemaTypeValidator(body, requestType);
+
+    Exception exception =
+        assertThrows(
+            DxRuntimeException.class,
+            () -> {
+              jsonSchemaTypeValidator.isValid();
+            });
+
     testContext.completeNow();
   }
 }

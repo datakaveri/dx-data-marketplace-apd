@@ -86,6 +86,7 @@ public class ProductServiceImpl implements ProductService {
                                   rf.onSuccess(
                                       j -> {
                                         JsonObject jres = (JsonObject) j;
+                                        LOGGER.debug(jres.getString(DATASET_ID));
                                         if (jres.getString(DATASET_ID)
                                             .equalsIgnoreCase(res.getString(DATASET_ID))) {
                                           res.put(TOTAL_RESOURCES, jres.getInteger("totalHits"));
@@ -110,7 +111,6 @@ public class ProductServiceImpl implements ProductService {
                                         queries,
                                         pgHandler -> {
                                           if (pgHandler.succeeded()) {
-                                            LOGGER.debug(pgHandler.result());
                                             handler.handle(
                                                 Future.succeededFuture(
                                                     pgHandler.result().put(PRODUCT_ID, productID)));
@@ -122,13 +122,13 @@ public class ProductServiceImpl implements ProductService {
                                   });
                         });
               } else {
-                LOGGER.debug("error here");
+                LOGGER.error("could not fetch provider details");
               }
             });
     return this;
   }
 
-  private Future<Boolean> checkIfProductExists(String providerID, String productID) {
+  Future<Boolean> checkIfProductExists(String providerID, String productID) {
     Promise<Boolean> promise = Promise.promise();
     StringBuilder query =
         new StringBuilder(
