@@ -8,7 +8,6 @@ import io.vertx.ext.web.RoutingContext;
 import iudx.data.marketplace.apiserver.handlers.AuthHandler;
 import iudx.data.marketplace.apiserver.handlers.ExceptionHandler;
 import iudx.data.marketplace.apiserver.handlers.ValidationHandler;
-import iudx.data.marketplace.apiserver.util.Constants;
 import iudx.data.marketplace.apiserver.util.RequestType;
 import iudx.data.marketplace.product.ProductService;
 import iudx.data.marketplace.product.variant.ProductVariantService;
@@ -16,8 +15,9 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import static iudx.data.marketplace.apiserver.util.Constants.*;
-import static iudx.data.marketplace.apiserver.util.Constants.PRODUCT_VARIANT_NAME;
-import static iudx.data.marketplace.common.Constants.*;
+import static iudx.data.marketplace.common.Constants.PRODUCT_SERVICE_ADDRESS;
+import static iudx.data.marketplace.common.Constants.PRODUCT_VARIANT_SERVICE_ADDRESS;
+import static iudx.data.marketplace.common.Constants.AUTH_INFO;
 
 public class ProviderApis {
   public static final Logger LOGGER = LogManager.getLogger(ProviderApis.class);
@@ -37,6 +37,7 @@ public class ProviderApis {
     ValidationHandler productValidationHandler = new ValidationHandler(vertx, RequestType.PRODUCT);
     ValidationHandler variantValidationHandler =
         new ValidationHandler(vertx, RequestType.PRODUCT_VARIANT);
+    ValidationHandler datasetValidationHandler = new ValidationHandler(vertx, RequestType.DATASET);
     ExceptionHandler exceptionHandler = new ExceptionHandler();
 
     productService = ProductService.createProxy(vertx, PRODUCT_SERVICE_ADDRESS);
@@ -59,6 +60,7 @@ public class ProviderApis {
 
     router
         .get(PROVIDER_BASE_PATH + LIST_PRODUCTS_PATH)
+        .handler(datasetValidationHandler)
         .handler(AuthHandler.create(vertx))
         .handler(this::listProducts)
         .failureHandler(exceptionHandler);

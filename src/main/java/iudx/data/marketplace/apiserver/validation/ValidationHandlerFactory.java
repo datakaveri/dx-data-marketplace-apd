@@ -3,10 +3,7 @@ package iudx.data.marketplace.apiserver.validation;
 import io.vertx.core.MultiMap;
 import io.vertx.core.json.JsonObject;
 import iudx.data.marketplace.apiserver.util.RequestType;
-import iudx.data.marketplace.apiserver.validation.types.JsonSchemaTypeValidator;
-import iudx.data.marketplace.apiserver.validation.types.ProductIDTypeValidator;
-import iudx.data.marketplace.apiserver.validation.types.Validator;
-import iudx.data.marketplace.apiserver.validation.types.VariantNameTypeValidator;
+import iudx.data.marketplace.apiserver.validation.types.*;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -15,6 +12,7 @@ import java.util.List;
 
 import static iudx.data.marketplace.apiserver.util.Constants.PRODUCT_ID;
 import static iudx.data.marketplace.apiserver.util.Constants.PRODUCT_VARIANT_NAME;
+import static iudx.data.marketplace.apiserver.util.Constants.DATASET_ID;
 
 public class ValidationHandlerFactory {
   private static final Logger LOGGER = LogManager.getLogger(ValidationHandlerFactory.class);
@@ -31,8 +29,17 @@ public class ValidationHandlerFactory {
         break;
       case PRODUCT_VARIANT:
         validator = getProductVariantValidators(parameters, body, requestType);
+      case DATASET:
+        validator = getDatasetIDValidators(parameters, requestType);
     }
     return validator;
+  }
+
+  private List<Validator> getDatasetIDValidators(final MultiMap parameters, final RequestType requestType) {
+    List<Validator> validators = new ArrayList<>();
+
+    validators.add(new DatasetIDTypeValidator(parameters.get(DATASET_ID), true));
+    return validators;
   }
 
   private List<Validator> getProductValidators(
