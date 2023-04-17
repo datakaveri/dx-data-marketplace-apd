@@ -19,4 +19,5 @@ public class Constants {
   public static final String PRODUCT_SERVICE_ADDRESS = "iudx.data.marketplace.product.service";
   public static final String PRODUCT_VARIANT_SERVICE_ADDRESS = "iudx.data.marketplace.product.variant.service";
   public static final String POSTGRES_SERVICE_ADDRESS = "iudx.data.marketplace.postgres.service";
+  public static final String CONSUMER_SERVICE_ADDRESS = "iudx.data.marketplace.consumer.service";
 }

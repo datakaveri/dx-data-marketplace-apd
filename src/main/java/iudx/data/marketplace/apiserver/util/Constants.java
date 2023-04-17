@@ -53,6 +53,8 @@ public class Constants {
   public static final String PRODUCT_VARIANT_NAME = "variant";
   public static final String DATASET_ID = "datasetID";
 
+  public static final String PROVIDER_ID = "providerID";
+
   //validations
   public static final int VALIDATION_URN_DELIMITER_COUNT = 3;
 

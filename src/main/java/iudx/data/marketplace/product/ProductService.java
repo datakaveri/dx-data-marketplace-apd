@@ -46,7 +46,7 @@ public interface ProductService {
   ProductService deleteProduct(JsonObject request, Handler<AsyncResult<JsonObject>> handler);
 
   /**
-   * The listProduct method fetches all the products available on the IUDX data marketplace
+   * The listProduct method fetches some or all the products available on the IUDX data marketplace
    *
    * @param request which is a JsonObject
    * @param handler which is a Request Handler

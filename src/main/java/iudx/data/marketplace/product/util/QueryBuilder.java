@@ -133,7 +133,7 @@ public class QueryBuilder {
                 .replace("$6", datasetIDs)
                 .replace("$7", datasetCaps)
                 .replace("$8", request.getDouble(PRICE).toString())
-                .replace("$9", request.getInteger(VALIDITY).toString())
+                .replace("$9", request.getInteger(DURATION).toString())
                 .replace("$s", Status.ACTIVE.toString()));
 
     return query.toString();

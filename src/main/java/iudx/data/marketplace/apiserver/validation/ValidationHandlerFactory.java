@@ -38,7 +38,7 @@ public class ValidationHandlerFactory {
   private List<Validator> getDatasetIDValidators(final MultiMap parameters, final RequestType requestType) {
     List<Validator> validators = new ArrayList<>();
 
-    validators.add(new DatasetIDTypeValidator(parameters.get(DATASET_ID), true));
+    validators.add(new DatasetIDTypeValidator(parameters.get(DATASET_ID), false));
     return validators;
   }
 
