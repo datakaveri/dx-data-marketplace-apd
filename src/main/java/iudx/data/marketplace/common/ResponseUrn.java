@@ -36,6 +36,7 @@ public enum ResponseUrn {
   INVALID_HEADER_VALUE_URN("urn:dx:dm:invalidHeaderValue", "Invalid header value"),
   DB_ERROR_URN("urn:dx:dm:DatabaseError", "Database error"),
   QUEUE_ERROR_URN("urn:dx:dm:QueueError", "Queue error"),
+  INVALID_DATASET_URN("urn:dx:dm:InvalidDatasetID", "Dataset ID is invalid"),
 
   BACKING_SERVICE_FORMAT_URN(
       "urn:dx:dm:backend", "format error from backing service [cat,auth etc.]"),

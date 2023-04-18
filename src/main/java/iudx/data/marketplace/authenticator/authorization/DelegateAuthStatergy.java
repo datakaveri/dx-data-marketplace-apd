@@ -26,6 +26,10 @@ public class DelegateAuthStatergy implements AuthorizationStatergy {
     apiAccessList.add(new AuthorizationRequest(DELETE, PRODUCT));
     apiAccessList.add(new AuthorizationRequest(GET, PROVIDER_LIST_PRODUCTS));
     apiAccessList.add(new AuthorizationRequest(GET, PROVIDER_LIST_PURCHASES));
+    apiAccessList.add(new AuthorizationRequest(POST, PRODUCT_VARIANT));
+    apiAccessList.add(new AuthorizationRequest(PUT, PRODUCT_VARIANT));
+    apiAccessList.add(new AuthorizationRequest(GET, PRODUCT_VARIANT));
+    apiAccessList.add(new AuthorizationRequest(DELETE, PRODUCT_VARIANT));
     delegateAuthRules = apiAccessList;
   }
 

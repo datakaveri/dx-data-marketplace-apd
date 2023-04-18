@@ -10,6 +10,17 @@ import io.vertx.ext.web.client.WebClientOptions;
 
 import static iudx.data.marketplace.common.Constants.*;
 
+/**
+ * The Catalogue Service
+ *
+ * <h1>Catalogue Service</h1>
+ *
+ * <p>The catalogue service defines the operations to be performed on the
+ * IUDX Catalogue Web client</p>
+ *
+ * @version 1.0
+ * @since 2023-01-20
+ */
 public class CatalogueService {
   private static final Logger LOGGER = LogManager.getLogger(CatalogueService.class);
 
@@ -33,6 +44,14 @@ public class CatalogueService {
     }
   }
 
+  /**
+   * The getItemDetails method calls the IUDX Catalogue item endpoint to get corresponding details using
+   * a webClient
+   *
+   * @see io.vertx.ext.web.client.WebClient
+   * @param itemID which is String
+   * @return Future which is of type JsonObject
+   */
   public Future<JsonObject> getItemDetails(String itemID) {
     Promise<JsonObject> promise = Promise.promise();
     JsonObject itemDetails = new JsonObject();
@@ -70,6 +89,13 @@ public class CatalogueService {
     return promise.future();
   }
 
+  /**
+   * The getResourceCount method calls the IUDX catalogue relationship endpoint using a webClient
+   *
+   * @see io.vertx.ext.web.client.WebClient
+   * @param datasetID which is a String
+   * @return Future which is of type JsonObject
+   */
   public Future<JsonObject> getResourceCount(String datasetID) {
     Promise<JsonObject> promise = Promise.promise();
     catWebClient

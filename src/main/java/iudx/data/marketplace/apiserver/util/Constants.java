@@ -51,6 +51,7 @@ public class Constants {
 
   public static final String PRODUCT_ID = "id";
   public static final String PRODUCT_VARIANT_NAME = "variant";
+  public static final String DATASET_ID = "datasetID";
 
   //validations
   public static final int VALIDATION_URN_DELIMITER_COUNT = 3;
@@ -59,4 +60,6 @@ public class Constants {
   public static final Pattern VALIDATION_PRODUCT_ID_REGEX = Pattern.compile("^[a-zA-Z0-9/.:-]{3,150}$");
   public static final int VALIDATION_VARIANT_NAME_MAX_LEN = 100;
   public static final Pattern VALIDATION_VARIANT_NAME_REGEX = Pattern.compile("^[a-zA-Z0-9-]{3,100}$");
+  public static final int VALIDATION_DATASET_ID_MAXLEN = 512;
+  public static final Pattern VALIDATION_DATASET_ID_REGEX = Pattern.compile("^[a-zA-Z0-9.]{4,100}/[a-zA-Z0-9.]{4,100}/[a-zA-Z.]{4,100}/[a-zA-Z-_.]{4,100}$");
 }

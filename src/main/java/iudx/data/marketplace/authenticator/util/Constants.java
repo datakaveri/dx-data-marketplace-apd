@@ -11,6 +11,7 @@ public class Constants {
   public static final String ADMIN = "admin";
 
   public static final String PROVIDER_PRODUCT_ENDPOINT = "/provider/product";
+  public static final String PROVIDER_PRODUCT_VARIANT_ENDPOINT = "/provider/product-variant";
   public static final String PROVIDER_LIST_PRODUCTS_ENDPOINT = "/provider/list/products";
   public static final String PROVIDER_LIST_PURCHASES_ENDPOINT = "/provider/list/purchases";
   public static final String CONSUMER_LIST_PROVIDERS_ENDPOINT = "/consumer/list/providers";

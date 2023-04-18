@@ -8,6 +8,7 @@ import iudx.data.marketplace.common.CatalogueService;
 import iudx.data.marketplace.common.ResponseUrn;
 import iudx.data.marketplace.postgres.PostgresService;
 import iudx.data.marketplace.product.util.QueryBuilder;
+import iudx.data.marketplace.product.util.Status;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -28,14 +29,15 @@ public class ProductServiceImpl implements ProductService {
       JsonObject config, PostgresService pgService, CatalogueService catService) {
     this.pgService = pgService;
     this.catService = catService;
-    this.productTableName = config.getJsonArray(TABLES).getString(0);
     this.queryBuilder = new QueryBuilder(config.getJsonArray(TABLES));
+    this.productTableName = config.getJsonArray(TABLES).getString(0);
   }
 
   @Override
   public ProductService createProduct(
       JsonObject request, Handler<AsyncResult<JsonObject>> handler) {
     String providerID = request.getJsonObject(AUTH_INFO).getString(IID);
+    // TODO: get provider ID from token
     providerID = "datakaveri.org/b8bd3e3f39615c8ec96722131ae95056b5938f2f";
     String productID =
         URN_PREFIX.concat(providerID).concat(":").concat(request.getString(PRODUCT_ID));
@@ -84,6 +86,7 @@ public class ProductServiceImpl implements ProductService {
                                   rf.onSuccess(
                                       j -> {
                                         JsonObject jres = (JsonObject) j;
+                                        LOGGER.debug(jres.getString(DATASET_ID));
                                         if (jres.getString(DATASET_ID)
                                             .equalsIgnoreCase(res.getString(DATASET_ID))) {
                                           res.put(TOTAL_RESOURCES, jres.getInteger("totalHits"));
@@ -108,7 +111,6 @@ public class ProductServiceImpl implements ProductService {
                                         queries,
                                         pgHandler -> {
                                           if (pgHandler.succeeded()) {
-                                            LOGGER.debug(pgHandler.result());
                                             handler.handle(
                                                 Future.succeededFuture(
                                                     pgHandler.result().put(PRODUCT_ID, productID)));
@@ -120,13 +122,13 @@ public class ProductServiceImpl implements ProductService {
                                   });
                         });
               } else {
-                LOGGER.debug("error here");
+                LOGGER.error("could not fetch provider details");
               }
             });
     return this;
   }
 
-  private Future<Boolean> checkIfProductExists(String providerID, String productID) {
+  Future<Boolean> checkIfProductExists(String providerID, String productID) {
     Promise<Boolean> promise = Promise.promise();
     StringBuilder query =
         new StringBuilder(
@@ -151,11 +153,51 @@ public class ProductServiceImpl implements ProductService {
   @Override
   public ProductService deleteProduct(
       JsonObject request, Handler<AsyncResult<JsonObject>> handler) {
-    return null;
+
+    JsonObject params =
+        new JsonObject()
+            .put(STATUS, Status.INACTIVE.toString())
+            .put(PRODUCT_ID, request.getString(PRODUCT_ID));
+
+    pgService.executePreparedQuery(
+        DELETE_PRODUCT_QUERY.replace("$0", productTableName),
+        params,
+        pgHandler -> {
+          if (pgHandler.succeeded()) {
+            handler.handle(Future.succeededFuture(pgHandler.result()));
+          } else {
+            LOGGER.error("deletion failed");
+            handler.handle(Future.failedFuture(pgHandler.cause()));
+          }
+        });
+    return this;
   }
 
   @Override
   public ProductService listProducts(JsonObject request, Handler<AsyncResult<JsonObject>> handler) {
-    return null;
+
+    String providerID = request.getString(IID);
+    providerID = "datakaveri.org/b8bd3e3f39615c8ec96722131ae95056b5938f2f";
+    JsonObject params =
+        new JsonObject().put(STATUS, Status.ACTIVE.toString()).put(PROVIDER_ID, providerID);
+
+    if (request.containsKey(DATASET_ID)) {
+      params.put(DATASET_ID, request.getString(DATASET_ID));
+    }
+
+    String query = queryBuilder.buildListProductsQuery(request);
+
+    pgService.executePreparedQuery(
+        query,
+        params,
+        pgHandler -> {
+          if (pgHandler.succeeded()) {
+            handler.handle(Future.succeededFuture(pgHandler.result()));
+          } else {
+            LOGGER.error("list failed");
+            handler.handle(Future.failedFuture(pgHandler.cause()));
+          }
+        });
+    return this;
   }
 }

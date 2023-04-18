@@ -47,20 +47,21 @@ CREATE TABLE IF NOT EXISTS product_dataset_relation
 
 CREATE TABLE IF NOT EXISTS product_variant
 (
+    _id uuid NOT NULL,
     productVariantName varchar NOT NULL,
     productID varchar NOT NULL,
-    providerName varchar NOT NULL,
+    providerID varchar NOT NULL,
     datasets varchar[] NOT NULL,
     datasetIDs varchar[] NOT NULL,
     datasetCapabilities varchar[][] NOT NULL,
     price numeric NOT NULL,
     validity numeric NOT NULL,
+    status status_type NOT NULL,
     created_at timestamp without time zone NOT NULL,
     modified_at timestamp without time zone NOT NULL,
     CONSTRAINT pv_pk PRIMARY KEY
     (
-        productVariantName,
-        productID
+      _id
     ),
     CONSTRAINT product_fk
         FOREIGN KEY(productID)

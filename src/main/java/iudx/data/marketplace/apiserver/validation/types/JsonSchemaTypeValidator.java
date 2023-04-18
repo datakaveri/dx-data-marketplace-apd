@@ -13,7 +13,6 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import java.io.IOException;
-import java.nio.file.LinkOption;
 
 import static iudx.data.marketplace.common.ResponseUrn.INVALID_PAYLOAD_FORMAT_URN;
 import static iudx.data.marketplace.common.ResponseUrn.SCHEMA_READ_ERROR_URN;
@@ -33,10 +32,8 @@ public class JsonSchemaTypeValidator implements Validator {
   public boolean isValid() {
     boolean isValid;
     try {
-      LOGGER.debug("here 1");
       isValid = validateJson(body, requestType);
     } catch (IOException | ProcessingException e) {
-      LOGGER.debug("here 2");
       throw new DxRuntimeException(failureCode(), SCHEMA_READ_ERROR_URN, failureMessage(body.toString()));
     }
     if(!isValid) {
@@ -63,11 +60,9 @@ public class JsonSchemaTypeValidator implements Validator {
     schema = factory.getJsonSchema(schemaNode);
 
     try {
-      LOGGER.debug("here 4");
       JsonNode jsonobj = loadString(body.toString());
       isValid = schema.validInstance(jsonobj);
     } catch (IOException | ProcessingException e) {
-      LOGGER.debug("here 5");
       isValid = false;
     }
     return isValid;

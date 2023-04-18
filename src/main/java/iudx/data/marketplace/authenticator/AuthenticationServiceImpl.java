@@ -24,7 +24,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
   final JWTAuth jwtAuth;
   final String audience;
 
-  AuthenticationServiceImpl(Vertx vertx, final JWTAuth jwtAuth, final JsonObject config) {
+  public AuthenticationServiceImpl(Vertx vertx, final JWTAuth jwtAuth, final JsonObject config) {
     this.jwtAuth = jwtAuth;
     this.audience = config.getString("host");
   }
@@ -48,12 +48,10 @@ public class AuthenticationServiceImpl implements AuthenticationService {
             })
         .compose(
             audienceHandler -> {
-              LOGGER.debug(isValidEndpoint(endPoint).succeeded());
               return isValidEndpoint(endPoint);
             })
         .compose(
             validEndpointHandler -> {
-              LOGGER.debug(validateAccess(result.jwtData, authenticationInfo).succeeded());
               return validateAccess(result.jwtData, authenticationInfo);
             })
         .onComplete(
@@ -74,7 +72,6 @@ public class AuthenticationServiceImpl implements AuthenticationService {
 
   Future<JwtData> decodeJwt(String jwtToken) {
     Promise<JwtData> promise = Promise.promise();
-    LOGGER.debug(jwtToken);
     TokenCredentials credentials = new TokenCredentials(jwtToken);
 
     jwtAuth
