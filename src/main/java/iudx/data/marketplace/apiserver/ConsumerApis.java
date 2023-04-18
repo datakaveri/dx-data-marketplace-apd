@@ -35,12 +35,15 @@ public class ConsumerApis {
   Router init() {
 
     ValidationHandler datasetValidationHandler = new ValidationHandler(vertx, RequestType.DATASET);
+    ValidationHandler providerValidationHandler = new ValidationHandler(vertx, RequestType.PROVIDER);
     ExceptionHandler exceptionHandler = new ExceptionHandler();
 
     consumerService = ConsumerService.createProxy(vertx, CONSUMER_SERVICE_ADDRESS);
 
     router
         .get(CONSUMER_BASE_PATH + LIST_PROVIDERS_PATH)
+        .handler(providerValidationHandler)
+        .handler(AuthHandler.create(vertx))
         .handler(this::listProviders)
         .failureHandler(exceptionHandler);
 
@@ -65,6 +68,22 @@ public class ConsumerApis {
   }
 
   private void listProviders(RoutingContext routingContext) {
+    HttpServerRequest request = routingContext.request();
+    JsonObject requestBody = new JsonObject();
+    for(Map.Entry<String, String> param: request.params()) {
+      requestBody.put(param.getKey(), param.getValue());
+    }
+
+    JsonObject authInfo = (JsonObject) routingContext.data().get(AUTH_INFO);
+    requestBody.put(AUTH_INFO, authInfo);
+
+    consumerService.listProviders(requestBody, handler -> {
+      if(handler.succeeded()) {
+        handleSuccessResponse(routingContext, handler.result());
+      } else {
+        handleFailureResponse(routingContext, handler.cause());
+      }
+    });
   }
 
   private void listDatasets(RoutingContext routingContext) {

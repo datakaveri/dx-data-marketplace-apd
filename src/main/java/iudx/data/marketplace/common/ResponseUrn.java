@@ -18,7 +18,8 @@ public enum ResponseUrn {
   MISSING_TOKEN_URN("urn:dx:dm:missingAuthorizationToken", "Token needed and not present"),
   INVALID_TOKEN_URN("urn:dx:dm:invalidAuthorizationToken", "Token is invalid"),
   RESOURCE_NOT_FOUND_URN("urn:dx:dm:resourceNotFound", "Document of given id does not exist"),
-  RESOURCE_ALREADY_EXISTS_URN("urn:dx:dm:resourceAlreadyExists", "Document of given id already exists"),
+  RESOURCE_ALREADY_EXISTS_URN(
+      "urn:dx:dm:resourceAlreadyExists", "Document of given id already exists"),
 
   LIMIT_EXCEED_URN(
       "urn:dx:dm:requestLimitExceeded", "Operation exceeds the default value of limit"),
@@ -28,7 +29,7 @@ public enum ResponseUrn {
   // extra urn
   INTERNAL_SERVER_ERR_URN("urn:dx:dm:internalServerError", "Internal Server Error"),
   INVALID_ID_VALUE_URN("urn:dx:dm:invalidIdValue", "Invalid id"),
-  INVALID_NAME_URN("urn:dx:dm:invalidNameValue","Invalid name"),
+  INVALID_NAME_URN("urn:dx:dm:invalidNameValue", "Invalid name"),
   INVALID_PAYLOAD_FORMAT_URN(
       "urn:dx:dm:invalidPayloadFormat", "Invalid json format in post request [schema mismatch]"),
   INVALID_PARAM_VALUE_URN("urn:dx:dm:invalidParamameterValue", "Invalid parameter value passed"),
@@ -37,6 +38,7 @@ public enum ResponseUrn {
   DB_ERROR_URN("urn:dx:dm:DatabaseError", "Database error"),
   QUEUE_ERROR_URN("urn:dx:dm:QueueError", "Queue error"),
   INVALID_DATASET_URN("urn:dx:dm:InvalidDatasetID", "Dataset ID is invalid"),
+  INVALID_PROVIDER_URN("urn:dx:dm:InvalidProviderID", "Provider ID is invalid"),
 
   BACKING_SERVICE_FORMAT_URN(
       "urn:dx:dm:backend", "format error from backing service [cat,auth etc.]"),

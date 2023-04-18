@@ -10,9 +10,7 @@ import org.apache.logging.log4j.Logger;
 import java.util.ArrayList;
 import java.util.List;
 
-import static iudx.data.marketplace.apiserver.util.Constants.PRODUCT_ID;
-import static iudx.data.marketplace.apiserver.util.Constants.PRODUCT_VARIANT_NAME;
-import static iudx.data.marketplace.apiserver.util.Constants.DATASET_ID;
+import static iudx.data.marketplace.apiserver.util.Constants.*;
 
 public class ValidationHandlerFactory {
   private static final Logger LOGGER = LogManager.getLogger(ValidationHandlerFactory.class);
@@ -29,16 +27,29 @@ public class ValidationHandlerFactory {
         break;
       case PRODUCT_VARIANT:
         validator = getProductVariantValidators(parameters, body, requestType);
+        break;
       case DATASET:
-        validator = getDatasetIDValidators(parameters, requestType);
+        validator = getDatasetIDValidators(parameters);
+        break;
+      case PROVIDER:
+        validator = getProviderIDValidators(parameters);
+        break;
     }
     return validator;
   }
 
-  private List<Validator> getDatasetIDValidators(final MultiMap parameters, final RequestType requestType) {
+  private List<Validator> getDatasetIDValidators(final MultiMap parameters) {
     List<Validator> validators = new ArrayList<>();
 
     validators.add(new DatasetIDTypeValidator(parameters.get(DATASET_ID), false));
+    validators.add(new ProviderIDTypeValidator(parameters.get(PROVIDER_ID), false));
+    return validators;
+  }
+
+  private List<Validator> getProviderIDValidators(final MultiMap parameters) {
+    List<Validator> validators = new ArrayList<>();
+
+    validators.add(new ProviderIDTypeValidator(parameters.get(PROVIDER_ID), false));
     return validators;
   }
 

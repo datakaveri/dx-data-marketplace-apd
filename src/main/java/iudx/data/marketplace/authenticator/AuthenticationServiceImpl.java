@@ -71,6 +71,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
   }
 
   Future<JwtData> decodeJwt(String jwtToken) {
+    LOGGER.debug(jwtToken);
     Promise<JwtData> promise = Promise.promise();
     TokenCredentials credentials = new TokenCredentials(jwtToken);
 

@@ -64,4 +64,7 @@ public class Constants {
   public static final Pattern VALIDATION_VARIANT_NAME_REGEX = Pattern.compile("^[a-zA-Z0-9-]{3,100}$");
   public static final int VALIDATION_DATASET_ID_MAXLEN = 512;
   public static final Pattern VALIDATION_DATASET_ID_REGEX = Pattern.compile("^[a-zA-Z0-9.]{4,100}/[a-zA-Z0-9.]{4,100}/[a-zA-Z.]{4,100}/[a-zA-Z-_.]{4,100}$");
+
+  public static final int VALIDATION_PROVIDER_ID_MAXLEN = 200;
+  public static final Pattern VALIDATION_PROVIDER_ID_REGEX = Pattern.compile("^[a-zA-Z0-9.]{4,100}/[a-zA-Z0-9.]{4,100}$");
 }
