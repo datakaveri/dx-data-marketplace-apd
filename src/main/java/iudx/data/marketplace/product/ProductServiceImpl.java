@@ -1,5 +1,8 @@
 package iudx.data.marketplace.product;
 
+import static iudx.data.marketplace.common.Constants.*;
+import static iudx.data.marketplace.product.util.Constants.*;
+
 import io.vertx.core.*;
 import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
@@ -9,20 +12,16 @@ import iudx.data.marketplace.common.ResponseUrn;
 import iudx.data.marketplace.postgres.PostgresService;
 import iudx.data.marketplace.product.util.QueryBuilder;
 import iudx.data.marketplace.product.util.Status;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
-
 import java.util.ArrayList;
 import java.util.List;
-
-import static iudx.data.marketplace.common.Constants.*;
-import static iudx.data.marketplace.product.util.Constants.*;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 public class ProductServiceImpl implements ProductService {
   private static final Logger LOGGER = LogManager.getLogger(ProductServiceImpl.class);
   private final PostgresService pgService;
-  private CatalogueService catService;
   private final String productTableName;
+  private CatalogueService catService;
   private QueryBuilder queryBuilder;
 
   public ProductServiceImpl(
@@ -52,10 +51,7 @@ public class ProductServiceImpl implements ProductService {
         .compose(
             existenceHandler -> {
               if (existenceHandler) {
-                throw new DxRuntimeException(
-                    409,
-                    ResponseUrn.RESOURCE_ALREADY_EXISTS_URN,
-                    ResponseUrn.RESOURCE_ALREADY_EXISTS_URN.getMessage());
+                return Future.failedFuture(ResponseUrn.RESOURCE_ALREADY_EXISTS_URN.getUrn());
               } else {
                 return getProviderDetails;
               }
@@ -122,7 +118,7 @@ public class ProductServiceImpl implements ProductService {
                                   });
                         });
               } else {
-                LOGGER.error("could not fetch provider details");
+                handler.handle(Future.failedFuture(completeHandler.cause()));
               }
             });
     return this;
@@ -154,22 +150,36 @@ public class ProductServiceImpl implements ProductService {
   public ProductService deleteProduct(
       JsonObject request, Handler<AsyncResult<JsonObject>> handler) {
 
+    String providerID = request.getJsonObject(AUTH_INFO).getString(IID);
+    // TODO: get provider ID from token
+    providerID = "datakaveri.org/b8bd3e3f39615c8ec96722131ae95056b5938f2f";
+    String productID = request.getString(PRODUCT_ID);
     JsonObject params =
-        new JsonObject()
-            .put(STATUS, Status.INACTIVE.toString())
-            .put(PRODUCT_ID, request.getString(PRODUCT_ID));
+        new JsonObject().put(STATUS, Status.INACTIVE.toString()).put(PRODUCT_ID, productID);
 
-    pgService.executePreparedQuery(
-        DELETE_PRODUCT_QUERY.replace("$0", productTableName),
-        params,
-        pgHandler -> {
-          if (pgHandler.succeeded()) {
-            handler.handle(Future.succeededFuture(pgHandler.result()));
-          } else {
-            LOGGER.error("deletion failed");
-            handler.handle(Future.failedFuture(pgHandler.cause()));
-          }
-        });
+    LOGGER.debug("here xyz");
+    checkIfProductExists(providerID, productID)
+        .onComplete(
+            existsHandler -> {
+              LOGGER.error(existsHandler.result());
+              if (!existsHandler.result()) {
+                LOGGER.error("deletion failed");
+                handler.handle(
+                    Future.failedFuture(ResponseUrn.RESOURCE_NOT_FOUND_URN.getUrn()));
+              } else {
+                pgService.executePreparedQuery(
+                    DELETE_PRODUCT_QUERY.replace("$0", productTableName),
+                    params,
+                    pgHandler -> {
+                      if (pgHandler.succeeded()) {
+                        handler.handle(Future.succeededFuture(pgHandler.result()));
+                      } else {
+                        LOGGER.error("deletion failed");
+                        handler.handle(Future.failedFuture(pgHandler.cause()));
+                      }
+                    });
+              }
+            });
     return this;
   }
 

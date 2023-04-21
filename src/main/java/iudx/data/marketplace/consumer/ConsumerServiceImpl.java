@@ -1,19 +1,18 @@
 package iudx.data.marketplace.consumer;
 
+import static iudx.data.marketplace.common.Constants.DATASET_ID;
+import static iudx.data.marketplace.common.Constants.PROVIDER_ID;
+import static iudx.data.marketplace.consumer.util.Constants.*;
+import static iudx.data.marketplace.product.util.Constants.STATUS;
+
 import io.vertx.core.AsyncResult;
 import io.vertx.core.Future;
 import io.vertx.core.Handler;
 import io.vertx.core.json.JsonObject;
 import iudx.data.marketplace.postgres.PostgresService;
+import iudx.data.marketplace.product.util.Status;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-
-import java.util.HashMap;
-import java.util.Map;
-
-import static iudx.data.marketplace.common.Constants.DATASET_ID;
-import static iudx.data.marketplace.common.Constants.PROVIDER_ID;
-import static iudx.data.marketplace.consumer.util.Constants.*;
 
 public class ConsumerServiceImpl implements ConsumerService {
   public static final Logger LOGGER = LogManager.getLogger(ConsumerServiceImpl.class);
@@ -42,7 +41,6 @@ public class ConsumerServiceImpl implements ConsumerService {
       query.append(" where ").append(PROVIDER_ID).append('=').append("$1");
     }
 
-    LOGGER.debug(query);
     pgService.executePreparedQuery(
         query.toString(),
         params,
@@ -68,18 +66,20 @@ public class ConsumerServiceImpl implements ConsumerService {
     if (request.containsKey(PROVIDER_ID)) {
       String providerID = request.getString(PROVIDER_ID);
       params.put(PROVIDER_ID, providerID);
-      query.insert(query.indexOf("group by")-1, " where " + PROVIDER_ID + '=' + "$1");
+      query.insert(query.indexOf("group by") - 1, " where " + PROVIDER_ID + '=' + "$1");
     }
 
-    LOGGER.debug(query);
-    pgService.executePreparedQuery(query.toString(), params, pgHandler -> {
-      if(pgHandler.succeeded()) {
-        handler.handle(Future.succeededFuture(pgHandler.result()));
-      } else {
-        LOGGER.error("get providers failed");
-        handler.handle(Future.failedFuture(pgHandler.cause()));
-      }
-    });
+    pgService.executePreparedQuery(
+        query.toString(),
+        params,
+        pgHandler -> {
+          if (pgHandler.succeeded()) {
+            handler.handle(Future.succeededFuture(pgHandler.result()));
+          } else {
+            LOGGER.error("get providers failed");
+            handler.handle(Future.failedFuture(pgHandler.cause()));
+          }
+        });
     return this;
   }
 
@@ -92,6 +92,44 @@ public class ConsumerServiceImpl implements ConsumerService {
   @Override
   public ConsumerService listProducts(
       JsonObject request, Handler<AsyncResult<JsonObject>> handler) {
-    return null;
+    String productTable = config.getJsonArray(TABLES).getString(0);
+    String datasetTable = config.getJsonArray(TABLES).getString(1);
+    String productDatasetRelationTable = config.getJsonArray(TABLES).getString(2);
+
+    JsonObject params = new JsonObject();
+    String query;
+
+    if (request.containsKey(DATASET_ID)) {
+      String datasetID = request.getString(DATASET_ID);
+      params.put(STATUS, Status.ACTIVE.toString()).put(DATASET_ID, datasetID);
+      query = LIST_PRODUCTS_FOR_DATASET;
+    } else if (request.containsKey(PROVIDER_ID)) {
+      String providerID = request.getString(PROVIDER_ID);
+      params.put(STATUS, Status.ACTIVE.toString()).put(PROVIDER_ID, providerID);
+      query = LIST_PRODUCTS_FOR_PROVIDER;
+    } else {
+      params.put(STATUS, Status.ACTIVE.toString());
+      query = LIST_ALL_PRODUCTS_QUERY;
+    }
+
+    StringBuilder finalQuery =
+        new StringBuilder(
+            query
+                .replace("$0", productTable)
+                .replace("$9", productDatasetRelationTable)
+                .replace("$8", datasetTable));
+
+    pgService.executePreparedQuery(
+        finalQuery.toString(),
+        params,
+        pgHandler -> {
+          if (pgHandler.succeeded()) {
+            handler.handle(Future.succeededFuture(pgHandler.result()));
+          } else {
+            LOGGER.error("get datasets failed");
+            handler.handle(Future.failedFuture(pgHandler.cause()));
+          }
+        });
+    return this;
   }
 }

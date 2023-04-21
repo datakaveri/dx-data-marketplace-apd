@@ -1,0 +1,1604 @@
+{
+	"info": {
+		"_postman_id": "7e714028-9527-4de9-87e0-7f085b499c31",
+		"name": "IUDX-Data-Marketplace-APIs-V4.0",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "17194681"
+	},
+	"item": [
+		{
+			"name": "Provider APIs",
+			"item": [
+				{
+					"name": "Product",
+					"item": [
+						{
+							"name": "Create Product",
+							"item": [
+								{
+									"name": "200 - Create Product",
+									"event": [
+										{
+											"listen": "prerequest",
+											"script": {
+												"exec": [
+													""
+												],
+												"type": "text/javascript"
+											}
+										}
+									],
+									"request": {
+										"method": "POST",
+										"header": [],
+										"body": {
+											"mode": "raw",
+											"raw": "{\n    \"id\": \"abcedede\",\n    \"datasets\": [\n        \"datakaveri.org/b8bd3e3f39615c8ec96722131ae95056b5938f2f/rs.iudx.io/agra-swachhata-app\",\n        \"datakaveri.org/b8bd3e3f39615c8ec96722131ae95056b5938f2f/rs.iudx.io/agra-point-of-interests\"\n    ]\n}",
+											"options": {
+												"raw": {
+													"language": "json"
+												}
+											}
+										},
+										"url": {
+											"raw": "https://localhost:8445/provider/product",
+											"protocol": "https",
+											"host": [
+												"localhost"
+											],
+											"port": "8445",
+											"path": [
+												"provider",
+												"product"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "400 - Invalid Payload",
+									"event": [
+										{
+											"listen": "prerequest",
+											"script": {
+												"exec": [
+													""
+												],
+												"type": "text/javascript"
+											}
+										}
+									],
+									"request": {
+										"method": "POST",
+										"header": [],
+										"body": {
+											"mode": "raw",
+											"raw": "{\n    \"id\": \"abcedede\",\n    \"datasets\": [\n        \"datakaveri.org/b8bd3e3f39615c8ec96722131ae95056b5938f2f/rs.iudx.io////agra-swachhata-app\",\n        \"datakaveri.org/b8bd3e3f39615c8ec96722131ae95056b5938f2f/rs.iudx.io/agra-point-of-interests\"\n    ]\n}",
+											"options": {
+												"raw": {
+													"language": "json"
+												}
+											}
+										},
+										"url": {
+											"raw": "https://localhost:8445/provider/product",
+											"protocol": "https",
+											"host": [
+												"localhost"
+											],
+											"port": "8445",
+											"path": [
+												"provider",
+												"product"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "401 - Unauthorized",
+									"event": [
+										{
+											"listen": "prerequest",
+											"script": {
+												"exec": [
+													""
+												],
+												"type": "text/javascript"
+											}
+										}
+									],
+									"request": {
+										"auth": {
+											"type": "noauth"
+										},
+										"method": "POST",
+										"header": [],
+										"body": {
+											"mode": "raw",
+											"raw": "{\n    \"id\": \"abcedede\",\n    \"datasets\": [\n        \"datakaveri.org/b8bd3e3f39615c8ec96722131ae95056b5938f2f/rs.iudx.io/agra-swachhata-app\",\n        \"datakaveri.org/b8bd3e3f39615c8ec96722131ae95056b5938f2f/rs.iudx.io/agra-point-of-interests\"\n    ]\n}",
+											"options": {
+												"raw": {
+													"language": "json"
+												}
+											}
+										},
+										"url": {
+											"raw": "https://localhost:8445/provider/product",
+											"protocol": "https",
+											"host": [
+												"localhost"
+											],
+											"port": "8445",
+											"path": [
+												"provider",
+												"product"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "409 - Product Already Exists",
+									"event": [
+										{
+											"listen": "prerequest",
+											"script": {
+												"exec": [
+													""
+												],
+												"type": "text/javascript"
+											}
+										}
+									],
+									"request": {
+										"method": "POST",
+										"header": [],
+										"body": {
+											"mode": "raw",
+											"raw": "{\n    \"id\": \"abcedede\",\n    \"datasets\": [\n        \"datakaveri.org/b8bd3e3f39615c8ec96722131ae95056b5938f2f/rs.iudx.io/agra-swachhata-app\",\n        \"datakaveri.org/b8bd3e3f39615c8ec96722131ae95056b5938f2f/rs.iudx.io/agra-point-of-interests\"\n    ]\n}",
+											"options": {
+												"raw": {
+													"language": "json"
+												}
+											}
+										},
+										"url": {
+											"raw": "https://localhost:8445/provider/product",
+											"protocol": "https",
+											"host": [
+												"localhost"
+											],
+											"port": "8445",
+											"path": [
+												"provider",
+												"product"
+											]
+										}
+									},
+									"response": []
+								}
+							],
+							"event": [
+								{
+									"listen": "prerequest",
+									"script": {
+										"type": "text/javascript",
+										"exec": [
+											""
+										]
+									}
+								},
+								{
+									"listen": "test",
+									"script": {
+										"type": "text/javascript",
+										"exec": [
+											""
+										]
+									}
+								}
+							]
+						},
+						{
+							"name": "Delete Product",
+							"item": [
+								{
+									"name": "200 - Delete Product",
+									"request": {
+										"method": "DELETE",
+										"header": [],
+										"url": {
+											"raw": "https://localhost:8445/provider/product?id=urn:datakaveri.org:datakaveri.org/b8bd3e3f39615c8ec96722131ae95056b5938f2f:abcedede",
+											"protocol": "https",
+											"host": [
+												"localhost"
+											],
+											"port": "8445",
+											"path": [
+												"provider",
+												"product"
+											],
+											"query": [
+												{
+													"key": "id",
+													"value": "urn:datakaveri.org:datakaveri.org/b8bd3e3f39615c8ec96722131ae95056b5938f2f:abcedede"
+												}
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "401 - Unauthorized",
+									"request": {
+										"auth": {
+											"type": "noauth"
+										},
+										"method": "DELETE",
+										"header": [],
+										"url": {
+											"raw": "https://localhost:8445/provider/product?id=urn:datakaveri.org:datakaveri.org/b8bd3e3f39615c8ec96722131ae95056b5938f2f:abcedede",
+											"protocol": "https",
+											"host": [
+												"localhost"
+											],
+											"port": "8445",
+											"path": [
+												"provider",
+												"product"
+											],
+											"query": [
+												{
+													"key": "id",
+													"value": "urn:datakaveri.org:datakaveri.org/b8bd3e3f39615c8ec96722131ae95056b5938f2f:abcedede"
+												}
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "400 - Invalid ID",
+									"request": {
+										"method": "DELETE",
+										"header": [],
+										"url": {
+											"raw": "https://localhost:8445/provider/product?id=urn:datakaveri.org:datakaveri.org/b8bd3e3f39615c8ec96722131ae95056b5938f2f:xyz123***",
+											"protocol": "https",
+											"host": [
+												"localhost"
+											],
+											"port": "8445",
+											"path": [
+												"provider",
+												"product"
+											],
+											"query": [
+												{
+													"key": "id",
+													"value": "urn:datakaveri.org:datakaveri.org/b8bd3e3f39615c8ec96722131ae95056b5938f2f:xyz123***"
+												}
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "404 - Not Found",
+									"request": {
+										"method": "DELETE",
+										"header": [],
+										"url": {
+											"raw": "https://localhost:8445/provider/product?id=urn:datakaveri.org:datakaveri.org/b8bd3e3f39615c8ec96722131ae95056b5938f2f:xyz123",
+											"protocol": "https",
+											"host": [
+												"localhost"
+											],
+											"port": "8445",
+											"path": [
+												"provider",
+												"product"
+											],
+											"query": [
+												{
+													"key": "id",
+													"value": "urn:datakaveri.org:datakaveri.org/b8bd3e3f39615c8ec96722131ae95056b5938f2f:xyz123"
+												}
+											]
+										}
+									},
+									"response": []
+								}
+							],
+							"event": [
+								{
+									"listen": "prerequest",
+									"script": {
+										"type": "text/javascript",
+										"exec": [
+											""
+										]
+									}
+								},
+								{
+									"listen": "test",
+									"script": {
+										"type": "text/javascript",
+										"exec": [
+											""
+										]
+									}
+								}
+							]
+						}
+					]
+				},
+				{
+					"name": "Product Variant (P.V.)",
+					"item": [
+						{
+							"name": "Create P.V.",
+							"item": [
+								{
+									"name": "201 - Create P.V.",
+									"event": [
+										{
+											"listen": "prerequest",
+											"script": {
+												"exec": [
+													""
+												],
+												"type": "text/javascript"
+											}
+										}
+									],
+									"request": {
+										"method": "POST",
+										"header": [
+											{
+												"key": "token",
+												"value": "{{token}}",
+												"type": "text"
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": "{\n    \"id\": \"urn:datakaveri.org:datakaveri.org/b8bd3e3f39615c8ec96722131ae95056b5938f2f:abcedede\",\n    \"variant\": \"variant1\",\n    \"datasets\": [\n        {\n          \"id\": \"datakaveri.org/b8bd3e3f39615c8ec96722131ae95056b5938f2f/rs.iudx.io/agra-swachhata-app\",\n          \"capabilities\": [\n            \"api\", \"sub\"\n          ]\n        },\n        {\n          \"id\": \"datakaveri.org/b8bd3e3f39615c8ec96722131ae95056b5938f2f/rs.iudx.io/agra-point-of-interests\",\n          \"capabilities\": [\n            \"sub\", \"file\"\n          ]\n        }\n      ],\n      \"price\": 100.0,\n      \"duration\": 12\n}",
+											"options": {
+												"raw": {
+													"language": "json"
+												}
+											}
+										},
+										"url": {
+											"raw": "https://localhost:8445/provider/product-variant",
+											"protocol": "https",
+											"host": [
+												"localhost"
+											],
+											"port": "8445",
+											"path": [
+												"provider",
+												"product-variant"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "400 - Invalid Payload",
+									"event": [
+										{
+											"listen": "prerequest",
+											"script": {
+												"exec": [
+													""
+												],
+												"type": "text/javascript"
+											}
+										}
+									],
+									"request": {
+										"method": "POST",
+										"header": [],
+										"body": {
+											"mode": "raw",
+											"raw": "{\n    \"variant\": \"variant1\",\n    \"datasets\": [\n        {\n          \"id\": \"datakaveri.org/b8bd3e3f39615c8ec96722131ae95056b5938f2f/rs.iudx.io/agra-swachhata-app\",\n          \"capabilities\": [\n            \"api\", \"sub\"\n          ]\n        },\n        {\n          \"id\": \"datakaveri.org/b8bd3e3f39615c8ec96722131ae95056b5938f2f/rs.iudx.io/agra-point-of-interests\",\n          \"capabilities\": [\n            \"sub\", \"file\"\n          ]\n        }\n      ],\n      \"price\": 100.0,\n      \"duration\": 12\n}",
+											"options": {
+												"raw": {
+													"language": "json"
+												}
+											}
+										},
+										"url": {
+											"raw": "https://localhost:8445/provider/product-variant",
+											"protocol": "https",
+											"host": [
+												"localhost"
+											],
+											"port": "8445",
+											"path": [
+												"provider",
+												"product-variant"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "401 - Unauthorized",
+									"event": [
+										{
+											"listen": "prerequest",
+											"script": {
+												"exec": [
+													""
+												],
+												"type": "text/javascript"
+											}
+										}
+									],
+									"request": {
+										"method": "POST",
+										"header": [],
+										"body": {
+											"mode": "raw",
+											"raw": "{\n    \"id\": \"urn:datakaveri.org:datakaveri.org/b8bd3e3f39615c8ec96722131ae95056b5938f2f:abcedede\",\n    \"variant\": \"variant1\",\n    \"datasets\": [\n        {\n          \"id\": \"datakaveri.org/b8bd3e3f39615c8ec96722131ae95056b5938f2f/rs.iudx.io/agra-swachhata-app\",\n          \"capabilities\": [\n            \"api\", \"sub\"\n          ]\n        },\n        {\n          \"id\": \"datakaveri.org/b8bd3e3f39615c8ec96722131ae95056b5938f2f/rs.iudx.io/agra-point-of-interests\",\n          \"capabilities\": [\n            \"sub\", \"file\"\n          ]\n        }\n      ],\n      \"price\": 100.0,\n      \"duration\": 12\n}",
+											"options": {
+												"raw": {
+													"language": "json"
+												}
+											}
+										},
+										"url": {
+											"raw": "https://localhost:8445/provider/product-variant",
+											"protocol": "https",
+											"host": [
+												"localhost"
+											],
+											"port": "8445",
+											"path": [
+												"provider",
+												"product-variant"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "409 - P.V. Alreaady Exists",
+									"event": [
+										{
+											"listen": "prerequest",
+											"script": {
+												"exec": [
+													""
+												],
+												"type": "text/javascript"
+											}
+										}
+									],
+									"request": {
+										"method": "POST",
+										"header": [],
+										"body": {
+											"mode": "raw",
+											"raw": "{\n    \"id\": \"urn:datakaveri.org:datakaveri.org/b8bd3e3f39615c8ec96722131ae95056b5938f2f:abcedede\",\n    \"variant\": \"variant1\",\n    \"datasets\": [\n        {\n          \"id\": \"datakaveri.org/b8bd3e3f39615c8ec96722131ae95056b5938f2f/rs.iudx.io/agra-swachhata-app\",\n          \"capabilities\": [\n            \"api\", \"sub\"\n          ]\n        },\n        {\n          \"id\": \"datakaveri.org/b8bd3e3f39615c8ec96722131ae95056b5938f2f/rs.iudx.io/agra-point-of-interests\",\n          \"capabilities\": [\n            \"sub\", \"file\"\n          ]\n        }\n      ],\n      \"price\": 100.0,\n      \"duration\": 12\n}",
+											"options": {
+												"raw": {
+													"language": "json"
+												}
+											}
+										},
+										"url": {
+											"raw": "https://localhost:8445/provider/product-variant",
+											"protocol": "https",
+											"host": [
+												"localhost"
+											],
+											"port": "8445",
+											"path": [
+												"provider",
+												"product-variant"
+											]
+										}
+									},
+									"response": []
+								}
+							]
+						},
+						{
+							"name": "Update P.V.",
+							"item": [
+								{
+									"name": "200 - Update P.V.",
+									"event": [
+										{
+											"listen": "prerequest",
+											"script": {
+												"exec": [
+													""
+												],
+												"type": "text/javascript"
+											}
+										}
+									],
+									"request": {
+										"method": "PUT",
+										"header": [],
+										"body": {
+											"mode": "raw",
+											"raw": "{\n    \"id\": \"urn:datakaveri.org:datakaveri.org/b8bd3e3f39615c8ec96722131ae95056b5938f2f:abcedede\",\n    \"variant\": \"variant1\",\n    \"datasets\": [\n        {\n          \"id\": \"datakaveri.org/b8bd3e3f39615c8ec96722131ae95056b5938f2f/rs.iudx.io/agra-swachhata-app\",\n          \"capabilities\": [\n            \"api\", \"sub\"\n          ]\n        },\n        {\n          \"id\": \"datakaveri.org/b8bd3e3f39615c8ec96722131ae95056b5938f2f/rs.iudx.io/agra-point-of-interests\",\n          \"capabilities\": [\n            \"sub\", \"file\"\n          ]\n        }\n      ],\n      \"price\": 100.0,\n      \"duration\": 12\n}",
+											"options": {
+												"raw": {
+													"language": "json"
+												}
+											}
+										},
+										"url": {
+											"raw": "https://localhost:8445/provider/product-variant",
+											"protocol": "https",
+											"host": [
+												"localhost"
+											],
+											"port": "8445",
+											"path": [
+												"provider",
+												"product-variant"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "400 - Invalid Payload",
+									"event": [
+										{
+											"listen": "prerequest",
+											"script": {
+												"exec": [
+													""
+												],
+												"type": "text/javascript"
+											}
+										}
+									],
+									"request": {
+										"method": "PUT",
+										"header": [],
+										"body": {
+											"mode": "raw",
+											"raw": "{\n    \n    \"variant\": \"variant1\",\n    \"datasets\": [\n        {\n          \"id\": \"datakaveri.org/b8bd3e3f39615c8ec96722131ae95056b5938f2f/rs.iudx.io/agra-swachhata-app\",\n          \"capabilities\": [\n            \"api\", \"sub\"\n          ]\n        },\n        {\n          \"id\": \"datakaveri.org/b8bd3e3f39615c8ec96722131ae95056b5938f2f/rs.iudx.io/agra-point-of-interests\",\n          \"capabilities\": [\n            \"sub\", \"file\"\n          ]\n        }\n      ],\n      \"price\": 100.0,\n      \"duration\": 12\n}",
+											"options": {
+												"raw": {
+													"language": "json"
+												}
+											}
+										},
+										"url": {
+											"raw": "https://localhost:8445/provider/product-variant",
+											"protocol": "https",
+											"host": [
+												"localhost"
+											],
+											"port": "8445",
+											"path": [
+												"provider",
+												"product-variant"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "401 - Unauthorized",
+									"event": [
+										{
+											"listen": "prerequest",
+											"script": {
+												"exec": [
+													""
+												],
+												"type": "text/javascript"
+											}
+										}
+									],
+									"request": {
+										"auth": {
+											"type": "noauth"
+										},
+										"method": "PUT",
+										"header": [],
+										"body": {
+											"mode": "raw",
+											"raw": "{\n    \"id\": \"urn:datakaveri.org:datakaveri.org/b8bd3e3f39615c8ec96722131ae95056b5938f2f:abcedede\",\n    \"variant\": \"variant1\",\n    \"datasets\": [\n        {\n          \"id\": \"datakaveri.org/b8bd3e3f39615c8ec96722131ae95056b5938f2f/rs.iudx.io/agra-swachhata-app\",\n          \"capabilities\": [\n            \"api\", \"sub\"\n          ]\n        },\n        {\n          \"id\": \"datakaveri.org/b8bd3e3f39615c8ec96722131ae95056b5938f2f/rs.iudx.io/agra-point-of-interests\",\n          \"capabilities\": [\n            \"sub\", \"file\"\n          ]\n        }\n      ],\n      \"price\": 100.0,\n      \"duration\": 12\n}",
+											"options": {
+												"raw": {
+													"language": "json"
+												}
+											}
+										},
+										"url": {
+											"raw": "https://localhost:8445/provider/product-variant",
+											"protocol": "https",
+											"host": [
+												"localhost"
+											],
+											"port": "8445",
+											"path": [
+												"provider",
+												"product-variant"
+											]
+										}
+									},
+									"response": []
+								}
+							]
+						},
+						{
+							"name": "Delete P.V.",
+							"item": [
+								{
+									"name": "200 - Delete P.V.",
+									"request": {
+										"method": "DELETE",
+										"header": [],
+										"url": {
+											"raw": "https://localhost:8445/provider/product-variant?id=urn:datakaveri.org:datakaveri.org/b8bd3e3f39615c8ec96722131ae95056b5938f2f:abcedede&variant=variant1",
+											"protocol": "https",
+											"host": [
+												"localhost"
+											],
+											"port": "8445",
+											"path": [
+												"provider",
+												"product-variant"
+											],
+											"query": [
+												{
+													"key": "id",
+													"value": "urn:datakaveri.org:datakaveri.org/b8bd3e3f39615c8ec96722131ae95056b5938f2f:abcedede"
+												},
+												{
+													"key": "variant",
+													"value": "variant1"
+												}
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "400 - Invalid Name",
+									"request": {
+										"method": "DELETE",
+										"header": [],
+										"url": {
+											"raw": "https://localhost:8445/provider/product-variant?id=urn:datakaveri.org:datakaveri.org/b8bd3e3f39615c8ec96722131ae95056b5938f2f:abced&variant=variant1!!",
+											"protocol": "https",
+											"host": [
+												"localhost"
+											],
+											"port": "8445",
+											"path": [
+												"provider",
+												"product-variant"
+											],
+											"query": [
+												{
+													"key": "id",
+													"value": "urn:datakaveri.org:datakaveri.org/b8bd3e3f39615c8ec96722131ae95056b5938f2f:abced"
+												},
+												{
+													"key": "variant",
+													"value": "variant1!!"
+												}
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "400 - Invalid Name Copy",
+									"request": {
+										"method": "DELETE",
+										"header": [],
+										"url": {
+											"raw": "https://localhost:8445/provider/product-variant?id=urn:datakaveri.org:datakaveri.org/b8bd3e3f39615c8ec96722131ae95056b5938f2f:abced&variant=variant1",
+											"protocol": "https",
+											"host": [
+												"localhost"
+											],
+											"port": "8445",
+											"path": [
+												"provider",
+												"product-variant"
+											],
+											"query": [
+												{
+													"key": "id",
+													"value": "urn:datakaveri.org:datakaveri.org/b8bd3e3f39615c8ec96722131ae95056b5938f2f:abced"
+												},
+												{
+													"key": "variant",
+													"value": "variant1"
+												}
+											]
+										}
+									},
+									"response": []
+								}
+							]
+						}
+					]
+				},
+				{
+					"name": "List APIs",
+					"item": [
+						{
+							"name": "List Products",
+							"item": [
+								{
+									"name": "200 - List Products",
+									"request": {
+										"method": "GET",
+										"header": [],
+										"url": {
+											"raw": "https://localhost:8445/provider/list/products",
+											"protocol": "https",
+											"host": [
+												"localhost"
+											],
+											"port": "8445",
+											"path": [
+												"provider",
+												"list",
+												"products"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "200 - List Products for Dataset",
+									"request": {
+										"method": "GET",
+										"header": [],
+										"url": {
+											"raw": "https://localhost:8445/provider/list/products?datasetID=datakaveri.org/b8bd3e3f39615c8ec96722131ae95056b5938f2f/rs.iudx.io/agra-point-of-interests",
+											"protocol": "https",
+											"host": [
+												"localhost"
+											],
+											"port": "8445",
+											"path": [
+												"provider",
+												"list",
+												"products"
+											],
+											"query": [
+												{
+													"key": "datasetID",
+													"value": "datakaveri.org/b8bd3e3f39615c8ec96722131ae95056b5938f2f/rs.iudx.io/agra-point-of-interests"
+												}
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "204 - No Content",
+									"request": {
+										"method": "GET",
+										"header": [],
+										"url": {
+											"raw": "https://localhost:8445/provider/list/products?datasetID=datakaveri.org/b8bd3e3f39615c8ec96722131ae95056b5938f2f/rs.iudx.io/pune-point-of-interests",
+											"protocol": "https",
+											"host": [
+												"localhost"
+											],
+											"port": "8445",
+											"path": [
+												"provider",
+												"list",
+												"products"
+											],
+											"query": [
+												{
+													"key": "datasetID",
+													"value": "datakaveri.org/b8bd3e3f39615c8ec96722131ae95056b5938f2f/rs.iudx.io/pune-point-of-interests"
+												}
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "401 - Unauthorized",
+									"request": {
+										"auth": {
+											"type": "noauth"
+										},
+										"method": "GET",
+										"header": [],
+										"url": {
+											"raw": "https://localhost:8445/provider/list/products",
+											"protocol": "https",
+											"host": [
+												"localhost"
+											],
+											"port": "8445",
+											"path": [
+												"provider",
+												"list",
+												"products"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "400 - Invalid dataset ID",
+									"request": {
+										"method": "GET",
+										"header": [],
+										"url": {
+											"raw": "https://localhost:8445/provider/list/products?datasetID=datakaveri.org/b8bd3e3f39615c8ec96722131ae95056b5938f2f/rs.iudx.io/pune-point-of-interests***",
+											"protocol": "https",
+											"host": [
+												"localhost"
+											],
+											"port": "8445",
+											"path": [
+												"provider",
+												"list",
+												"products"
+											],
+											"query": [
+												{
+													"key": "datasetID",
+													"value": "datakaveri.org/b8bd3e3f39615c8ec96722131ae95056b5938f2f/rs.iudx.io/pune-point-of-interests***"
+												}
+											]
+										}
+									},
+									"response": []
+								}
+							],
+							"event": [
+								{
+									"listen": "prerequest",
+									"script": {
+										"type": "text/javascript",
+										"exec": [
+											""
+										]
+									}
+								},
+								{
+									"listen": "test",
+									"script": {
+										"type": "text/javascript",
+										"exec": [
+											""
+										]
+									}
+								}
+							]
+						},
+						{
+							"name": "List Purchases",
+							"item": [
+								{
+									"name": "List Purchases",
+									"request": {
+										"method": "GET",
+										"header": []
+									},
+									"response": []
+								}
+							]
+						}
+					]
+				}
+			],
+			"auth": {
+				"type": "apikey",
+				"apikey": [
+					{
+						"key": "value",
+						"value": "{{token}}",
+						"type": "string"
+					},
+					{
+						"key": "key",
+						"value": "token",
+						"type": "string"
+					}
+				]
+			},
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"type": "text/javascript",
+						"exec": [
+							"const clientId = pm.environment.get(\"providerClientID\");",
+							"const clientSecret = pm.environment.get(\"providerClientSecret\");",
+							"",
+							"const authReq = {",
+							"    url : 'https://authvertx.iudx.io/auth/v1/token',",
+							"    method: 'POST',",
+							"    header : {",
+							"        'Content-Type': 'application/json',",
+							"        'clientId': clientId,",
+							"        'clientSecret': clientSecret",
+							"    },",
+							"    body: {",
+							"        mode: 'raw',",
+							"        raw: JSON.stringify({",
+							"  itemId: 'rs.iudx.io', ",
+							"  itemType: 'resource_server',",
+							"  role: 'provider'",
+							"})",
+							"    }",
+							"};",
+							"",
+							"pm.sendRequest(authReq, function (err, response) {",
+							"    console.log(response.json());",
+							"    var jsonData = response.json();",
+							"    pm.environment.set(\"token\", jsonData.results.accessToken);",
+							"});"
+						]
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"type": "text/javascript",
+						"exec": [
+							""
+						]
+					}
+				}
+			]
+		},
+		{
+			"name": "Consumer APIs",
+			"item": [
+				{
+					"name": "List Datasets",
+					"item": [
+						{
+							"name": "200 - Get Datasets",
+							"event": [
+								{
+									"listen": "prerequest",
+									"script": {
+										"exec": [
+											""
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "https://localhost:8445/consumer/list/datasets",
+									"protocol": "https",
+									"host": [
+										"localhost"
+									],
+									"port": "8445",
+									"path": [
+										"consumer",
+										"list",
+										"datasets"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "200 - Get Datasets for Provider",
+							"event": [
+								{
+									"listen": "prerequest",
+									"script": {
+										"exec": [
+											""
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "https://localhost:8445/consumer/list/datasets?providerID=datakaveri.org/b8bd3e3f39615c8ec96722131ae95056b5938f2f",
+									"protocol": "https",
+									"host": [
+										"localhost"
+									],
+									"port": "8445",
+									"path": [
+										"consumer",
+										"list",
+										"datasets"
+									],
+									"query": [
+										{
+											"key": "providerID",
+											"value": "datakaveri.org/b8bd3e3f39615c8ec96722131ae95056b5938f2f"
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "200 - Get Dataset by ID",
+							"event": [
+								{
+									"listen": "prerequest",
+									"script": {
+										"exec": [
+											""
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "https://localhost:8445/consumer/list/datasets?datasetID=datakaveri.org/b8bd3e3f39615c8ec96722131ae95056b5938f2f/rs.iudx.io/agra-point-of-interests",
+									"protocol": "https",
+									"host": [
+										"localhost"
+									],
+									"port": "8445",
+									"path": [
+										"consumer",
+										"list",
+										"datasets"
+									],
+									"query": [
+										{
+											"key": "datasetID",
+											"value": "datakaveri.org/b8bd3e3f39615c8ec96722131ae95056b5938f2f/rs.iudx.io/agra-point-of-interests"
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "204 - No Content",
+							"event": [
+								{
+									"listen": "prerequest",
+									"script": {
+										"exec": [
+											""
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "https://localhost:8445/consumer/list/datasets?providerID=datakaveri.org/b8bd3e3f39615c8ec96722131ae95056b5938f2f",
+									"protocol": "https",
+									"host": [
+										"localhost"
+									],
+									"port": "8445",
+									"path": [
+										"consumer",
+										"list",
+										"datasets"
+									],
+									"query": [
+										{
+											"key": "providerID",
+											"value": "datakaveri.org/b8bd3e3f39615c8ec96722131ae95056b5938f2f"
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "400 - Invalid DatasetID",
+							"event": [
+								{
+									"listen": "prerequest",
+									"script": {
+										"exec": [
+											""
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "token",
+										"value": "{{openToken}}",
+										"type": "text"
+									}
+								],
+								"url": {
+									"raw": "https://localhost:8445/consumer/list/datasets?datasetID=datakaveri.org/b8bd3e3f39615c8ec96722131ae95056b5938f2f/rs.iudx.io/agra-point-of-interests",
+									"protocol": "https",
+									"host": [
+										"localhost"
+									],
+									"port": "8445",
+									"path": [
+										"consumer",
+										"list",
+										"datasets"
+									],
+									"query": [
+										{
+											"key": "datasetID",
+											"value": "datakaveri.org/b8bd3e3f39615c8ec96722131ae95056b5938f2f/rs.iudx.io/agra-point-of-interests"
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "401 - Unauthorized",
+							"event": [
+								{
+									"listen": "prerequest",
+									"script": {
+										"exec": [
+											""
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"auth": {
+									"type": "noauth"
+								},
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "https://localhost:8445/consumer/list/datasets?datasetID=datakaveri.org/b8bd3e3f39615c8ec96722131ae95056b5938f2f/rs.iudx.io/agra-point-of-interests",
+									"protocol": "https",
+									"host": [
+										"localhost"
+									],
+									"port": "8445",
+									"path": [
+										"consumer",
+										"list",
+										"datasets"
+									],
+									"query": [
+										{
+											"key": "datasetID",
+											"value": "datakaveri.org/b8bd3e3f39615c8ec96722131ae95056b5938f2f/rs.iudx.io/agra-point-of-interests"
+										}
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				},
+				{
+					"name": "List Providers",
+					"item": [
+						{
+							"name": "200 - Get Providers",
+							"event": [
+								{
+									"listen": "prerequest",
+									"script": {
+										"exec": [
+											""
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "https://localhost:8445/consumer/list/providers",
+									"protocol": "https",
+									"host": [
+										"localhost"
+									],
+									"port": "8445",
+									"path": [
+										"consumer",
+										"list",
+										"providers"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "200 - Get Provider by ID",
+							"event": [
+								{
+									"listen": "prerequest",
+									"script": {
+										"exec": [
+											""
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "https://localhost:8445/consumer/list/providers?providerID=datakaveri.org/b8bd3e3f39615c8ec96722131ae95056b5938f2f",
+									"protocol": "https",
+									"host": [
+										"localhost"
+									],
+									"port": "8445",
+									"path": [
+										"consumer",
+										"list",
+										"providers"
+									],
+									"query": [
+										{
+											"key": "providerID",
+											"value": "datakaveri.org/b8bd3e3f39615c8ec96722131ae95056b5938f2f"
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "204 - No Content",
+							"event": [
+								{
+									"listen": "prerequest",
+									"script": {
+										"exec": [
+											""
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "https://localhost:8445/consumer/list/providers?providerID=datakaveri.org/b8bd3e3f39615c8ec96722131ae95056b5938f2nocontent",
+									"protocol": "https",
+									"host": [
+										"localhost"
+									],
+									"port": "8445",
+									"path": [
+										"consumer",
+										"list",
+										"providers"
+									],
+									"query": [
+										{
+											"key": "providerID",
+											"value": "datakaveri.org/b8bd3e3f39615c8ec96722131ae95056b5938f2nocontent"
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "400 - Invalid ProviderID",
+							"event": [
+								{
+									"listen": "prerequest",
+									"script": {
+										"exec": [
+											""
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "https://localhost:8445/consumer/list/providers?providerID=datakaveri.org/b8bd3e3f39615c8ec96722131ae95056b5938f2f/invalid",
+									"protocol": "https",
+									"host": [
+										"localhost"
+									],
+									"port": "8445",
+									"path": [
+										"consumer",
+										"list",
+										"providers"
+									],
+									"query": [
+										{
+											"key": "providerID",
+											"value": "datakaveri.org/b8bd3e3f39615c8ec96722131ae95056b5938f2f/invalid"
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "401 - Unathorized",
+							"event": [
+								{
+									"listen": "prerequest",
+									"script": {
+										"exec": [
+											""
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"auth": {
+									"type": "noauth"
+								},
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "https://localhost:8445/consumer/list/providers?providerID=datakaveri.org/b8bd3e3f39615c8ec96722131ae95056b5938f2f",
+									"protocol": "https",
+									"host": [
+										"localhost"
+									],
+									"port": "8445",
+									"path": [
+										"consumer",
+										"list",
+										"providers"
+									],
+									"query": [
+										{
+											"key": "providerID",
+											"value": "datakaveri.org/b8bd3e3f39615c8ec96722131ae95056b5938f2f"
+										}
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				},
+				{
+					"name": "List Products",
+					"item": [
+						{
+							"name": "200 - List Products",
+							"event": [
+								{
+									"listen": "prerequest",
+									"script": {
+										"exec": [
+											""
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "https://localhost:8445/consumer/list/products",
+									"protocol": "https",
+									"host": [
+										"localhost"
+									],
+									"port": "8445",
+									"path": [
+										"consumer",
+										"list",
+										"products"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "200 - List Products having given dataset",
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "https://localhost:8445/consumer/list/products?datasetId=datakaveri.org/b8bd3e3f39615c8ec96722131ae95056b5938f2f/rs.iudx.io/agra-point-of-interests",
+									"protocol": "https",
+									"host": [
+										"localhost"
+									],
+									"port": "8445",
+									"path": [
+										"consumer",
+										"list",
+										"products"
+									],
+									"query": [
+										{
+											"key": "datasetId",
+											"value": "datakaveri.org/b8bd3e3f39615c8ec96722131ae95056b5938f2f/rs.iudx.io/agra-point-of-interests"
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "200 - List Products of a Provider",
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "https://localhost:8445/consumer/list/products?providerID=datakaveri.org/b8bd3e3f39615c8ec96722131ae95056b5938f2f",
+									"protocol": "https",
+									"host": [
+										"localhost"
+									],
+									"port": "8445",
+									"path": [
+										"consumer",
+										"list",
+										"products"
+									],
+									"query": [
+										{
+											"key": "providerID",
+											"value": "datakaveri.org/b8bd3e3f39615c8ec96722131ae95056b5938f2f"
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "204 - No content",
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "https://localhost:8445/consumer/list/products?providerID=datakaveri.org/b8bd3e3f39615c8ec96722131ae95056b5938f2nocontent",
+									"protocol": "https",
+									"host": [
+										"localhost"
+									],
+									"port": "8445",
+									"path": [
+										"consumer",
+										"list",
+										"products"
+									],
+									"query": [
+										{
+											"key": "providerID",
+											"value": "datakaveri.org/b8bd3e3f39615c8ec96722131ae95056b5938f2nocontent"
+										}
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				},
+				{
+					"name": "List Purchases",
+					"item": [
+						{
+							"name": "List Purchases",
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "https://localhost:8445/consumer/list/purchases",
+									"protocol": "https",
+									"host": [
+										"localhost"
+									],
+									"port": "8445",
+									"path": [
+										"consumer",
+										"list",
+										"purchases"
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				}
+			],
+			"auth": {
+				"type": "apikey",
+				"apikey": [
+					{
+						"key": "value",
+						"value": "{{token}}",
+						"type": "string"
+					},
+					{
+						"key": "key",
+						"value": "token",
+						"type": "string"
+					}
+				]
+			},
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"type": "text/javascript",
+						"exec": [
+							"const clientId = pm.environment.get(\"clientID\");",
+							"const clientSecret = pm.environment.get(\"clientSecret\");",
+							"",
+							"const authReq = {",
+							"    url : 'https://authvertx.iudx.io/auth/v1/token',",
+							"    method: 'POST',",
+							"    header : {",
+							"        'Content-Type': 'application/json',",
+							"        'clientId': clientId,",
+							"        'clientSecret': clientSecret",
+							"    },",
+							"    body: {",
+							"        mode: 'raw',",
+							"        raw: JSON.stringify({",
+							"  itemId: 'rs.iudx.io', ",
+							"  itemType: 'resource_server',",
+							"  role: 'consumer'",
+							"})",
+							"    }",
+							"};",
+							"",
+							"pm.sendRequest(authReq, function (err, response) {",
+							"    var jsonData = response.json();",
+							"    pm.environment.set(\"token\", jsonData.results.accessToken);",
+							"});"
+						]
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"type": "text/javascript",
+						"exec": [
+							""
+						]
+					}
+				}
+			]
+		}
+	]
+}

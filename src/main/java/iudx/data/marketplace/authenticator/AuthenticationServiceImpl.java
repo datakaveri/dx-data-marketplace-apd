@@ -71,7 +71,6 @@ public class AuthenticationServiceImpl implements AuthenticationService {
   }
 
   Future<JwtData> decodeJwt(String jwtToken) {
-    LOGGER.debug(jwtToken);
     Promise<JwtData> promise = Promise.promise();
     TokenCredentials credentials = new TokenCredentials(jwtToken);
 
@@ -85,7 +84,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
         .onFailure(
             err -> {
               LOGGER.error("failed to decode/validate jwt token : " + err.getMessage());
-              promise.fail("failed");
+              promise.fail("failed to decode/validate jwt token : " + err.getMessage());
             });
     return promise.future();
   }
