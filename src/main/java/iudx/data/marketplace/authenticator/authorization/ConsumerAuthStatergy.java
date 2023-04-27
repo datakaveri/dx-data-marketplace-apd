@@ -21,6 +21,8 @@ public class ConsumerAuthStatergy implements AuthorizationStatergy {
 
     // api access list
     List<AuthorizationRequest> apiAccessList = new ArrayList<>();
+    apiAccessList.add(new AuthorizationRequest(GET, CONSUMER_LIST_DATASETS));
+    apiAccessList.add(new AuthorizationRequest(GET, CONSUMER_LIST_PROVIDERS));
     apiAccessList.add(new AuthorizationRequest(GET, CONSUMER_LIST_PRODUCTS));
     apiAccessList.add(new AuthorizationRequest(GET, CONSUMER_LIST_PURCHASES));
     consumerAuthRules = apiAccessList;
@@ -28,10 +30,6 @@ public class ConsumerAuthStatergy implements AuthorizationStatergy {
 
   @Override
   public boolean isAuthorized(AuthorizationRequest authorizationRequest, JwtData jwtData) {
-    JsonArray access = jwtData.getCons() != null ? jwtData.getCons().getJsonArray("access") : null;
-    if (access == null) {
-      return false;
-    }
     String endpoint = authorizationRequest.getApi().getEndpoint();
     Method method = authorizationRequest.getMethod();
     LOGGER.info("authorization request for : " + endpoint + " with method : " + method.name());

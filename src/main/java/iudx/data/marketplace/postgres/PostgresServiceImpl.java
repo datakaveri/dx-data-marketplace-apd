@@ -51,7 +51,6 @@ public class PostgresServiceImpl implements PostgresService {
             })
         .onFailure(
             failureHandler -> {
-              LOGGER.debug(failureHandler);
               String response =
                   new RespBuilder()
                       .withType(ResponseUrn.DB_ERROR_URN.getUrn())
@@ -76,7 +75,6 @@ public class PostgresServiceImpl implements PostgresService {
             })
         .onFailure(
             failureHandler -> {
-              LOGGER.debug(failureHandler);
               String response =
                   new RespBuilder()
                       .withType(ResponseUrn.DB_ERROR_URN.getUrn())
@@ -191,7 +189,6 @@ public class PostgresServiceImpl implements PostgresService {
             })
         .onFailure(
             failureHandler -> {
-              LOGGER.error(failureHandler);
               String response =
                   new RespBuilder()
                       .withType(ResponseUrn.DB_ERROR_URN.getUrn())

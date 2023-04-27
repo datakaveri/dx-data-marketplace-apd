@@ -1,17 +1,16 @@
 package iudx.data.marketplace.product.util;
 
+import static iudx.data.marketplace.common.Constants.*;
+import static iudx.data.marketplace.product.util.Constants.*;
+
 import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
-
-import static iudx.data.marketplace.common.Constants.*;
-import static iudx.data.marketplace.product.util.Constants.*;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 public class QueryBuilder {
 
@@ -133,13 +132,13 @@ public class QueryBuilder {
                 .replace("$6", datasetIDs)
                 .replace("$7", datasetCaps)
                 .replace("$8", request.getDouble(PRICE).toString())
-                .replace("$9", request.getInteger(VALIDITY).toString())
+                .replace("$9", request.getInteger(DURATION).toString())
                 .replace("$s", Status.ACTIVE.toString()));
 
     return query.toString();
   }
 
-  public String updateProductVariantStatusQuery(String productID, String variant) {
+  public String   updateProductVariantStatusQuery(String productID, String variant) {
     StringBuilder query =
         new StringBuilder(
             UPDATE_PV_STATUS_QUERY
@@ -149,6 +148,16 @@ public class QueryBuilder {
                 .replace("$3", Status.ACTIVE.toString())
                 .replace("$4", Status.INACTIVE.toString()));
 
+    return query.toString();
+  }
+
+  public String selectProductVariant(String productID, String variantName) {
+    StringBuilder query =
+        new StringBuilder(
+            SELECT_PV_QUERY
+                .replace("$0", productVariantTable)
+                .replace("$1", productID)
+                .replace("$2", variantName).replace("$3", Status.ACTIVE.toString()));
     return query.toString();
   }
 }

@@ -1,22 +1,21 @@
 package iudx.data.marketplace.common;
 
+import static iudx.data.marketplace.common.Constants.*;
+
 import io.vertx.core.*;
 import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
 import io.vertx.ext.web.client.WebClient;
+import io.vertx.ext.web.client.WebClientOptions;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import io.vertx.ext.web.client.WebClientOptions;
-
-import static iudx.data.marketplace.common.Constants.*;
 
 /**
  * The Catalogue Service
  *
  * <h1>Catalogue Service</h1>
  *
- * <p>The catalogue service defines the operations to be performed on the
- * IUDX Catalogue Web client</p>
+ * <p>The catalogue service defines the operations to be performed on the IUDX Catalogue Web client
  *
  * @version 1.0
  * @since 2023-01-20
@@ -45,8 +44,8 @@ public class CatalogueService {
   }
 
   /**
-   * The getItemDetails method calls the IUDX Catalogue item endpoint to get corresponding details using
-   * a webClient
+   * The getItemDetails method calls the IUDX Catalogue item endpoint to get corresponding details
+   * using a webClient
    *
    * @see io.vertx.ext.web.client.WebClient
    * @param itemID which is String
@@ -74,7 +73,6 @@ public class CatalogueService {
                         .put(DATASET_ID, itemID)
                         .put(DATASET_NAME, result.getString("label"))
                         .put("accessPolicy", result.getString("accessPolicy"));
-
                   }
                   promise.complete(itemDetails);
                 } else {
@@ -102,16 +100,19 @@ public class CatalogueService {
         .get(catPort, catHost, catRelPath)
         .addQueryParam("id", datasetID)
         .addQueryParam("rel", "resource")
-        .send(catRelHandler -> {
-          if (catRelHandler.succeeded()) {
-            int totalHits = catRelHandler.result().bodyAsJsonObject().getInteger("totalHits");
-            JsonObject res = new JsonObject().put(DATASET_ID, datasetID).put("totalHits", totalHits);
-            promise.complete(res);
-          } else {
-            LOGGER.debug("Cat web client call to {} failed for id: {} ", catRelPath, datasetID);
-            promise.fail("Cat web client call to " + catItemPath + " failed for id: " + datasetID);
-          }
-        });
+        .send(
+            catRelHandler -> {
+              if (catRelHandler.succeeded()) {
+                int totalHits = catRelHandler.result().bodyAsJsonObject().getInteger("totalHits");
+                JsonObject res =
+                    new JsonObject().put(DATASET_ID, datasetID).put("totalHits", totalHits);
+                promise.complete(res);
+              } else {
+                LOGGER.debug("Cat web client call to {} failed for id: {} ", catRelPath, datasetID);
+                promise.fail(
+                    "Cat web client call to " + catItemPath + " failed for id: " + datasetID);
+              }
+            });
 
     return promise.future();
   }

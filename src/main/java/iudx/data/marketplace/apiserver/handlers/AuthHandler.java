@@ -71,20 +71,20 @@ public class AuthHandler implements Handler<RoutingContext> {
     if (result.contains("Not Found")) {
       LOGGER.error("Error : Item Not Found");
       HttpStatusCode statusCode = HttpStatusCode.getByValue(404);
-      generateResponse(ctx, RESOURCE_NOT_FOUND_URN, statusCode);
+      generateResponse(ctx, RESOURCE_NOT_FOUND_URN, statusCode, result);
     } else {
       LOGGER.error("Error : Authentication Failure");
       HttpStatusCode statusCode = HttpStatusCode.getByValue(401);
-      generateResponse(ctx, INVALID_TOKEN_URN, statusCode);
+      generateResponse(ctx, INVALID_TOKEN_URN, statusCode, result);
     }
   }
 
-  private void generateResponse(RoutingContext ctx, ResponseUrn urn, HttpStatusCode statusCode) {
+  private void generateResponse(RoutingContext ctx, ResponseUrn urn, HttpStatusCode statusCode, String errMessage) {
     String response =
         new RespBuilder()
             .withType(urn.getUrn())
             .withTitle(statusCode.getDescription())
-            .withDetail(statusCode.getDescription())
+            .withDetail(errMessage)
             .getResponse();
 
     ctx.response()

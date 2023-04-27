@@ -1,5 +1,7 @@
 package iudx.data.marketplace.product.variant;
 
+import static iudx.data.marketplace.product.util.Constants.*;
+
 import io.vertx.core.AsyncResult;
 import io.vertx.core.Future;
 import io.vertx.core.Handler;
@@ -7,17 +9,12 @@ import io.vertx.core.Promise;
 import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
 import iudx.data.marketplace.apiserver.exceptions.DxRuntimeException;
-import iudx.data.marketplace.common.HttpStatusCode;
 import iudx.data.marketplace.common.RespBuilder;
 import iudx.data.marketplace.common.ResponseUrn;
 import iudx.data.marketplace.postgres.PostgresService;
 import iudx.data.marketplace.product.util.QueryBuilder;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-
-import java.util.concurrent.atomic.AtomicReference;
-
-import static iudx.data.marketplace.product.util.Constants.*;
 
 public class ProductVariantServiceImpl implements ProductVariantService {
 
@@ -34,55 +31,82 @@ public class ProductVariantServiceImpl implements ProductVariantService {
   public ProductVariantService createProductVariant(
       JsonObject request, Handler<AsyncResult<JsonObject>> handler) {
     String productID = request.getString(PRODUCT_ID);
+    String variantName = request.getString(VARIANT);
+    Future<Boolean> checkForExistence = checkIfProductVariantExists(productID, variantName);
     Future<JsonObject> productDetailsFuture = getProductDetails(productID);
     JsonArray datasets = request.getJsonArray(DATASETS);
-    productDetailsFuture.onComplete(
-        pdfHandler -> {
-          if (pdfHandler.succeeded()) {
-            JsonObject res = pdfHandler.result().getJsonArray(RESULTS).getJsonObject(0);
-            JsonArray resDatasets = res.getJsonArray(DATASETS);
-            if (datasets.size() != resDatasets.size()) {
-              handler.handle(
-                  Future.failedFuture(
-                      "Number of datasets is incorrect, required : " + resDatasets.size()));
-            }
-            int i, j;
-            for (i = 0; i < datasets.size(); i++) {
-              for (j = 0; j < resDatasets.size(); j++) {
-                String reqID = datasets.getJsonObject(i).getString(ID);
-                String resID = resDatasets.getJsonObject(j).getString(ID);
-                if (reqID.equalsIgnoreCase(resID)) {
-                  resDatasets.getJsonObject(j).mergeIn(datasets.getJsonObject(i));
-                }
+
+    checkForExistence
+        .compose(
+            existenceHandler -> {
+              if (existenceHandler) {
+                return Future.failedFuture(ResponseUrn.RESOURCE_ALREADY_EXISTS_URN.getUrn());
+              } else {
+                return productDetailsFuture;
               }
-            }
-            request.mergeIn(res);
-            String query = queryBuilder.buildCreateProductVariantQuery(request);
-            pgService.executeQuery(
-                query,
-                pgHandler -> {
-                  if (pgHandler.succeeded()) {
-                    RespBuilder respBuilder =
-                        new RespBuilder()
-                            .withType(ResponseUrn.SUCCESS_URN.getUrn())
-                            .withTitle(ResponseUrn.SUCCESS_URN.getMessage())
-                            .withResult(
-                                new JsonArray()
-                                    .add(
-                                        new JsonObject()
-                                            .put(PRODUCT_ID, request.getString(PRODUCT_ID))
-                                            .put(VARIANT, request.getString(VARIANT))));
-                    handler.handle(Future.succeededFuture(respBuilder.getJsonResponse()));
-                  } else {
-                    handler.handle(Future.failedFuture(pgHandler.cause()));
+            })
+        .onComplete(
+            pdfHandler -> {
+              if (pdfHandler.succeeded()) {
+                JsonObject res = pdfHandler.result().getJsonArray(RESULTS).getJsonObject(0);
+                JsonArray resDatasets = res.getJsonArray(DATASETS);
+                if (datasets.size() != resDatasets.size()) {
+                  handler.handle(
+                      Future.failedFuture(
+                          "Number of datasets is incorrect, required : " + resDatasets.size()));
+                }
+                int i, j;
+                for (i = 0; i < datasets.size(); i++) {
+                  for (j = 0; j < resDatasets.size(); j++) {
+                    String reqID = datasets.getJsonObject(i).getString(ID);
+                    String resID = resDatasets.getJsonObject(j).getString(ID);
+                    if (reqID.equalsIgnoreCase(resID)) {
+                      resDatasets.getJsonObject(j).mergeIn(datasets.getJsonObject(i));
+                    }
                   }
-                });
+                }
+                request.mergeIn(res);
+                String query = queryBuilder.buildCreateProductVariantQuery(request);
+                pgService.executeQuery(
+                    query,
+                    pgHandler -> {
+                      if (pgHandler.succeeded()) {
+                        RespBuilder respBuilder =
+                            new RespBuilder()
+                                .withType(ResponseUrn.SUCCESS_URN.getUrn())
+                                .withTitle(ResponseUrn.SUCCESS_URN.getMessage())
+                                .withResult(
+                                    new JsonArray()
+                                        .add(
+                                            new JsonObject()
+                                                .put(PRODUCT_ID, productID)
+                                                .put(VARIANT, variantName)));
+                        handler.handle(Future.succeededFuture(respBuilder.getJsonResponse()));
+                      } else {
+                        handler.handle(Future.failedFuture(pgHandler.cause()));
+                      }
+                    });
+              } else {
+                handler.handle(Future.failedFuture(pdfHandler.cause()));
+              }
+            });
+    return this;
+  }
+
+  private Future<Boolean> checkIfProductVariantExists(String productID, String variantName) {
+    Promise<Boolean> promise = Promise.promise();
+    String query = queryBuilder.selectProductVariant(productID, variantName);
+    pgService.executeCountQuery(
+        query,
+        handler -> {
+          if (handler.succeeded()) {
+            if (handler.result().getInteger("totalHits") != 0) promise.complete(true);
+            else promise.complete(false);
           } else {
-            throw new DxRuntimeException(
-                500, ResponseUrn.DB_ERROR_URN, ResponseUrn.DB_ERROR_URN.getMessage());
+            promise.fail(handler.cause());
           }
         });
-    return this;
+    return promise.future();
   }
 
   Future<JsonObject> getProductDetails(String productID) {
@@ -138,6 +162,7 @@ public class ProductVariantServiceImpl implements ProductVariantService {
         query,
         pgHandler -> {
           if (pgHandler.succeeded()) {
+            LOGGER.debug(pgHandler.result());
             promise.complete(true);
           } else {
             promise.fail(pgHandler.cause());
