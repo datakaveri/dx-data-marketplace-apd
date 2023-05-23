@@ -71,7 +71,7 @@ public class ValidationHandlerTest {
                                     "datakaveri.org/b8bd3e3f39615c8ec96722131ae95056b5938f2f/rs.iudx.io/agra-swachhata-app")
                                 .put("capabilities", new JsonArray().add("api").add("sub"))))
                 .put("price", 100.0)
-                .put("validity", 12)));
+                .put("duration", 12)));
   }
 
   @ParameterizedTest

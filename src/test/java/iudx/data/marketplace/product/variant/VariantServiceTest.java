@@ -58,6 +58,7 @@ public class VariantServiceTest {
     ProductVariantServiceImpl variantServiceSpy = spy(variantServiceImpl);
     when(jsonObjectMock.getString("providerid")).thenReturn("provider-id");
     when(jsonObjectMock.getJsonArray(DATASETS)).thenReturn(jsonArrayMock);
+    when(jsonObjectMock.getInteger("totalHits")).thenReturn(0);
     doAnswer(
             Answer ->
                 Future.succeededFuture(
@@ -76,6 +77,19 @@ public class VariantServiceTest {
     when(jsonArrayMock.getJsonObject(anyInt())).thenReturn(jsonObjectMock);
 
     when(asyncResult.succeeded()).thenReturn(true);
+    when(asyncResult.result()).thenReturn(jsonObjectMock);
+    doAnswer(
+            new Answer<AsyncResult<JsonObject>>() {
+              @Override
+              public AsyncResult<JsonObject> answer(InvocationOnMock invocationOnMock)
+                      throws Throwable {
+                ((Handler<AsyncResult<JsonObject>>) invocationOnMock.getArgument(1))
+                        .handle(asyncResult);
+                return null;
+              }
+            })
+            .when(postgresService)
+            .executeCountQuery(anyString(), any());
     doAnswer(
             new Answer<AsyncResult<JsonObject>>() {
               @Override
@@ -95,6 +109,7 @@ public class VariantServiceTest {
           if (handler.succeeded()) {
             verify(variantServiceSpy, times(1)).getProductDetails(anyString());
             verify(postgresService, times(1)).executeQuery(anyString(),any());
+            verify(postgresService, times(1)).executeCountQuery(anyString(),any());
             testContext.completeNow();
           } else {
             testContext.failNow("create variant test failed");

@@ -21,6 +21,7 @@ import java.util.stream.Stream;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.lenient;
+import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 @ExtendWith(VertxExtension.class)
@@ -28,8 +29,10 @@ public class AuthCtxFactoryTest {
   public static final Logger LOGGER = LogManager.getLogger(AuthCtxFactoryTest.class);
   @Mock AuthorizationRequest authRequest;
   @Mock JwtData jwtData;
+  @Mock Api api;
+  @Mock Method method;
   DelegateAuthStatergy delegateAuthStatergy;
-  ConsumerAuthStatergy consumerAuthStatergy;
+  @Mock ConsumerAuthStatergy consumerAuthStatergy;
   AuthorizationContextFactory authorizationContextFactory;
 
   @Test
@@ -38,6 +41,9 @@ public class AuthCtxFactoryTest {
     authorizationContextFactory = new AuthorizationContextFactory();
     String role = "consumer";
     consumerAuthStatergy = new ConsumerAuthStatergy();
+    when(authRequest.getApi()).thenReturn(api);
+    when(api.getEndpoint()).thenReturn("dummy endpoint");
+    when(authRequest.getMethod()).thenReturn(method);
     assertFalse(consumerAuthStatergy.isAuthorized(authRequest, jwtData));
     assertNotNull(AuthorizationContextFactory.create(role));
     vertxTestContext.completeNow();

@@ -114,7 +114,22 @@ public class ProductServiceTest {
   @DisplayName("test delete product - success")
   public void testDeleteProduct(VertxTestContext testContext) {
 
+    JsonObject auth_info = new JsonObject().put(IID, "iid");
+    JsonObject request =
+        new JsonObject().put(AUTH_INFO, auth_info).put(PRODUCT_ID, "id").put("totalHits", 1);
     when(asyncResult.succeeded()).thenReturn(true);
+    when(asyncResult.result()).thenReturn(request);
+    doAnswer(
+            new Answer<AsyncResult<JsonObject>>() {
+              @Override
+              public AsyncResult<JsonObject> answer(InvocationOnMock arg0) throws Throwable {
+                ((Handler<AsyncResult<JsonObject>>) arg0.getArgument(1)).handle(asyncResult);
+                return null;
+              }
+            })
+        .when(postgresService)
+        .executeCountQuery(anyString(), any());
+
     doAnswer(
             new Answer<AsyncResult<JsonObject>>() {
               @Override
@@ -127,10 +142,11 @@ public class ProductServiceTest {
         .executePreparedQuery(anyString(), any(), any());
 
     productServiceImpl.deleteProduct(
-        new JsonObject(),
+        request,
         handler -> {
           if (handler.succeeded()) {
             verify(postgresService, times(2)).executePreparedQuery(anyString(), any(), any());
+            verify(postgresService, times(2)).executeCountQuery(anyString(), any());
             testContext.completeNow();
           } else {
             testContext.failNow("delete product test failed");
@@ -178,22 +194,29 @@ public class ProductServiceTest {
     when(asyncResult.succeeded()).thenReturn(true);
     when(asyncResult.result()).thenReturn(jsonObjectMock);
     when(jsonObjectMock.getInteger("totalHits")).thenReturn(1);
-    Mockito.doAnswer(new Answer<AsyncResult<JsonObject>>() {
-      @Override
-      public AsyncResult<JsonObject> answer(InvocationOnMock invocationOnMock) throws Throwable {
-        ((Handler<AsyncResult<JsonObject>>) invocationOnMock.getArgument(1))
-            .handle(asyncResult);
-        return null;
-      }
-    }).when(postgresService).executeCountQuery(anyString(),any());
+    Mockito.doAnswer(
+            new Answer<AsyncResult<JsonObject>>() {
+              @Override
+              public AsyncResult<JsonObject> answer(InvocationOnMock invocationOnMock)
+                  throws Throwable {
+                ((Handler<AsyncResult<JsonObject>>) invocationOnMock.getArgument(1))
+                    .handle(asyncResult);
+                return null;
+              }
+            })
+        .when(postgresService)
+        .executeCountQuery(anyString(), any());
 
-    productServiceImpl.checkIfProductExists(anyString(),anyString()).onComplete(handler -> {
-      if(handler.succeeded()) {
-        verify(postgresService, times(1)).executeCountQuery(anyString(),any());
-        testContext.completeNow();
-      } else {
-        testContext.failNow("product exists future test failed");
-      }
-    });
+    productServiceImpl
+        .checkIfProductExists(anyString(), anyString())
+        .onComplete(
+            handler -> {
+              if (handler.succeeded()) {
+                verify(postgresService, times(1)).executeCountQuery(anyString(), any());
+                testContext.completeNow();
+              } else {
+                testContext.failNow("product exists future test failed");
+              }
+            });
   }
 }
