@@ -112,7 +112,6 @@ public class ConsumerServiceTest {
 
     request.put(PROVIDER_ID, "iid");
     when(asyncResult.succeeded()).thenReturn(true);
-    consumerService = new ConsumerServiceImpl(config, postgresService);
     doAnswer(
             new Answer<AsyncResult<JsonObject>>() {
               @Override
