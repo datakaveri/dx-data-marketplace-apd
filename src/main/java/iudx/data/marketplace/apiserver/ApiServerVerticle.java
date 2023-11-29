@@ -121,6 +121,7 @@ public class ApiServerVerticle extends AbstractVerticle {
                   });
             });
 
+    //TODO: define API docs using /api endpoint here
     router.route().handler(BodyHandler.create());
 
     isSSL = config().getBoolean("ssl");
