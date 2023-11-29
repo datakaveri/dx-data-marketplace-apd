@@ -21,4 +21,6 @@ public class Constants {
       "iudx.data.marketplace.product.variant.service";
   public static final String POSTGRES_SERVICE_ADDRESS = "iudx.data.marketplace.postgres.service";
   public static final String CONSUMER_SERVICE_ADDRESS = "iudx.data.marketplace.consumer.service";
+  public static final String POLICY_SERVICE_ADDRESS = "iudx.apd.acl.policy.service";
+
 }
