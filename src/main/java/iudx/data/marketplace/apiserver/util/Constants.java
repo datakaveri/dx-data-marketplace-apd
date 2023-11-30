@@ -55,6 +55,7 @@ public class Constants {
   public static final String LIST_DATASETS_PATH = "/list/datasets";
   public static final String USERMAPS_PATH = "/product/usermaps";
   public static final String VERIFY_PATH = "/verify";
+  public static final String POLICIES_API = "/policies";
 
   // query parameters | request body
 
@@ -76,4 +77,19 @@ public class Constants {
 
   public static final int VALIDATION_PROVIDER_ID_MAXLEN = 200;
   public static final Pattern VALIDATION_PROVIDER_ID_REGEX = Pattern.compile("^[a-zA-Z0-9.]{4,100}/[a-zA-Z0-9.]{4,100}$");
+
+  // API docs
+  public static final String ROUTE_DOC = "/apis";
+  public static final String MIME_TEXT_HTML = "text/html";
+  public static final String ROUTE_STATIC_SPEC = "/apis/spec";
+  public static final String MIME_APPLICATION_JSON = "application/json";
+
+  // response keys
+  public static final String TYPE = "type";
+  public static final String TITLE = "title";
+  public static final String DETAIL = "detail";
+  public static final String RESULT = "results";
+  public static final String STATUS_CODE = "statusCode";
+
+
 }

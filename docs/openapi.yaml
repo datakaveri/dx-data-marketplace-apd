@@ -1,14 +1,14 @@
 openapi: 3.0.2
 info:
-  title: IUDX Data marketplace APIs
+  title: DX Data Marketplace APIs
   version: 4.5.0
-  description: 'The data marketplace is IUDX''s platform that enables data Providers to host their datasets as a product. Likewise, data consumers can buy the products listed by various providers '
+  description: 'The data marketplace is Data Exchange (DX) platform that enables data Providers to host their datasets as a product. Likewise, data consumers can buy the products listed by various providers '
   contact:
     email: support@iudx.org.in
     name: For support contact IUDX team at
 paths:
   /provider/product:
-    summary: Manage marketplace products and perform Create/Update/Delete operations on them. These apis are intended to be used by IUDX data providers
+    summary: Manage marketplace products and perform Create/Update/Delete operations on them. These apis are intended to be used by DX data providers
     post:
       tags:
         - provider
@@ -26,7 +26,7 @@ paths:
                     - stqc-flood-sensors
       parameters:
         - name: token
-          description: IUDX Auth token to process the request
+          description: DX Auth token to process the request
           schema:
             maxLength: 512
             minLength: 0
@@ -89,7 +89,7 @@ paths:
         - provider
       parameters:
         - name: token
-          description: IUDX Auth token to process the request
+          description: DX Auth token to process the request
           schema:
             maxLength: 512
             minLength: 0
@@ -152,7 +152,7 @@ paths:
         - provider
       parameters:
         - name: token
-          description: IUDX Auth token to process the request
+          description: DX Auth token to process the request
           schema:
             maxLength: 512
             minLength: 0
@@ -206,7 +206,7 @@ paths:
         - provider
       parameters:
         - name: token
-          description: IUDX Auth token to process the request
+          description: DX Auth token to process the request
           schema:
             maxLength: 512
             minLength: 0
@@ -293,7 +293,7 @@ paths:
             type: string
           in: header
           name: token
-          description: IUDX Auth token to process the request
+          description: DX Auth token to process the request
       requestBody:
         content:
           application/json:
@@ -366,7 +366,7 @@ paths:
             type: string
           in: header
           name: token
-          description: IUDX Auth token to process the request
+          description: DX Auth token to process the request
         - schema:
             type: string
           in: query
@@ -391,7 +391,7 @@ paths:
             type: string
           in: header
           name: token
-          description: IUDX Auth token to process the request
+          description: DX Auth token to process the request
       requestBody:
         content:
           application/json:
@@ -455,7 +455,7 @@ paths:
             type: string
           in: header
           name: token
-          description: IUDX Auth token to process the request
+          description: DX Auth token to process the request
   /consumer/list/datasets:
     summary: List API for the consumer to view the datasets available on the marketplace.
     get:
@@ -463,7 +463,7 @@ paths:
         - consumer
       parameters:
         - name: token
-          description: IUDX Auth token to process the request
+          description: DX Auth token to process the request
           schema:
             maxLength: 512
             minLength: 0
@@ -528,7 +528,7 @@ paths:
         - consumer
       parameters:
         - name: token
-          description: IUDX Auth token to process the request
+          description: DX Auth token to process the request
           schema:
             maxLength: 512
             minLength: 0
@@ -570,7 +570,7 @@ paths:
         - consumer
       parameters:
         - name: token
-          description: IUDX Auth token to process the request
+          description: DX Auth token to process the request
           schema:
             maxLength: 512
             minLength: 0
@@ -606,7 +606,7 @@ paths:
         - consumer
       parameters:
         - name: token
-          description: IUDX Auth token to process the request
+          description: DX Auth token to process the request
           schema:
             maxLength: 512
             minLength: 0
@@ -666,7 +666,7 @@ paths:
         - admin
       parameters:
         - name: token
-          description: IUDX Auth token to process the request
+          description: DX Auth token to process the request
           schema:
             maxLength: 512
             minLength: 0
