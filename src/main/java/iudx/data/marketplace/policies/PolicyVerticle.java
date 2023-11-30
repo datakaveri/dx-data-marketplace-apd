@@ -62,14 +62,14 @@ public class PolicyVerticle extends AbstractVerticle {
 
         catalogueService = new CatalogueService(vertx, config());
         postgresService = new PostgresServiceImpl(pool);
-//        deletePolicy = new DeletePolicy(postgresService);
-//        getPolicy = new GetPolicy(postgresService);
-//        createPolicy = new CreatePolicy(postgresService, catalogueService);
-//        verifyPolicy = new VerifyPolicy(postgresService, catalogueService);
-//        policyService = new PolicyServiceImpl(deletePolicy, createPolicy, getPolicy, verifyPolicy, config());
-//
-//         new ServiceBinder(vertx)
-//                .setAddress(POLICY_SERVICE_ADDRESS)
-//                .register(PolicyService.class, policyService);
+        deletePolicy = new DeletePolicy(postgresService);
+        getPolicy = new GetPolicy(postgresService);
+        createPolicy = new CreatePolicy(postgresService, catalogueService);
+        verifyPolicy = new VerifyPolicy(postgresService, catalogueService);
+        policyService = new PolicyServiceImpl(deletePolicy, createPolicy, getPolicy, verifyPolicy, config());
+
+         new ServiceBinder(vertx)
+                .setAddress(POLICY_SERVICE_ADDRESS)
+                .register(PolicyService.class, policyService);
     }
 }

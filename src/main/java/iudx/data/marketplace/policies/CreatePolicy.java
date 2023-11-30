@@ -17,10 +17,10 @@ import java.util.stream.Collectors;
 
 public class CreatePolicy {
     private static final Logger LOGGER = LogManager.getLogger(CreatePolicy.class);
-    private final PostgresServiceImpl postgresService;
+    private final PostgresService postgresService;
     private final CatalogueService catalogueService;
 
-    public CreatePolicy(PostgresServiceImpl postgresService, CatalogueService catalogueService) {
+    public CreatePolicy(PostgresService postgresService, CatalogueService catalogueService) {
         this.postgresService = postgresService;
         this.catalogueService = catalogueService;
     }
