@@ -5,6 +5,7 @@ import io.vertx.core.json.JsonObject;
 import io.vertx.pgclient.PgPool;
 import iudx.data.marketplace.apiserver.util.Role;
 
+import iudx.data.marketplace.postgres.PostgresService;
 import iudx.data.marketplace.postgres.PostgresServiceImpl;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -12,9 +13,9 @@ import org.slf4j.LoggerFactory;
 public class GetPolicy {
     private static final Logger LOG = LoggerFactory.getLogger(GetPolicy.class);
     private static final String FAILURE_MESSAGE = "Policy could not be fetched";
-    private final PostgresServiceImpl postgresService;
+    private final PostgresService postgresService;
 
-    public GetPolicy(PostgresServiceImpl postgresService) {
+    public GetPolicy(PostgresService postgresService) {
         this.postgresService = postgresService;
     }
 
