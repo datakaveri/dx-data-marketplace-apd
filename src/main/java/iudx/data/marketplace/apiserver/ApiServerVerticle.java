@@ -141,7 +141,7 @@ public class ApiServerVerticle extends AbstractVerticle {
             });
 
     router.route().handler(BodyHandler.create().setHandleFileUploads(false));
-    router.route().handler(TimeoutHandler.create(10000, 408));
+    router.route().handler(TimeoutHandler.create(30000, 408));
 
     isSSL = config().getBoolean("ssl");
 
