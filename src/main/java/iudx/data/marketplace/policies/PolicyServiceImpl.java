@@ -64,7 +64,7 @@ public class PolicyServiceImpl implements PolicyService{
     }
 
     @Override
-    public Future<JsonObject> getPolicy(User user) {
+    public Future<JsonObject> getPolicies(User user) {
         Promise<JsonObject> promise = Promise.promise();
         this.getPolicy
                 .initiateGetPolicy(user)

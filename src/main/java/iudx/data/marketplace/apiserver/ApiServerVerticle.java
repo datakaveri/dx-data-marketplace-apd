@@ -253,7 +253,7 @@ public class ApiServerVerticle extends AbstractVerticle {
 
     User user = routingContext.get("user");
     policyService
-            .getPolicy(user)
+            .getPolicies(user)
             .onComplete(
                     handler -> {
                       if (handler.succeeded()) {
