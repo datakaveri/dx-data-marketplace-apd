@@ -191,12 +191,6 @@ public class ApiServerVerticle extends AbstractVerticle {
 
 
     router
-            .put(api.getPoliciesUrl())
-            .handler(AuthHandler.create(vertx))
-            .handler(this::postPoliciesHandler)
-            .failureHandler(exceptionHandler);
-
-    router
             .get(api.getPoliciesUrl())
             .handler(AuthHandler.create(vertx))
             .handler(this::getPoliciesHandler)
@@ -249,24 +243,6 @@ public class ApiServerVerticle extends AbstractVerticle {
     }
   }
 
-  private void postPoliciesHandler(RoutingContext routingContext) {
-    JsonObject requestBody = routingContext.body().asJsonObject();
-    HttpServerResponse response = routingContext.response();
-    User user = routingContext.get("user");
-    policyService
-            .createPolicy(requestBody, user)
-            .onComplete(
-                    handler -> {
-                      if (handler.succeeded()) {
-                        LOGGER.info("Policy created successfully ");
-                        handleSuccessResponse(
-                                response, HttpStatusCode.SUCCESS.getValue(), handler.result().toString());
-                      } else {
-                        LOGGER.error("Policy could not be created");
-                        handleFailureResponse(routingContext, handler.cause().getMessage());
-                      }
-                    });
-  }
   private void deletePoliciesHandler(RoutingContext routingContext) {
     JsonObject policy = routingContext.body().asJsonObject();
     HttpServerResponse response = routingContext.response();
