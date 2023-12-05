@@ -6,9 +6,12 @@ import io.vertx.pgclient.PgConnectOptions;
 import io.vertx.pgclient.PgPool;
 import io.vertx.serviceproxy.ServiceBinder;
 import io.vertx.sqlclient.PoolOptions;
+import iudx.data.marketplace.apiserver.ApiServerVerticle;
 import iudx.data.marketplace.common.CatalogueService;
 import iudx.data.marketplace.postgres.PostgresService;
 import iudx.data.marketplace.postgres.PostgresServiceImpl;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import java.util.Map;
 
@@ -26,11 +29,9 @@ public class PolicyVerticle extends AbstractVerticle {
     private VerifyPolicy verifyPolicy;
     private GetPolicy getPolicy;
     private CatalogueService catalogueService;
-    private Vertx vertx;
 
     @Override
-    public void start() throws Exception {
-        vertx = Vertx.vertx();
+    public void start() {
         catalogueService = new CatalogueService(vertx, config());
         postgresService = PostgresService.createProxy(vertx, POSTGRES_SERVICE_ADDRESS);
         deletePolicy = new DeletePolicy(postgresService);
