@@ -51,7 +51,8 @@ public class PostgresServiceImpl implements PostgresService {
             })
         .onFailure(
             failureHandler -> {
-              String response =
+                LOGGER.debug("Failure : {}",failureHandler.getMessage() );
+                String response =
                   new RespBuilder()
                       .withType(ResponseUrn.DB_ERROR_URN.getUrn())
                       .withTitle(ResponseUrn.DB_ERROR_URN.getMessage())
@@ -75,7 +76,8 @@ public class PostgresServiceImpl implements PostgresService {
             })
         .onFailure(
             failureHandler -> {
-              String response =
+                LOGGER.debug("Failure : {}",failureHandler.getMessage() );
+                String response =
                   new RespBuilder()
                       .withType(ResponseUrn.DB_ERROR_URN.getUrn())
                       .withTitle(ResponseUrn.DB_ERROR_URN.getMessage())
@@ -110,7 +112,8 @@ public class PostgresServiceImpl implements PostgresService {
               })
           .onFailure(
               failureHandler -> {
-                LOGGER.error("Fail db");
+                  LOGGER.debug("Failure : {}",failureHandler.getMessage() );
+                  LOGGER.error("Fail db");
                 promise.fail(failureHandler);
               });
       return promise.future();
@@ -142,7 +145,8 @@ public class PostgresServiceImpl implements PostgresService {
                 handler.handle(Future.succeededFuture(responseJson));
               } else {
                 LOGGER.debug("transaction failed");
-                String response =
+                LOGGER.debug("Failure : {}",completeHandler.cause().getMessage());
+                  String response =
                     new RespBuilder()
                         .withType(ResponseUrn.DB_ERROR_URN.getUrn())
                         .withTitle(ResponseUrn.DB_ERROR_URN.getMessage())
@@ -189,6 +193,7 @@ public class PostgresServiceImpl implements PostgresService {
             })
         .onFailure(
             failureHandler -> {
+                LOGGER.debug("Failure : {}",failureHandler.getMessage());
               String response =
                   new RespBuilder()
                       .withType(ResponseUrn.DB_ERROR_URN.getUrn())
