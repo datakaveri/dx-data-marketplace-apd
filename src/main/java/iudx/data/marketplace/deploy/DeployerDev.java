@@ -8,6 +8,7 @@ import io.vertx.core.cli.CommandLine;
 import io.vertx.core.cli.Option;
 import io.vertx.core.eventbus.EventBusOptions;
 import io.vertx.core.json.JsonObject;
+import iudx.data.marketplace.apiserver.ApiServerVerticle;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -22,6 +23,7 @@ public class DeployerDev {
 
   public static void recursiveDeploy(Vertx vertx, JsonObject configs, int i) {
     if (i >= configs.getJsonArray("modules").size()) {
+      ApiServerVerticle.callCreatePolicy();
       LOGGER.info("Deployed all");
       return;
     }

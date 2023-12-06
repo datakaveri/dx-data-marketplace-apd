@@ -15,12 +15,13 @@ import io.vertx.ext.web.handler.CorsHandler;
 import io.vertx.ext.web.handler.TimeoutHandler;
 import iudx.data.marketplace.apiserver.handlers.AuthHandler;
 import iudx.data.marketplace.apiserver.handlers.ExceptionHandler;
-import iudx.data.marketplace.common.Api;
-import iudx.data.marketplace.common.HttpStatusCode;
-import iudx.data.marketplace.common.RespBuilder;
-import iudx.data.marketplace.common.ResponseUrn;
+import iudx.data.marketplace.common.*;
+import iudx.data.marketplace.policies.CreatePolicy;
 import iudx.data.marketplace.policies.PolicyService;
+import iudx.data.marketplace.policies.PolicyServiceImpl;
 import iudx.data.marketplace.policies.User;
+import iudx.data.marketplace.postgres.PostgresService;
+import iudx.data.marketplace.postgres.PostgresServiceImpl;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -34,6 +35,7 @@ import java.util.stream.Stream;
 import static iudx.data.marketplace.apiserver.response.ResponseUtil.generateResponse;
 import static iudx.data.marketplace.apiserver.util.Constants.*;
 import static iudx.data.marketplace.common.Constants.POLICY_SERVICE_ADDRESS;
+import static iudx.data.marketplace.common.Constants.POSTGRES_SERVICE_ADDRESS;
 import static iudx.data.marketplace.common.HttpStatusCode.BAD_REQUEST;
 
 /**
@@ -50,16 +52,31 @@ import static iudx.data.marketplace.common.HttpStatusCode.BAD_REQUEST;
 public class ApiServerVerticle extends AbstractVerticle {
 
   private static final Logger LOGGER = LogManager.getLogger(ApiServerVerticle.class);
-
+  private static PolicyService policyService;
   private HttpServer server;
   private Router router;
   private String detail;
-
   private int port;
   private boolean isSSL;
   private String keystore;
   private String keystorePassword;
-  private PolicyService policyService;
+  private PostgresService postgresService;
+
+  public static void callCreatePolicy()
+  {
+    policyService.createPolicy(new JsonObject(),null).onComplete(handler -> {
+      if(handler.succeeded())
+      {
+        LOGGER.info("Insertion Success");
+//        LOGGER.debug(handler.result().encodePrettily());
+      }
+      else
+      {
+        handler.cause().printStackTrace();
+        LOGGER.error("Failure : " + handler.cause().getMessage());
+      }
+    });
+  }
 
   /**
    * This method is used to start the Verticle. It deploys a verticle in a cluster, reads the
@@ -89,7 +106,10 @@ public class ApiServerVerticle extends AbstractVerticle {
     allowedMethods.add(HttpMethod.PUT);
 
     Api api = Api.getInstance(config().getString("dxApiBasePath"));
+
+    /* Initialize service proxy */
     policyService = PolicyService.createProxy(vertx, POLICY_SERVICE_ADDRESS);
+    postgresService = PostgresService.createProxy(vertx, POSTGRES_SERVICE_ADDRESS);
 
     router = Router.router(vertx);
 
@@ -267,6 +287,7 @@ public class ApiServerVerticle extends AbstractVerticle {
                       }
                     });
   }
+
   private void getPoliciesHandler(RoutingContext routingContext) {
     HttpServerResponse response = routingContext.response();
 
