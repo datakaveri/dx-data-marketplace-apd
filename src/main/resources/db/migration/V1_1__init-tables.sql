@@ -26,7 +26,7 @@ CREATE TABLE IF NOT EXISTS user_table
 	first_name varchar NOT NULL,
 	last_name varchar NOT NULL,
 	created_at timestamp without time zone NOT NULL,
-	updated_at timestamp without time zone NOT NULL,
+	modified_at timestamp without time zone NOT NULL,
 	CONSTRAINT user_pk PRIMARY KEY (_id)
 
 );
@@ -40,7 +40,7 @@ CREATE TABLE IF NOT EXISTS resource_entity
 	resource_server_url varchar NOT NULL,
 	accessPolicy varchar NOT NULL,
 	created_at timestamp without time zone NOT NULL,
-	updated_at timestamp without time zone NOT NULL,
+	modified_at timestamp without time zone NOT NULL,
 	CONSTRAINT resource_pk PRIMARY KEY (_id),
 	CONSTRAINT provider_id_fk FOREIGN KEY (provider_id) REFERENCES user_table(_id)
 );
