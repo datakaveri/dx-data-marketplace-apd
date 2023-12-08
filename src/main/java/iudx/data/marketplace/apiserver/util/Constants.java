@@ -42,6 +42,7 @@ public class Constants {
   public static final String RS_SERVER_URL = "resourceServerUrl";
   public static final String FIRST_NAME = "firstName";
   public static final String LAST_NAME = "lastName";
+  public static final String POLICY_ID = "id";
 
 
   // paths
@@ -74,6 +75,8 @@ public class Constants {
   public static final Pattern VALIDATION_VARIANT_NAME_REGEX = Pattern.compile("^[a-zA-Z0-9-]{3,100}$");
   public static final int VALIDATION_DATASET_ID_MAXLEN = 512;
   public static final Pattern VALIDATION_DATASET_ID_REGEX = Pattern.compile("^[a-zA-Z0-9.]{4,100}/[a-zA-Z0-9.]{4,100}/[a-zA-Z.]{4,100}/[a-zA-Z-_.]{4,100}$");
+  public static final Pattern POLICY_ID_PATTERN = Pattern.compile("[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-4[a-fA-F0-9]{3}-[89abAB][a-fA-F0-9]{3}-[a-fA-F0-9]{12}");
+
 
   public static final int VALIDATION_PROVIDER_ID_MAXLEN = 200;
   public static final Pattern VALIDATION_PROVIDER_ID_REGEX = Pattern.compile("^[a-zA-Z0-9.]{4,100}/[a-zA-Z0-9.]{4,100}$");
