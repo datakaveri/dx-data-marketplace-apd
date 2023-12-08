@@ -15,6 +15,8 @@ import io.vertx.ext.web.handler.CorsHandler;
 import io.vertx.ext.web.handler.TimeoutHandler;
 import iudx.data.marketplace.apiserver.handlers.AuthHandler;
 import iudx.data.marketplace.apiserver.handlers.ExceptionHandler;
+import iudx.data.marketplace.apiserver.handlers.ValidationHandler;
+import iudx.data.marketplace.apiserver.util.RequestType;
 import iudx.data.marketplace.common.*;
 import iudx.data.marketplace.policies.CreatePolicy;
 import iudx.data.marketplace.policies.PolicyService;
@@ -161,7 +163,7 @@ public class ApiServerVerticle extends AbstractVerticle {
             });
 
     router.route().handler(BodyHandler.create().setHandleFileUploads(false));
-    router.route().handler(TimeoutHandler.create(30000, 408));
+    router.route().handler(TimeoutHandler.create(90000, 408));
 
     isSSL = config().getBoolean("ssl");
 
@@ -208,8 +210,8 @@ public class ApiServerVerticle extends AbstractVerticle {
     router.route(CONSUMER_BASE_PATH + "/*").subRouter(new ConsumerApis(vertx, router).init());
 
     ExceptionHandler exceptionHandler = new ExceptionHandler();
-
-
+    ValidationHandler policyValidationHandler = new ValidationHandler(vertx, RequestType.POLICY);
+    ValidationHandler verifyValidationHandler = new ValidationHandler(vertx, RequestType.VERIFY);
     router
             .get(api.getPoliciesUrl())
             .handler(AuthHandler.create(vertx))
@@ -218,6 +220,7 @@ public class ApiServerVerticle extends AbstractVerticle {
 
     router
             .delete(api.getPoliciesUrl())
+            .handler(policyValidationHandler)
             .handler(AuthHandler.create(vertx))
             .handler(this::deletePoliciesHandler)
             .failureHandler(exceptionHandler);
@@ -229,6 +232,8 @@ public class ApiServerVerticle extends AbstractVerticle {
 
     router
         .post(VERIFY_PATH)
+        .handler(verifyValidationHandler)
+        .handler(AuthHandler.create(vertx))
         .handler(this::handleVerify)
         .failureHandler(exceptionHandler);
 
