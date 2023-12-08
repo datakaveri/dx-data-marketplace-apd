@@ -38,17 +38,17 @@ public class ValidationHandlerFactory {
         validator: getPolicyValidators(parameters);
         break;
       case VERIFY:
-        validator: getVerifyPolicyValidator(parameters);
+        validator: getVerifyPolicyValidator(parameters, body);
         break;
 
     }
     return validator;
   }
 
-  private List<Validator> getVerifyPolicyValidator(MultiMap parameters) {
+  private List<Validator> getVerifyPolicyValidator(MultiMap parameters, JsonObject body) {
     List<Validator> validators = new ArrayList<>();
-
-    return null;
+    validators.add(new JsonSchemaTypeValidator(body, RequestType.VERIFY));
+    return validators;
   }
 
   private List<Validator> getPolicyValidators(final MultiMap parameters){
