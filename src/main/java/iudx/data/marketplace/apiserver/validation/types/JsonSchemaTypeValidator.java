@@ -22,10 +22,13 @@ public class JsonSchemaTypeValidator implements Validator {
 
   private final JsonObject body;
   private final RequestType requestType;
+  private static String pkg = Validator.class.getPackageName();
+  private static final String PACKAGE_NAME = "/" + pkg.replace(".","/");
 
   public JsonSchemaTypeValidator(JsonObject body, RequestType requestType) {
     this.body = body;
     this.requestType = requestType;
+    isValid();
   }
 
   @Override
@@ -45,7 +48,7 @@ public class JsonSchemaTypeValidator implements Validator {
 
   private boolean validateJson(JsonObject body, RequestType requestType) throws IOException, ProcessingException {
     boolean isValid;
-    String schemaPath = "/".concat(requestType.getFilename()).concat("_schema.json");
+    String schemaPath = PACKAGE_NAME + "/".concat(requestType.getFilename()).concat("_schema.json");
 
     LOGGER.debug(schemaPath);
     final JsonSchema schema;
