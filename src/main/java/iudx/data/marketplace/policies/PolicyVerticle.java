@@ -23,6 +23,7 @@ import static iudx.data.marketplace.policies.util.Constants.DB_RECONNECT_INTERVA
 public class PolicyVerticle extends AbstractVerticle {
 
     private PostgresService postgresService;
+    private PostgresServiceImpl postgresServiceImpl;
     private PolicyServiceImpl policyService;
     private DeletePolicy deletePolicy;
     private CreatePolicy createPolicy;
@@ -34,10 +35,11 @@ public class PolicyVerticle extends AbstractVerticle {
     public void start() {
         catalogueService = new CatalogueService(vertx, config());
         postgresService = PostgresService.createProxy(vertx, POSTGRES_SERVICE_ADDRESS);
+        postgresServiceImpl = new PostgresServiceImpl(config(), vertx);
         deletePolicy = new DeletePolicy(postgresService);
         getPolicy = new GetPolicy(postgresService);
-        createPolicy = new CreatePolicy(postgresService, catalogueService);
-        verifyPolicy = new VerifyPolicy(postgresService, catalogueService);
+        createPolicy = new CreatePolicy(postgresServiceImpl, catalogueService);
+        verifyPolicy = new VerifyPolicy(postgresServiceImpl);
         policyService = new PolicyServiceImpl(deletePolicy, createPolicy, getPolicy, verifyPolicy, config());
 
          new ServiceBinder(vertx)

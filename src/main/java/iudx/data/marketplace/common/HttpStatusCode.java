@@ -16,6 +16,8 @@ public enum HttpStatusCode {
   UNAUTHORIZED(401, "Not Authorized", "urn:dx:dm:notAuthorized"),
   PAYMENT_REQUIRED(402, "Payment Required", "urn:dx:dm:paymentRequired"),
   FORBIDDEN(403, "Forbidden", "urn:dx:dm:forbidden"),
+  VERIFY_FORBIDDEN(403, "Policy does not exist", "urn:apd:Deny"),
+
   NOT_FOUND(404, "Not Found", "urn:dx:dm:notFound"),
   METHOD_NOT_ALLOWED(405, "Method Not Allowed", "urn:dx:dm:methodNotAllowed"),
   NOT_ACCEPTABLE(406, "Not Acceptable", "urn:dx:dm:notAcceptable"),
