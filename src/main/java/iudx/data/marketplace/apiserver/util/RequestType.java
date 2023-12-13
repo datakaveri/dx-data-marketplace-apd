@@ -3,7 +3,7 @@ package iudx.data.marketplace.apiserver.util;
 public enum RequestType {
   PRODUCT("product"),
   PRODUCT_VARIANT("product_variant"),
-  DATASET("dataset"),
+  RESOURCE("resource"),
   PROVIDER("provider");
 
   private String filename;

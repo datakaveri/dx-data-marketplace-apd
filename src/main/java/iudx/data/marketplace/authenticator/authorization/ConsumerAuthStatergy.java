@@ -21,7 +21,7 @@ public class ConsumerAuthStatergy implements AuthorizationStatergy {
 
     // api access list
     List<AuthorizationRequest> apiAccessList = new ArrayList<>();
-    apiAccessList.add(new AuthorizationRequest(GET, CONSUMER_LIST_DATASETS));
+    apiAccessList.add(new AuthorizationRequest(GET, CONSUMER_LIST_RESOURCES));
     apiAccessList.add(new AuthorizationRequest(GET, CONSUMER_LIST_PROVIDERS));
     apiAccessList.add(new AuthorizationRequest(GET, CONSUMER_LIST_PRODUCTS));
     apiAccessList.add(new AuthorizationRequest(GET, CONSUMER_LIST_PURCHASES));

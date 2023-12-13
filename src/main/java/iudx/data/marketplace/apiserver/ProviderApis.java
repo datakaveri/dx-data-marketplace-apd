@@ -19,6 +19,7 @@ import iudx.data.marketplace.common.RespBuilder;
 import iudx.data.marketplace.common.ResponseUrn;
 import iudx.data.marketplace.product.ProductService;
 import iudx.data.marketplace.product.variant.ProductVariantService;
+import java.util.Map;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -40,7 +41,7 @@ public class ProviderApis {
     ValidationHandler productValidationHandler = new ValidationHandler(vertx, RequestType.PRODUCT);
     ValidationHandler variantValidationHandler =
         new ValidationHandler(vertx, RequestType.PRODUCT_VARIANT);
-    ValidationHandler datasetValidationHandler = new ValidationHandler(vertx, RequestType.DATASET);
+    ValidationHandler resourceValidationHandler = new ValidationHandler(vertx, RequestType.RESOURCE);
     ExceptionHandler exceptionHandler = new ExceptionHandler();
 
     productService = ProductService.createProxy(vertx, PRODUCT_SERVICE_ADDRESS);
@@ -63,7 +64,7 @@ public class ProviderApis {
 
     router
         .get(PROVIDER_BASE_PATH + LIST_PRODUCTS_PATH)
-        .handler(datasetValidationHandler)
+        .handler(resourceValidationHandler)
         .handler(AuthHandler.create(vertx))
         .handler(this::listProducts)
         .failureHandler(exceptionHandler);
@@ -157,8 +158,9 @@ public class ProviderApis {
   private void listProducts(RoutingContext routingContext) {
     HttpServerRequest request = routingContext.request();
     JsonObject requestBody = new JsonObject();
-    if (request.getParam(DATASET_ID) != null) {
-      requestBody.put(DATASET_ID, request.getParam(DATASET_ID));
+
+    for (Map.Entry<String, String> param : request.params()) {
+      requestBody.put(param.getKey(), param.getValue());
     }
     JsonObject authInfo = (JsonObject) routingContext.data().get(AUTH_INFO);
     requestBody.put(AUTH_INFO, authInfo);

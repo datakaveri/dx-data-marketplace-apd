@@ -1,10 +1,14 @@
 package iudx.data.marketplace.authenticator;
 
-import iudx.data.marketplace.authenticator.authorization.*;
-import iudx.data.marketplace.authenticator.model.JwtData;
-import iudx.data.marketplace.authenticator.authorization.Api.*;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+import static iudx.data.marketplace.authenticator.util.Constants.API_ENDPOINT;
+import static iudx.data.marketplace.authenticator.util.Constants.TOKEN;
+import static iudx.data.marketplace.authenticator.util.Constants.METHOD;
+import static iudx.data.marketplace.authenticator.util.Constants.USER_ROLE;
+import static iudx.data.marketplace.authenticator.util.Constants.USER_ID;
+import static iudx.data.marketplace.authenticator.util.Constants.ADMIN;
+import static iudx.data.marketplace.authenticator.util.Constants.IID;
+import static iudx.data.marketplace.common.Constants.EXPIRY;
+import static iudx.data.marketplace.common.Constants.PROVIDER_ID;
 
 import io.vertx.core.AsyncResult;
 import io.vertx.core.Future;
@@ -14,8 +18,10 @@ import io.vertx.core.Vertx;
 import io.vertx.core.json.JsonObject;
 import io.vertx.ext.auth.authentication.TokenCredentials;
 import io.vertx.ext.auth.jwt.JWTAuth;
-
-import static iudx.data.marketplace.authenticator.util.Constants.*;
+import iudx.data.marketplace.authenticator.authorization.*;
+import iudx.data.marketplace.authenticator.model.JwtData;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 public class AuthenticationServiceImpl implements AuthenticationService {
 
@@ -63,11 +69,6 @@ public class AuthenticationServiceImpl implements AuthenticationService {
               }
             });
     return this;
-  }
-
-  // class to contain intermediate data for token introspection
-  final class ResultContainer {
-    JwtData jwtData;
   }
 
   Future<JwtData> decodeJwt(String jwtToken) {
@@ -136,19 +137,20 @@ public class AuthenticationServiceImpl implements AuthenticationService {
       JsonObject response = new JsonObject();
 
       response.put(USER_ROLE, jwtData.getRole()).put(USER_ID, jwtData.getSub());
+      response.put(EXPIRY,jwtData.getExp());
       if (jwtData.getRole().equalsIgnoreCase(ADMIN)) {
         response.put(IID, "admin");
       } else {
-        if (jwtData.getIid().contains("/")) {
-          response.put(
-              IID,
-              (jwtData.getIid().split(":")[1]).split("/")[0]
-                  + "/"
-                  + (jwtData.getIid().split(":")[1]).split("/")[1]);
-        } else {
           response.put(IID, (jwtData.getIid().split(":")[1]));
-        }
       }
+
+      // Add provider user's id for provider APIs
+      if(jwtData.getRole().equalsIgnoreCase("provider")) {
+        response.put(PROVIDER_ID, jwtData.getSub());
+      } else if(jwtData.getDrl().equalsIgnoreCase("provider")) {
+        response.put(PROVIDER_ID, jwtData.getDid());
+      }
+
       promise.complete(response);
     } else {
       LOGGER.error("user access denied");
@@ -156,5 +158,10 @@ public class AuthenticationServiceImpl implements AuthenticationService {
       promise.fail(result.toString());
     }
     return promise.future();
+  }
+
+  // class to contain intermediate data for token introspection
+  final class ResultContainer {
+    JwtData jwtData;
   }
 }

@@ -22,6 +22,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.mockito.stubbing.Answer;
 
 import static iudx.data.marketplace.common.Constants.PROVIDER_NAME;
+import static iudx.data.marketplace.common.Constants.TYPE_RG;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.anyString;
@@ -80,7 +81,7 @@ public class CatalogueServiceTest {
     when(jsonArrayMock.isEmpty()).thenReturn(false);
     when(jsonArrayMock.getJsonObject(anyInt())).thenReturn(jsonObjectMock);
     when(jsonObjectMock.getJsonArray("type").contains("iudx:Provider")).thenReturn(true);
-    when(jsonObjectMock.getString("description")).thenReturn("new desc");
+    when(jsonObjectMock.getString("description", "")).thenReturn("new desc");
     catalogueService
         .getItemDetails("new-item-id")
         .onComplete(
@@ -96,16 +97,16 @@ public class CatalogueServiceTest {
   }
 
   @Test
-  @DisplayName("test get dataset details")
-  public void testGetDatasetDetails(VertxTestContext testContext) {
+  @DisplayName("test get resource details")
+  public void testGetResourceDetails(VertxTestContext testContext) {
 
     when(jsonObjectMock.getJsonArray(anyString())).thenReturn(jsonArrayMock);
     when(jsonArrayMock.isEmpty()).thenReturn(false);
     when(jsonArrayMock.getJsonObject(anyInt())).thenReturn(jsonObjectMock);
     when(jsonObjectMock.getJsonArray("type").contains("iudx:Provider")).thenReturn(false);
     when(jsonObjectMock.getJsonArray("type").contains("iudx:ResourceGroup")).thenReturn(true);
-    when(jsonObjectMock.getString("label")).thenReturn("labelxyz");
-    when(jsonObjectMock.getString("accessPolicy")).thenReturn("OPEN");
+    when(jsonObjectMock.getString("label", "")).thenReturn("labelxyz");
+    when(jsonObjectMock.getString("accessPolicy", "")).thenReturn("OPEN");
     catalogueService
         .getItemDetails("new-item-id")
         .onComplete(
@@ -116,8 +117,9 @@ public class CatalogueServiceTest {
                 verify(httpRequest, times(1)).addQueryParam(anyString(), anyString());
                 assertEquals(
                     new JsonObject()
-                        .put("datasetID", "new-item-id")
-                        .put("datasetName", "labelxyz")
+                        .put("type", TYPE_RG)
+                        .put("resourceID", "new-item-id")
+                        .put("resourceName", "labelxyz")
                         .put("accessPolicy", "OPEN"),
                     handler.result());
                 testContext.completeNow();
@@ -131,7 +133,7 @@ public class CatalogueServiceTest {
 
     when(jsonObjectMock.getInteger("totalHits")).thenReturn(5);
     catalogueService
-        .getResourceCount("dataset-id")
+        .getResourceCount("resource-id")
         .onComplete(
             handler -> {
               if (handler.succeeded()) {
@@ -139,10 +141,27 @@ public class CatalogueServiceTest {
                     .get(anyInt(), anyString(), anyString());
                 verify(httpRequest, times(2)).addQueryParam(anyString(), anyString());
                 assertEquals(
-                    new JsonObject().put("datasetID", "dataset-id").put("totalHits", 5),
+                    new JsonObject().put("resourceID", "resource-id").put("totalHits", 5),
                     handler.result());
                 testContext.completeNow();
               }
+            });
+  }
+
+  @Test
+  public void newTest(Vertx vertx, VertxTestContext testContext) throws InterruptedException {
+
+    JsonObject config = configuration.configLoader(3, vertx);
+//    CatalogueService newCat = new CatalogueService(vertx, config);
+
+    JsonObject params = new JsonObject();
+    params.put("id", "dec308e5-bc50-3671-af18-7f89ec33564b");
+        params.put("ownerUserId", "d8e46706-b9db-44e1-a9aa-e40839396b01");
+
+
+        catalogueService.searchApi(params)
+            .onSuccess(ar -> {
+              testContext.completeNow();
             });
   }
 }

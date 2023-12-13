@@ -10,6 +10,8 @@ import io.vertx.ext.web.client.WebClientOptions;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import java.util.concurrent.TimeUnit;
+
 /**
  * The Catalogue Service
  *
@@ -66,13 +68,18 @@ public class CatalogueService {
                   JsonObject result = response.getJsonObject(0);
                   if (result.getJsonArray("type").contains(TYPE_PROVIDER)) {
                     itemDetails
+                        .put("type", TYPE_PROVIDER)
                         .put(PROVIDER_ID, itemID)
-                        .put(PROVIDER_NAME, result.getString("description"));
-                  } else if (result.getJsonArray("type").contains(TYPE_RG)) {
+                        .put("ownerUserId", result.getString("ownerUserId", ""))
+                        .put(PROVIDER_NAME, result.getString("description", ""));
+                  } else if (result.getJsonArray("type").contains(TYPE_RI)) {
                     itemDetails
-                        .put(DATASET_ID, itemID)
-                        .put(DATASET_NAME, result.getString("label"))
-                        .put("accessPolicy", result.getString("accessPolicy"));
+                        .put("type", TYPE_RI)
+                        .put(RESOURCE_ID, itemID)
+                        .put(RESOURCE_NAME, result.getString("label", ""))
+                        .put(RESOURCE_SERVER, result.getValue(RESOURCE_SERVER))
+                        .put(PROVIDER, result.getValue(PROVIDER))
+                        .put("accessPolicy", result.getString("accessPolicy", ""));
                   }
                   promise.complete(itemDetails);
                 } else {
@@ -91,29 +98,62 @@ public class CatalogueService {
    * The getResourceCount method calls the IUDX catalogue relationship endpoint using a webClient
    *
    * @see io.vertx.ext.web.client.WebClient
-   * @param datasetID which is a String
+   * @param resourceID which is a String
    * @return Future which is of type JsonObject
    */
-  public Future<JsonObject> getResourceCount(String datasetID) {
+  public Future<JsonObject> getResourceCount(String resourceID) {
     Promise<JsonObject> promise = Promise.promise();
     catWebClient
         .get(catPort, catHost, catRelPath)
-        .addQueryParam("id", datasetID)
+        .addQueryParam("id", resourceID)
         .addQueryParam("rel", "resource")
         .send(
             catRelHandler -> {
               if (catRelHandler.succeeded()) {
                 int totalHits = catRelHandler.result().bodyAsJsonObject().getInteger("totalHits");
                 JsonObject res =
-                    new JsonObject().put(DATASET_ID, datasetID).put("totalHits", totalHits);
+                    new JsonObject().put(RESOURCE_ID, resourceID).put("totalHits", totalHits);
                 promise.complete(res);
               } else {
-                LOGGER.debug("Cat web client call to {} failed for id: {} ", catRelPath, datasetID);
+                LOGGER.debug("Cat web client call to {} failed for id: {} ", catRelPath, resourceID);
                 promise.fail(
-                    "Cat web client call to " + catItemPath + " failed for id: " + datasetID);
+                    "Cat web client call to " + catItemPath + " failed for id: " + resourceID);
               }
             });
 
+    return promise.future();
+  }
+
+  public Future<JsonObject> searchApi(JsonObject params) {
+    Promise<JsonObject> promise = Promise.promise();
+
+    JsonArray keysArray = new JsonArray();
+    JsonArray valuesArray = new JsonArray();
+
+    params.forEach(entry -> {
+      keysArray.add(entry.getKey());
+      JsonArray valueArray = new JsonArray().add(entry.getValue());
+      valuesArray.add(valueArray.getList());
+    });
+
+    LOGGER.debug(keysArray.getList().toString());
+    LOGGER.debug(valuesArray.getList().toString());
+
+    catWebClient
+        .get(catPort, catHost, "/iudx/cat/v1/search")
+        .addQueryParam("property", keysArray.getList().toString())
+        .addQueryParam("value", valuesArray.getList().toString())
+            .send(searchApiHandler -> {
+              if(searchApiHandler.succeeded()) {
+                LOGGER.debug("here");
+                LOGGER.debug(searchApiHandler.result().bodyAsJsonObject());
+              } else {
+                LOGGER.debug("here2");
+                LOGGER.error(searchApiHandler.cause());
+              }
+            });
+
+    promise.complete();
     return promise.future();
   }
 }

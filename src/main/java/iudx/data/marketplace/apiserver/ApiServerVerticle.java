@@ -145,6 +145,25 @@ public class ApiServerVerticle extends AbstractVerticle {
     server = vertx.createHttpServer(serverOptions);
     server.requestHandler(router).listen(port);
 
+    //  Documentation routes
+
+    /* Static Resource Handler */
+    /* Get openapiv3 spec */
+    router.get(ROUTE_STATIC_SPEC)
+        .produces(MIME_APPLICATION_JSON)
+        .handler(routingContext -> {
+          HttpServerResponse response = routingContext.response();
+          response.sendFile("docs/apidocs.yaml");
+        });
+    /* Get redoc */
+    router.get(ROUTE_DOC)
+        .produces(MIME_TEXT_HTML)
+        .handler(routingContext -> {
+          HttpServerResponse response = routingContext.response();
+          response.sendFile("docs/apidoc.html");
+        });
+
+
     router.route(PROVIDER_BASE_PATH + "/*").subRouter(new ProviderApis(vertx, router).init());
     router.route(CONSUMER_BASE_PATH + "/*").subRouter(new ConsumerApis(vertx, router).init());
 

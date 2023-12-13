@@ -15,7 +15,7 @@ public class Constants {
   public static final String PROVIDER_LIST_PRODUCTS_ENDPOINT = "/provider/list/products";
   public static final String PROVIDER_LIST_PURCHASES_ENDPOINT = "/provider/list/purchases";
   public static final String CONSUMER_LIST_PROVIDERS_ENDPOINT = "/consumer/list/providers";
-  public static final String CONSUMER_LIST_DATASETS_ENDPOINT = "/consumer/list/datasets";
+  public static final String CONSUMER_LIST_RESOURCES_ENDPOINT = "/consumer/list/resources";
   public static final String CONSUMER_LIST_PRODUCTS_ENDNPOINT = "/consumer/list/products";
   public static final String CONSUMER_LIST_PURCHASES_ENDPOINT = "/consumer/list/purchases";
   public static final String USERMAPS_ENDPOINT = "/product/usermaps";

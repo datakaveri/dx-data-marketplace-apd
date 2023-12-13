@@ -28,8 +28,8 @@ public class ValidationHandlerFactory {
       case PRODUCT_VARIANT:
         validator = getProductVariantValidators(parameters, body, requestType);
         break;
-      case DATASET:
-        validator = getDatasetIDValidators(parameters);
+      case RESOURCE:
+        validator = getResourceIDValidators(parameters);
         break;
       case PROVIDER:
         validator = getProviderIDValidators(parameters);
@@ -38,10 +38,10 @@ public class ValidationHandlerFactory {
     return validator;
   }
 
-  private List<Validator> getDatasetIDValidators(final MultiMap parameters) {
+  private List<Validator> getResourceIDValidators(final MultiMap parameters) {
     List<Validator> validators = new ArrayList<>();
 
-    validators.add(new DatasetIDTypeValidator(parameters.get(DATASET_ID), false));
+    validators.add(new ResourceIDTypeValidator(parameters.get(RESOURCE_ID), false));
     validators.add(new ProviderIDTypeValidator(parameters.get(PROVIDER_ID), false));
     return validators;
   }

@@ -1,4 +1,6 @@
 openapi: 3.0.2
+x-stoplight:
+  id: l45dgkoihffc8
 info:
   title: IUDX Data marketplace APIs
   version: 4.5.0
@@ -272,6 +274,8 @@ paths:
                     detail: failed
   /provider/product-variant:
     post:
+      tags:
+        - provider
       summary: ''
       operationId: post-provider-product-variant
       responses:
@@ -286,7 +290,7 @@ paths:
                   value:
                     type: 'urn:dx:dmp:Success'
                     title: Success
-                    results: [ ]
+                    results: []
       description: 'Create a product variant where the body contains details about the variant such as price, duration, resources and their capabilities. Along with the name of the variant and the product it belongs to.'
       parameters:
         - schema:
@@ -351,6 +355,8 @@ paths:
                   price: 100
                   validity: 12
     get:
+      tags:
+        - provider
       summary: ''
       operationId: get-provider-product-variant
       responses:
@@ -360,7 +366,7 @@ paths:
             application/json:
               schema:
                 type: object
-                properties: { }
+                properties: {}
       parameters:
         - schema:
             type: string
@@ -375,8 +381,10 @@ paths:
             type: string
           in: query
           name: variant
-    parameters: [ ]
+    parameters: []
     put:
+      tags:
+        - provider
       summary: ''
       operationId: put-provider-product-variant
       responses:
@@ -433,6 +441,8 @@ paths:
                   price: 100
                   validity: 12
     delete:
+      tags:
+        - provider
       summary: ''
       operationId: delete-provider-product-variant
       responses:
@@ -600,7 +610,7 @@ paths:
                     title: Token is invalid
                     detail: failed
   /consumer/list/products:
-    summary: List API for the comsumer to view all the products available against a resource.
+    summary: List API for the comsumer to view all the products available against a dataset.
     get:
       tags:
         - consumer
@@ -614,8 +624,8 @@ paths:
             type: string
           in: header
           required: true
-        - name: resourceID
-          description: ID of the resource for listing products that contain it.
+        - name: datasetID
+          description: ID of the dataset for listing products that contain it.
           in: query
           schema:
             type: string
@@ -646,7 +656,7 @@ paths:
                   value:
                     type: 'urn:dx:dmp:InvalidResourceIDValue'
                     title: Bad request
-                    detail: Invalid resource ID
+                    detail: Invalid dataset ID
         '401':
           description: Unauthorized access
           content:
@@ -803,7 +813,7 @@ components:
             description: some text description for the product (e.g. a student associated in DataKaveri)
             price: 100
             duration: 12
-            resources:
+            datasets:
               - pune-env-flood
               - stqc-flood-sensor
     exampleResponseListPurchases:
@@ -837,8 +847,8 @@ components:
             expiry: '2023-11-22T09:00:00Z'
             status: active/expired
     exampleListResourcesResponse:
-      title: Root type for list resources API response
-      description: example response for list resources
+      title: Root type for list datasets API response
+      description: example response for list datasets
       type: object
       properties:
         type:
@@ -859,7 +869,7 @@ components:
         type: 'urn:dx:rs:success'
         title: success
         results:
-          - resourceID: abc1
+          - datasetID: abc1
             datasetName: abc–flood
             accessPolicy: secure
             providerID: iisc.ac.in/123qwerty
