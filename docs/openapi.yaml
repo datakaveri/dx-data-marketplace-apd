@@ -732,28 +732,147 @@ paths:
                     detail: failed
   /verify:
     post:
+      operationId: post-verify-policy
+      summary: Verify Policy
       tags:
         - admin
+      description: |
+        Verify API endpoint is used by DX AAA Server to check if a policy is present for a given consumer for the given 
+        resource with a specified provider of the resource. This check is done by DX AAA Server before issuing 
+        a token. 
+        
+        DMP Data Marketplace APD Server creates policy for a given item with type `resource`
+      parameters:
+        - in: header
+          name: Authorization
+          required: true
+          schema:
+            type: string
+            minLength: 1
+            maxLength: 512
+            example: Bearer <JWT>
+            description: Keycloak issued token
       requestBody:
         content:
           application/json:
             schema:
               $ref: '#/components/schemas/exampleVerifyRequestBody'
+            examples:
+              Request body for verify policy:
+                value:
+                    user:
+                      id: a109807f-6b06-4d8a-ab64-a3a19b04a3b4
+                      name:
+                        firstName: test
+                        lastName: consumer
+                      email: consumer@gmail.com
+                    owner:
+                      id: 114077a3-6411-4b6e-bc97-c7e81b87685d
+                      name:
+                        firstName: test
+                        lastName: provider
+                      email: test@provider.com
+                    item:
+                      itemId: 2a0be315-4165-4c5b-a74e-116cc89272cb
+                      itemType: resource
+      security:
+        - authorization: [ ]
       responses:
         '200':
-          description: success
+          description: |- 
+            OK
+            - An active policy is present for the consumer for given resource with given constraints
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/successResponseWithObjects'
+                $ref: '#/components/schemas/verifyPolicySuccessResponse'
+        '400':
+          description: |- 
+            Bad request
+            - Invalid request schema
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/verifyPolicyBadRequestResponse'
         '403':
-          description: forbidden
+          description: |- 
+            forbidden
+            - Policy does not exist
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/exampleVerifyFailResponse'
+                $ref: '#/components/schemas/verifyPolicyForbiddenResponse'
+
 components:
+  securitySchemes:
+    authorization:
+      type: http
+      scheme: bearer
   schemas:
+    verifyPolicySuccessResponse:
+      title: Verify policy success response
+      type: object
+      properties:
+        type:
+          type: string
+          description: URN type of success response
+        apdConstraints:
+          type: object
+          description: Constraints of the policy
+      required:
+        - type
+        - apdConstraints
+      example:
+        type: urn:apd:allow
+        apdConstraints:
+          rule: read
+          duration: 3600
+    verifyPolicyBadRequestResponse:
+      title: 400 Response for verify policy
+      type: object
+      properties:
+        type:
+          type: string
+          description: URN type of error response
+        title:
+          type: string
+          description: title of the error response
+        detail:
+          type: string
+          description: Error message describing the issue
+      required:
+        - type
+        - title
+        - detail
+      example:
+        {
+          "type": "urn:dx:dm:invalidPayloadFormat",
+          "title": "Bad Request",
+          "detail": "Invalid json format in post request [schema mismatch]"
+        }
+    verifyPolicyForbiddenResponse:
+      title: 403 Response for verify policy
+      type: object
+      properties:
+        type:
+          type: string
+          description: URN type of the error response
+        title:
+          type: string
+          description: title of the error message
+        detail:
+          type: string
+          description: Description of error message
+      required:
+        - type
+        - title
+        - detail
+      example:
+        {
+          "type": "urn:apd:Deny",
+          "title": "Forbidden",
+          "detail": "No policy exists for the given resource"
+        }
     successResponseForDeleteProduct:
       title: Root Tupe for standard DELETE response
       description: example response for delete product API
@@ -938,15 +1057,91 @@ components:
         consumerID: qwerty987
         paymentStatus: payment.succeeded
         paymentTime: '2022-11-23T16:28:00Z'
+
+
+    name:
+      title: schemaName
+      type: object
+      properties:
+        firstName:
+          type: string
+        lastName:
+          type: string
+
+
+    user:
+      title: schemaUser
+      description: consumer information
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          pattern: '^[0-9a-f]{8}\b-[0-9a-f]{4}\b-[0-9a-f]{4}\b-[0-9a-f]{4}\b-[0-9a-f]{12}$'
+          minLength: 36
+          maxLength: 36
+        name:
+          $ref: '#/components/schemas/name'
+        email:
+          pattern: >-
+            ^([a-zA-Z0-9_\-\.]+)@([a-zA-Z0-9_\-\.]+)\.([a-zA-Z]{2,5})$
+          minLength: 1
+      required:
+        - id
+        - name
+        - email
+
+    owner:
+      title: schemaOwner
+      description: provider information
+      type: object
+      properties:
+        id:
+          format: uuid
+          pattern: '^[0-9a-f]{8}\b-[0-9a-f]{4}\b-[0-9a-f]{4}\b-[0-9a-f]{4}\b-[0-9a-f]{12}$'
+          minLength: 36
+          maxLength: 36
+        name:
+          $ref: '#/components/schemas/name'
+        email:
+          pattern: >-
+            ^([a-zA-Z0-9_\-\.]+)@([a-zA-Z0-9_\-\.]+)\.([a-zA-Z]{2,5})$
+          minLength: 1
+      required:
+        - id
+        - name
+        - email
+
+    item:
+      type: object
+      description: resource information
+      properties:
+        itemId:
+          format: uuid
+          pattern: '^[0-9a-f]{8}\b-[0-9a-f]{4}\b-[0-9a-f]{4}\b-[0-9a-f]{4}\b-[0-9a-f]{12}$'
+          minLength: 36
+          maxLength: 36
+        itemType:
+          enum:
+            - resource
+          minLength: 1
+      required:
+        - itemId
+        - itemType
+
     exampleVerifyRequestBody:
       title: Root type for verify API body
       description: 'example request for verifying if consumer has purchased product, and if the purchase is expired or not'
       type: object
       properties:
-        consumerID:
-          type: string
-        productID:
-          type: string
+        user:
+          $ref: '#/components/schemas/user'
+        owner:
+          $ref: '#/components/schemas/owner'
+        item:
+          $ref: '#/components/schemas/item'
+
+
     exampleVerifyFailResponse:
       title: Root type for verify fail response
       description: example response for failed verify request
