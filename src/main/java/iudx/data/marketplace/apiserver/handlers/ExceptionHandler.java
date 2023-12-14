@@ -89,7 +89,7 @@ public class ExceptionHandler implements Handler<RoutingContext> {
     LOGGER.error("Error: Invalid Json payload: " + routingContext.failure().getLocalizedMessage());
     String response = "";
 
-    if (routingContext.request().uri().startsWith(PROVIDER_BASE_PATH)) {
+    if (routingContext.request().uri().startsWith(PROVIDER_PATH)) {
 
       response =
           new RespBuilder()

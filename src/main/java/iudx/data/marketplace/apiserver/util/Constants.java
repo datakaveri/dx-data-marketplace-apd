@@ -46,12 +46,12 @@ public class Constants {
 
 
   // paths
-  public static final String PROVIDER_BASE_PATH = "/provider";
+  public static final String PROVIDER_PATH = "/provider";
   public static final String PRODUCT_PATH = "/product";
   public static final String PRODUCT_VARIANT_PATH = "/product-variant";
   public static final String LIST_PRODUCTS_PATH = "/list/products";
   public static final String LIST_PURCHASES_PATH = "/list/purchases";
-  public static final String CONSUMER_BASE_PATH = "/consumer";
+  public static final String CONSUMER_PATH = "/consumer";
   public static final String LIST_PROVIDERS_PATH = "/list/providers";
   public static final String LIST_DATASETS_PATH = "/list/datasets";
   public static final String USERMAPS_PATH = "/product/usermaps";

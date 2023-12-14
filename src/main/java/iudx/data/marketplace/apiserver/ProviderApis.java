@@ -15,6 +15,7 @@ import iudx.data.marketplace.apiserver.handlers.AuthHandler;
 import iudx.data.marketplace.apiserver.handlers.ExceptionHandler;
 import iudx.data.marketplace.apiserver.handlers.ValidationHandler;
 import iudx.data.marketplace.apiserver.util.RequestType;
+import iudx.data.marketplace.common.Api;
 import iudx.data.marketplace.common.RespBuilder;
 import iudx.data.marketplace.common.ResponseUrn;
 import iudx.data.marketplace.product.ProductService;
@@ -29,10 +30,12 @@ public class ProviderApis {
   private final Router router;
   private ProductService productService;
   private ProductVariantService variantService;
+  private Api api;
 
-  ProviderApis(Vertx vertx, Router router) {
+  ProviderApis(Vertx vertx, Router router, Api apis) {
     this.vertx = vertx;
     this.router = router;
+    this.api = apis;
   }
 
   Router init() {
@@ -47,57 +50,57 @@ public class ProviderApis {
     variantService = ProductVariantService.createProxy(vertx, PRODUCT_VARIANT_SERVICE_ADDRESS);
 
     router
-        .post(PROVIDER_BASE_PATH + PRODUCT_PATH)
+        .post(PROVIDER_PATH + PRODUCT_PATH)
         .consumes(APPLICATION_JSON)
         .handler(productValidationHandler)
-        .handler(AuthHandler.create(vertx))
+        .handler(AuthHandler.create(vertx, api))
         .handler(this::handleCreateProduct)
         .failureHandler(exceptionHandler);
 
     router
-        .delete(PROVIDER_BASE_PATH + PRODUCT_PATH)
+        .delete(PROVIDER_PATH + PRODUCT_PATH)
         .handler(productValidationHandler)
-        .handler(AuthHandler.create(vertx))
+        .handler(AuthHandler.create(vertx, api))
         .handler(this::handleDeleteProduct)
         .failureHandler(exceptionHandler);
 
     router
-        .get(PROVIDER_BASE_PATH + LIST_PRODUCTS_PATH)
+        .get(PROVIDER_PATH + LIST_PRODUCTS_PATH)
         .handler(datasetValidationHandler)
-        .handler(AuthHandler.create(vertx))
+        .handler(AuthHandler.create(vertx, api))
         .handler(this::listProducts)
         .failureHandler(exceptionHandler);
 
     router
-        .get(PROVIDER_BASE_PATH + LIST_PURCHASES_PATH)
-        .handler(AuthHandler.create(vertx))
+        .get(PROVIDER_PATH + LIST_PURCHASES_PATH)
+        .handler(AuthHandler.create(vertx, api))
         .handler(this::listPurchases)
         .failureHandler(exceptionHandler);
 
     router
-        .post(PROVIDER_BASE_PATH + PRODUCT_VARIANT_PATH)
+        .post(PROVIDER_PATH + PRODUCT_VARIANT_PATH)
         .handler(variantValidationHandler)
-        .handler(AuthHandler.create(vertx))
+        .handler(AuthHandler.create(vertx, api))
         .handler(this::handleCreateProductVariant)
         .failureHandler(exceptionHandler);
 
     router
-        .put(PROVIDER_BASE_PATH + PRODUCT_VARIANT_PATH)
+        .put(PROVIDER_PATH + PRODUCT_VARIANT_PATH)
         .handler(variantValidationHandler)
-        .handler(AuthHandler.create(vertx))
+        .handler(AuthHandler.create(vertx, api))
         .handler(this::handleUpdateProductVariant)
         .failureHandler(exceptionHandler);
 
     router
-        .get(PROVIDER_BASE_PATH + PRODUCT_VARIANT_PATH)
-        .handler(AuthHandler.create(vertx))
+        .get(PROVIDER_PATH + PRODUCT_VARIANT_PATH)
+        .handler(AuthHandler.create(vertx, api))
         .handler(this::handleGetProductVariants)
         .failureHandler(exceptionHandler);
 
     router
-        .delete(PROVIDER_BASE_PATH + PRODUCT_VARIANT_PATH)
+        .delete(PROVIDER_PATH + PRODUCT_VARIANT_PATH)
         .handler(variantValidationHandler)
-        .handler(AuthHandler.create(vertx))
+        .handler(AuthHandler.create(vertx, api))
         .handler(this::handleDeleteProductVariant)
         .failureHandler(exceptionHandler);
     return this.router;

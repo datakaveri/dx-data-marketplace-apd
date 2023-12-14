@@ -1,8 +1,6 @@
 package iudx.data.marketplace.apiserver;
 
 import io.vertx.core.AbstractVerticle;
-import io.vertx.core.Future;
-import io.vertx.core.Promise;
 import io.vertx.core.http.*;
 import io.vertx.core.json.DecodeException;
 import io.vertx.core.json.JsonObject;
@@ -18,18 +16,12 @@ import iudx.data.marketplace.apiserver.handlers.ExceptionHandler;
 import iudx.data.marketplace.apiserver.handlers.ValidationHandler;
 import iudx.data.marketplace.apiserver.util.RequestType;
 import iudx.data.marketplace.common.*;
-import iudx.data.marketplace.policies.CreatePolicy;
 import iudx.data.marketplace.policies.PolicyService;
-import iudx.data.marketplace.policies.PolicyServiceImpl;
 import iudx.data.marketplace.policies.User;
 import iudx.data.marketplace.postgres.PostgresService;
-import iudx.data.marketplace.postgres.PostgresServiceImpl;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import java.time.ZoneId;
-import java.time.ZonedDateTime;
-import java.time.temporal.ChronoUnit;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.stream.Stream;
@@ -187,22 +179,22 @@ public class ApiServerVerticle extends AbstractVerticle {
     server = vertx.createHttpServer(serverOptions);
     server.requestHandler(router).listen(port);
 
-    router.route(PROVIDER_BASE_PATH + "/*").subRouter(new ProviderApis(vertx, router).init());
-    router.route(CONSUMER_BASE_PATH + "/*").subRouter(new ConsumerApis(vertx, router).init());
+    router.route(PROVIDER_PATH + "/*").subRouter(new ProviderApis(vertx, router, api).init());
+    router.route(CONSUMER_PATH + "/*").subRouter(new ConsumerApis(vertx, router, api).init());
 
     ExceptionHandler exceptionHandler = new ExceptionHandler();
     ValidationHandler policyValidationHandler = new ValidationHandler(vertx, RequestType.POLICY);
     ValidationHandler verifyValidationHandler = new ValidationHandler(vertx, RequestType.VERIFY);
     router
             .get(api.getPoliciesUrl())
-            .handler(AuthHandler.create(vertx))
+            .handler(AuthHandler.create(vertx, api))
             .handler(this::getPoliciesHandler)
             .failureHandler(exceptionHandler);
 
     router
             .delete(api.getPoliciesUrl())
             .handler(policyValidationHandler)
-            .handler(AuthHandler.create(vertx))
+            .handler(AuthHandler.create(vertx, api))
             .handler(this::deletePoliciesHandler)
             .failureHandler(exceptionHandler);
 
@@ -214,7 +206,7 @@ public class ApiServerVerticle extends AbstractVerticle {
     router
         .post(VERIFY_PATH)
         .handler(verifyValidationHandler)
-        .handler(AuthHandler.create(vertx))
+        .handler(AuthHandler.create(vertx, api))
         .handler(this::handleVerify)
         .failureHandler(exceptionHandler);
 
@@ -295,7 +287,21 @@ public class ApiServerVerticle extends AbstractVerticle {
   }
 
   private void handleVerify(RoutingContext routingContext) {
-
+    JsonObject requestBody = routingContext.body().asJsonObject();
+    HttpServerResponse response = routingContext.response();
+    policyService
+            .verifyPolicy(requestBody)
+            .onComplete(
+                    handler -> {
+                      if (handler.succeeded()) {
+                        LOGGER.info("Policy verified successfully ");
+                        handleSuccessResponse(
+                                response, HttpStatusCode.SUCCESS.getValue(), handler.result().toString());
+                      } else {
+                        LOGGER.error("Policy could not be verified {}", handler.cause().getMessage());
+                        handleFailureResponse(routingContext, handler.cause().getMessage());
+                      }
+                    });
   }
 
   /**
