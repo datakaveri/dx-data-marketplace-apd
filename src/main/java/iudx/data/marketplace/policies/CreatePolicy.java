@@ -70,7 +70,7 @@ public class CreatePolicy {
         UUID resourceId = UUID.randomUUID();
         String resourceName = UUID.randomUUID().toString().substring(0, 6);
         String resourceServerUrl = "rs.iudx.io";
-        String accessPolicy = "streaming";
+        String accessPolicy = "SECURE";
 
         Tuple resourceEntityTuple = Tuple.of(resourceId, resourceName, providerId, resourceServerUrl, accessPolicy);
         String resourceEntityInsertion = "INSERT INTO resource_entity (_id, resource_name, provider_id, resource_server_url, accesspolicy)" +
@@ -84,6 +84,26 @@ public class CreatePolicy {
 
         Tuple productTuple = Tuple.of(productId, resourceId, status);
         String insertProduct = "INSERT INTO PRODUCT (product_id, resource_id, status) VALUES ($1, $2, $3)";
+
+        /* product variant insertion */
+        UUID pvId = UUID.randomUUID();
+        String productVariantName = UUID.randomUUID().toString();
+        List<String> resourceNames = List.of(resourceName);
+        List<String> resourceIds = List.of(resourceId.toString());
+        List<String> constraint = List.of(String.valueOf(new JsonObject().put("access", "file")));
+        String price = "10$";
+        int validity = 10;
+        String productVariantStatus = "ACTIVE";
+
+        Tuple productVariantTuple = Tuple.of(pvId, productVariantName, productId, providerId,
+                resourceNames.toString(), resourceIds.toString(), constraint.toString(), price, validity, productVariantStatus);
+        String productVariantInsertion = "INSERT INTO public.product_variant(" +
+                "_id, product_variant_name, product_id, provider_id, resource_name, resource_ids, " +
+                "resource_capabilities, price, validity, status)" +
+                " VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10);";
+
+
+
 
     /* policy related information */
     UUID policyId = UUID.randomUUID();
@@ -130,18 +150,22 @@ public class CreatePolicy {
               return insertQueries(insertProduct, productTuple, "product insertion ");
             });
 
+    var pvInsertion = productInsertion.compose(productInsertedSuccessfully -> {
+        return insertQueries(productVariantInsertion, productVariantTuple, "product variant insertion ");
+    });
+
     var policyInsertion =
-        productInsertion.compose(
-            productInsertedSuccessfully -> {
+            pvInsertion.compose(
+            productVariantInsertedSuccessfully -> {
               return insertQueries(insertPolicy, policyTuple, "policy insertion ");
             });
 
-        var purchaseInsertion =
-                policyInsertion.compose(
-                        policyInsertedSuccessfully -> {
-                            return insertQueries(insertPurchase, purchaseTuple, "purchase insertion");
-                        }
-                );
+//        var purchaseInsertion =
+//                policyInsertion.compose(
+//                        policyInsertedSuccessfully -> {
+//                            return insertQueries(insertPurchase, purchaseTuple, "purchase insertion");
+//                        }
+//                );
 
         policyInsertion.onComplete(
         handler -> {

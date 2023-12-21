@@ -68,12 +68,12 @@ CREATE TABLE IF NOT EXISTS policy
     expiry_at timestamp without time zone,
     expiry_amount varchar,
     status policy_status NOT NULL,
-    product_id uuid NOT NULL,
+    product_variant_id uuid NOT NULL,
     created_at timestamp without time zone NOT NULL,
     modified_at timestamp without time zone NOT NULL,
     CONSTRAINT resource_id_fk FOREIGN KEY(resource_id) REFERENCES resource_entity(_id),
     CONSTRAINT provider_id_fk FOREIGN KEY (provider_id) REFERENCES user_table (_id),
-    CONSTRAINT product_id_fk FOREIGN KEY (product_id) REFERENCES product (product_id)
+    CONSTRAINT policy_product_variant_id_fkey FOREIGN KEY (product_variant_id) REFERENCES product_variant (_id)
 );
 
 

@@ -5,8 +5,10 @@ import io.vertx.core.json.JsonObject;
 import io.vertx.junit5.VertxExtension;
 import io.vertx.junit5.VertxTestContext;
 
+import iudx.data.marketplace.common.Api;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -20,6 +22,7 @@ import iudx.data.marketplace.authenticator.model.JwtData;
 import java.util.stream.Stream;
 
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.lenient;
 import static org.mockito.Mockito.when;
 
@@ -29,23 +32,27 @@ public class AuthCtxFactoryTest {
   public static final Logger LOGGER = LogManager.getLogger(AuthCtxFactoryTest.class);
   @Mock AuthorizationRequest authRequest;
   @Mock JwtData jwtData;
-  @Mock Api api;
   @Mock Method method;
-  DelegateAuthStatergy delegateAuthStatergy;
+
+  Api api;
   @Mock ConsumerAuthStatergy consumerAuthStatergy;
   AuthorizationContextFactory authorizationContextFactory;
 
+  @BeforeEach
+  public void setUp(VertxTestContext vertxTestContext)
+  {
+    api = Api.getInstance("basePath");
+  }
   @Test
   @DisplayName("testing the method create when role is consumer")
   public void testCreate(VertxTestContext vertxTestContext) {
     authorizationContextFactory = new AuthorizationContextFactory();
-    String role = "consumer";
-    consumerAuthStatergy = new ConsumerAuthStatergy();
-    when(authRequest.getApi()).thenReturn(api);
-    when(api.getEndpoint()).thenReturn("dummy endpoint");
+    IudxRole role = IudxRole.CONSUMER;
+    consumerAuthStatergy = ConsumerAuthStatergy.getInstance(api);
+    when(authRequest.getApi()).thenReturn("dummy endpoint");
     when(authRequest.getMethod()).thenReturn(method);
     assertFalse(consumerAuthStatergy.isAuthorized(authRequest, jwtData));
-    assertNotNull(AuthorizationContextFactory.create(role));
+    assertNotNull(AuthorizationContextFactory.create(role, api));
     vertxTestContext.completeNow();
   }
 
@@ -53,10 +60,8 @@ public class AuthCtxFactoryTest {
   @DisplayName("testing the method create when role is delegate")
   public void testCreateDelegate(VertxTestContext vertxTestContext) {
     authorizationContextFactory = new AuthorizationContextFactory();
-    String role = "delegate";
-    delegateAuthStatergy = new DelegateAuthStatergy();
-    assertFalse(delegateAuthStatergy.isAuthorized(authRequest, jwtData));
-    assertNotNull(AuthorizationContextFactory.create(role));
+    IudxRole role = IudxRole.DELEGATE;
+    assertNotNull(AuthorizationContextFactory.create(role, api));
     vertxTestContext.completeNow();
   }
 
@@ -67,37 +72,36 @@ public class AuthCtxFactoryTest {
         IllegalArgumentException.class,
         () -> {
           authorizationContextFactory = new AuthorizationContextFactory();
-          String role = "dummy";
-          AuthorizationContextFactory.create(role);
+          IudxRole role = IudxRole.ADMIN;
+          AuthorizationContextFactory.create(role, api);
         });
     vertxTestContext.completeNow();
   }
 
   public static Stream<Arguments> roles() {
     return Stream.of(
-        Arguments.of(new ProviderAuthStatergy(), "provider"),
-        Arguments.of(new DelegateAuthStatergy(), "delegate"),
-        Arguments.of(new ConsumerAuthStatergy(), "consumer"),
-        Arguments.of(new AdminAuthStatergy(), "admin"));
+        Arguments.of(ProviderAuthStatergy.getInstance(any()),IudxRole.PROVIDER),
+        Arguments.of(ConsumerAuthStatergy.getInstance(any()), IudxRole.CONSUMER),
+        Arguments.of(AdminAuthStatergy.getInstance(any()), IudxRole.ADMIN));
   }
 
   @ParameterizedTest
   @MethodSource("roles")
   @DisplayName("test user with x role is authorized")
   public void testConsumerIsAuthorized(
-      AuthorizationStatergy authorizationStatergy, String role, VertxTestContext testContext) {
+      AuthorizationStatergy authorizationStatergy, IudxRole role, VertxTestContext testContext) {
 
-    if(role.equalsIgnoreCase("admin"))
-      authRequest = new AuthorizationRequest(Method.POST, Api.VERIFY);
+    if(role.equals(IudxRole.ADMIN))
+      authRequest = new AuthorizationRequest(Method.POST, api.getVerifyUrl());
     else
-      authRequest = new AuthorizationRequest(Method.POST, Api.PRODUCT);
+      authRequest = new AuthorizationRequest(Method.POST, api.getProviderProductPath());
     lenient().when(jwtData.getCons()).thenReturn(new JsonObject().put("access", new JsonArray()));
     authorizationContextFactory = new AuthorizationContextFactory();
     if (authorizationStatergy instanceof ConsumerAuthStatergy)
       assertFalse(authorizationStatergy.isAuthorized(authRequest, jwtData));
     else
       assertTrue(authorizationStatergy.isAuthorized(authRequest, jwtData));
-    assertNotNull(AuthorizationContextFactory.create(role));
+    assertNotNull(AuthorizationContextFactory.create(role, api));
     testContext.completeNow();
   }
 }

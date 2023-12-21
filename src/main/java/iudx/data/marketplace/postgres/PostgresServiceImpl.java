@@ -9,8 +9,11 @@ import io.vertx.sqlclient.PoolOptions;
 import io.vertx.sqlclient.Row;
 import io.vertx.sqlclient.SqlConnection;
 import io.vertx.sqlclient.Tuple;
+import iudx.data.marketplace.apiserver.util.Role;
+import iudx.data.marketplace.common.HttpStatusCode;
 import iudx.data.marketplace.common.RespBuilder;
 import iudx.data.marketplace.common.ResponseUrn;
+import iudx.data.marketplace.policies.GetPolicy;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -19,6 +22,9 @@ import java.util.List;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.stream.Collector;
 import java.util.stream.Collectors;
+
+import static iudx.data.marketplace.apiserver.util.Constants.*;
+import static iudx.data.marketplace.policies.GetPolicy.FAILURE_MESSAGE;
 
 public class PostgresServiceImpl implements PostgresService {
   private static final Logger LOGGER = LogManager.getLogger(PostgresServiceImpl.class);
@@ -277,4 +283,64 @@ public class PostgresServiceImpl implements PostgresService {
             });
     return promise.future();
   }
+
+  // TODO : remove this as it's specific to get policy and not postgres
+    /**
+     * Executes the respective queries by using the vertx PgPool instance
+     *
+     * @param tuple Exchangeable values of query in the form of Vertx Tuple
+     * @param query String query to be executed
+     * @param information Information to be added in the response
+     * @return the response as Future JsonObject type
+     */
+    public Future<JsonObject> executeGetPolicy(
+            Tuple tuple, String query, JsonObject information, Role role, GetPolicy getPolicy) {
+        Promise<JsonObject> promise = Promise.promise();
+        Collector<Row, ?, List<JsonObject>> rowListCollector =
+                Collectors.mapping(row -> row.toJson(), Collectors.toList());
+        client.withConnection(
+                        sqlConnection ->
+                                sqlConnection
+                                        .preparedQuery(query)
+                                        .collecting(rowListCollector)
+                                        .execute(tuple)
+                                        .map(rows -> rows.value()))
+                .onComplete(
+                        handler -> {
+                            if (handler.succeeded()) {
+                                if (handler.result().size() > 0) {
+                                    for (JsonObject jsonObject : handler.result()) {
+                                        jsonObject.mergeIn(information).mergeIn(getPolicy.getInformation(jsonObject, role));
+                                    }
+                                    JsonObject result =
+                                            new JsonObject()
+                                                    .put(TYPE, ResponseUrn.SUCCESS_URN.getUrn())
+                                                    .put(TITLE, ResponseUrn.SUCCESS_URN.getMessage())
+                                                    .put(RESULT, handler.result());
+
+                                    promise.complete(
+                                            new JsonObject()
+                                                    .put(RESULT, result)
+                                                    .put(STATUS_CODE, HttpStatusCode.SUCCESS.getValue()));
+                                } else {
+                                    JsonObject response =
+                                            new JsonObject()
+                                                    .put(TYPE, HttpStatusCode.NOT_FOUND.getValue())
+                                                    .put(TITLE, ResponseUrn.RESOURCE_NOT_FOUND_URN.getUrn())
+                                                    .put(DETAIL, "Policy not found");
+                                    LOGGER.error("No policy found!");
+                                    promise.fail(response.encode());
+                                }
+                            } else {
+                                JsonObject response =
+                                        new JsonObject()
+                                                .put(TYPE, HttpStatusCode.INTERNAL_SERVER_ERROR.getValue())
+                                                .put(TITLE, ResponseUrn.DB_ERROR_URN.getUrn())
+                                                .put(DETAIL, FAILURE_MESSAGE + ", Failure while executing query");
+                                promise.fail(response.encode());
+                                LOGGER.error("Error response : {}", handler.cause().getMessage());
+                            }
+                        });
+        return promise.future();
+    }
 }

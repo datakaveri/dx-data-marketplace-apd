@@ -137,6 +137,12 @@
             <artifactId>failsafe</artifactId>
             <version>3.3.2</version>
         </dependency>
+        <!--   guava retrying dependency-->
+        <dependency>
+            <groupId>com.github.rholder</groupId>
+            <artifactId>guava-retrying</artifactId>
+            <version>1.0.6</version>
+        </dependency>
         <!-- log4j2 logging dependencies-->
         <dependency>
             <groupId>org.apache.logging.log4j</groupId>

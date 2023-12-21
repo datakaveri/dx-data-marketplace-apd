@@ -8,6 +8,8 @@ import io.vertx.core.net.JksOptions;
 import io.vertx.ext.web.Route;
 import io.vertx.ext.web.Router;
 import io.vertx.ext.web.RoutingContext;
+import io.vertx.ext.web.client.WebClient;
+import io.vertx.ext.web.client.WebClientOptions;
 import io.vertx.ext.web.handler.BodyHandler;
 import io.vertx.ext.web.handler.CorsHandler;
 import io.vertx.ext.web.handler.TimeoutHandler;
@@ -15,10 +17,13 @@ import iudx.data.marketplace.apiserver.handlers.AuthHandler;
 import iudx.data.marketplace.apiserver.handlers.ExceptionHandler;
 import iudx.data.marketplace.apiserver.handlers.ValidationHandler;
 import iudx.data.marketplace.apiserver.util.RequestType;
+import iudx.data.marketplace.authenticator.AuthClient;
+import iudx.data.marketplace.authenticator.AuthenticationService;
 import iudx.data.marketplace.common.*;
 import iudx.data.marketplace.policies.PolicyService;
 import iudx.data.marketplace.policies.User;
 import iudx.data.marketplace.postgres.PostgresService;
+import iudx.data.marketplace.postgres.PostgresServiceImpl;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -28,8 +33,7 @@ import java.util.stream.Stream;
 
 import static iudx.data.marketplace.apiserver.response.ResponseUtil.generateResponse;
 import static iudx.data.marketplace.apiserver.util.Constants.*;
-import static iudx.data.marketplace.common.Constants.POLICY_SERVICE_ADDRESS;
-import static iudx.data.marketplace.common.Constants.POSTGRES_SERVICE_ADDRESS;
+import static iudx.data.marketplace.common.Constants.*;
 import static iudx.data.marketplace.common.HttpStatusCode.BAD_REQUEST;
 
 /**
@@ -55,6 +59,11 @@ public class ApiServerVerticle extends AbstractVerticle {
   private String keystore;
   private String keystorePassword;
   private PostgresService postgresService;
+  private PostgresServiceImpl pgServiceImpl;
+  private AuthClient authClient;
+  private WebClient webClient;
+  private WebClientOptions webClientOptions;
+  private AuthenticationService authenticationService;
 
   public static void callCreatePolicy()
   {
@@ -99,12 +108,19 @@ public class ApiServerVerticle extends AbstractVerticle {
     allowedMethods.add(HttpMethod.PATCH);
     allowedMethods.add(HttpMethod.PUT);
 
+    webClientOptions = new WebClientOptions();
+    webClientOptions.setTrustAll(false).setVerifyHost(true).setSsl(true);
+    webClient = WebClient.create(vertx, webClientOptions);
+
     Api api = Api.getInstance(config().getString("dxApiBasePath"));
 
     /* Initialize service proxy */
     policyService = PolicyService.createProxy(vertx, POLICY_SERVICE_ADDRESS);
     postgresService = PostgresService.createProxy(vertx, POSTGRES_SERVICE_ADDRESS);
-    policyService = PolicyService.createProxy(vertx, POLICY_SERVICE_ADDRESS);
+
+    pgServiceImpl = new PostgresServiceImpl(config(), vertx);
+    authClient = new AuthClient(config(),webClient);
+    authenticationService = AuthenticationService.createProxy(vertx, AUTH_SERVICE_ADDRESS);
 
     router = Router.router(vertx);
 
@@ -200,34 +216,34 @@ public class ApiServerVerticle extends AbstractVerticle {
         });
 
 
-      router.route(PROVIDER_PATH + "/*").subRouter(new ProviderApis(vertx, router, api).init());
-      router.route(CONSUMER_PATH + "/*").subRouter(new ConsumerApis(vertx, router, api).init());
+      router.route(PROVIDER_PATH + "/*").subRouter(new ProviderApis(vertx, router, api, pgServiceImpl, authClient, authenticationService).init());
+      router.route(CONSUMER_PATH + "/*").subRouter(new ConsumerApis(vertx, router, api, pgServiceImpl, authClient, authenticationService).init());
 
     ExceptionHandler exceptionHandler = new ExceptionHandler();
     ValidationHandler policyValidationHandler = new ValidationHandler(vertx, RequestType.POLICY);
     ValidationHandler verifyValidationHandler = new ValidationHandler(vertx, RequestType.VERIFY);
     router
             .get(api.getPoliciesUrl())
-            .handler(AuthHandler.create(vertx))
+            .handler(AuthHandler.create(authenticationService, vertx, api, pgServiceImpl,authClient))
             .handler(this::getPoliciesHandler)
             .failureHandler(exceptionHandler);
 
     router
             .delete(api.getPoliciesUrl())
             .handler(policyValidationHandler)
-            .handler(AuthHandler.create(vertx))
+            .handler(AuthHandler.create(authenticationService, vertx, api, pgServiceImpl, authClient))
             .handler(this::deletePoliciesHandler)
             .failureHandler(exceptionHandler);
 
     router
-        .post(USERMAPS_PATH)
+        .post(api.getProductUserMapsPath())
         .handler(this::mapUserToProduct)
         .failureHandler(exceptionHandler);
 
     router
-        .post(VERIFY_PATH)
+        .post(api.getVerifyUrl())
         .handler(verifyValidationHandler)
-        .handler(AuthHandler.create(vertx))
+        .handler(AuthHandler.create(authenticationService, vertx, api, pgServiceImpl, authClient))
         .handler(this::handleVerify)
         .failureHandler(exceptionHandler);
 

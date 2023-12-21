@@ -36,6 +36,10 @@ public class Constants {
   public static final String JSON_DETAIL = "detail";
   public static final String USERID = "userId";
   public static final String ROLE = "role";
+  public static final String AUD = "aud";
+
+  public static final String IS_DELEGATE = "isDelegate";
+
   public static final String RESOURCE_SERVER_URL = "resourceServer";
   public static final String USER_ROLE = "userRole";
   public static final String EMAIL_ID = "emailId";

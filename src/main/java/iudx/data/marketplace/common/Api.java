@@ -56,39 +56,39 @@ public class Api {
     return verifyUrl.toString();
   }
 
-  public StringBuilder getProviderProductPath() {
-    return providerProductPath;
+  public String getProviderProductPath() {
+    return providerProductPath.toString();
   }
 
-  public StringBuilder getProviderListProductsPath() {
-    return providerListProductsPath;
+  public String getProviderListProductsPath() {
+    return providerListProductsPath.toString();
   }
 
-  public StringBuilder getProviderListPurchasesPath() {
-    return providerListPurchasesPath;
+  public String getProviderListPurchasesPath() {
+    return providerListPurchasesPath.toString();
   }
 
-  public StringBuilder getProviderProductVariantPath() {
-    return providerProductVariantPath;
+  public String getProviderProductVariantPath() {
+    return providerProductVariantPath.toString();
   }
 
-  public StringBuilder getProductUserMapsPath() {
-    return productUserMapsPath;
+  public String getProductUserMapsPath() {
+    return productUserMapsPath.toString();
   }
 
-  public StringBuilder getConsumerListDatasets() {
-    return consumerListDatasets;
+  public String getConsumerListDatasets() {
+    return consumerListDatasets.toString();
   }
 
-  public StringBuilder getConsumerListProviders() {
-    return consumerListProviders;
+  public String getConsumerListProviders() {
+    return consumerListProviders.toString();
   }
 
-  public StringBuilder getConsumerListPurchases() {
-    return consumerListPurchases;
+  public String getConsumerListPurchases() {
+    return consumerListPurchases.toString();
   }
 
-  public StringBuilder getConsumerListProducts() {
-    return consumerListProducts;
+  public String getConsumerListProducts() {
+    return consumerListProducts.toString();
   }
 }
