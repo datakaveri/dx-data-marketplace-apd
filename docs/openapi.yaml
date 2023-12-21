@@ -979,14 +979,14 @@ components:
         title: success
         results:
           - resourceID: abc1
-            datasetName: abc–flood
+            resourceName: abc–flood
             accessPolicy: secure
             providerID: iisc.ac.in/123qwerty
             totalResources: 12
         totalHits: 1
     exampleListProviderResponse:
-      title: Root type for list datasets API response
-      description: example response for list datasets
+      title: Root type for list resources API response
+      description: example response for list resources
       type: object
       properties:
         type:
@@ -1020,18 +1020,18 @@ components:
         description: some description for flod-sensors
         price: 50
         duration: 12
-        datasets:
+        resources:
           - pune-env-flood
           - stqc-flood-sensors
       properties:
         name:
           type: string
-        datasets:
+        resources:
           type: array
           items:
             type: object
             properties:
-              datasetID:
+              resourceID:
                 type: string
     exampleUsermapsPostBody:
       title: Root type for usermaps body
