@@ -1,14 +1,5 @@
 package iudx.data.marketplace.authenticator;
 
-import static iudx.data.marketplace.authenticator.util.Constants.API_ENDPOINT;
-import static iudx.data.marketplace.authenticator.util.Constants.TOKEN;
-import static iudx.data.marketplace.authenticator.util.Constants.METHOD;
-import static iudx.data.marketplace.authenticator.util.Constants.USER_ROLE;
-import static iudx.data.marketplace.authenticator.util.Constants.USER_ID;
-import static iudx.data.marketplace.authenticator.util.Constants.ADMIN;
-import static iudx.data.marketplace.authenticator.util.Constants.IID;
-import static iudx.data.marketplace.common.Constants.EXPIRY;
-import static iudx.data.marketplace.common.Constants.PROVIDER_ID;
 import iudx.data.marketplace.authenticator.authorization.*;
 import iudx.data.marketplace.authenticator.model.JwtData;
 import org.apache.logging.log4j.LogManager;
@@ -23,12 +14,10 @@ import io.vertx.core.Vertx;
 import io.vertx.core.json.JsonObject;
 import io.vertx.ext.auth.authentication.TokenCredentials;
 import io.vertx.ext.auth.jwt.JWTAuth;
-import iudx.data.marketplace.authenticator.authorization.*;
-import iudx.data.marketplace.authenticator.model.JwtData;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 
 import static iudx.data.marketplace.apiserver.util.Constants.*;
+import static iudx.data.marketplace.apiserver.util.Constants.API_ENDPOINT;
+import static iudx.data.marketplace.apiserver.util.Constants.METHOD;
 import static iudx.data.marketplace.authenticator.authorization.IudxRole.DELEGATE;
 import static iudx.data.marketplace.authenticator.util.Constants.*;
 
@@ -85,27 +74,27 @@ public class AuthenticationServiceImpl implements AuthenticationService {
 //            });
 //    return this;
 //  }
-@Override
-public AuthenticationService tokenIntrospect(JsonObject request, JsonObject authenticationInfo, Handler<AsyncResult<JsonObject>> handler) {
-  String token = authenticationInfo.getString(TOKEN);
-  ResultContainer resultContainer = new ResultContainer();
+  @Override
+  public AuthenticationService tokenIntrospect(JsonObject request, JsonObject authenticationInfo, Handler<AsyncResult<JsonObject>> handler) {
+    String token = authenticationInfo.getString(TOKEN);
+    ResultContainer resultContainer = new ResultContainer();
 
-  Future<JwtData> jwtDecodeFuture = decodeJwt(token);
-  jwtDecodeFuture
-          .compose(
-                  decodeHandler -> {
-                    resultContainer.jwtData = decodeHandler;
-                    return validateJwtAccess(resultContainer.jwtData);
-                  })
-          .compose(isValidJwtAccess -> validateAccess(resultContainer.jwtData, authenticationInfo))
-          .onSuccess(successHandler -> handler.handle(Future.succeededFuture(successHandler)))
-          .onFailure(
-                  failureHandler -> {
-                    LOGGER.error("error : " + failureHandler.getMessage());
-                    handler.handle(Future.failedFuture(failureHandler.getMessage()));
-                  });
-  return this;
-}
+    Future<JwtData> jwtDecodeFuture = decodeJwt(token);
+    jwtDecodeFuture
+            .compose(
+                    decodeHandler -> {
+                      resultContainer.jwtData = decodeHandler;
+                      return validateJwtAccess(resultContainer.jwtData);
+                    })
+            .compose(isValidJwtAccess -> validateAccess(resultContainer.jwtData, authenticationInfo))
+            .onSuccess(successHandler -> handler.handle(Future.succeededFuture(successHandler)))
+            .onFailure(
+                    failureHandler -> {
+                      LOGGER.error("error : " + failureHandler.getMessage());
+                      handler.handle(Future.failedFuture(failureHandler.getMessage()));
+                    });
+    return this;
+  }
   Future<JsonObject> validateAccess(JwtData jwtData, JsonObject authInfo) {
     LOGGER.info("Authorization check started");
     Promise<JsonObject> promise = Promise.promise();
@@ -157,36 +146,41 @@ public AuthenticationService tokenIntrospect(JsonObject request, JsonObject auth
 
   @Override
   public AuthenticationService tokenIntrospect4Verify(
-      JsonObject authInfo, Handler<AsyncResult<JsonObject>> handler) {
+          JsonObject authInfo, Handler<AsyncResult<JsonObject>> handler) {
     String token = authInfo.getString(TOKEN);
 
     Future<JwtData> jwtDecodeFuture = decodeJwt(token);
     jwtDecodeFuture
-        .onSuccess(
-            jwtData -> {
-              if (jwtData.getSub() == null) {
-                LOGGER.error("No sub value in JWT");
-                handler.handle(Future.failedFuture("No sub value in JWT"));
-              } else if (!(jwtData.getIss() != null && issuer.equalsIgnoreCase(jwtData.getIss()))) {
-                LOGGER.error("Incorrect issuer value in JWT");
-                handler.handle(Future.failedFuture("Incorrect issuer value in JWT"));
-              } else if (jwtData.getAud().isEmpty()) {
-                LOGGER.error("No audience value in JWT");
-                handler.handle(Future.failedFuture("No audience value in JWT"));
-              } else if (!jwtData.getAud().equalsIgnoreCase(apdUrl)) {
-                LOGGER.error("Incorrect audience value in JWT");
-                handler.handle(Future.failedFuture("Incorrect subject value in JWT"));
-              } else {
-                LOGGER.info("Auth token verified");
-                handler.handle(Future.succeededFuture());
-              }
-            })
-        .onFailure(
-            failureHandler -> {
-              LOGGER.error("Failed to decode the token : {}", failureHandler.getMessage());
-              handler.handle(Future.failedFuture(failureHandler.getMessage()));
-            });
+            .onSuccess(
+                    jwtData -> {
+                      if (jwtData.getSub() == null) {
+                        LOGGER.error("No sub value in JWT");
+                        handler.handle(Future.failedFuture("No sub value in JWT"));
+                      } else if (!(jwtData.getIss() != null && issuer.equalsIgnoreCase(jwtData.getIss()))) {
+                        LOGGER.error("Incorrect issuer value in JWT");
+                        handler.handle(Future.failedFuture("Incorrect issuer value in JWT"));
+                      } else if (jwtData.getAud().isEmpty()) {
+                        LOGGER.error("No audience value in JWT");
+                        handler.handle(Future.failedFuture("No audience value in JWT"));
+                      } else if (!jwtData.getAud().equalsIgnoreCase(apdUrl)) {
+                        LOGGER.error("Incorrect audience value in JWT");
+                        handler.handle(Future.failedFuture("Incorrect subject value in JWT"));
+                      } else {
+                        LOGGER.info("Auth token verified");
+                        handler.handle(Future.succeededFuture());
+                      }
+                    })
+            .onFailure(
+                    failureHandler -> {
+                      LOGGER.error("Failed to decode the token : {}", failureHandler.getMessage());
+                      handler.handle(Future.failedFuture(failureHandler.getMessage()));
+                    });
     return this;
+  }
+
+  // class to contain intermediate data for token introspection
+  final class ResultContainer {
+    JwtData jwtData;
   }
 
   Future<JwtData> decodeJwt(String jwtToken) {
@@ -194,19 +188,19 @@ public AuthenticationService tokenIntrospect(JsonObject request, JsonObject auth
     TokenCredentials credentials = new TokenCredentials(jwtToken);
 
     jwtAuth
-        .authenticate(credentials)
-        .onSuccess(
-            user -> {
-              JwtData jwtData = new JwtData(user.principal());
-              jwtData.setExp(user.get("exp"));
-              jwtData.setIat(user.get("iat"));
-              promise.complete(jwtData);
-            })
-        .onFailure(
-            err -> {
-              LOGGER.error("failed to decode/validate jwt token : " + err.getMessage());
-              promise.fail("failed to decode/validate jwt token : " + err.getMessage());
-            });
+            .authenticate(credentials)
+            .onSuccess(
+                    user -> {
+                      JwtData jwtData = new JwtData(user.principal());
+                      jwtData.setExp(user.get("exp"));
+                      jwtData.setIat(user.get("iat"));
+                      promise.complete(jwtData);
+                    })
+            .onFailure(
+                    err -> {
+                      LOGGER.error("failed to decode/validate jwt token : " + err.getMessage());
+                      promise.fail("failed to decode/validate jwt token : " + err.getMessage());
+                    });
     return promise.future();
   }
 
@@ -237,10 +231,6 @@ public AuthenticationService tokenIntrospect(JsonObject request, JsonObject auth
 //    return promise.future();
 //  }
 
-  // class to contain intermediate data for token introspection
-  final class ResultContainer {
-    JwtData jwtData;
-  }
 //  public Future<JsonObject> validateAccess(JwtData jwtData, JsonObject authenticationInfo) {
 //    LOGGER.trace("validateAccess() started");
 //    Promise<JsonObject> promise = Promise.promise();
