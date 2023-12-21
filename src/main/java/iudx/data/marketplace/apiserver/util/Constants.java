@@ -99,6 +99,9 @@ public class Constants {
   public static final int VALIDATION_ID_LENGTH = 36;
   public static final Pattern VALIDATION_IUDX_ID_REGEX =
       Pattern.compile("^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$");
+  public static final int VALIDATION_DATASET_ID_MAXLEN = 512;
+  public static final Pattern VALIDATION_DATASET_ID_REGEX = Pattern.compile("^[a-zA-Z0-9.]{4,100}/[a-zA-Z0-9.]{4,100}/[a-zA-Z.]{4,100}/[a-zA-Z-_.]{4,100}$");
+  public static final Pattern POLICY_ID_PATTERN = Pattern.compile("[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-4[a-fA-F0-9]{3}-[89abAB][a-fA-F0-9]{3}-[a-fA-F0-9]{12}");
 
 
   public static final int VALIDATION_PROVIDER_ID_MAXLEN = 200;
