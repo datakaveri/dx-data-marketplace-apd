@@ -52,7 +52,7 @@ public class Constants {
   public static final String MIME_APPLICATION_JSON = "application/json";
   public static final String MIME_TEXT_HTML = "text/html";
 
-  public static final String PROVIDER_BASE_PATH = "/provider";
+  public static final String PROVIDER_PATH = "/provider";
   public static final String PRODUCT_PATH = "/product";
   public static final String PRODUCT_VARIANT_PATH = "/product-variant";
   public static final String LIST_PRODUCTS_PATH = "/list/products";

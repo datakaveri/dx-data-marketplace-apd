@@ -66,7 +66,7 @@ public class ProviderApis {
         .failureHandler(exceptionHandler);
 
     router
-        .get(PROVIDER_BASE_PATH + LIST_PRODUCTS_PATH)
+        .get(PROVIDER_PATH + LIST_PRODUCTS_PATH)
         .handler(resourceValidationHandler)
         .handler(AuthHandler.create(vertx))
         .handler(this::listProducts)
