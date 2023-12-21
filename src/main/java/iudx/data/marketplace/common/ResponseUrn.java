@@ -49,6 +49,8 @@ public enum ResponseUrn {
       "urn:dx:dm:backend", "format error from backing service [cat,auth etc.]"),
   SCHEMA_READ_ERROR_URN("urn:dx:dm:readError", "Fail to read file"),
   ROLE_NOT_FOUND("urn:dx:dm:invalidRole", "Role does not exist"),
+  VERIFY_FORBIDDEN_URN("urn:apd:Deny", "Policy does not exist"),
+  VERIFY_SUCCESS_URN("urn:apd:Allow", "Success"),
 
   YET_NOT_IMPLEMENTED_URN("urn:dx:dm:general", "urn yet not implemented in backend verticle.");
 
