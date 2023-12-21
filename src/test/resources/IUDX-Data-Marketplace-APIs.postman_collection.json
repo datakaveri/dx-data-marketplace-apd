@@ -33,7 +33,7 @@
 										"header": [],
 										"body": {
 											"mode": "raw",
-											"raw": "{\n    \"id\": \"abcedede\",\n    \"datasets\": [\n        \"datakaveri.org/b8bd3e3f39615c8ec96722131ae95056b5938f2f/rs.iudx.io/agra-swachhata-app\",\n        \"datakaveri.org/b8bd3e3f39615c8ec96722131ae95056b5938f2f/rs.iudx.io/agra-point-of-interests\"\n    ]\n}",
+											"raw": "{\n    \"id\": \"abcedede\",\n    \"resources\": [\n        \"datakaveri.org/b8bd3e3f39615c8ec96722131ae95056b5938f2f/rs.iudx.io/agra-swachhata-app\",\n        \"datakaveri.org/b8bd3e3f39615c8ec96722131ae95056b5938f2f/rs.iudx.io/agra-point-of-interests\"\n    ]\n}",
 											"options": {
 												"raw": {
 													"language": "json"
@@ -73,7 +73,7 @@
 										"header": [],
 										"body": {
 											"mode": "raw",
-											"raw": "{\n    \"id\": \"abcedede\",\n    \"datasets\": [\n        \"datakaveri.org/b8bd3e3f39615c8ec96722131ae95056b5938f2f/rs.iudx.io////agra-swachhata-app\",\n        \"datakaveri.org/b8bd3e3f39615c8ec96722131ae95056b5938f2f/rs.iudx.io/agra-point-of-interests\"\n    ]\n}",
+											"raw": "{\n    \"id\": \"abcedede\",\n    \"resources\": [\n        \"datakaveri.org/b8bd3e3f39615c8ec96722131ae95056b5938f2f/rs.iudx.io////agra-swachhata-app\",\n        \"datakaveri.org/b8bd3e3f39615c8ec96722131ae95056b5938f2f/rs.iudx.io/agra-point-of-interests\"\n    ]\n}",
 											"options": {
 												"raw": {
 													"language": "json"
@@ -116,7 +116,7 @@
 										"header": [],
 										"body": {
 											"mode": "raw",
-											"raw": "{\n    \"id\": \"abcedede\",\n    \"datasets\": [\n        \"datakaveri.org/b8bd3e3f39615c8ec96722131ae95056b5938f2f/rs.iudx.io/agra-swachhata-app\",\n        \"datakaveri.org/b8bd3e3f39615c8ec96722131ae95056b5938f2f/rs.iudx.io/agra-point-of-interests\"\n    ]\n}",
+											"raw": "{\n    \"id\": \"abcedede\",\n    \"resources\": [\n        \"datakaveri.org/b8bd3e3f39615c8ec96722131ae95056b5938f2f/rs.iudx.io/agra-swachhata-app\",\n        \"datakaveri.org/b8bd3e3f39615c8ec96722131ae95056b5938f2f/rs.iudx.io/agra-point-of-interests\"\n    ]\n}",
 											"options": {
 												"raw": {
 													"language": "json"
@@ -156,7 +156,7 @@
 										"header": [],
 										"body": {
 											"mode": "raw",
-											"raw": "{\n    \"id\": \"abcedede\",\n    \"datasets\": [\n        \"datakaveri.org/b8bd3e3f39615c8ec96722131ae95056b5938f2f/rs.iudx.io/agra-swachhata-app\",\n        \"datakaveri.org/b8bd3e3f39615c8ec96722131ae95056b5938f2f/rs.iudx.io/agra-point-of-interests\"\n    ]\n}",
+											"raw": "{\n    \"id\": \"abcedede\",\n    \"resources\": [\n        \"datakaveri.org/b8bd3e3f39615c8ec96722131ae95056b5938f2f/rs.iudx.io/agra-swachhata-app\",\n        \"datakaveri.org/b8bd3e3f39615c8ec96722131ae95056b5938f2f/rs.iudx.io/agra-point-of-interests\"\n    ]\n}",
 											"options": {
 												"raw": {
 													"language": "json"
@@ -364,7 +364,7 @@
 										],
 										"body": {
 											"mode": "raw",
-											"raw": "{\n    \"id\": \"urn:datakaveri.org:datakaveri.org/b8bd3e3f39615c8ec96722131ae95056b5938f2f:abcedede\",\n    \"variant\": \"variant1\",\n    \"datasets\": [\n        {\n          \"id\": \"datakaveri.org/b8bd3e3f39615c8ec96722131ae95056b5938f2f/rs.iudx.io/agra-swachhata-app\",\n          \"capabilities\": [\n            \"api\", \"sub\"\n          ]\n        },\n        {\n          \"id\": \"datakaveri.org/b8bd3e3f39615c8ec96722131ae95056b5938f2f/rs.iudx.io/agra-point-of-interests\",\n          \"capabilities\": [\n            \"sub\", \"file\"\n          ]\n        }\n      ],\n      \"price\": 100.0,\n      \"duration\": 12\n}",
+											"raw": "{\n    \"id\": \"urn:datakaveri.org:datakaveri.org/b8bd3e3f39615c8ec96722131ae95056b5938f2f:abcedede\",\n    \"variant\": \"variant1\",\n    \"resources\": [\n        {\n          \"id\": \"datakaveri.org/b8bd3e3f39615c8ec96722131ae95056b5938f2f/rs.iudx.io/agra-swachhata-app\",\n          \"capabilities\": [\n            \"api\", \"sub\"\n          ]\n        },\n        {\n          \"id\": \"datakaveri.org/b8bd3e3f39615c8ec96722131ae95056b5938f2f/rs.iudx.io/agra-point-of-interests\",\n          \"capabilities\": [\n            \"sub\", \"file\"\n          ]\n        }\n      ],\n      \"price\": 100.0,\n      \"duration\": 12\n}",
 											"options": {
 												"raw": {
 													"language": "json"
@@ -404,7 +404,7 @@
 										"header": [],
 										"body": {
 											"mode": "raw",
-											"raw": "{\n    \"variant\": \"variant1\",\n    \"datasets\": [\n        {\n          \"id\": \"datakaveri.org/b8bd3e3f39615c8ec96722131ae95056b5938f2f/rs.iudx.io/agra-swachhata-app\",\n          \"capabilities\": [\n            \"api\", \"sub\"\n          ]\n        },\n        {\n          \"id\": \"datakaveri.org/b8bd3e3f39615c8ec96722131ae95056b5938f2f/rs.iudx.io/agra-point-of-interests\",\n          \"capabilities\": [\n            \"sub\", \"file\"\n          ]\n        }\n      ],\n      \"price\": 100.0,\n      \"duration\": 12\n}",
+											"raw": "{\n    \"variant\": \"variant1\",\n    \"resources\": [\n        {\n          \"id\": \"datakaveri.org/b8bd3e3f39615c8ec96722131ae95056b5938f2f/rs.iudx.io/agra-swachhata-app\",\n          \"capabilities\": [\n            \"api\", \"sub\"\n          ]\n        },\n        {\n          \"id\": \"datakaveri.org/b8bd3e3f39615c8ec96722131ae95056b5938f2f/rs.iudx.io/agra-point-of-interests\",\n          \"capabilities\": [\n            \"sub\", \"file\"\n          ]\n        }\n      ],\n      \"price\": 100.0,\n      \"duration\": 12\n}",
 											"options": {
 												"raw": {
 													"language": "json"
@@ -444,7 +444,7 @@
 										"header": [],
 										"body": {
 											"mode": "raw",
-											"raw": "{\n    \"id\": \"urn:datakaveri.org:datakaveri.org/b8bd3e3f39615c8ec96722131ae95056b5938f2f:abcedede\",\n    \"variant\": \"variant1\",\n    \"datasets\": [\n        {\n          \"id\": \"datakaveri.org/b8bd3e3f39615c8ec96722131ae95056b5938f2f/rs.iudx.io/agra-swachhata-app\",\n          \"capabilities\": [\n            \"api\", \"sub\"\n          ]\n        },\n        {\n          \"id\": \"datakaveri.org/b8bd3e3f39615c8ec96722131ae95056b5938f2f/rs.iudx.io/agra-point-of-interests\",\n          \"capabilities\": [\n            \"sub\", \"file\"\n          ]\n        }\n      ],\n      \"price\": 100.0,\n      \"duration\": 12\n}",
+											"raw": "{\n    \"id\": \"urn:datakaveri.org:datakaveri.org/b8bd3e3f39615c8ec96722131ae95056b5938f2f:abcedede\",\n    \"variant\": \"variant1\",\n    \"resources\": [\n        {\n          \"id\": \"datakaveri.org/b8bd3e3f39615c8ec96722131ae95056b5938f2f/rs.iudx.io/agra-swachhata-app\",\n          \"capabilities\": [\n            \"api\", \"sub\"\n          ]\n        },\n        {\n          \"id\": \"datakaveri.org/b8bd3e3f39615c8ec96722131ae95056b5938f2f/rs.iudx.io/agra-point-of-interests\",\n          \"capabilities\": [\n            \"sub\", \"file\"\n          ]\n        }\n      ],\n      \"price\": 100.0,\n      \"duration\": 12\n}",
 											"options": {
 												"raw": {
 													"language": "json"
@@ -484,7 +484,7 @@
 										"header": [],
 										"body": {
 											"mode": "raw",
-											"raw": "{\n    \"id\": \"urn:datakaveri.org:datakaveri.org/b8bd3e3f39615c8ec96722131ae95056b5938f2f:abcedede\",\n    \"variant\": \"variant1\",\n    \"datasets\": [\n        {\n          \"id\": \"datakaveri.org/b8bd3e3f39615c8ec96722131ae95056b5938f2f/rs.iudx.io/agra-swachhata-app\",\n          \"capabilities\": [\n            \"api\", \"sub\"\n          ]\n        },\n        {\n          \"id\": \"datakaveri.org/b8bd3e3f39615c8ec96722131ae95056b5938f2f/rs.iudx.io/agra-point-of-interests\",\n          \"capabilities\": [\n            \"sub\", \"file\"\n          ]\n        }\n      ],\n      \"price\": 100.0,\n      \"duration\": 12\n}",
+											"raw": "{\n    \"id\": \"urn:datakaveri.org:datakaveri.org/b8bd3e3f39615c8ec96722131ae95056b5938f2f:abcedede\",\n    \"variant\": \"variant1\",\n    \"resources\": [\n        {\n          \"id\": \"datakaveri.org/b8bd3e3f39615c8ec96722131ae95056b5938f2f/rs.iudx.io/agra-swachhata-app\",\n          \"capabilities\": [\n            \"api\", \"sub\"\n          ]\n        },\n        {\n          \"id\": \"datakaveri.org/b8bd3e3f39615c8ec96722131ae95056b5938f2f/rs.iudx.io/agra-point-of-interests\",\n          \"capabilities\": [\n            \"sub\", \"file\"\n          ]\n        }\n      ],\n      \"price\": 100.0,\n      \"duration\": 12\n}",
 											"options": {
 												"raw": {
 													"language": "json"
@@ -529,7 +529,7 @@
 										"header": [],
 										"body": {
 											"mode": "raw",
-											"raw": "{\n    \"id\": \"urn:datakaveri.org:datakaveri.org/b8bd3e3f39615c8ec96722131ae95056b5938f2f:abcedede\",\n    \"variant\": \"variant1\",\n    \"datasets\": [\n        {\n          \"id\": \"datakaveri.org/b8bd3e3f39615c8ec96722131ae95056b5938f2f/rs.iudx.io/agra-swachhata-app\",\n          \"capabilities\": [\n            \"api\", \"sub\"\n          ]\n        },\n        {\n          \"id\": \"datakaveri.org/b8bd3e3f39615c8ec96722131ae95056b5938f2f/rs.iudx.io/agra-point-of-interests\",\n          \"capabilities\": [\n            \"sub\", \"file\"\n          ]\n        }\n      ],\n      \"price\": 100.0,\n      \"duration\": 12\n}",
+											"raw": "{\n    \"id\": \"urn:datakaveri.org:datakaveri.org/b8bd3e3f39615c8ec96722131ae95056b5938f2f:abcedede\",\n    \"variant\": \"variant1\",\n    \"resources\": [\n        {\n          \"id\": \"datakaveri.org/b8bd3e3f39615c8ec96722131ae95056b5938f2f/rs.iudx.io/agra-swachhata-app\",\n          \"capabilities\": [\n            \"api\", \"sub\"\n          ]\n        },\n        {\n          \"id\": \"datakaveri.org/b8bd3e3f39615c8ec96722131ae95056b5938f2f/rs.iudx.io/agra-point-of-interests\",\n          \"capabilities\": [\n            \"sub\", \"file\"\n          ]\n        }\n      ],\n      \"price\": 100.0,\n      \"duration\": 12\n}",
 											"options": {
 												"raw": {
 													"language": "json"
@@ -569,7 +569,7 @@
 										"header": [],
 										"body": {
 											"mode": "raw",
-											"raw": "{\n    \n    \"variant\": \"variant1\",\n    \"datasets\": [\n        {\n          \"id\": \"datakaveri.org/b8bd3e3f39615c8ec96722131ae95056b5938f2f/rs.iudx.io/agra-swachhata-app\",\n          \"capabilities\": [\n            \"api\", \"sub\"\n          ]\n        },\n        {\n          \"id\": \"datakaveri.org/b8bd3e3f39615c8ec96722131ae95056b5938f2f/rs.iudx.io/agra-point-of-interests\",\n          \"capabilities\": [\n            \"sub\", \"file\"\n          ]\n        }\n      ],\n      \"price\": 100.0,\n      \"duration\": 12\n}",
+											"raw": "{\n    \n    \"variant\": \"variant1\",\n    \"resources\": [\n        {\n          \"id\": \"datakaveri.org/b8bd3e3f39615c8ec96722131ae95056b5938f2f/rs.iudx.io/agra-swachhata-app\",\n          \"capabilities\": [\n            \"api\", \"sub\"\n          ]\n        },\n        {\n          \"id\": \"datakaveri.org/b8bd3e3f39615c8ec96722131ae95056b5938f2f/rs.iudx.io/agra-point-of-interests\",\n          \"capabilities\": [\n            \"sub\", \"file\"\n          ]\n        }\n      ],\n      \"price\": 100.0,\n      \"duration\": 12\n}",
 											"options": {
 												"raw": {
 													"language": "json"
@@ -612,7 +612,7 @@
 										"header": [],
 										"body": {
 											"mode": "raw",
-											"raw": "{\n    \"id\": \"urn:datakaveri.org:datakaveri.org/b8bd3e3f39615c8ec96722131ae95056b5938f2f:abcedede\",\n    \"variant\": \"variant1\",\n    \"datasets\": [\n        {\n          \"id\": \"datakaveri.org/b8bd3e3f39615c8ec96722131ae95056b5938f2f/rs.iudx.io/agra-swachhata-app\",\n          \"capabilities\": [\n            \"api\", \"sub\"\n          ]\n        },\n        {\n          \"id\": \"datakaveri.org/b8bd3e3f39615c8ec96722131ae95056b5938f2f/rs.iudx.io/agra-point-of-interests\",\n          \"capabilities\": [\n            \"sub\", \"file\"\n          ]\n        }\n      ],\n      \"price\": 100.0,\n      \"duration\": 12\n}",
+											"raw": "{\n    \"id\": \"urn:datakaveri.org:datakaveri.org/b8bd3e3f39615c8ec96722131ae95056b5938f2f:abcedede\",\n    \"variant\": \"variant1\",\n    \"resources\": [\n        {\n          \"id\": \"datakaveri.org/b8bd3e3f39615c8ec96722131ae95056b5938f2f/rs.iudx.io/agra-swachhata-app\",\n          \"capabilities\": [\n            \"api\", \"sub\"\n          ]\n        },\n        {\n          \"id\": \"datakaveri.org/b8bd3e3f39615c8ec96722131ae95056b5938f2f/rs.iudx.io/agra-point-of-interests\",\n          \"capabilities\": [\n            \"sub\", \"file\"\n          ]\n        }\n      ],\n      \"price\": 100.0,\n      \"duration\": 12\n}",
 											"options": {
 												"raw": {
 													"language": "json"
@@ -761,12 +761,12 @@
 									"response": []
 								},
 								{
-									"name": "200 - List Products for Dataset",
+									"name": "200 - List Products for Resource",
 									"request": {
 										"method": "GET",
 										"header": [],
 										"url": {
-											"raw": "https://localhost:8445/provider/list/products?datasetID=datakaveri.org/b8bd3e3f39615c8ec96722131ae95056b5938f2f/rs.iudx.io/agra-point-of-interests",
+											"raw": "https://localhost:8445/provider/list/products?resourceID=datakaveri.org/b8bd3e3f39615c8ec96722131ae95056b5938f2f/rs.iudx.io/agra-point-of-interests",
 											"protocol": "https",
 											"host": [
 												"localhost"
@@ -779,7 +779,7 @@
 											],
 											"query": [
 												{
-													"key": "datasetID",
+													"key": "resourceID",
 													"value": "datakaveri.org/b8bd3e3f39615c8ec96722131ae95056b5938f2f/rs.iudx.io/agra-point-of-interests"
 												}
 											]
@@ -793,7 +793,7 @@
 										"method": "GET",
 										"header": [],
 										"url": {
-											"raw": "https://localhost:8445/provider/list/products?datasetID=datakaveri.org/b8bd3e3f39615c8ec96722131ae95056b5938f2f/rs.iudx.io/pune-point-of-interests",
+											"raw": "https://localhost:8445/provider/list/products?resourceID=datakaveri.org/b8bd3e3f39615c8ec96722131ae95056b5938f2f/rs.iudx.io/pune-point-of-interests",
 											"protocol": "https",
 											"host": [
 												"localhost"
@@ -806,7 +806,7 @@
 											],
 											"query": [
 												{
-													"key": "datasetID",
+													"key": "resourceID",
 													"value": "datakaveri.org/b8bd3e3f39615c8ec96722131ae95056b5938f2f/rs.iudx.io/pune-point-of-interests"
 												}
 											]
@@ -839,12 +839,12 @@
 									"response": []
 								},
 								{
-									"name": "400 - Invalid dataset ID",
+									"name": "400 - Invalid resource ID",
 									"request": {
 										"method": "GET",
 										"header": [],
 										"url": {
-											"raw": "https://localhost:8445/provider/list/products?datasetID=datakaveri.org/b8bd3e3f39615c8ec96722131ae95056b5938f2f/rs.iudx.io/pune-point-of-interests***",
+											"raw": "https://localhost:8445/provider/list/products?resourceID=datakaveri.org/b8bd3e3f39615c8ec96722131ae95056b5938f2f/rs.iudx.io/pune-point-of-interests***",
 											"protocol": "https",
 											"host": [
 												"localhost"
@@ -968,10 +968,10 @@
 			"name": "Consumer APIs",
 			"item": [
 				{
-					"name": "List Datasets",
+					"name": "List Resources",
 					"item": [
 						{
-							"name": "200 - Get Datasets",
+							"name": "200 - Get Resources",
 							"event": [
 								{
 									"listen": "prerequest",
@@ -1003,7 +1003,7 @@
 							"response": []
 						},
 						{
-							"name": "200 - Get Datasets for Provider",
+							"name": "200 - Get Resources for Provider",
 							"event": [
 								{
 									"listen": "prerequest",
@@ -1041,7 +1041,7 @@
 							"response": []
 						},
 						{
-							"name": "200 - Get Dataset by ID",
+							"name": "200 - Get Resource by ID",
 							"event": [
 								{
 									"listen": "prerequest",
@@ -1117,7 +1117,7 @@
 							"response": []
 						},
 						{
-							"name": "400 - Invalid DatasetID",
+							"name": "400 - Invalid ResourceID",
 							"event": [
 								{
 									"listen": "prerequest",

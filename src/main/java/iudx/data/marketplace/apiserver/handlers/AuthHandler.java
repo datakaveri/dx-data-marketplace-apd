@@ -39,6 +39,10 @@ public class AuthHandler implements Handler<RoutingContext> {
       requestJson = new JsonObject();
     }
 
+    if(context.pathParams().containsKey(PROVIDER_ID)) {
+      requestJson.put(PROVIDER_ID, context.pathParam(PROVIDER_ID));
+    }
+
     LOGGER.debug("Info : path " + request.path());
 
     String token = request.headers().get(HEADER_TOKEN);
@@ -58,6 +62,7 @@ public class AuthHandler implements Handler<RoutingContext> {
             authInfo.put(IID, authHandler.result().getValue(IID));
             authInfo.put(USER_ID, authHandler.result().getValue(USER_ID));
             authInfo.put(EXPIRY, authHandler.result().getValue(EXPIRY));
+            authInfo.put(PROVIDER_ID, authHandler.result().getValue(PROVIDER_ID, ""));
             context.data().put(AUTH_INFO, authInfo);
           } else {
             processAuthFailure(context, authHandler.cause().getMessage());

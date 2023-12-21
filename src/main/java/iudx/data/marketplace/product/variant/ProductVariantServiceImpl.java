@@ -34,7 +34,7 @@ public class ProductVariantServiceImpl implements ProductVariantService {
     String variantName = request.getString(VARIANT);
     Future<Boolean> checkForExistence = checkIfProductVariantExists(productID, variantName);
     Future<JsonObject> productDetailsFuture = getProductDetails(productID);
-    JsonArray datasets = request.getJsonArray(DATASETS);
+    JsonArray resources = request.getJsonArray(resourceNames);
 
     checkForExistence
         .compose(
@@ -49,19 +49,20 @@ public class ProductVariantServiceImpl implements ProductVariantService {
             pdfHandler -> {
               if (pdfHandler.succeeded()) {
                 JsonObject res = pdfHandler.result().getJsonArray(RESULTS).getJsonObject(0);
-                JsonArray resDatasets = res.getJsonArray(DATASETS);
-                if (datasets.size() != resDatasets.size()) {
+                JsonArray resResources = res.getJsonArray(resourceNames);
+                if (resources.size() != resResources.size()) {
                   handler.handle(
                       Future.failedFuture(
-                          "Number of datasets is incorrect, required : " + resDatasets.size()));
+                          "Number of resources is incorrect, required : " + resResources.size()));
                 }
                 int i, j;
-                for (i = 0; i < datasets.size(); i++) {
-                  for (j = 0; j < resDatasets.size(); j++) {
-                    String reqID = datasets.getJsonObject(i).getString(ID);
-                    String resID = resDatasets.getJsonObject(j).getString(ID);
+                for (i = 0; i < resources.size(); i++) {
+                  for (j = 0; j < resResources.size(); j++) {
+                    String reqID = resources.getJsonObject(i).getString(ID);
+                    String resID = resResources.getJsonObject(j).getString(ID);
                     if (reqID.equalsIgnoreCase(resID)) {
-                      resDatasets.getJsonObject(j).mergeIn(datasets.getJsonObject(i));
+                      resResources.getJsonObject(j).mergeIn(resources.getJsonObject(i));
+                      break;
                     }
                   }
                 }

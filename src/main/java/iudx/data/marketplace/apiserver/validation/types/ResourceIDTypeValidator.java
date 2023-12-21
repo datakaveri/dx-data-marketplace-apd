@@ -6,16 +6,16 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import static iudx.data.marketplace.apiserver.util.Constants.*;
-import static iudx.data.marketplace.common.ResponseUrn.INVALID_PROVIDER_URN;
+import static iudx.data.marketplace.common.ResponseUrn.INVALID_RESOURCE_URN;
 
-public class ProviderIDTypeValidator implements Validator {
+public class ResourceIDTypeValidator implements Validator {
 
-  public static final Logger LOGGER = LogManager.getLogger(ProviderIDTypeValidator.class);
+  public static final Logger LOGGER = LogManager.getLogger(ResourceIDTypeValidator.class);
 
   private final String value;
   private final boolean required;
 
-  public ProviderIDTypeValidator(final String value, final boolean required) {
+  public ResourceIDTypeValidator(final String value, final boolean required) {
     this.value = value;
     this.required = required;
   }
@@ -29,23 +29,23 @@ public class ProviderIDTypeValidator implements Validator {
     LOGGER.debug("value : " + value + "");
     if (required && (value == null || value.isBlank())) {
       LOGGER.error("validation error: null or blank value for required mandatory field");
-      throw new DxRuntimeException(failureCode(), INVALID_PROVIDER_URN, failureMessage());
+      throw new DxRuntimeException(failureCode(), INVALID_RESOURCE_URN, failureMessage());
     } else {
       if (value == null) {
         return true;
       }
       if (value.isBlank()) {
         LOGGER.error("Validation error: blank value passed");
-        throw new DxRuntimeException(failureCode(), INVALID_PROVIDER_URN, failureMessage(value));
+        throw new DxRuntimeException(failureCode(), INVALID_RESOURCE_URN, failureMessage(value));
       }
     }
     if (value.length() != VALIDATION_ID_LENGTH) {
       LOGGER.error("Validation error : Value mismatch character limit.");
-      throw new DxRuntimeException(failureCode(), INVALID_PROVIDER_URN, failureMessage(value));
+      throw new DxRuntimeException(failureCode(), INVALID_RESOURCE_URN, failureMessage(value));
     }
     if (!isValidID(value)) {
       LOGGER.error("Validation error : Invalid Resource ID");
-      throw new DxRuntimeException(failureCode(), INVALID_PROVIDER_URN, failureMessage(value));
+      throw new DxRuntimeException(failureCode(), INVALID_RESOURCE_URN, failureMessage(value));
     }
     return true;
   }
@@ -57,6 +57,6 @@ public class ProviderIDTypeValidator implements Validator {
 
   @Override
   public String failureMessage() {
-    return INVALID_PROVIDER_URN.getMessage();
+    return INVALID_RESOURCE_URN.getMessage();
   }
 }

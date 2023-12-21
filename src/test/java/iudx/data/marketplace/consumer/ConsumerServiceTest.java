@@ -16,7 +16,7 @@ import org.mockito.invocation.InvocationOnMock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.mockito.stubbing.Answer;
 
-import static iudx.data.marketplace.common.Constants.DATASET_ID;
+import static iudx.data.marketplace.common.Constants.RESOURCE_ID;
 import static iudx.data.marketplace.common.Constants.PROVIDER_ID;
 import static iudx.data.marketplace.consumer.util.Constants.TABLES;
 import static org.mockito.ArgumentMatchers.any;
@@ -46,10 +46,10 @@ public class ConsumerServiceTest {
   }
 
   @Test
-  @DisplayName("Test list Datasets - Success ")
-  public void testListDatasetsSuccess(VertxTestContext testContext) {
+  @DisplayName("Test list Resources - Success ")
+  public void testListResourcesSuccess(VertxTestContext testContext) {
 
-    request.put(DATASET_ID, "iid");
+    request.put(RESOURCE_ID, "iid");
     when(asyncResult.succeeded()).thenReturn(true);
     doAnswer(
             new Answer<AsyncResult<JsonObject>>() {
@@ -64,7 +64,7 @@ public class ConsumerServiceTest {
         .when(postgresService)
         .executePreparedQuery(anyString(), any(), any());
 
-    consumerService.listDatasets(
+    consumerService.listResources(
         request,
         handler -> {
           if (handler.succeeded()) {
@@ -77,8 +77,8 @@ public class ConsumerServiceTest {
   }
 
   @Test
-  @DisplayName("Test list Datasets - Failed")
-  public void testListDatasetFailed(VertxTestContext testContext) {
+  @DisplayName("Test list Resources - Failed")
+  public void testListResourceFailed(VertxTestContext testContext) {
     request.put(PROVIDER_ID, "iid");
     when(asyncResult.succeeded()).thenReturn(false);
     doAnswer(
@@ -94,7 +94,7 @@ public class ConsumerServiceTest {
         .when(postgresService)
         .executePreparedQuery(anyString(), any(), any());
 
-    consumerService.listDatasets(
+    consumerService.listResources(
         request,
         handler -> {
           if (handler.succeeded()) {
@@ -204,7 +204,7 @@ public class ConsumerServiceTest {
   public void testListProductsFailed2(VertxTestContext testContext) {
 
     tableArray.add("table name");
-    request.put(DATASET_ID, "did");
+    request.put(RESOURCE_ID, "did");
     when(asyncResult.succeeded()).thenReturn(false);
     doAnswer(
             new Answer<AsyncResult<JsonObject>>() {

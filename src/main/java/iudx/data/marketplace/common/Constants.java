@@ -8,11 +8,16 @@ public class Constants {
   public static final String CAT_REL_PATH = "catRelPath";
   public static final String TYPE_PROVIDER = "iudx:Provider";
   public static final String TYPE_RG = "iudx:ResourceGroup";
+  public static final String TYPE_RI = "iudx:Resource";
   public static final String PROVIDER_ID = "providerID";
   public static final String PROVIDER_NAME = "providerName";
-  public static final String DATASET_ID = "datasetID";
-  public static final String DATASET_NAME = "datasetName";
+  public static final String RESOURCE_ID = "resourceID";
+  public static final String RESOURCE_NAME = "resourceName";
+  public static final String RESOURCE_SERVER = "resourceServer";
+  public static final String PROVIDER = "provider";
   public static final String PRODUCT_VARIANT_NAME = "productVariantName";
+
+  public static final String EXPIRY = "expiry";
 
   // Service addresses
   public static final String AUTH_SERVICE_ADDRESS = "iudx.data.marketplace.authentication.service";

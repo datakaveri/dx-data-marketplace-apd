@@ -47,13 +47,19 @@ public class Constants {
 
   // paths
   public static final String PROVIDER_PATH = "/provider";
+  public static final String ROUTE_STATIC_SPEC = "/apis/spec";
+  public static final String ROUTE_DOC = "/apis";
+  public static final String MIME_APPLICATION_JSON = "application/json";
+  public static final String MIME_TEXT_HTML = "text/html";
+
+  public static final String PROVIDER_BASE_PATH = "/provider";
   public static final String PRODUCT_PATH = "/product";
   public static final String PRODUCT_VARIANT_PATH = "/product-variant";
   public static final String LIST_PRODUCTS_PATH = "/list/products";
   public static final String LIST_PURCHASES_PATH = "/list/purchases";
   public static final String CONSUMER_PATH = "/consumer";
   public static final String LIST_PROVIDERS_PATH = "/list/providers";
-  public static final String LIST_DATASETS_PATH = "/list/datasets";
+  public static final String LIST_RESOURCES_PATH = "/list/resources";
   public static final String USERMAPS_PATH = "/product/usermaps";
   public static final String VERIFY_PATH = "/verify";
   public static final String POLICIES_API = "/policies";
@@ -62,7 +68,7 @@ public class Constants {
 
   public static final String PRODUCT_ID = "id";
   public static final String PRODUCT_VARIANT_NAME = "variant";
-  public static final String DATASET_ID = "datasetID";
+  public static final String RESOURCE_ID = "resourceID";
 
   public static final String PROVIDER_ID = "providerID";
 
@@ -81,11 +87,6 @@ public class Constants {
   public static final int VALIDATION_PROVIDER_ID_MAXLEN = 200;
   public static final Pattern VALIDATION_PROVIDER_ID_REGEX = Pattern.compile("^[a-zA-Z0-9.]{4,100}/[a-zA-Z0-9.]{4,100}$");
 
-  // API docs
-  public static final String ROUTE_DOC = "/apis";
-  public static final String MIME_TEXT_HTML = "text/html";
-  public static final String ROUTE_STATIC_SPEC = "/apis/spec";
-  public static final String MIME_APPLICATION_JSON = "application/json";
 
   // response keys
   public static final String TYPE = "type";
@@ -94,5 +95,9 @@ public class Constants {
   public static final String RESULT = "results";
   public static final String STATUS_CODE = "statusCode";
 
+
+  public static final int VALIDATION_ID_LENGTH = 36;
+  public static final Pattern VALIDATION_IUDX_ID_REGEX =
+      Pattern.compile("^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$");
 
 }

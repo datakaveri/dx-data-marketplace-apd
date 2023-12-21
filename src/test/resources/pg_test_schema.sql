@@ -11,23 +11,23 @@ CREATE TABLE IF NOT EXISTS product
     CONSTRAINT product_pk PRIMARY KEY (productID)
 );
 
-CREATE TABLE IF NOT EXISTS dataset
+CREATE TABLE IF NOT EXISTS resource
 (
-    datasetID varchar UNIQUE NOT NULL,
-    datasetName varchar UNIQUE NOT NULL,
+    resourceID varchar UNIQUE NOT NULL,
+    resourceName varchar UNIQUE NOT NULL,
     accessPolicy varchar NOT NULL,
     providerID varchar NOT NULL,
     providerName varchar NOT NULL,
     totalResources integer NOT NULL,
     created_at timestamp without time zone NOT NULL,
     modified_at timestamp without time zone NOT NULL,
-    CONSTRAINT dataset_pk PRIMARY KEY (datasetID)
+    CONSTRAINT resource_pk PRIMARY KEY (resourceID)
 );
 
-CREATE TABLE IF NOT EXISTS product_dataset_relation
+CREATE TABLE IF NOT EXISTS product_resource_relation
 (
     productID varchar REFERENCES product (productID),
-    datasetID varchar REFERENCES dataset (datasetID),
+    resourceID varchar REFERENCES resource (resourceID),
     _id uuid DEFAULT uuid_generate_v4 () NOT NULL,
     CONSTRAINT pkey PRIMARY KEY (_id)
 );
@@ -60,8 +60,8 @@ CREATE TRIGGER update_product_modified BEFORE INSERT
 OR UPDATE ON
    product FOR EACH ROW EXECUTE PROCEDURE update_modified ();
 
--- dataset table
-CREATE TRIGGER update_dataset_created BEFORE INSERT ON dataset FOR EACH ROW EXECUTE PROCEDURE update_created ();
+-- resource table
+CREATE TRIGGER update_resource_created BEFORE INSERT ON dataset FOR EACH ROW EXECUTE PROCEDURE update_created ();
 CREATE TRIGGER update_dataset_modified BEFORE INSERT
 OR UPDATE ON
    dataset FOR EACH ROW EXECUTE PROCEDURE update_modified ();

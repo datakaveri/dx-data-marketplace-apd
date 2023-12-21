@@ -1,6 +1,6 @@
 package iudx.data.marketplace.consumer;
 
-import static iudx.data.marketplace.common.Constants.DATASET_ID;
+import static iudx.data.marketplace.common.Constants.RESOURCE_ID;
 import static iudx.data.marketplace.common.Constants.PROVIDER_ID;
 import static iudx.data.marketplace.consumer.util.Constants.*;
 import static iudx.data.marketplace.product.util.Constants.STATUS;
@@ -25,16 +25,16 @@ public class ConsumerServiceImpl implements ConsumerService {
   }
 
   @Override
-  public ConsumerService listDatasets(
+  public ConsumerService listResources(
       JsonObject request, Handler<AsyncResult<JsonObject>> handler) {
 
-    String datasetTable = config.getJsonArray(TABLES).getString(1);
+    String resourceTable = config.getJsonArray(TABLES).getString(1);
     JsonObject params = new JsonObject();
-    StringBuilder query = new StringBuilder(LIST_DATASETS_QUERY.replace("$0", datasetTable));
-    if (request.containsKey(DATASET_ID)) {
-      String datasetID = request.getString(DATASET_ID);
-      params.put(DATASET_ID, datasetID);
-      query.append(" where ").append(DATASET_ID).append('=').append("$1");
+    StringBuilder query = new StringBuilder(LIST_RESOURCES_QUERY.replace("$0", resourceTable));
+    if (request.containsKey(RESOURCE_ID)) {
+      String resourceID = request.getString(RESOURCE_ID);
+      params.put(RESOURCE_ID, resourceID);
+      query.append(" where ").append(RESOURCE_ID).append('=').append("$1");
     } else if (request.containsKey(PROVIDER_ID)) {
       String providerID = request.getString(PROVIDER_ID);
       params.put(PROVIDER_ID, providerID);
@@ -48,7 +48,7 @@ public class ConsumerServiceImpl implements ConsumerService {
           if (pgHandler.succeeded()) {
             handler.handle(Future.succeededFuture(pgHandler.result()));
           } else {
-            LOGGER.error("get datasets failed");
+            LOGGER.error("get resources failed");
             handler.handle(Future.failedFuture(pgHandler.cause()));
           }
         });
@@ -59,9 +59,9 @@ public class ConsumerServiceImpl implements ConsumerService {
   public ConsumerService listProviders(
       JsonObject request, Handler<AsyncResult<JsonObject>> handler) {
 
-    String datasetTable = config.getJsonArray(TABLES).getString(1);
+    String resourceTable = config.getJsonArray(TABLES).getString(1);
     JsonObject params = new JsonObject();
-    StringBuilder query = new StringBuilder(LIST_PROVIDERS_QUERY.replace("$0", datasetTable));
+    StringBuilder query = new StringBuilder(LIST_PROVIDERS_QUERY.replace("$0", resourceTable));
 
     if (request.containsKey(PROVIDER_ID)) {
       String providerID = request.getString(PROVIDER_ID);
@@ -93,16 +93,16 @@ public class ConsumerServiceImpl implements ConsumerService {
   public ConsumerService listProducts(
       JsonObject request, Handler<AsyncResult<JsonObject>> handler) {
     String productTable = config.getJsonArray(TABLES).getString(0);
-    String datasetTable = config.getJsonArray(TABLES).getString(1);
-    String productDatasetRelationTable = config.getJsonArray(TABLES).getString(2);
+    String resourceTable = config.getJsonArray(TABLES).getString(1);
+    String productResourceRelationTable = config.getJsonArray(TABLES).getString(2);
 
     JsonObject params = new JsonObject();
     String query;
 
-    if (request.containsKey(DATASET_ID)) {
-      String datasetID = request.getString(DATASET_ID);
-      params.put(STATUS, Status.ACTIVE.toString()).put(DATASET_ID, datasetID);
-      query = LIST_PRODUCTS_FOR_DATASET;
+    if (request.containsKey(RESOURCE_ID)) {
+      String resourceID = request.getString(RESOURCE_ID);
+      params.put(STATUS, Status.ACTIVE.toString()).put(RESOURCE_ID, resourceID);
+      query = LIST_PRODUCTS_FOR_RESOURCE;
     } else if (request.containsKey(PROVIDER_ID)) {
       String providerID = request.getString(PROVIDER_ID);
       params.put(STATUS, Status.ACTIVE.toString()).put(PROVIDER_ID, providerID);
@@ -116,8 +116,8 @@ public class ConsumerServiceImpl implements ConsumerService {
         new StringBuilder(
             query
                 .replace("$0", productTable)
-                .replace("$9", productDatasetRelationTable)
-                .replace("$8", datasetTable));
+                .replace("$9", productResourceRelationTable)
+                .replace("$8", resourceTable));
 
     pgService.executePreparedQuery(
         finalQuery.toString(),
@@ -126,7 +126,7 @@ public class ConsumerServiceImpl implements ConsumerService {
           if (pgHandler.succeeded()) {
             handler.handle(Future.succeededFuture(pgHandler.result()));
           } else {
-            LOGGER.error("get datasets failed");
+            LOGGER.error("get resources failed");
             handler.handle(Future.failedFuture(pgHandler.cause()));
           }
         });

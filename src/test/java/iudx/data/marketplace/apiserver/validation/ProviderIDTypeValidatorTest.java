@@ -11,6 +11,8 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.mockito.junit.jupiter.MockitoExtension;
+
+import java.util.UUID;
 import java.util.stream.Stream;
 
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -27,7 +29,7 @@ public class ProviderIDTypeValidatorTest {
     @Test
     @DisplayName("Test for valid ID")
     public void testForValidId(VertxTestContext testContext) {
-    value = "AbCd.1234/xyZ.5678";
+    value = UUID.randomUUID().toString();
         providerIDTypeValidator = new ProviderIDTypeValidator(value, true);
 
         boolean valid = providerIDTypeValidator.isValid();

@@ -3,7 +3,7 @@ package iudx.data.marketplace.apiserver.validation;
 import io.vertx.junit5.VertxExtension;
 import io.vertx.junit5.VertxTestContext;
 import iudx.data.marketplace.apiserver.exceptions.DxRuntimeException;
-import iudx.data.marketplace.apiserver.validation.types.DatasetIDTypeValidator;
+import iudx.data.marketplace.apiserver.validation.types.ResourceIDTypeValidator;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -16,9 +16,9 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 
 @ExtendWith(VertxExtension.class)
 @ExtendWith(MockitoExtension.class)
-public class DatasetIDTypeValidatorTest {
+public class ResourceIDTypeValidatorTest {
 
-    DatasetIDTypeValidator datasetIDTypeValidator;
+    ResourceIDTypeValidator resourceIDTypeValidator;
     String value;
     boolean required;
 
@@ -38,9 +38,9 @@ public class DatasetIDTypeValidatorTest {
     public void failureTestIDValidator(String id, VertxTestContext testContext) {
         value = id;
 
-        datasetIDTypeValidator = new DatasetIDTypeValidator(value, true);
+        resourceIDTypeValidator = new ResourceIDTypeValidator(value, true);
         Exception exception = assertThrows(DxRuntimeException.class, () -> {
-            datasetIDTypeValidator.isValid();
+            resourceIDTypeValidator.isValid();
         });
         testContext.completeNow();
     }

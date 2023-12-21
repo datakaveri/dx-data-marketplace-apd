@@ -20,6 +20,7 @@ import iudx.data.marketplace.common.RespBuilder;
 import iudx.data.marketplace.common.ResponseUrn;
 import iudx.data.marketplace.product.ProductService;
 import iudx.data.marketplace.product.variant.ProductVariantService;
+import java.util.Map;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -43,7 +44,7 @@ public class ProviderApis {
     ValidationHandler productValidationHandler = new ValidationHandler(vertx, RequestType.PRODUCT);
     ValidationHandler variantValidationHandler =
         new ValidationHandler(vertx, RequestType.PRODUCT_VARIANT);
-    ValidationHandler datasetValidationHandler = new ValidationHandler(vertx, RequestType.DATASET);
+    ValidationHandler resourceValidationHandler = new ValidationHandler(vertx, RequestType.RESOURCE);
     ExceptionHandler exceptionHandler = new ExceptionHandler();
 
     productService = ProductService.createProxy(vertx, PRODUCT_SERVICE_ADDRESS);
@@ -53,54 +54,54 @@ public class ProviderApis {
         .post(PROVIDER_PATH + PRODUCT_PATH)
         .consumes(APPLICATION_JSON)
         .handler(productValidationHandler)
-        .handler(AuthHandler.create(vertx, api))
+        .handler(AuthHandler.create(vertx))
         .handler(this::handleCreateProduct)
         .failureHandler(exceptionHandler);
 
     router
         .delete(PROVIDER_PATH + PRODUCT_PATH)
         .handler(productValidationHandler)
-        .handler(AuthHandler.create(vertx, api))
+        .handler(AuthHandler.create(vertx))
         .handler(this::handleDeleteProduct)
         .failureHandler(exceptionHandler);
 
     router
-        .get(PROVIDER_PATH + LIST_PRODUCTS_PATH)
-        .handler(datasetValidationHandler)
-        .handler(AuthHandler.create(vertx, api))
+        .get(PROVIDER_BASE_PATH + LIST_PRODUCTS_PATH)
+        .handler(resourceValidationHandler)
+        .handler(AuthHandler.create(vertx))
         .handler(this::listProducts)
         .failureHandler(exceptionHandler);
 
     router
         .get(PROVIDER_PATH + LIST_PURCHASES_PATH)
-        .handler(AuthHandler.create(vertx, api))
+        .handler(AuthHandler.create(vertx))
         .handler(this::listPurchases)
         .failureHandler(exceptionHandler);
 
     router
         .post(PROVIDER_PATH + PRODUCT_VARIANT_PATH)
         .handler(variantValidationHandler)
-        .handler(AuthHandler.create(vertx, api))
+        .handler(AuthHandler.create(vertx))
         .handler(this::handleCreateProductVariant)
         .failureHandler(exceptionHandler);
 
     router
         .put(PROVIDER_PATH + PRODUCT_VARIANT_PATH)
         .handler(variantValidationHandler)
-        .handler(AuthHandler.create(vertx, api))
+        .handler(AuthHandler.create(vertx))
         .handler(this::handleUpdateProductVariant)
         .failureHandler(exceptionHandler);
 
     router
         .get(PROVIDER_PATH + PRODUCT_VARIANT_PATH)
-        .handler(AuthHandler.create(vertx, api))
+        .handler(AuthHandler.create(vertx))
         .handler(this::handleGetProductVariants)
         .failureHandler(exceptionHandler);
 
     router
         .delete(PROVIDER_PATH + PRODUCT_VARIANT_PATH)
         .handler(variantValidationHandler)
-        .handler(AuthHandler.create(vertx, api))
+        .handler(AuthHandler.create(vertx))
         .handler(this::handleDeleteProductVariant)
         .failureHandler(exceptionHandler);
     return this.router;
@@ -160,8 +161,9 @@ public class ProviderApis {
   private void listProducts(RoutingContext routingContext) {
     HttpServerRequest request = routingContext.request();
     JsonObject requestBody = new JsonObject();
-    if (request.getParam(DATASET_ID) != null) {
-      requestBody.put(DATASET_ID, request.getParam(DATASET_ID));
+
+    for (Map.Entry<String, String> param : request.params()) {
+      requestBody.put(param.getKey(), param.getValue());
     }
     JsonObject authInfo = (JsonObject) routingContext.data().get(AUTH_INFO);
     requestBody.put(AUTH_INFO, authInfo);

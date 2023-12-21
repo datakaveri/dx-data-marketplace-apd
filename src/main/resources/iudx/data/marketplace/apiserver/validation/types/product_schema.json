@@ -7,15 +7,15 @@
   "examples": [
     {
       "id": "flood-sensors",
-      "datasets": [
-        "pune-env-flood",
-        "stqc-flood-sensors"
+      "resourceIds": [
+        "83a3bec5-247c-47a2-9810-273123564b0a",
+        "0880ec14-f078-4059-bfde-4c9f022526a9"
       ]
     }
   ],
   "required": [
     "id",
-    "datasets"
+    "resourceIds"
   ],
   "properties": {
     "id": {
@@ -28,18 +28,17 @@
       "maxLength": 150,
       "additionalItems": false
     },
-    "datasets": {
-      "$id": "#/properties/datasets",
+    "resourceIds": {
+      "$id": "#/properties/resourceIds",
       "type": "array",
-      "title": "Datasets schema",
-      "description": "An array of datasets belonging to a product",
+      "title": "ResourceIds schema",
+      "description": "An array of resourceIds belonging to a product",
       "items": {
-        "$id": "#/properties/datasets/items",
+        "$id": "#/properties/resourceIds/items",
         "title": "Items",
         "type": "string",
         "default": "",
-        "pattern": "^[a-zA-Z0-9.]{4,100}/[a-zA-Z0-9.]{4,100}/[a-zA-Z.]{4,100}/[a-zA-Z-_.]{4,100}$",
-        "maxLength": 512
+        "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$"
       }
     }
   },

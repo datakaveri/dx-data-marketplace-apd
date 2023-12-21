@@ -13,14 +13,14 @@ import io.vertx.core.json.JsonObject;
 public interface ConsumerService {
 
   /**
-   * The listDatasets method fetches some or all datasets available on the IUDX marketplace
+   * The listResources method fetches some or all resources available on the IUDX marketplace
    *
    * @param request which is a JsonObject
    * @param handler which is a Request Handler
    * @return ConsumerService which ia service
    */
   @Fluent
-  ConsumerService listDatasets(JsonObject request, Handler<AsyncResult<JsonObject>> handler);
+  ConsumerService listResources(JsonObject request, Handler<AsyncResult<JsonObject>> handler);
 
   /**
    * The listProviders method fetches all or one providers available on the IUDX marketplace

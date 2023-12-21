@@ -42,7 +42,7 @@ public class Api {
     providerListPurchasesPath = new StringBuilder(PROVIDER_PATH + LIST_PURCHASES_PATH);
     providerProductVariantPath = new StringBuilder(PROVIDER_PATH + PRODUCT_VARIANT_PATH);
     productUserMapsPath = new StringBuilder(USERMAPS_PATH);
-    consumerListDatasets = new StringBuilder(CONSUMER_PATH + LIST_DATASETS_PATH);
+    consumerListDatasets = new StringBuilder(CONSUMER_PATH + LIST_RESOURCES_PATH);
     consumerListProviders = new StringBuilder(CONSUMER_PATH + LIST_PROVIDERS_PATH);
     consumerListPurchases = new StringBuilder(CONSUMER_PATH + LIST_PURCHASES_PATH);
     consumerListProducts = new StringBuilder(CONSUMER_PATH + LIST_PRODUCTS_PATH);

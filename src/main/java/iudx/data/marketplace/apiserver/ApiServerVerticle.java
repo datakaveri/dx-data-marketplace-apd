@@ -179,22 +179,42 @@ public class ApiServerVerticle extends AbstractVerticle {
     server = vertx.createHttpServer(serverOptions);
     server.requestHandler(router).listen(port);
 
-    router.route(PROVIDER_PATH + "/*").subRouter(new ProviderApis(vertx, router, api).init());
-    router.route(CONSUMER_PATH + "/*").subRouter(new ConsumerApis(vertx, router, api).init());
+
+    //  Documentation routes
+
+    /* Static Resource Handler */
+    /* Get openapiv3 spec */
+    router.get(ROUTE_STATIC_SPEC)
+        .produces(MIME_APPLICATION_JSON)
+        .handler(routingContext -> {
+          HttpServerResponse response = routingContext.response();
+          response.sendFile("docs/apidocs.yaml");
+        });
+    /* Get redoc */
+    router.get(ROUTE_DOC)
+        .produces(MIME_TEXT_HTML)
+        .handler(routingContext -> {
+          HttpServerResponse response = routingContext.response();
+          response.sendFile("docs/apidoc.html");
+        });
+
+
+      router.route(PROVIDER_PATH + "/*").subRouter(new ProviderApis(vertx, router, api).init());
+      router.route(CONSUMER_PATH + "/*").subRouter(new ConsumerApis(vertx, router, api).init());
 
     ExceptionHandler exceptionHandler = new ExceptionHandler();
     ValidationHandler policyValidationHandler = new ValidationHandler(vertx, RequestType.POLICY);
     ValidationHandler verifyValidationHandler = new ValidationHandler(vertx, RequestType.VERIFY);
     router
             .get(api.getPoliciesUrl())
-            .handler(AuthHandler.create(vertx, api))
+            .handler(AuthHandler.create(vertx))
             .handler(this::getPoliciesHandler)
             .failureHandler(exceptionHandler);
 
     router
             .delete(api.getPoliciesUrl())
             .handler(policyValidationHandler)
-            .handler(AuthHandler.create(vertx, api))
+            .handler(AuthHandler.create(vertx))
             .handler(this::deletePoliciesHandler)
             .failureHandler(exceptionHandler);
 
@@ -206,7 +226,7 @@ public class ApiServerVerticle extends AbstractVerticle {
     router
         .post(VERIFY_PATH)
         .handler(verifyValidationHandler)
-        .handler(AuthHandler.create(vertx, api))
+        .handler(AuthHandler.create(vertx))
         .handler(this::handleVerify)
         .failureHandler(exceptionHandler);
 

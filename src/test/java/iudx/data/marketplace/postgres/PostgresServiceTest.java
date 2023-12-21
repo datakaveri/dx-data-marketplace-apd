@@ -96,7 +96,7 @@ public class PostgresServiceTest {
                 .replace("$3", "provider-name")
                 .replace("$4", "ACTIVE"));
 
-    String expected = "{\"type\":\"urn:dx:dm:success\",\"title\":\"Success\",\"results\":[]}";
+    String expected = "{\"type\":\"urn:dx:dmp:success\",\"title\":\"Success\",\"results\":[]}";
     pgService.executeQuery(
         stringBuilder.toString(),
         handler -> {
@@ -106,7 +106,7 @@ public class PostgresServiceTest {
             assertTrue(handler.result().containsKey("title"));
             assertTrue(handler.result().containsKey("results"));
             assertEquals("Success", handler.result().getString("title"));
-            assertEquals("urn:dx:dm:success", handler.result().getString("type"));
+            assertEquals("urn:dx:dmp:success", handler.result().getString("type"));
             testContext.completeNow();
           } else {
             testContext.failNow(handler.cause());
@@ -128,7 +128,7 @@ public class PostgresServiceTest {
                 .replace("$3", "provider-name")
                 .replace("$4", "ACTIVE"));
 
-    String expected = "{\"type\":\"urn:dx:dm:DatabaseError\",\"title\":\"Database error\",\"detail\":\"ERROR: duplicate key value violates unique constraint \\\"product_pk\\\" (23505)\"}";
+    String expected = "{\"type\":\"urn:dx:dmp:DatabaseError\",\"title\":\"Database error\",\"detail\":\"ERROR: duplicate key value violates unique constraint \\\"product_pk\\\" (23505)\"}";
     pgService.executeQuery(stringBuilder.toString(), handler -> {
       if(handler.failed()) {
         assertEquals(expected,handler.cause().getMessage());
@@ -163,7 +163,7 @@ public class PostgresServiceTest {
   public void testExecuteCountQueryFailure(VertxTestContext testContext) {
     String query = "select count(*) from nosuchtable";
 
-    String expected = "{\"type\":\"urn:dx:dm:DatabaseError\",\"title\":\"Database error\",\"detail\":\"ERROR: relation \\\"nosuchtable\\\" does not exist (42P01)\"}";
+    String expected = "{\"type\":\"urn:dx:dmp:DatabaseError\",\"title\":\"Database error\",\"detail\":\"ERROR: relation \\\"nosuchtable\\\" does not exist (42P01)\"}";
     pgService.executeCountQuery(query, handler -> {
       if(handler.failed()) {
         assertEquals(expected,handler.cause().getMessage());
@@ -180,7 +180,7 @@ public class PostgresServiceTest {
   public void testExecutePreparedQuery(VertxTestContext testContext) {
     JsonObject params = new JsonObject().put(Constants.STATUS, "INACTIVE").put(Constants.PRODUCT_ID, "product-id-alter");
 
-    String expected = "{\"type\":\"urn:dx:dm:success\",\"title\":\"Success\",\"results\":[]}";
+    String expected = "{\"type\":\"urn:dx:dmp:success\",\"title\":\"Success\",\"results\":[]}";
     pgService.executePreparedQuery(Constants.DELETE_PRODUCT_QUERY.replace("$0", table), params, handler -> {
       if(handler.succeeded()) {
         assertEquals(expected, handler.result().toString());
@@ -188,7 +188,7 @@ public class PostgresServiceTest {
         assertTrue(handler.result().containsKey("title"));
         assertTrue(handler.result().containsKey("results"));
         assertEquals("Success", handler.result().getString("title"));
-        assertEquals("urn:dx:dm:success", handler.result().getString("type"));
+        assertEquals("urn:dx:dmp:success", handler.result().getString("type"));
         testContext.completeNow();
       } else {
         testContext.failNow("execute prepared query test failed");
@@ -214,10 +214,10 @@ public class PostgresServiceTest {
   @DisplayName("test execute transaction - success")
   public void testExecuteTransaction(VertxTestContext testContext) {
     List<String> queries = new ArrayList<>();
-    queries.add(Constants.INSERT_P_D_REL_QUERY.replace("$0", pdTable).replace("$1", "product-id-alter").replace("$2", "dataset-id-1"));
-    queries.add(Constants.INSERT_P_D_REL_QUERY.replace("$0", pdTable).replace("$1", "product-id-alter").replace("$2", "dataset-id-2"));
+    queries.add(Constants.INSERT_P_R_REL_QUERY.replace("$0", pdTable).replace("$1", "product-id-alter").replace("$2", "resource-id-1"));
+    queries.add(Constants.INSERT_P_R_REL_QUERY.replace("$0", pdTable).replace("$1", "product-id-alter").replace("$2", "resource-id-2"));
 
-    String expedted = "{\"type\":\"urn:dx:dm:success\",\"title\":\"Success\"}";
+    String expedted = "{\"type\":\"urn:dx:dmp:success\",\"title\":\"Success\"}";
     pgService.executeTransaction(queries, handler -> {
       if(handler.succeeded()) {
         assertEquals(expedted, handler.result().toString());
@@ -233,8 +233,8 @@ public class PostgresServiceTest {
   @DisplayName("test execute transaction - failure")
   public void testExecuteTransactionFailure(VertxTestContext testContext) {
     List<String> queries = new ArrayList<>();
-    queries.add(Constants.INSERT_P_D_REL_QUERY.replace("$0", pdTable).replace("$1", "product-id-alter").replace("$2", "dataset-id-some"));
-    queries.add(Constants.INSERT_P_D_REL_QUERY.replace("$0", pdTable).replace("$1", "product-id-alter").replace("$2", "dataset-id-thing"));
+    queries.add(Constants.INSERT_P_R_REL_QUERY.replace("$0", pdTable).replace("$1", "product-id-alter").replace("$2", "resource-id-some"));
+    queries.add(Constants.INSERT_P_R_REL_QUERY.replace("$0", pdTable).replace("$1", "product-id-alter").replace("$2", "resource-id-thing"));
 
     pgService.executeTransaction(queries, handler -> {
       if(handler.failed()) {

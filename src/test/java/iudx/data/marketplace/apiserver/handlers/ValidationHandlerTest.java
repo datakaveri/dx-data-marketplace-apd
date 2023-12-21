@@ -52,7 +52,7 @@ public class ValidationHandlerTest {
             new JsonObject()
                 .put("id", "newid")
                 .put(
-                    "datasets",
+                    "resources",
                     new JsonArray()
                         .add(
                             "datakaveri.org/b8bd3e3f39615c8ec96722131ae95056b5938f2f/rs.iudx.io/agra-swachhata-app"))),
@@ -62,7 +62,7 @@ public class ValidationHandlerTest {
                 .put("id", "urn:datakaveri.org:iisc.ac.in/123qwerty:newid")
                 .put("variant", "var1")
                 .put(
-                    "datasets",
+                    "resources",
                     new JsonArray()
                         .add(
                             new JsonObject()

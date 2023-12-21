@@ -38,7 +38,7 @@ public class ConsumerApis {
 
   Router init() {
 
-    ValidationHandler datasetValidationHandler = new ValidationHandler(vertx, RequestType.DATASET);
+    ValidationHandler resourceValidationHandler = new ValidationHandler(vertx, RequestType.RESOURCE);
     ValidationHandler providerValidationHandler =
         new ValidationHandler(vertx, RequestType.PROVIDER);
     ExceptionHandler exceptionHandler = new ExceptionHandler();
@@ -48,21 +48,21 @@ public class ConsumerApis {
     router
         .get(CONSUMER_PATH + LIST_PROVIDERS_PATH)
         .handler(providerValidationHandler)
-        .handler(AuthHandler.create(vertx, api))
+        .handler(AuthHandler.create(vertx))
         .handler(this::listProviders)
         .failureHandler(exceptionHandler);
 
     router
-        .get(CONSUMER_PATH + LIST_DATASETS_PATH)
-        .handler(datasetValidationHandler)
-        .handler(AuthHandler.create(vertx, api))
-        .handler(this::listDatasets)
+        .get(CONSUMER_PATH + LIST_RESOURCES_PATH)
+        .handler(resourceValidationHandler)
+        .handler(AuthHandler.create(vertx))
+        .handler(this::listResources)
         .failureHandler(exceptionHandler);
 
     router
         .get(CONSUMER_PATH + LIST_PRODUCTS_PATH)
-        .handler(datasetValidationHandler)
-        .handler(AuthHandler.create(vertx, api))
+        .handler(resourceValidationHandler)
+        .handler(AuthHandler.create(vertx))
         .handler(this::listProducts)
         .failureHandler(exceptionHandler);
 
@@ -99,7 +99,7 @@ public class ConsumerApis {
         });
   }
 
-  private void listDatasets(RoutingContext routingContext) {
+  private void listResources(RoutingContext routingContext) {
     HttpServerRequest request = routingContext.request();
     JsonObject requestBody = new JsonObject();
     for (Map.Entry<String, String> param : request.params()) {
@@ -109,7 +109,7 @@ public class ConsumerApis {
     JsonObject authInfo = (JsonObject) routingContext.data().get(AUTH_INFO);
     requestBody.put(AUTH_INFO, authInfo);
 
-    consumerService.listDatasets(
+    consumerService.listResources(
         requestBody,
         handler -> {
           if (handler.succeeded()) {

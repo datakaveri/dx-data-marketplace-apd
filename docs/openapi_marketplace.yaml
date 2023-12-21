@@ -1,14 +1,16 @@
 openapi: 3.0.2
+x-stoplight:
+  id: l45dgkoihffc8
 info:
-  title: DX Data Marketplace APIs
+  title: IUDX Data marketplace APIs
   version: 4.5.0
-  description: 'The data marketplace is Data Exchange (DX) platform that enables data Providers to host their datasets as a product. Likewise, data consumers can buy the products listed by various providers '
+  description: 'The data marketplace is IUDX''s platform that enables data Providers to host their resources as a product. Likewise, data consumers can buy the products listed by various providers '
   contact:
     email: support@iudx.org.in
     name: For support contact IUDX team at
 paths:
   /provider/product:
-    summary: Manage marketplace products and perform Create/Update/Delete operations on them. These apis are intended to be used by DX data providers
+    summary: Manage marketplace products and perform Create/Update/Delete operations on them. These apis are intended to be used by IUDX data providers
     post:
       tags:
         - provider
@@ -26,7 +28,7 @@ paths:
                     - stqc-flood-sensors
       parameters:
         - name: token
-          description: DX Auth token to process the request
+          description: IUDX Auth token to process the request
           schema:
             maxLength: 512
             minLength: 0
@@ -89,7 +91,7 @@ paths:
         - provider
       parameters:
         - name: token
-          description: DX Auth token to process the request
+          description: IUDX Auth token to process the request
           schema:
             maxLength: 512
             minLength: 0
@@ -152,7 +154,7 @@ paths:
         - provider
       parameters:
         - name: token
-          description: DX Auth token to process the request
+          description: IUDX Auth token to process the request
           schema:
             maxLength: 512
             minLength: 0
@@ -206,7 +208,7 @@ paths:
         - provider
       parameters:
         - name: token
-          description: DX Auth token to process the request
+          description: IUDX Auth token to process the request
           schema:
             maxLength: 512
             minLength: 0
@@ -272,6 +274,8 @@ paths:
                     detail: failed
   /provider/product-variant:
     post:
+      tags:
+        - provider
       summary: ''
       operationId: post-provider-product-variant
       responses:
@@ -286,14 +290,14 @@ paths:
                   value:
                     type: 'urn:dx:dmp:Success'
                     title: Success
-                    results: [ ]
+                    results: []
       description: 'Create a product variant where the body contains details about the variant such as price, duration, resources and their capabilities. Along with the name of the variant and the product it belongs to.'
       parameters:
         - schema:
             type: string
           in: header
           name: token
-          description: DX Auth token to process the request
+          description: IUDX Auth token to process the request
       requestBody:
         content:
           application/json:
@@ -351,6 +355,8 @@ paths:
                   price: 100
                   validity: 12
     get:
+      tags:
+        - provider
       summary: ''
       operationId: get-provider-product-variant
       responses:
@@ -360,13 +366,13 @@ paths:
             application/json:
               schema:
                 type: object
-                properties: { }
+                properties: {}
       parameters:
         - schema:
             type: string
           in: header
           name: token
-          description: DX Auth token to process the request
+          description: IUDX Auth token to process the request
         - schema:
             type: string
           in: query
@@ -375,8 +381,10 @@ paths:
             type: string
           in: query
           name: variant
-    parameters: [ ]
+    parameters: []
     put:
+      tags:
+        - provider
       summary: ''
       operationId: put-provider-product-variant
       responses:
@@ -391,7 +399,7 @@ paths:
             type: string
           in: header
           name: token
-          description: DX Auth token to process the request
+          description: IUDX Auth token to process the request
       requestBody:
         content:
           application/json:
@@ -433,6 +441,8 @@ paths:
                   price: 100
                   validity: 12
     delete:
+      tags:
+        - provider
       summary: ''
       operationId: delete-provider-product-variant
       responses:
@@ -455,15 +465,15 @@ paths:
             type: string
           in: header
           name: token
-          description: DX Auth token to process the request
-  /consumer/list/datasets:
-    summary: List API for the consumer to view the datasets available on the marketplace.
+          description: IUDX Auth token to process the request
+  /consumer/list/resources:
+    summary: List API for the consumer to view the resources available on the marketplace.
     get:
       tags:
         - consumer
       parameters:
         - name: token
-          description: DX Auth token to process the request
+          description: IUDX Auth token to process the request
           schema:
             maxLength: 512
             minLength: 0
@@ -528,7 +538,7 @@ paths:
         - consumer
       parameters:
         - name: token
-          description: DX Auth token to process the request
+          description: IUDX Auth token to process the request
           schema:
             maxLength: 512
             minLength: 0
@@ -570,7 +580,7 @@ paths:
         - consumer
       parameters:
         - name: token
-          description: DX Auth token to process the request
+          description: IUDX Auth token to process the request
           schema:
             maxLength: 512
             minLength: 0
@@ -600,13 +610,13 @@ paths:
                     title: Token is invalid
                     detail: failed
   /consumer/list/products:
-    summary: List API for the comsumer to view all the products available against a resource.
+    summary: List API for the comsumer to view all the products available against a dataset.
     get:
       tags:
         - consumer
       parameters:
         - name: token
-          description: DX Auth token to process the request
+          description: IUDX Auth token to process the request
           schema:
             maxLength: 512
             minLength: 0
@@ -614,8 +624,8 @@ paths:
             type: string
           in: header
           required: true
-        - name: resourceID
-          description: ID of the resource for listing products that contain it.
+        - name: datasetID
+          description: ID of the dataset for listing products that contain it.
           in: query
           schema:
             type: string
@@ -646,7 +656,7 @@ paths:
                   value:
                     type: 'urn:dx:dmp:InvalidResourceIDValue'
                     title: Bad request
-                    detail: Invalid resource ID
+                    detail: Invalid dataset ID
         '401':
           description: Unauthorized access
           content:
@@ -666,7 +676,7 @@ paths:
         - admin
       parameters:
         - name: token
-          description: DX Auth token to process the request
+          description: IUDX Auth token to process the request
           schema:
             maxLength: 512
             minLength: 0
@@ -726,147 +736,28 @@ paths:
                     detail: failed
   /verify:
     post:
-      operationId: post-verify-policy
-      summary: Verify Policy
       tags:
         - admin
-      description: |
-        Verify API endpoint is used by DX AAA Server to check if a policy is present for a given consumer for the given 
-        resource with a specified provider of the resource. This check is done by DX AAA Server before issuing 
-        a token. 
-        
-        DMP Data Marketplace APD Server creates policy for a given item with type `resource`
-      parameters:
-        - in: header
-          name: Authorization
-          required: true
-          schema:
-            type: string
-            minLength: 1
-            maxLength: 512
-            example: Bearer <JWT>
-            description: Keycloak issued token
       requestBody:
         content:
           application/json:
             schema:
               $ref: '#/components/schemas/exampleVerifyRequestBody'
-            examples:
-              Request body for verify policy:
-                value:
-                    user:
-                      id: a109807f-6b06-4d8a-ab64-a3a19b04a3b4
-                      name:
-                        firstName: test
-                        lastName: consumer
-                      email: consumer@gmail.com
-                    owner:
-                      id: 114077a3-6411-4b6e-bc97-c7e81b87685d
-                      name:
-                        firstName: test
-                        lastName: provider
-                      email: test@provider.com
-                    item:
-                      itemId: 2a0be315-4165-4c5b-a74e-116cc89272cb
-                      itemType: resource
-      security:
-        - authorization: [ ]
       responses:
         '200':
-          description: |- 
-            OK
-            - An active policy is present for the consumer for given resource with given constraints
+          description: success
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/verifyPolicySuccessResponse'
-        '400':
-          description: |- 
-            Bad request
-            - Invalid request schema
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/verifyPolicyBadRequestResponse'
+                $ref: '#/components/schemas/successResponseWithObjects'
         '403':
-          description: |- 
-            forbidden
-            - Policy does not exist
+          description: forbidden
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/verifyPolicyForbiddenResponse'
-
+                $ref: '#/components/schemas/exampleVerifyFailResponse'
 components:
-  securitySchemes:
-    authorization:
-      type: http
-      scheme: bearer
   schemas:
-    verifyPolicySuccessResponse:
-      title: Verify policy success response
-      type: object
-      properties:
-        type:
-          type: string
-          description: URN type of success response
-        apdConstraints:
-          type: object
-          description: Constraints of the policy
-      required:
-        - type
-        - apdConstraints
-      example:
-        type: urn:apd:allow
-        apdConstraints:
-          rule: read
-          duration: 3600
-    verifyPolicyBadRequestResponse:
-      title: 400 Response for verify policy
-      type: object
-      properties:
-        type:
-          type: string
-          description: URN type of error response
-        title:
-          type: string
-          description: title of the error response
-        detail:
-          type: string
-          description: Error message describing the issue
-      required:
-        - type
-        - title
-        - detail
-      example:
-        {
-          "type": "urn:dx:dm:invalidPayloadFormat",
-          "title": "Bad Request",
-          "detail": "Invalid json format in post request [schema mismatch]"
-        }
-    verifyPolicyForbiddenResponse:
-      title: 403 Response for verify policy
-      type: object
-      properties:
-        type:
-          type: string
-          description: URN type of the error response
-        title:
-          type: string
-          description: title of the error message
-        detail:
-          type: string
-          description: Description of error message
-      required:
-        - type
-        - title
-        - detail
-      example:
-        {
-          "type": "urn:apd:Deny",
-          "title": "Forbidden",
-          "detail": "No policy exists for the given resource"
-        }
     successResponseForDeleteProduct:
       title: Root Tupe for standard DELETE response
       description: example response for delete product API
@@ -922,7 +813,7 @@ components:
             description: some text description for the product (e.g. a student associated in DataKaveri)
             price: 100
             duration: 12
-            resources:
+            datasets:
               - pune-env-flood
               - stqc-flood-sensor
     exampleResponseListPurchases:
@@ -956,8 +847,8 @@ components:
             expiry: '2023-11-22T09:00:00Z'
             status: active/expired
     exampleListResourcesResponse:
-      title: Root type for list resources API response
-      description: example response for list resources
+      title: Root type for list datasets API response
+      description: example response for list datasets
       type: object
       properties:
         type:
@@ -978,7 +869,7 @@ components:
         type: 'urn:dx:rs:success'
         title: success
         results:
-          - resourceID: abc1
+          - datasetID: abc1
             datasetName: abc–flood
             accessPolicy: secure
             providerID: iisc.ac.in/123qwerty
@@ -1051,91 +942,15 @@ components:
         consumerID: qwerty987
         paymentStatus: payment.succeeded
         paymentTime: '2022-11-23T16:28:00Z'
-
-
-    name:
-      title: schemaName
-      type: object
-      properties:
-        firstName:
-          type: string
-        lastName:
-          type: string
-
-
-    user:
-      title: schemaUser
-      description: consumer information
-      type: object
-      properties:
-        id:
-          type: string
-          format: uuid
-          pattern: '^[0-9a-f]{8}\b-[0-9a-f]{4}\b-[0-9a-f]{4}\b-[0-9a-f]{4}\b-[0-9a-f]{12}$'
-          minLength: 36
-          maxLength: 36
-        name:
-          $ref: '#/components/schemas/name'
-        email:
-          pattern: >-
-            ^([a-zA-Z0-9_\-\.]+)@([a-zA-Z0-9_\-\.]+)\.([a-zA-Z]{2,5})$
-          minLength: 1
-      required:
-        - id
-        - name
-        - email
-
-    owner:
-      title: schemaOwner
-      description: provider information
-      type: object
-      properties:
-        id:
-          format: uuid
-          pattern: '^[0-9a-f]{8}\b-[0-9a-f]{4}\b-[0-9a-f]{4}\b-[0-9a-f]{4}\b-[0-9a-f]{12}$'
-          minLength: 36
-          maxLength: 36
-        name:
-          $ref: '#/components/schemas/name'
-        email:
-          pattern: >-
-            ^([a-zA-Z0-9_\-\.]+)@([a-zA-Z0-9_\-\.]+)\.([a-zA-Z]{2,5})$
-          minLength: 1
-      required:
-        - id
-        - name
-        - email
-
-    item:
-      type: object
-      description: resource information
-      properties:
-        itemId:
-          format: uuid
-          pattern: '^[0-9a-f]{8}\b-[0-9a-f]{4}\b-[0-9a-f]{4}\b-[0-9a-f]{4}\b-[0-9a-f]{12}$'
-          minLength: 36
-          maxLength: 36
-        itemType:
-          enum:
-            - resource
-          minLength: 1
-      required:
-        - itemId
-        - itemType
-
     exampleVerifyRequestBody:
       title: Root type for verify API body
       description: 'example request for verifying if consumer has purchased product, and if the purchase is expired or not'
       type: object
       properties:
-        user:
-          $ref: '#/components/schemas/user'
-        owner:
-          $ref: '#/components/schemas/owner'
-        item:
-          $ref: '#/components/schemas/item'
-
-
+        consumerID:
+          type: string
+        productID:
+          type: string
     exampleVerifyFailResponse:
       title: Root type for verify fail response
       description: example response for failed verify request
