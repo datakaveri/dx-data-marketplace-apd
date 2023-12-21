@@ -12,6 +12,9 @@ import iudx.data.marketplace.postgres.PostgresService;
 import iudx.data.marketplace.postgres.PostgresServiceImpl;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import iudx.data.marketplace.common.CatalogueService;
+import iudx.data.marketplace.postgres.PostgresService;
+import iudx.data.marketplace.postgres.PostgresServiceImpl;
 
 import java.util.Map;
 
@@ -37,7 +40,7 @@ public class PolicyVerticle extends AbstractVerticle {
         postgresService = PostgresService.createProxy(vertx, POSTGRES_SERVICE_ADDRESS);
         postgresServiceImpl = new PostgresServiceImpl(config(), vertx);
         deletePolicy = new DeletePolicy(postgresService);
-        getPolicy = new GetPolicy(postgresService);
+        getPolicy = new GetPolicy(postgresServiceImpl);
         createPolicy = new CreatePolicy(postgresServiceImpl, catalogueService);
         verifyPolicy = new VerifyPolicy(postgresServiceImpl);
         policyService = new PolicyServiceImpl(deletePolicy, createPolicy, getPolicy, verifyPolicy, config());
