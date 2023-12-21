@@ -53,7 +53,7 @@ public class ProductServiceTest {
   @DisplayName("test create product - success")
   public void testCreateProduct(VertxTestContext testContext) {
 
-    JsonArray datasetIDs = new JsonArray().add("dataset-1");
+    JsonArray resourceIDs = new JsonArray().add("resource-1");
 
     ProductServiceImpl productServiceSpy = spy(productServiceImpl);
     when(jsonObjectMock.getJsonObject(AUTH_INFO)).thenReturn(jsonObjectMock);
@@ -62,7 +62,7 @@ public class ProductServiceTest {
     when(jsonObjectMock.getString(PROVIDER_NAME)).thenReturn("new-provider");
     when(jsonObjectMock.getString(PRODUCT_ID)).thenReturn("abcde");
     when(jsonObjectMock.put(anyString(), anyString())).thenReturn(jsonObjectMock);
-    when(jsonObjectMock.getJsonArray(DATASETS)).thenReturn(datasetIDs);
+    when(jsonObjectMock.getJsonArray(resourceNames)).thenReturn(resourceIDs);
 
     doAnswer(Answer -> Future.succeededFuture(false))
         .when(productServiceSpy)
@@ -71,15 +71,15 @@ public class ProductServiceTest {
             Answer ->
                 Future.succeededFuture(
                     new JsonObject()
-                        .put(DATASET_ID, datasetIDs.getString(0))
-                        .put(DATASET_NAME, "dat-name")
+                        .put(RESOURCE_ID, resourceIDs.getString(0))
+                        .put(RESOURCE_NAME, "dat-name")
                         .put("accessPolicy", "OPEN")))
         .when(catService)
         .getItemDetails(anyString());
     doAnswer(
             Answer ->
                 Future.succeededFuture(
-                    new JsonObject().put(DATASET_ID, datasetIDs.getString(0)).put("totalHits", 1)))
+                    new JsonObject().put(RESOURCE_ID, resourceIDs.getString(0)).put("totalHits", 1)))
         .when(catService)
         .getResourceCount(anyString());
 
@@ -158,8 +158,8 @@ public class ProductServiceTest {
   @DisplayName("test list products - success")
   public void testListProducts(VertxTestContext testContext) {
 
-    lenient().when(jsonObjectMock.containsKey(DATASET_ID)).thenReturn(true);
-    lenient().when(jsonObjectMock.getString(DATASET_ID)).thenReturn("dataset-id-1");
+    lenient().when(jsonObjectMock.containsKey(RESOURCE_ID)).thenReturn(true);
+    lenient().when(jsonObjectMock.getString(RESOURCE_ID)).thenReturn("resource-id-1");
     when(asyncResult.succeeded()).thenReturn(true);
 
     doAnswer(

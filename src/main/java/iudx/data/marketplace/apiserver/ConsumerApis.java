@@ -35,7 +35,7 @@ public class ConsumerApis {
 
   Router init() {
 
-    ValidationHandler datasetValidationHandler = new ValidationHandler(vertx, RequestType.DATASET);
+    ValidationHandler resourceValidationHandler = new ValidationHandler(vertx, RequestType.RESOURCE);
     ValidationHandler providerValidationHandler =
         new ValidationHandler(vertx, RequestType.PROVIDER);
     ExceptionHandler exceptionHandler = new ExceptionHandler();
@@ -50,15 +50,15 @@ public class ConsumerApis {
         .failureHandler(exceptionHandler);
 
     router
-        .get(CONSUMER_BASE_PATH + LIST_DATASETS_PATH)
-        .handler(datasetValidationHandler)
+        .get(CONSUMER_BASE_PATH + LIST_RESOURCES_PATH)
+        .handler(resourceValidationHandler)
         .handler(AuthHandler.create(vertx))
-        .handler(this::listDatasets)
+        .handler(this::listResources)
         .failureHandler(exceptionHandler);
 
     router
         .get(CONSUMER_BASE_PATH + LIST_PRODUCTS_PATH)
-        .handler(datasetValidationHandler)
+        .handler(resourceValidationHandler)
         .handler(AuthHandler.create(vertx))
         .handler(this::listProducts)
         .failureHandler(exceptionHandler);
@@ -96,7 +96,7 @@ public class ConsumerApis {
         });
   }
 
-  private void listDatasets(RoutingContext routingContext) {
+  private void listResources(RoutingContext routingContext) {
     HttpServerRequest request = routingContext.request();
     JsonObject requestBody = new JsonObject();
     for (Map.Entry<String, String> param : request.params()) {
@@ -106,7 +106,7 @@ public class ConsumerApis {
     JsonObject authInfo = (JsonObject) routingContext.data().get(AUTH_INFO);
     requestBody.put(AUTH_INFO, authInfo);
 
-    consumerService.listDatasets(
+    consumerService.listResources(
         requestBody,
         handler -> {
           if (handler.succeeded()) {

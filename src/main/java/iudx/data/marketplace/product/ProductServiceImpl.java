@@ -35,92 +35,98 @@ public class ProductServiceImpl implements ProductService {
   @Override
   public ProductService createProduct(
       JsonObject request, Handler<AsyncResult<JsonObject>> handler) {
-    String providerID = request.getJsonObject(AUTH_INFO).getString(IID);
-    // TODO: get provider ID from token
-    providerID = "datakaveri.org/b8bd3e3f39615c8ec96722131ae95056b5938f2f";
+    String providerID = request.getJsonObject(AUTH_INFO).getString(PROVIDER_ID);
     String productID =
         URN_PREFIX.concat(providerID).concat(":").concat(request.getString(PRODUCT_ID));
     request.put(PROVIDER_ID, providerID).put(PRODUCT_ID, productID);
 
     Future<Boolean> checkForExistence = checkIfProductExists(providerID, productID);
-    Future<JsonObject> getProviderDetails = catService.getItemDetails(providerID);
-    JsonArray datasetIDs = request.getJsonArray(DATASETS);
-    JsonArray datasetDetails = new JsonArray();
+    JsonArray resourceIds = request.getJsonArray(RESOURCE_IDS);
+    JsonArray resourceDetails = new JsonArray();
 
-    checkForExistence
-        .compose(
-            existenceHandler -> {
-              if (existenceHandler) {
-                return Future.failedFuture(ResponseUrn.RESOURCE_ALREADY_EXISTS_URN.getUrn());
-              } else {
-                return getProviderDetails;
-              }
-            })
+    List<Future> itemFutures = new ArrayList<>();
+    resourceIds.forEach(
+        resourceID -> {
+          Future<JsonObject> getResourceDetails = catService.getItemDetails((String) resourceID);
+          itemFutures.add(getResourceDetails);
+        });
+
+    itemFutures.forEach(
+        fr -> {
+          fr.onSuccess(
+              h -> {
+                JsonObject res = (JsonObject) h;
+                resourceDetails.add(res);
+              });
+        });
+
+    CompositeFuture.all(itemFutures)
         .onComplete(
-            completeHandler -> {
-              if (completeHandler.succeeded()) {
-                request.put(PROVIDER_NAME, completeHandler.result().getString(PROVIDER_NAME));
-                List<Future> itemFutures = new ArrayList<>();
-                List<Future> relFutures = new ArrayList<>();
-                datasetIDs.forEach(
-                    datasetID -> {
-                      Future<JsonObject> getDatasetDetails =
-                          catService.getItemDetails((String) datasetID);
-                      Future<JsonObject> getResourceCount =
-                          catService.getResourceCount((String) datasetID);
-                      itemFutures.add(getDatasetDetails);
-                      relFutures.add(getResourceCount);
-                    });
-
-                itemFutures.forEach(
-                    fr -> {
-                      fr.onSuccess(
-                          h -> {
-                            JsonObject res = (JsonObject) h;
-                            relFutures.forEach(
-                                rf -> {
-                                  rf.onSuccess(
-                                      j -> {
-                                        JsonObject jres = (JsonObject) j;
-                                        LOGGER.debug(jres.getString(DATASET_ID));
-                                        if (jres.getString(DATASET_ID)
-                                            .equalsIgnoreCase(res.getString(DATASET_ID))) {
-                                          res.put(TOTAL_RESOURCES, jres.getInteger("totalHits"));
-                                          datasetDetails.add(res);
-                                        }
-                                      });
-                                });
-                          });
-                    });
-
-                CompositeFuture.all(itemFutures)
-                    .onComplete(
-                        ar -> {
-                          CompositeFuture.all(relFutures)
-                              .onComplete(
-                                  at -> {
-                                    List<String> queries =
-                                        queryBuilder.buildCreateProductQueries(
-                                            request, datasetDetails);
-
-                                    pgService.executeTransaction(
-                                        queries,
-                                        pgHandler -> {
-                                          if (pgHandler.succeeded()) {
-                                            handler.handle(
-                                                Future.succeededFuture(
-                                                    pgHandler.result().put(PRODUCT_ID, productID)));
-                                          } else {
-                                            LOGGER.error(pgHandler.cause());
-                                            handler.handle(Future.failedFuture(pgHandler.cause()));
-                                          }
-                                        });
-                                  });
-                        });
+            ar -> {
+              LOGGER.debug(resourceDetails);
+              String providerOfFirstResource = resourceDetails.getJsonObject(0).getString(PROVIDER);
+              boolean sameProviderForAll = true;
+              for (int i = 1; i < resourceDetails.size() && sameProviderForAll; i++) {
+                sameProviderForAll =
+                    resourceDetails
+                        .getJsonObject(i)
+                        .getString(PROVIDER)
+                        .equalsIgnoreCase(providerOfFirstResource);
+              }
+              if (!sameProviderForAll) {
+                handler.handle(
+                    Future.failedFuture("The resources listed belong to different providers"));
               } else {
-                handler.handle(Future.failedFuture(completeHandler.cause()));
+                String providerItemId = providerOfFirstResource;
+                Future<JsonObject> getProviderDetails = catService.getItemDetails(providerItemId);
+                checkForExistence
+                    .compose(
+                        existenceHandler -> {
+                          if (existenceHandler) {
+                            return Future.failedFuture(
+                                ResponseUrn.RESOURCE_ALREADY_EXISTS_URN.getUrn());
+                          } else {
+                            return getProviderDetails;
+                          }
+                        })
+                    .onComplete(
+                        completeHandler -> {
+                          if (completeHandler.succeeded()) {
+                            if (!completeHandler
+                                .result()
+                                .getString("ownerUserId")
+                                .equalsIgnoreCase(providerID)) {
+                              handler.handle(
+                                  Future.failedFuture(
+                                      "The user with given token does not own the resource listed"));
+                            } else {
+                              request.put(
+                                  PROVIDER_NAME,
+                                  completeHandler.result().getString(PROVIDER_NAME, ""));
+
+                              List<String> queries =
+                                  queryBuilder.buildCreateProductQueries(request, resourceDetails);
+
+                              pgService.executeTransaction(
+                                  queries,
+                                  pgHandler -> {
+                                    if (pgHandler.succeeded()) {
+                                      handler.handle(
+                                          Future.succeededFuture(
+                                              pgHandler.result().put(PRODUCT_ID, productID)));
+                                    } else {
+                                      LOGGER.error(pgHandler.cause());
+                                      handler.handle(Future.failedFuture(pgHandler.cause()));
+                                    }
+                                  });
+                            }
+                          } else {
+                            handler.handle(Future.failedFuture(completeHandler.cause()));
+                          }
+                        });
               }
             });
+
     return this;
   }
 
@@ -150,22 +156,18 @@ public class ProductServiceImpl implements ProductService {
   public ProductService deleteProduct(
       JsonObject request, Handler<AsyncResult<JsonObject>> handler) {
 
-    String providerID = request.getJsonObject(AUTH_INFO).getString(IID);
-    // TODO: get provider ID from token
-    providerID = "datakaveri.org/b8bd3e3f39615c8ec96722131ae95056b5938f2f";
+    String providerID = request.getJsonObject(AUTH_INFO).getString(PROVIDER_ID);
     String productID = request.getString(PRODUCT_ID);
     JsonObject params =
         new JsonObject().put(STATUS, Status.INACTIVE.toString()).put(PRODUCT_ID, productID);
 
-    LOGGER.debug("here xyz");
     checkIfProductExists(providerID, productID)
         .onComplete(
             existsHandler -> {
               LOGGER.error(existsHandler.result());
               if (!existsHandler.result()) {
                 LOGGER.error("deletion failed");
-                handler.handle(
-                    Future.failedFuture(ResponseUrn.RESOURCE_NOT_FOUND_URN.getUrn()));
+                handler.handle(Future.failedFuture(ResponseUrn.RESOURCE_NOT_FOUND_URN.getUrn()));
               } else {
                 pgService.executePreparedQuery(
                     DELETE_PRODUCT_QUERY.replace("$0", productTableName),
@@ -186,13 +188,12 @@ public class ProductServiceImpl implements ProductService {
   @Override
   public ProductService listProducts(JsonObject request, Handler<AsyncResult<JsonObject>> handler) {
 
-    String providerID = request.getString(IID);
-    providerID = "datakaveri.org/b8bd3e3f39615c8ec96722131ae95056b5938f2f";
+    String providerID = request.getJsonObject(AUTH_INFO).getString(PROVIDER_ID);
     JsonObject params =
         new JsonObject().put(STATUS, Status.ACTIVE.toString()).put(PROVIDER_ID, providerID);
 
-    if (request.containsKey(DATASET_ID)) {
-      params.put(DATASET_ID, request.getString(DATASET_ID));
+    if (request.containsKey(RESOURCE_ID)) {
+      params.put(RESOURCE_ID, request.getString(RESOURCE_ID));
     }
 
     String query = queryBuilder.buildListProductsQuery(request);

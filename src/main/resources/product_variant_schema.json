@@ -6,17 +6,17 @@
   "description": "The root schema comprises the entire JSON document.",
   "examples": [
     {
-      "id": "urn:datakaveri.org:iisc.ac.in/123qwerty:flood-sensors",
+      "id": "urn:datakaveri.org:0880ec14-f078-4059-bfde-4c9f022526a9:flood-sensors",
       "variant": "sensors-1",
-      "datasets": [
+      "resources": [
         {
-          "id": "pune-flood",
+          "id": "0880ec14-f078-4059-bfde-4c9f022526a9",
           "capabilities": [
             "api", "sub"
           ]
         },
         {
-          "id": "stqc-flood",
+          "id": "83a3bec5-247c-47a2-9810-273123564b0a",
           "capabilities": [
             "sub", "file"
           ]
@@ -29,7 +29,7 @@
   "required": [
     "id",
     "variant",
-    "datasets",
+    "resources",
     "price",
     "duration"
   ],
@@ -50,13 +50,13 @@
       "description": "An alphanumeric name for a product variant",
       "pattern": "^[a-zA-Z0-9 .-]{3,256}$"
     },
-    "datasets": {
-      "$id": "#/properties/datasets",
+    "resources": {
+      "$id": "#/properties/resources",
       "type": "array",
       "title": "Datasets schema",
-      "description": "An array of objects describing datasets and their capabilities",
+      "description": "An array of objects describing resources and their capabilities",
       "items": {
-        "$id": "#/properties/datasets/items",
+        "$id": "#/properties/resources/items",
         "title": "Dataset",
         "type": "object",
         "default": {},
@@ -66,20 +66,20 @@
         ],
         "properties": {
           "id": {
-            "$id": "#/properties/datasets/items/id",
-            "title": "dataset id",
+            "$id": "#/properties/resources/items/id",
+            "title": "resource id",
             "type": "string",
             "default": "",
-            "pattern": "^[a-zA-Z0-9.]{4,100}/[a-zA-Z0-9.]{4,100}/[a-zA-Z.]{4,100}/[a-zA-Z-_.]{4,100}$",
+            "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$",
             "maxLength": 512
           },
           "capabilities": {
-            "$id": "#/properties/datasets/items/capabilities",
-            "title": "dataset capabilities",
+            "$id": "#/properties/resources/items/capabilities",
+            "title": "resource capabilities",
             "type": "array",
             "default": [],
             "items": {
-              "$id": "#/properties/datasets/items/capabilities/items",
+              "$id": "#/properties/resources/items/capabilities/items",
               "title": "items",
               "type": "string",
               "default": "",

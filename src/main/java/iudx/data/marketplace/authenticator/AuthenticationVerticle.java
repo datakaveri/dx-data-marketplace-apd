@@ -12,6 +12,7 @@ import io.vertx.ext.auth.jwt.JWTAuthOptions;
 import io.vertx.ext.web.client.WebClient;
 import io.vertx.ext.web.client.WebClientOptions;
 import io.vertx.serviceproxy.ServiceBinder;
+import iudx.data.marketplace.common.CatalogueService;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -21,6 +22,7 @@ public class AuthenticationVerticle extends AbstractVerticle {
   private static final Logger LOGGER = LogManager.getLogger(AuthenticationVerticle.class);
 
   private AuthenticationService authenticationService;
+  private CatalogueService catalogueService;
   private ServiceBinder binder;
   private MessageConsumer<JsonObject> consumer;
   private WebClient webClient;
@@ -70,6 +72,7 @@ public class AuthenticationVerticle extends AbstractVerticle {
               }
               JWTAuth jwtAuth = JWTAuth.create(vertx, jwtAuthOptions);
 
+              catalogueService = new CatalogueService(vertx, config());
               authenticationService = new AuthenticationServiceImpl(vertx, jwtAuth, config());
 
               /* Publish the Authentication service with the Event Bus against an address. */

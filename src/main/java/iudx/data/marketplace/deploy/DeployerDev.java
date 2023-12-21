@@ -25,7 +25,7 @@ public class DeployerDev {
       LOGGER.info("Deployed all");
       return;
     }
-    JsonObject config = configs.getJsonArray("modules").getJsonObject(i);
+    JsonObject config = getConfigForModule(i, configs);
     config.put("host", configs.getString("host"));
     String moduleName = config.getString("id");
     int numInstances = config.getInteger("verticleInstances");
@@ -43,6 +43,12 @@ public class DeployerDev {
             LOGGER.fatal("Failed to deploy " + moduleName + " cause:", ar.cause());
           }
         });
+  }
+
+  private static JsonObject getConfigForModule(int moduleIndex, JsonObject configurations) {
+    JsonObject commonConfigs = configurations.getJsonObject("commonConfig");
+    JsonObject config = configurations.getJsonArray("modules").getJsonObject(moduleIndex);
+    return config.mergeIn(commonConfigs, true);
   }
 
   public static void deploy(String configPath) {

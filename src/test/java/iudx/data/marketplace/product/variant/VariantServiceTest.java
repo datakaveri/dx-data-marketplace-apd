@@ -19,7 +19,6 @@ import org.mockito.invocation.InvocationOnMock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.mockito.stubbing.Answer;
 
-import static iudx.data.marketplace.common.Constants.PROVIDER_ID;
 import static iudx.data.marketplace.product.util.Constants.*;
 import static org.mockito.Mockito.*;
 
@@ -57,7 +56,7 @@ public class VariantServiceTest {
 
     ProductVariantServiceImpl variantServiceSpy = spy(variantServiceImpl);
     when(jsonObjectMock.getString("providerid")).thenReturn("provider-id");
-    when(jsonObjectMock.getJsonArray(DATASETS)).thenReturn(jsonArrayMock);
+    when(jsonObjectMock.getJsonArray(resourceNames)).thenReturn(jsonArrayMock);
     when(jsonObjectMock.getInteger("totalHits")).thenReturn(0);
     doAnswer(
             Answer ->
@@ -70,7 +69,7 @@ public class VariantServiceTest {
                                     new JsonObject()
                                         .put("providerid", "provider-id")
                                         .put(PRODUCT_ID, "urn:datakaeri.org:provider-id:abcde")
-                                        .put(DATASETS, new JsonArray().add(new JsonObject().put(ID, "dataset-1").put(NAME, "dat-name")))))))
+                                        .put(resourceNames, new JsonArray().add(new JsonObject().put(ID, "resource-1").put(NAME, "dat-name")))))))
         .when(variantServiceSpy)
         .getProductDetails(anyString());
     when(jsonArrayMock.size()).thenReturn(1);
