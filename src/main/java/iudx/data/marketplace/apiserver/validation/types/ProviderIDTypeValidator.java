@@ -44,7 +44,7 @@ public class ProviderIDTypeValidator implements Validator {
       throw new DxRuntimeException(failureCode(), INVALID_PROVIDER_URN, failureMessage(value));
     }
     if (!isValidID(value)) {
-      LOGGER.error("Validation error : Invalid Resource ID");
+      LOGGER.error("Validation error : Invalid Provider ID");
       throw new DxRuntimeException(failureCode(), INVALID_PROVIDER_URN, failureMessage(value));
     }
     return true;
