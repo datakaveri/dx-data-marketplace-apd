@@ -104,6 +104,7 @@ public class ApiServerVerticle extends AbstractVerticle {
     /* Initialize service proxy */
     policyService = PolicyService.createProxy(vertx, POLICY_SERVICE_ADDRESS);
     postgresService = PostgresService.createProxy(vertx, POSTGRES_SERVICE_ADDRESS);
+    policyService = PolicyService.createProxy(vertx, POLICY_SERVICE_ADDRESS);
 
     router = Router.router(vertx);
 

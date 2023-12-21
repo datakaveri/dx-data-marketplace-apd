@@ -100,4 +100,17 @@ public class Constants {
   public static final Pattern VALIDATION_IUDX_ID_REGEX =
       Pattern.compile("^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$");
 
+
+  public static final int VALIDATION_PROVIDER_ID_MAXLEN = 200;
+  public static final Pattern VALIDATION_PROVIDER_ID_REGEX = Pattern.compile("^[a-zA-Z0-9.]{4,100}/[a-zA-Z0-9.]{4,100}$");
+
+
+  // response keys
+  public static final String TYPE = "type";
+  public static final String TITLE = "title";
+  public static final String DETAIL = "detail";
+  public static final String RESULT = "results";
+  public static final String STATUS_CODE = "statusCode";
+
+
 }
