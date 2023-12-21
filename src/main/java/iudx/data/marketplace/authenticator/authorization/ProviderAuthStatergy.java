@@ -2,45 +2,65 @@ package iudx.data.marketplace.authenticator.authorization;
 
 import io.vertx.core.json.JsonArray;
 import iudx.data.marketplace.authenticator.model.JwtData;
+import iudx.data.marketplace.common.Api;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
-import static iudx.data.marketplace.authenticator.authorization.Api.*;
+
 import static iudx.data.marketplace.authenticator.authorization.Method.*;
 
 public class ProviderAuthStatergy implements AuthorizationStatergy {
   private static final Logger LOGGER = LogManager.getLogger(ProviderAuthStatergy.class);
+  private static volatile ProviderAuthStatergy instance;
+  Map<String, List<AuthorizationRequest>> providerAuthorizationRequest = new HashMap<>();
 
-  static List<AuthorizationRequest> providerAuthRules = new ArrayList<>();
+  private ProviderAuthStatergy(Api api)
+  {
+    buildPermissions(api);
+  }
 
-  static {
-
-    // api access list
+  public static ProviderAuthStatergy getInstance(Api api)
+  {
+    if(instance == null)
+    {
+      synchronized (ProviderAuthStatergy.class)
+      {
+        if(instance == null)
+        {
+          instance = new ProviderAuthStatergy(api);
+        }
+      }
+    }
+    return instance;
+  }
+  private void buildPermissions(Api api) {
     List<AuthorizationRequest> apiAccessList = new ArrayList<>();
-    apiAccessList.add(new AuthorizationRequest(POST, PRODUCT));
-    apiAccessList.add(new AuthorizationRequest(DELETE, PRODUCT));
-    apiAccessList.add(new AuthorizationRequest(GET, PROVIDER_LIST_PRODUCTS));
-    apiAccessList.add(new AuthorizationRequest(GET, PROVIDER_LIST_PURCHASES));
-    apiAccessList.add(new AuthorizationRequest(POST, PRODUCT_VARIANT));
-    apiAccessList.add(new AuthorizationRequest(PUT, PRODUCT_VARIANT));
-    apiAccessList.add(new AuthorizationRequest(GET, PRODUCT_VARIANT));
-    apiAccessList.add(new AuthorizationRequest(DELETE, PRODUCT_VARIANT));
-    providerAuthRules = apiAccessList;
+    apiAccessList.add(new AuthorizationRequest(POST, api.getProviderProductPath()));
+    apiAccessList.add(new AuthorizationRequest(DELETE, api.getProviderProductPath()));
+    apiAccessList.add(new AuthorizationRequest(GET, api.getProviderListProductsPath()));
+    apiAccessList.add(new AuthorizationRequest(GET, api.getProviderListPurchasesPath()));
+    apiAccessList.add(new AuthorizationRequest(POST, api.getProviderProductVariantPath()));
+    apiAccessList.add(new AuthorizationRequest(PUT, api.getProviderProductVariantPath()));
+    apiAccessList.add(new AuthorizationRequest(GET, api.getProviderProductVariantPath()));
+    apiAccessList.add(new AuthorizationRequest(DELETE, api.getProviderProductVariantPath()));
+
+    //    policies
+    apiAccessList.add(new AuthorizationRequest(GET, api.getPoliciesUrl()));
+    apiAccessList.add(new AuthorizationRequest(DELETE, api.getPoliciesUrl()));
+    providerAuthorizationRequest.put("api", apiAccessList);
   }
 
   @Override
   public boolean isAuthorized(AuthorizationRequest authorizationRequest, JwtData jwtData) {
-    // JsonArray access = jwtData.getCons() != null ? jwtData.getCons().getJsonArray("access") : null;
-//    if (access == null) {
-//      return false;
-//    }
-    String endpoint = authorizationRequest.getApi().getEndpoint();
+    String endpoint = authorizationRequest.getApi().toString();
     Method method = authorizationRequest.getMethod();
     LOGGER.info("authorization request for : " + endpoint + " with method : " + method.name());
 
-    return providerAuthRules.contains(authorizationRequest);
+    return providerAuthorizationRequest.get("api").contains(authorizationRequest);
   }
 }

@@ -33,7 +33,7 @@ public class JwtDataTest {
   @Test
   @DisplayName("Test getAccess_token method")
   public void test_getAccess_token(VertxTestContext vertxTestContext) {
-    String actual = jwtData.getAccess_token();
+    String actual = jwtData.getAccessToken();
     assertNull(actual);
     vertxTestContext.completeNow();
   }
@@ -41,7 +41,7 @@ public class JwtDataTest {
   @Test
   @DisplayName("Test getIat method")
   public void test_getIat(VertxTestContext vertxTestContext) {
-    Long actual = jwtData.getIat();
+    Integer actual = jwtData.getIat();
     assertEquals(0, actual);
     vertxTestContext.completeNow();
   }

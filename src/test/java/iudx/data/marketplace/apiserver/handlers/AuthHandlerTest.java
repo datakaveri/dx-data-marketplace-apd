@@ -13,11 +13,15 @@ import io.vertx.ext.web.RequestBody;
 import io.vertx.ext.web.RoutingContext;
 import io.vertx.junit5.VertxExtension;
 import io.vertx.junit5.VertxTestContext;
+import iudx.data.marketplace.authenticator.AuthClient;
 import iudx.data.marketplace.authenticator.AuthenticationService;
+import iudx.data.marketplace.common.Api;
+import iudx.data.marketplace.postgres.PostgresServiceImpl;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.Mock;
 import org.mockito.invocation.InvocationOnMock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.mockito.stubbing.Answer;
@@ -44,10 +48,18 @@ public class AuthHandlerTest {
   RequestBody requestBody;
   Throwable throwable;
   Future<Void> voidFuture;
+  Api api;
+  @Mock
+  PostgresServiceImpl postgresService;
+  @Mock
+  AuthClient authClient;
+  @Mock
+  AuthenticationService authenticationService;
 
   @BeforeEach
   public void setup(Vertx vertx, VertxTestContext testContext) {
-    authHandler = AuthHandler.create(vertx);
+    api = Api.getInstance("some/base/path");
+    authHandler = AuthHandler.create(authenticationService, vertx, api, postgresService, authClient);
     ctx = mock(RoutingContext.class);
     req = mock(HttpServerRequest.class);
     map = mock(MultiMap.class);
@@ -64,7 +76,7 @@ public class AuthHandlerTest {
   @DisplayName("Test create method")
   public void testAuthHandlerCreateMethod(Vertx vertx, VertxTestContext testContext) {
     authenticator = mock(AuthenticationService.class);
-    assertNotNull(AuthHandler.create(vertx));
+    assertNotNull(AuthHandler.create(authenticationService,vertx,api, postgresService, authClient));
     testContext.completeNow();
   }
 
