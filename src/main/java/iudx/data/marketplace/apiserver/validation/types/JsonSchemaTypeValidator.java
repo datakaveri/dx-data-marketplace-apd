@@ -40,7 +40,7 @@ public class JsonSchemaTypeValidator implements Validator {
       throw new DxRuntimeException(failureCode(), SCHEMA_READ_ERROR_URN, failureMessage(body.encode()));
     }
     if(!isValid) {
-      throw new DxRuntimeException(failureCode(), INVALID_PAYLOAD_FORMAT_URN, failureMessage(body.encode()));
+      throw new DxRuntimeException(failureCode(), INVALID_PAYLOAD_FORMAT_URN, INVALID_PAYLOAD_FORMAT_URN.getMessage());
     } else {
       return true;
     }

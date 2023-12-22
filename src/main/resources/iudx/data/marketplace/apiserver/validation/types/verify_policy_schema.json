@@ -176,7 +176,7 @@
           "$id": "#root/item/itemType",
           "title": "Itemtype",
           "type": "string",
-          "enum": ["resource_group", "resource"],
+          "enum": ["resource"],
           "minLength": 1
         }
       }
