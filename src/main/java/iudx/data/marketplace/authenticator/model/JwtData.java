@@ -4,8 +4,7 @@ import io.vertx.codegen.annotations.DataObject;
 import io.vertx.core.json.JsonObject;
 
 @DataObject(generateConverter = true, publicConverter = false)
-public final class JwtData
-{
+public final class JwtData {
 
   private String accessToken;
   private String sub;
