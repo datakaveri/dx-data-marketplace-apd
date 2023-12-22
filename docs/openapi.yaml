@@ -981,11 +981,7 @@ components:
         title: success
         results:
           - resourceID: abc1
-<<<<<<< HEAD
             resourceName: abc–flood
-=======
-            datasetName: abc–flood
->>>>>>> 8361e74 (Update files)
             accessPolicy: secure
             providerID: iisc.ac.in/123qwerty
             totalResources: 12
