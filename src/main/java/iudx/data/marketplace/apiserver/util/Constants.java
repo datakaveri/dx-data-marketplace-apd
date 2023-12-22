@@ -34,6 +34,15 @@ public class Constants {
   public static final String JSON_TYPE = "type";
   public static final String JSON_TITLE = "title";
   public static final String JSON_DETAIL = "detail";
+  public static final String USERID = "userId";
+  public static final String ROLE = "role";
+  public static final String RESOURCE_SERVER_URL = "resourceServer";
+  public static final String USER_ROLE = "userRole";
+  public static final String EMAIL_ID = "emailId";
+  public static final String RS_SERVER_URL = "resourceServerUrl";
+  public static final String FIRST_NAME = "firstName";
+  public static final String LAST_NAME = "lastName";
+
 
   // paths
   public static final String ROUTE_STATIC_SPEC = "/apis/spec";
