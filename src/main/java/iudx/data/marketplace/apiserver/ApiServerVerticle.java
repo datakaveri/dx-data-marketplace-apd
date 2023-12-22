@@ -198,8 +198,8 @@ public class ApiServerVerticle extends AbstractVerticle {
         });
 
 
-    router.route(PROVIDER_PATH + "/*").subRouter(new ProviderApis(vertx, router, api).init());
-    router.route(CONSUMER_PATH + "/*").subRouter(new ConsumerApis(vertx, router, api).init());
+      router.route(PROVIDER_PATH + "/*").subRouter(new ProviderApis(vertx, router, api).init());
+      router.route(CONSUMER_PATH + "/*").subRouter(new ConsumerApis(vertx, router, api).init());
 
     ExceptionHandler exceptionHandler = new ExceptionHandler();
     ValidationHandler policyValidationHandler = new ValidationHandler(vertx, RequestType.POLICY);

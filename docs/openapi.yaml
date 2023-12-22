@@ -455,15 +455,11 @@ paths:
             type: string
           in: header
           name: token
-<<<<<<< HEAD:docs/apidocs.yaml
+
           description: IUDX Auth token to process the request
   /consumer/list/resources:
     summary: List API for the consumer to view the resources available on the marketplace.
-=======
-          description: DX Auth token to process the request
-  /consumer/list/datasets:
-    summary: List API for the consumer to view the datasets available on the marketplace.
->>>>>>> 141bb82 (Add and update files):docs/openapi.yaml
+
     get:
       tags:
         - consumer
@@ -985,7 +981,11 @@ components:
         title: success
         results:
           - resourceID: abc1
+<<<<<<< HEAD
             resourceName: abc–flood
+=======
+            datasetName: abc–flood
+>>>>>>> 8361e74 (Update files)
             accessPolicy: secure
             providerID: iisc.ac.in/123qwerty
             totalResources: 12
