@@ -26,6 +26,9 @@ public class CreatePolicy {
     }
     public Future<JsonObject> initiateCreatePolicy(JsonObject request, User user) {
         Promise<JsonObject> promise = Promise.promise();
+        /* TODO : Create a policy and return the response saying policy is created */
+        /* 200 Success response */
+        /* 500 Failure response */
        return null;
 
     }
