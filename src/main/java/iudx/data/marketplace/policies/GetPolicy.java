@@ -13,9 +13,10 @@ import org.slf4j.LoggerFactory;
 public class GetPolicy {
     private static final Logger LOG = LoggerFactory.getLogger(GetPolicy.class);
     private static final String FAILURE_MESSAGE = "Policy could not be fetched";
-    private final PostgresService postgresService;
 
-    public GetPolicy(PostgresService postgresService) {
+    private final PostgresServiceImpl postgresService;
+
+    public GetPolicy(PostgresServiceImpl postgresService) {
         this.postgresService = postgresService;
     }
 
