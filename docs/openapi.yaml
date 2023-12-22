@@ -1,17 +1,28 @@
 openapi: 3.0.2
 info:
-  title: DX Data Marketplace APIs
   version: 4.5.0
+  title: DX Data Marketplace APIs
   description: 'The data marketplace is Data Exchange (DX) platform that enables data Providers to host their datasets as a product. Likewise, data consumers can buy the products listed by various providers '
   contact:
     email: support@iudx.org.in
     name: For support contact IUDX team at
 paths:
   /provider/product:
-    summary: Manage marketplace products and perform Create/Update/Delete operations on them. These apis are intended to be used by DX data providers
     post:
       tags:
         - provider
+      description: |-
+        Create a product where the body contains the name and the array of resources that will be part of the product. 
+        The name cannot be updated once the product is created as it is a unique identifier for a product of a provider. The name is stored as a URN(for eg: a product named flood-sensors hosted by the provider iisc.ac.in/123qwerty is represented as urn:datakaveri.org:iisc.ac.in/123qwerty:flood-sensors)
+      parameters:
+        - name: token
+          in: header
+          description: DX Auth token to process the request
+          required: true
+          schema:
+            type: string
+            pattern: '^[a-zA-Z0-9\/\@\.]*$'
+            maxLength: 512
       requestBody:
         content:
           application/json:
@@ -22,18 +33,8 @@ paths:
                 value:
                   name: flood-sensors
                   resources:
-                    - pune-env-flood
-                    - stqc-flood-sensors
-      parameters:
-        - name: token
-          description: DX Auth token to process the request
-          schema:
-            maxLength: 512
-            minLength: 0
-            pattern: '^[a-zA-Z0-9\/\@\.]*$'
-            type: string
-          in: header
-          required: true
+                    - e3e940d9-5743-4229-bd9b-d7c2c80264bf
+                    - 9c2df357-4d3b-46fd-9d24-3248867eb77e
       responses:
         '200':
           description: success
@@ -81,30 +82,27 @@ paths:
                     type: 'urn:dx:cat:InvalidAuthorizationToken'
                     title: Token is invalid
                     detail: failed
-      description: |-
-        Create a product where the body contains the name and the array of resources that will be part of the product. 
-        The name cannot be updated once the product is created as it is a unique identifier for a product of a provider. The name is stored as a URN(for eg: a product named flood-sensors hosted by the provider iisc.ac.in/123qwerty is represented as urn:datakaveri.org:iisc.ac.in/123qwerty:flood-sensors)
     delete:
       tags:
         - provider
       parameters:
         - name: token
-          description: DX Auth token to process the request
-          schema:
-            maxLength: 512
-            minLength: 0
-            pattern: '^[a-zA-Z0-9\/\@\.]*$'
-            type: string
           in: header
+          description: DX Auth token to process the request
           required: true
-        - name: productID
-          description: urn name of the product
           schema:
-            maxLength: 150
-            minLength: 3
-            pattern: '^[a-zA-Z0-9/.:-]{3,150}$'
+            type: string
+            pattern: '^[a-zA-Z0-9\/\@\.]*$'
+            maxLength: 512
+        - name: productID
           in: query
+          description: urn name of the product
           required: true
+          schema:
+            type: string
+            pattern: '^[a-zA-Z0-9/.:-]{3,150}$'
+            minLength: 3
+            maxLength: 150
       responses:
         '200':
           description: success
@@ -146,26 +144,24 @@ paths:
                     title: Token is invalid
                     detail: failed
   /provider/list/products:
-    summary: 'List API for provider to view all the products listed by them, or a subset of the products based on the resources they contain.'
     get:
       tags:
         - provider
       parameters:
         - name: token
-          description: DX Auth token to process the request
-          schema:
-            maxLength: 512
-            minLength: 0
-            pattern: '^[a-zA-Z0-9\/\@\.]*$'
-            type: string
           in: header
+          description: DX Auth token to process the request
           required: true
-        - name: resourceID
-          description: 'If resourceID is provided for listing, then products are filtered to show products only for that resource'
-          in: query
           schema:
             type: string
+            pattern: '^[a-zA-Z0-9\/\@\.]*$'
+            maxLength: 512
+        - name: resourceID
+          in: query
+          description: 'If resourceID is provided for listing, then products are filtered to show products only for that resource'
           required: false
+          schema:
+            type: string
       responses:
         '200':
           description: success
@@ -200,34 +196,33 @@ paths:
                     title: Token is invalid
                     detail: failed
   /provider/list/purchases:
-    summary: 'List API for the provider to view all the purchases made on the products listed by them, or a subset of the purchases based on the product name.'
     get:
       tags:
         - provider
       parameters:
         - name: token
-          description: DX Auth token to process the request
-          schema:
-            maxLength: 512
-            minLength: 0
-            pattern: '^[a-zA-Z0-9\/\@\.]*$'
-            type: string
           in: header
+          description: DX Auth token to process the request
           required: true
-        - name: productID
-          description: urn name of the product
-          schema:
-            maxLength: 150
-            minLength: 3
-            pattern: '^[a-zA-Z0-9/.:-]{3,150}$'
-          in: query
-          required: false
-        - name: resourceID
-          description: 'If resourceID is provided for listing, then purchases are filtered to show purchases against that resource'
-          in: query
           schema:
             type: string
+            pattern: '^[a-zA-Z0-9\/\@\.]*$'
+            maxLength: 512
+        - name: productID
+          in: query
+          description: urn name of the product
           required: false
+          schema:
+            type: string
+            pattern: '^[a-zA-Z0-9/.:-]{3,150}$'
+            minLength: 3
+            maxLength: 150
+        - name: resourceID
+          in: query
+          description: 'If resourceID is provided for listing, then purchases are filtered to show purchases against that resource'
+          required: false
+          schema:
+            type: string
       responses:
         '200':
           description: success
@@ -272,28 +267,17 @@ paths:
                     detail: failed
   /provider/product-variant:
     post:
+      tags:
+        - provider
       summary: ''
-      operationId: post-provider-product-variant
-      responses:
-        '200':
-          description: ''
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/successResponseWithObjects'
-              examples:
-                Example 1:
-                  value:
-                    type: 'urn:dx:dmp:Success'
-                    title: Success
-                    results: [ ]
       description: 'Create a product variant where the body contains details about the variant such as price, duration, resources and their capabilities. Along with the name of the variant and the product it belongs to.'
+      operationId: post-provider-product-variant
       parameters:
-        - schema:
-            type: string
+        - name: token
           in: header
-          name: token
           description: DX Auth token to process the request
+          schema:
+            type: string
       requestBody:
         content:
           application/json:
@@ -350,9 +334,38 @@ paths:
                         - file
                   price: 100
                   validity: 12
+      responses:
+        '200':
+          description: ''
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/successResponseWithObjects'
+              examples:
+                Example 1:
+                  value:
+                    type: 'urn:dx:dmp:Success'
+                    title: Success
+                    results: []
     get:
+      tags:
+        - provider
       summary: ''
       operationId: get-provider-product-variant
+      parameters:
+        - name: token
+          in: header
+          description: DX Auth token to process the request
+          schema:
+            type: string
+        - name: id
+          in: query
+          schema:
+            type: string
+        - name: variant
+          in: query
+          schema:
+            type: string
       responses:
         '200':
           description: OK
@@ -360,38 +373,17 @@ paths:
             application/json:
               schema:
                 type: object
-                properties: { }
-      parameters:
-        - schema:
-            type: string
-          in: header
-          name: token
-          description: DX Auth token to process the request
-        - schema:
-            type: string
-          in: query
-          name: id
-        - schema:
-            type: string
-          in: query
-          name: variant
-    parameters: [ ]
     put:
+      tags:
+        - provider
       summary: ''
       operationId: put-provider-product-variant
-      responses:
-        '200':
-          description: OK
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/successResponseWithObjects'
       parameters:
-        - schema:
-            type: string
+        - name: token
           in: header
-          name: token
           description: DX Auth token to process the request
+          schema:
+            type: string
       requestBody:
         content:
           application/json:
@@ -432,9 +424,32 @@ paths:
                         - file
                   price: 100
                   validity: 12
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/successResponseWithObjects'
     delete:
+      tags:
+        - provider
       summary: ''
       operationId: delete-provider-product-variant
+      parameters:
+        - name: token
+          in: header
+          description: IUDX Auth token to process the request
+          schema:
+            type: string
+        - name: id
+          in: query
+          schema:
+            type: string
+        - name: variant
+          in: query
+          schema:
+            type: string
       responses:
         '200':
           description: OK
@@ -442,49 +457,31 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/successResponseForDeleteProduct'
-      parameters:
-        - schema:
-            type: string
-          in: query
-          name: id
-        - schema:
-            type: string
-          in: query
-          name: variant
-        - schema:
-            type: string
-          in: header
-          name: token
-
-          description: IUDX Auth token to process the request
   /consumer/list/resources:
-    summary: List API for the consumer to view the resources available on the marketplace.
-
     get:
       tags:
         - consumer
       parameters:
         - name: token
-          description: DX Auth token to process the request
-          schema:
-            maxLength: 512
-            minLength: 0
-            pattern: '^[a-zA-Z0-9\/\@\.]*$'
-            type: string
           in: header
+          description: DX Auth token to process the request
           required: true
+          schema:
+            type: string
+            pattern: '^[a-zA-Z0-9\/\@\.]*$'
+            maxLength: 512
         - name: providerID
+          in: query
           description: Id of the provider for listing their resources
+          required: false
           schema:
             type: string
-          in: query
-          required: false
         - name: resourceID
+          in: query
           description: Id of the resource for its details
+          required: false
           schema:
             type: string
-          in: query
-          required: false
       responses:
         '200':
           description: success
@@ -524,26 +521,24 @@ paths:
                     title: Token is invalid
                     detail: failed
   /consumer/list/providers:
-    summary: List API for consumers to view the providers enlisted on the marketplace.
     get:
       tags:
         - consumer
       parameters:
         - name: token
-          description: DX Auth token to process the request
-          schema:
-            maxLength: 512
-            minLength: 0
-            pattern: '^[a-zA-Z0-9\/\@\.]*$'
-            type: string
           in: header
+          description: DX Auth token to process the request
           required: true
-        - name: providerID
-          description: Id of the provider for its details
           schema:
             type: string
+            pattern: '^[a-zA-Z0-9\/\@\.]*$'
+            maxLength: 512
+        - name: providerID
           in: query
+          description: Id of the provider for its details
           required: false
+          schema:
+            type: string
       responses:
         '200':
           description: success
@@ -566,20 +561,18 @@ paths:
                     title: Token is invalid
                     detail: failed
   /consumer/list/purchases:
-    summary: 'List API for the consumer to view all the past purchases made by them. They can also see  the status of the payment on each '
     get:
       tags:
         - consumer
       parameters:
         - name: token
-          description: DX Auth token to process the request
-          schema:
-            maxLength: 512
-            minLength: 0
-            pattern: '^[a-zA-Z0-9\/\@\.]*$'
-            type: string
           in: header
+          description: DX Auth token to process the request
           required: true
+          schema:
+            type: string
+            pattern: '^[a-zA-Z0-9\/\@\.]*$'
+            maxLength: 512
       responses:
         '200':
           description: success
@@ -602,32 +595,30 @@ paths:
                     title: Token is invalid
                     detail: failed
   /consumer/list/products:
-    summary: List API for the comsumer to view all the products available against a resource.
     get:
       tags:
         - consumer
       parameters:
         - name: token
-          description: DX Auth token to process the request
-          schema:
-            maxLength: 512
-            minLength: 0
-            pattern: '^[a-zA-Z0-9\/\@\.]*$'
-            type: string
           in: header
+          description: DX Auth token to process the request
           required: true
+          schema:
+            type: string
+            pattern: '^[a-zA-Z0-9\/\@\.]*$'
+            maxLength: 512
         - name: resourceID
+          in: query
           description: ID of the resource for listing products that contain it.
-          in: query
+          required: false
           schema:
             type: string
-          required: false
         - name: providerID
+          in: query
           description: Id of the provider for listing their products
+          required: false
           schema:
             type: string
-          in: query
-          required: false
       responses:
         '200':
           description: success
@@ -661,93 +652,77 @@ paths:
                     type: 'urn:dx:cat:InvalidAuthorizationToken'
                     title: Token is invalid
                     detail: failed
-  /product/usermaps:
-    summary: CRUD APIs to map a consumer to a product after purchase is successful.
+  /consumer/create-purchase:
     post:
       tags:
-        - admin
+        - consumer
+      operationId: post-consumer-create-purchase
       parameters:
         - name: token
-          description: DX Auth token to process the request
-          schema:
-            maxLength: 512
-            minLength: 0
-            pattern: '^[a-zA-Z0-9\/\@\.]*$'
-            type: string
           in: header
-          required: true
+          description: DX Auth consumer token to process the request
+          schema:
+            type: string
       requestBody:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/exampleUsermapsPostBody'
+              type: object
+              properties:
+                variantId:
+                  type: string
+                  description: Product Variant ID
+                stateId:
+                  type: string
+                  description: |
+                    Generated at UI to maintain state of a purchase
+
       responses:
-        '200':
-          description: success
+        '202':
+          description: Accepted
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/successResponseWithObjects'
-        '400':
-          description: bad request
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/errorResponseWithObjects'
-              examples:
-                Doesn't Exist:
-                  value:
-                    type: 'urn:dx:dmp:DocDoesNotExist'
-                    results:
-                      productID: 'urn:datakaveri.org:iisc.ac.in/123qwerty:zxcvb'
-                      method: delete
-                      title: failed
-                      detail: 'Fail: Cannot delete, Doc does not exist'
-                    title: Product does not exist
-                Invalid productID:
-                  value:
-                    type: 'urn:dx:dmp:InvalidProductIDValue'
-                    title: Bad request
-                    detail: 'Invalid productID [ abc&23? ]'
-                Invalid Syntax:
-                  value:
-                    type: 'urn:dx:dmp:InvalidSyntax'
-                    title: Invalid syntax
-                    detail: Invalid format for time
-        '401':
-          description: Unauthorized access
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/errorResponseWithObjects'
-              examples:
-                Unauthorized:
-                  value:
-                    type: 'urn:dx:cat:InvalidAuthorizationToken'
-                    title: Token is invalid
-                    detail: failed
+                type: object
+                properties:
+                  purchaseID:
+                    type: string
+                    x-stoplight:
+                      id: lovxsd0sofs7p
+                  variantID:
+                    type: string
+                    x-stoplight:
+                      id: crxqfci74zbxn
+                  purchasedAt:
+                    type: string
+                    x-stoplight:
+                      id: j1wfk87bielyn
+                  status:
+                    type: string
+                    x-stoplight:
+                      id: vf4copthw9pbt
   /verify:
     post:
-      operationId: post-verify-policy
-      summary: Verify Policy
       tags:
-        - admin
+        - Policies
       description: |
         Verify API endpoint is used by DX AAA Server to check if a policy is present for a given consumer for the given 
         resource with a specified provider of the resource. This check is done by DX AAA Server before issuing 
         a token. 
-        
+
         DMP Data Marketplace APD Server creates policy for a given item with type `resource`
+      operationId: post-verify-policy
+      summary: Verify Policy
       parameters:
-        - in: header
-          name: Authorization
+        - name: Authorization
+          in: header
           required: true
           schema:
             type: string
+            description: Keycloak issued token
             minLength: 1
             maxLength: 512
             example: Bearer <JWT>
-            description: Keycloak issued token
       requestBody:
         content:
           application/json:
@@ -756,26 +731,24 @@ paths:
             examples:
               Request body for verify policy:
                 value:
-                    user:
-                      id: a109807f-6b06-4d8a-ab64-a3a19b04a3b4
-                      name:
-                        firstName: test
-                        lastName: consumer
-                      email: consumer@gmail.com
-                    owner:
-                      id: 114077a3-6411-4b6e-bc97-c7e81b87685d
-                      name:
-                        firstName: test
-                        lastName: provider
-                      email: test@provider.com
-                    item:
-                      itemId: 2a0be315-4165-4c5b-a74e-116cc89272cb
-                      itemType: resource
-      security:
-        - authorization: [ ]
+                  user:
+                    id: a109807f-6b06-4d8a-ab64-a3a19b04a3b4
+                    name:
+                      firstName: test
+                      lastName: consumer
+                    email: consumer@gmail.com
+                  owner:
+                    id: 114077a3-6411-4b6e-bc97-c7e81b87685d
+                    name:
+                      firstName: test
+                      lastName: provider
+                    email: test@provider.com
+                  item:
+                    itemId: 2a0be315-4165-4c5b-a74e-116cc89272cb
+                    itemType: resource
       responses:
         '200':
-          description: |- 
+          description: |-
             OK
             - An active policy is present for the consumer for given resource with given constraints
           content:
@@ -783,7 +756,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/verifyPolicySuccessResponse'
         '400':
-          description: |- 
+          description: |-
             Bad request
             - Invalid request schema
           content:
@@ -791,23 +764,676 @@ paths:
               schema:
                 $ref: '#/components/schemas/verifyPolicyBadRequestResponse'
         '403':
-          description: |- 
+          description: |-
             forbidden
             - Policy does not exist
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/verifyPolicyForbiddenResponse'
+      security:
+        - authorization: []
+      x-internal: false
 
+  /policy:
+    get:
+      tags:
+        - Policies
+      summary: Get Policies
+      description: |
+        Get policies associated with a specific user. The response is determined by the user's roles:
+        
+        - If the user is a `provider`, the response includes all policies created by the provider or their delegates.
+        - If the user is a `delegate`, the response comprises policies set by the delegate or set for the consumer on whose behalf the delegate is acting.
+        - If the user is a `consumer`, the response includes policies set for the consumer.
+        
+        `Note`: Please note that the response displays the policies for a user concerning a specific server.
+
+      operationId: get-auth-v1-policies
+      parameters:
+        - name: Authorization
+          in: header
+          description: AAA issued identity token
+          required: true
+          schema:
+            type: string
+            minLength: 1
+            maxLength: 512
+            pattern: '^[a-zA-Z0-9_*\-*\.\/]+$'
+      responses:
+        '200':
+          description: |-
+            Policies have been successfully listed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/getPolicySuccessResponseWithResourceType'
+          headers:
+            Content-Type:
+              schema:
+                type: string
+              description: application/json
+        '401':
+          description: 'Unauthorized - `token` invalid/expired'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/errorResponseWithObjects'
+                examples:
+                  Unauthorized:
+                    value:
+                      type: 'urn:dx:cat:InvalidAuthorizationToken'
+                      title: Token is invalid
+                      detail: failed
+          headers:
+            Content-Type:
+              schema:
+                type: string
+              description: application/json
+        '404':
+          description: 'Not Found - Policy not found'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/policyNotFound'
+          headers:
+            Content-Type:
+              schema:
+                type: string
+              description: application/json
+      security:
+        - authorization: [ ]
+    delete:
+      tags:
+        - Policies
+      summary: Delete Policy
+      description: |-
+        A provider of the resource can delete the policy. An existing active policy can be deleted by the provider or provider delegate. The request would contain id, i.e. the ID of the policy that the user wants to delete. The user can use the GET Policy API to get the policy ID.
+        <br>
+        <br>
+        `Note`: A Provider gets to delete the policy if they find any conflict of interest with a given consumer accessing their resource
+      operationId: delete-auth-v1-policies
+      parameters:
+        - name: Authorization
+          in: header
+          description: AAA issued identity token
+          required: true
+          schema:
+            type: string
+            minLength: 1
+            maxLength: 512
+            pattern: '^[a-zA-Z0-9_*\-*\.\/]+$'
+      requestBody:
+        description: Request body is a JsonObject containing ID whose value is the policy ID.
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                id:
+                  type: string
+                  format: uuid
+                  pattern: '^[0-9a-f]{8}\b-[0-9a-f]{4}\b-[0-9a-f]{4}\b-[0-9a-f]{4}\b-[0-9a-f]{12}$'
+                  minLength: 36
+                  maxLength: 36
+
+              required:
+                - id
+            examples:
+              Request body for Delete Policy:
+                value:
+                  id: 231f6eca-6276-4993-bfeb-53cbbbba6f06
+      responses:
+        '200':
+          description: User Policy deleted successfully.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/deletePolicy'
+          headers:
+            Content-Type:
+              schema:
+                type: string
+              description: application/json
+        '400':
+          description: |-
+            Bad Request
+            - Id is not a valid policyId
+            - Policy has expired
+            - Policy was previously deleted
+
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/deletePolicyErrorResponse'
+          headers:
+            Content-Type:
+              schema:
+                type: string
+              description: application/json
+        '404':
+          description: |-
+            Not Found
+              - Policy id does not exist
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/deletePolicyNotFoundErrorResponse'
+          headers:
+            Content-Type:
+              schema:
+                type: string
+              description: application/json
+        '401':
+          description: |-
+            Unauthorized
+              - `token` invalid/expired
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Unauthorized'
+          headers:
+            Content-Type:
+              schema:
+                type: string
+              description: application/json
+      security:
+        - authorization: [ ]
+
+
+
+
+
+tags:
+  - name: provider
+    description: |
+      Datamarketplace specific data provider APIs.
+    x-displayName: Provider
+  - name: consumer
+    description: |
+      Catalogue consumer specific apis.
+    x-displayName: Consumer
 components:
   securitySchemes:
     authorization:
       type: http
       scheme: bearer
   schemas:
-    verifyPolicySuccessResponse:
-      title: Verify policy success response
+
+    Unauthorized:
       type: object
+      properties:
+        type:
+          type: string
+          minLength: 1
+        title:
+          type: string
+          minLength: 1
+        detail:
+          type: string
+          minLength: 1
+      required:
+        - type
+        - title
+        - detail
+      example:
+        type: urn:dx:dmp:invalidAuthorizationToken
+        title: Not Authorized
+        detail: Not Authorized
+    deletePolicyNotFoundErrorResponse:
+      title: deletePolicyNotFoundErrorResponse
+      type: object
+      properties:
+        type:
+          type: string
+          minLength: 1
+        title:
+          type: string
+          minLength: 1
+        detail:
+          type: string
+          minLength: 1
+      required:
+        - type
+        - title
+        - detail
+      example:
+        type: urn:dx:dmp:resourceNotFound
+        title: Not Found
+        detail: Policy could not be deleted, as it doesn't exist
+
+    deletePolicyErrorResponse:
+      title: deletePolicyErrorResponse
+      type: object
+      properties:
+        type:
+          type: string
+          minLength: 1
+        title:
+          type: string
+          minLength: 1
+        detail:
+          type: string
+          minLength: 1
+      required:
+        - type
+        - title
+        - detail
+      example:
+        type: urn:dx:dmp:badRequest
+        title: Bad Request
+        detail: Policy could not be deleted, as policy is not ACTIVE
+
+    deletePolicy:
+      title: deletePolicy
+      type: object
+      properties:
+        type:
+          type: string
+          minLength: 1
+        title:
+          type: string
+          minLength: 1
+        detail:
+          type: string
+          minLength: 1
+      required:
+        - type
+        - title
+        - detail
+      example:
+        type: urn:dx:dmp:success
+        title: Success
+        detail: Policy deleted successfully
+    policyNotFound:
+      title: policyNotFound
+      type: object
+      properties:
+        type:
+          type: string
+          minLength: 1
+        title:
+          type: string
+          minLength: 1
+        detail:
+          type: string
+          minLength: 1
+      required:
+        - type
+        - title
+        - detail
+      example:
+        type: urn:dx:dmp:resourceNotFound
+        title: Not Found
+        detail: Policy Not Found
+
+    getPolicySuccessResponseWithResourceType:
+      title: get policy for resource item type.
+      required:
+        - type
+        - title
+        - results
+      properties:
+        type:
+          type: string
+          minLength: 1
+        title:
+          type: string
+          minLength: 1
+        results:
+          type: array
+          minLength: 1
+          items:
+            type: object
+            properties:
+              policyId:
+                type: string
+              itemId:
+                type: string
+              accessPolicy:
+                type: string
+              resourceName:
+                type: string
+              productVariantId:
+                type: string
+              resourceServerUrl:
+                type: string
+              consumer:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    name:
+                      type: array
+                      items:
+                        type: object
+                        properties:
+                          email:
+                            type: string
+                          name:
+                            type: array
+                            items:
+                              type: object
+                              properties:
+                                firstName:
+                                  type: string
+                                lastName:
+                                  type: string
+                          id:
+                            type: string
+              provider:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    name:
+                      type: array
+                      items:
+                        type: object
+                        properties:
+                          email:
+                            type: string
+                          name:
+                            type: array
+                            items:
+                              type: object
+                              properties:
+                                firstName:
+                                  type: string
+                                lastName:
+                                  type: string
+                          id:
+                            type: string
+              status:
+                type: string
+                enum: [ "ACTIVE","DELETED" ]
+              expiryAt:
+                type: string
+              constraints:
+                type: object
+      example: { "type": "urn:dx:dmp:success",
+                 "title": "Success",
+                 "results": [ { "policyId": "aaaaaaaa-1234-1234-1234-1234aaaa1234",
+                                "itemId": "cccccccc-4576-3455-5645-3565aaaa4255",
+                                "accessPolicy": "SECURE",
+                                "resourceName": "Surat itms",
+                                "productVariantId": "ddddddd-1234-1234-1234-1234aaaa1234",
+                                "resourceServerUrl": "dummy.resource.server.url",
+                                "expiryAt": "2024-03-05T20:00:19",
+                                "constraints": { access: [ sub ] },
+                                "status": "ACTIVE",
+                                "consumer": { "email": "dummyConsumer@example.com",
+                                              "name": { "firstName": "Some",
+                                                        "lastName": "Consumer" },
+                                              "id": "gklmcd4-4576-3455-5645-3565aaaa4255" },
+                                "provider": { "email": "someProvider@example.com",
+                                              "name": { "firstName": "Some",
+                                                        "lastName": "Provider" },
+                                              "id": "abcdcd4-4576-3455-5645-3565aaaa4255" } } ] }
+
+    exampleProductPostBody:
+      type: object
+      title: Root type for product body
+      description: example request for creating product
+      properties:
+        name:
+          type: string
+        resources:
+          type: array
+          items:
+            type: object
+            properties:
+              resourceID:
+                type: string
+      example:
+        name: flood-sensors
+        description: some description for flod-sensors
+        price: 50
+        duration: 12
+        resources:
+          - e3e940d9-5743-4229-bd9b-d7c2c80264bf
+          - 9c2df357-4d3b-46fd-9d24-3248867eb77e
+    successResponseWithObjects:
+      type: object
+      title: Root Type for standardResponse
+      description: example Response for get products request
+      properties:
+        totalHits:
+          type: integer
+          description: Total number of documents which matched the query.
+          format: int32
+        results:
+          type: array
+          description: Results which matched the query. This is an array of objects.
+          items:
+            type: object
+        detail:
+          type: string
+          description: Detailed description of the type or response
+        type:
+          type: string
+          description: URN type of the response indicating if the query was successful or if any errors have been triggered.
+        title:
+          description: A human readable title to the message response.
+      required:
+        - type
+      example:
+        type: 'urn:dx:dmp:Success'
+        title: Success
+        totalHits: 1
+        results:
+          - productID: 'the productID formatted as a URN - URN would be based on the APD URL (e.g. urn:datakaveri.org:iisc.ac.in/123qwerty:zxcvb)'
+            description: some text description for the product (e.g. a student associated in DataKaveri)
+            price: 100
+            duration: 12
+            resources:
+              - pune-env-flood
+              - stqc-flood-sensor
+    errorResponseWithObjects:
+      type: object
+      title: Root Type for standardResponse
+      description: example Response for get products request
+      properties:
+        detail:
+          type: string
+          description: Detailed description of the type or response
+        type:
+          type: string
+          description: URN type of the response indicating if the query was successful or if any errors have been triggered.
+        title:
+          description: A human readable title to the message response.
+      required:
+        - type
+    successResponseForDeleteProduct:
+      type: object
+      title: Root Tupe for standard DELETE response
+      description: example response for delete product API
+      properties:
+        type:
+          type: string
+          description: URN type of the response indicating if the query was successful or if any errors have been triggered.
+        title:
+          description: A human readable title to the message response.
+        results:
+          type: array
+          description: Results which matched the query. This is an array of objects.
+          items:
+            type: object
+      required:
+        - type
+      example:
+        type: 'urn:dx:dmp:Success'
+        title: Success
+        results:
+          - productID: 'urn:datakaveri.org:iisc.ac.in/123qwerty:zxcvb'
+    exampleResponseListPurchases:
+      type: object
+      title: Root type for purchases API response
+      description: example response for list products
+      properties:
+        type:
+          type: string
+          description: URN type of the response indicating if the query was successful or if any errors have been triggered.
+        title:
+          description: A human readable title to the message response.
+        totalHits:
+          type: integer
+          description: Total number of documents which matched the query.
+          format: int32
+        results:
+          type: array
+          description: Results which matched the query. This is an array of objects.
+          items:
+            type: object
+      example:
+        type: 'urn:dx:dmp:Success'
+        title: Success
+        totalHits: 1
+        results:
+          - productID: 'urn:datakaveri.org:iisc.ac.in/123qwerty:zxcvb'
+            consumerID: 89a36273d77dac4cf38114fca1bbe64392547f86
+            paymentStatus: payment.succeeded
+            paymentTime: '2022-11-23T09:00:00Z'
+            expiry: '2023-11-22T09:00:00Z'
+            status: active/expired
+    exampleListResourcesResponse:
+      type: object
+      title: Root type for list resources API response
+      description: example response for list resources
+      properties:
+        type:
+          type: string
+          description: URN type of the response indicating if the query was successful or if any errors have been triggered.
+        title:
+          description: A human readable title to the message response.
+        totalHits:
+          type: integer
+          description: Total number of documents which matched the query.
+          format: int32
+        results:
+          type: array
+          description: Results which matched the query. This is an array of objects.
+          items:
+            type: object
+      example:
+        type: 'urn:dx:rs:success'
+        title: success
+        results:
+          - resourceID: abc1
+            resourceName: abc–flood
+            accessPolicy: secure
+            providerID: iisc.ac.in/123qwerty
+            totalResources: 12
+        totalHits: 1
+    exampleListProviderResponse:
+      type: object
+      title: Root type for list resources API response
+      description: example response for list resources
+      properties:
+        type:
+          type: string
+          description: URN type of the response indicating if the query was successful or if any errors have been triggered.
+        title:
+          description: A human readable title to the message response.
+        totalHits:
+          type: integer
+          description: Total number of documents which matched the query.
+          format: int32
+        results:
+          type: array
+          description: Results which matched the query. This is an array of objects.
+          items:
+            type: object
+      example:
+        type: 'urn:dx:rs:success'
+        title: success
+        results:
+          - providerID: abc1
+            providerName: abc–flood
+            totalResources: 5
+        totalHits: 1
+    exampleVerifyRequestBody:
+      type: object
+      title: Root type for verify API body
+      description: 'example request for verifying if consumer has purchased product, and if the purchase is expired or not'
+      properties:
+        user:
+          $ref: '#/components/schemas/user'
+        owner:
+          $ref: '#/components/schemas/owner'
+        item:
+          $ref: '#/components/schemas/item'
+    user:
+      type: object
+      title: schemaUser
+      description: consumer information
+      properties:
+        id:
+          type: string
+          format: uuid
+          pattern: '^[0-9a-f]{8}\b-[0-9a-f]{4}\b-[0-9a-f]{4}\b-[0-9a-f]{4}\b-[0-9a-f]{12}$'
+          minLength: 36
+          maxLength: 36
+        name:
+          $ref: '#/components/schemas/name'
+        email:
+          type: string
+          pattern: '^([a-zA-Z0-9_\-\.]+)@([a-zA-Z0-9_\-\.]+)\.([a-zA-Z]{2,5})$'
+          minLength: 1
+      required:
+        - id
+        - name
+        - email
+    name:
+      type: object
+      title: schemaName
+      properties:
+        firstName:
+          type: string
+        lastName:
+          type: string
+    owner:
+      type: object
+      title: schemaOwner
+      description: provider information
+      properties:
+        id:
+          type: string
+          format: uuid
+          pattern: '^[0-9a-f]{8}\b-[0-9a-f]{4}\b-[0-9a-f]{4}\b-[0-9a-f]{4}\b-[0-9a-f]{12}$'
+          minLength: 36
+          maxLength: 36
+        name:
+          $ref: '#/components/schemas/name'
+        email:
+          type: string
+          pattern: '^([a-zA-Z0-9_\-\.]+)@([a-zA-Z0-9_\-\.]+)\.([a-zA-Z]{2,5})$'
+          minLength: 1
+      required:
+        - id
+        - name
+        - email
+    item:
+      type: object
+      description: resource information
+      properties:
+        itemId:
+          type: string
+          format: uuid
+          pattern: '^[0-9a-f]{8}\b-[0-9a-f]{4}\b-[0-9a-f]{4}\b-[0-9a-f]{4}\b-[0-9a-f]{12}$'
+          minLength: 36
+          maxLength: 36
+        itemType:
+          type: string
+          enum:
+            - resource
+          minLength: 1
+      required:
+        - itemId
+        - itemType
+    verifyPolicySuccessResponse:
+      type: object
+      title: Verify policy success response
       properties:
         type:
           type: string
@@ -819,13 +1445,13 @@ components:
         - type
         - apdConstraints
       example:
-        type: urn:apd:allow
+        type: 'urn:apd:allow'
         apdConstraints:
           rule: read
           duration: 3600
     verifyPolicyBadRequestResponse:
-      title: 400 Response for verify policy
       type: object
+      title: 400 Response for verify policy
       properties:
         type:
           type: string
@@ -841,14 +1467,12 @@ components:
         - title
         - detail
       example:
-        {
-          "type": "urn:dx:dm:invalidPayloadFormat",
-          "title": "Bad Request",
-          "detail": "Invalid json format in post request [schema mismatch]"
-        }
+        type: 'urn:dx:dm:invalidPayloadFormat'
+        title: Bad Request
+        detail: 'Invalid json format in post request [schema mismatch]'
     verifyPolicyForbiddenResponse:
-      title: 403 Response for verify policy
       type: object
+      title: 403 Response for verify policy
       properties:
         type:
           type: string
@@ -864,324 +1488,6 @@ components:
         - title
         - detail
       example:
-        {
-          "type": "urn:apd:Deny",
-          "title": "Forbidden",
-          "detail": "No policy exists for the given resource"
-        }
-    successResponseForDeleteProduct:
-      title: Root Tupe for standard DELETE response
-      description: example response for delete product API
-      required:
-        - type
-      type: object
-      properties:
-        type:
-          description: URN type of the response indicating if the query was successful or if any errors have been triggered.
-          type: string
-        title:
-          description: A human readable title to the message response.
-        results:
-          description: Results which matched the query. This is an array of objects.
-          type: array
-          items:
-            type: object
-      example:
-        type: 'urn:dx:dmp:Success'
-        title: Success
-        results:
-          - productID: 'urn:datakaveri.org:iisc.ac.in/123qwerty:zxcvb'
-    successResponseWithObjects:
-      title: Root Type for standardResponse
-      description: example Response for get products request
-      required:
-        - type
-      type: object
-      properties:
-        totalHits:
-          format: int32
-          description: Total number of documents which matched the query.
-          type: integer
-        results:
-          description: Results which matched the query. This is an array of objects.
-          type: array
-          items:
-            type: object
-        detail:
-          description: Detailed description of the type or response
-          type: string
-        type:
-          description: URN type of the response indicating if the query was successful or if any errors have been triggered.
-          type: string
-        title:
-          description: A human readable title to the message response.
-      example:
-        type: 'urn:dx:dmp:Success'
-        title: Success
-        totalHits: 1
-        results:
-          - productID: 'the productID formatted as a URN - URN would be based on the APD URL (e.g. urn:datakaveri.org:iisc.ac.in/123qwerty:zxcvb)'
-            description: some text description for the product (e.g. a student associated in DataKaveri)
-            price: 100
-            duration: 12
-            resources:
-              - pune-env-flood
-              - stqc-flood-sensor
-    exampleResponseListPurchases:
-      title: Root type for purchases API response
-      description: example response for list products
-      type: object
-      properties:
-        type:
-          description: URN type of the response indicating if the query was successful or if any errors have been triggered.
-          type: string
-        title:
-          description: A human readable title to the message response.
-        totalHits:
-          format: int32
-          description: Total number of documents which matched the query.
-          type: integer
-        results:
-          description: Results which matched the query. This is an array of objects.
-          type: array
-          items:
-            type: object
-      example:
-        type: 'urn:dx:dmp:Success'
-        title: Success
-        totalHits: 1
-        results:
-          - productID: 'urn:datakaveri.org:iisc.ac.in/123qwerty:zxcvb'
-            consumerID: 89a36273d77dac4cf38114fca1bbe64392547f86
-            paymentStatus: payment.succeeded
-            paymentTime: '2022-11-23T09:00:00Z'
-            expiry: '2023-11-22T09:00:00Z'
-            status: active/expired
-    exampleListResourcesResponse:
-      title: Root type for list resources API response
-      description: example response for list resources
-      type: object
-      properties:
-        type:
-          description: URN type of the response indicating if the query was successful or if any errors have been triggered.
-          type: string
-        title:
-          description: A human readable title to the message response.
-        totalHits:
-          format: int32
-          description: Total number of documents which matched the query.
-          type: integer
-        results:
-          description: Results which matched the query. This is an array of objects.
-          type: array
-          items:
-            type: object
-      example:
-        type: 'urn:dx:rs:success'
-        title: success
-        results:
-          - resourceID: abc1
-            resourceName: abc–flood
-            accessPolicy: secure
-            providerID: iisc.ac.in/123qwerty
-            totalResources: 12
-        totalHits: 1
-    exampleListProviderResponse:
-      title: Root type for list resources API response
-      description: example response for list resources
-      type: object
-      properties:
-        type:
-          description: URN type of the response indicating if the query was successful or if any errors have been triggered.
-          type: string
-        title:
-          description: A human readable title to the message response.
-        totalHits:
-          format: int32
-          description: Total number of documents which matched the query.
-          type: integer
-        results:
-          description: Results which matched the query. This is an array of objects.
-          type: array
-          items:
-            type: object
-      example:
-        type: 'urn:dx:rs:success'
-        title: success
-        results:
-          - providerID: abc1
-            providerName: abc–flood
-            totalResources: 5
-        totalHits: 1
-    exampleProductPostBody:
-      title: Root type for product body
-      description: example request for creating product
-      type: object
-      example:
-        name: flood-sensors
-        description: some description for flod-sensors
-        price: 50
-        duration: 12
-        resources:
-          - pune-env-flood
-          - stqc-flood-sensors
-      properties:
-        name:
-          type: string
-        resources:
-          type: array
-          items:
-            type: object
-            properties:
-              resourceID:
-                type: string
-    exampleUsermapsPostBody:
-      title: Root type for usermaps body
-      description: example request for creating user map to product
-      type: object
-      properties:
-        productID:
-          type: string
-        consumerID:
-          type: string
-        paymentStatus:
-          type: string
-        paymentTime:
-          type: object
-      example:
-        productID: 'urn:datakaveri.org:iisc.ac.in/123qwerty:zxcvb'
-        consumerID: qwerty987
-        paymentStatus: payment.succeeded
-        paymentTime: '2022-11-23T16:28:00Z'
-
-
-    name:
-      title: schemaName
-      type: object
-      properties:
-        firstName:
-          type: string
-        lastName:
-          type: string
-
-
-    user:
-      title: schemaUser
-      description: consumer information
-      type: object
-      properties:
-        id:
-          type: string
-          format: uuid
-          pattern: '^[0-9a-f]{8}\b-[0-9a-f]{4}\b-[0-9a-f]{4}\b-[0-9a-f]{4}\b-[0-9a-f]{12}$'
-          minLength: 36
-          maxLength: 36
-        name:
-          $ref: '#/components/schemas/name'
-        email:
-          pattern: >-
-            ^([a-zA-Z0-9_\-\.]+)@([a-zA-Z0-9_\-\.]+)\.([a-zA-Z]{2,5})$
-          minLength: 1
-      required:
-        - id
-        - name
-        - email
-
-    owner:
-      title: schemaOwner
-      description: provider information
-      type: object
-      properties:
-        id:
-          format: uuid
-          pattern: '^[0-9a-f]{8}\b-[0-9a-f]{4}\b-[0-9a-f]{4}\b-[0-9a-f]{4}\b-[0-9a-f]{12}$'
-          minLength: 36
-          maxLength: 36
-        name:
-          $ref: '#/components/schemas/name'
-        email:
-          pattern: >-
-            ^([a-zA-Z0-9_\-\.]+)@([a-zA-Z0-9_\-\.]+)\.([a-zA-Z]{2,5})$
-          minLength: 1
-      required:
-        - id
-        - name
-        - email
-
-    item:
-      type: object
-      description: resource information
-      properties:
-        itemId:
-          format: uuid
-          pattern: '^[0-9a-f]{8}\b-[0-9a-f]{4}\b-[0-9a-f]{4}\b-[0-9a-f]{4}\b-[0-9a-f]{12}$'
-          minLength: 36
-          maxLength: 36
-        itemType:
-          enum:
-            - resource
-          minLength: 1
-      required:
-        - itemId
-        - itemType
-
-    exampleVerifyRequestBody:
-      title: Root type for verify API body
-      description: 'example request for verifying if consumer has purchased product, and if the purchase is expired or not'
-      type: object
-      properties:
-        user:
-          $ref: '#/components/schemas/user'
-        owner:
-          $ref: '#/components/schemas/owner'
-        item:
-          $ref: '#/components/schemas/item'
-
-
-    exampleVerifyFailResponse:
-      title: Root type for verify fail response
-      description: example response for failed verify request
-      type: object
-      properties:
-        type:
-          type: string
-        title:
-          type: string
-        details:
-          type: string
-      example:
-        type: 'urn:dx:dmp:Deny'
-        title: Access Denied
-        detail: message to convey to user
-    errorResponseWithObjects:
-      title: Root Type for standardResponse
-      description: example Response for get products request
-      required:
-        - type
-      type: object
-      properties:
-        detail:
-          description: Detailed description of the type or response
-          type: string
-        type:
-          description: URN type of the response indicating if the query was successful or if any errors have been triggered.
-          type: string
-        title:
-          description: A human readable title to the message response.
-    exampleResponseForGetPV:
-      title: exampleResponseForGetPV
-      x-stoplight:
-        id: a1k5kz93pqx26
-      type: object
-      properties:
-        id:
-          type: string
-tags:
-  - name: provider
-    description: |
-      Datamarketplace specific data provider APIs.
-    x-displayName: Provider
-  - name: consumer
-    description: |
-      Catalogue consumer specific apis.
-    x-displayName: Consumer
+        type: 'urn:apd:Deny'
+        title: Forbidden
+        detail: No policy exists for the given resource

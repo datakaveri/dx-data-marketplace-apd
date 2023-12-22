@@ -172,8 +172,7 @@ public class ApiServerVerticle extends AbstractVerticle {
             });
 
     router.route().handler(BodyHandler.create().setHandleFileUploads(false));
-    router.route().handler(TimeoutHandler.create(90000, 408));
-
+    router.route().handler(TimeoutHandler.create(30000, 408));
     isSSL = config().getBoolean("ssl");
 
     HttpServerOptions serverOptions = new HttpServerOptions();
@@ -200,20 +199,23 @@ public class ApiServerVerticle extends AbstractVerticle {
 
     /* Static Resource Handler */
     /* Get openapiv3 spec */
-    router.get(ROUTE_STATIC_SPEC)
-        .produces(MIME_APPLICATION_JSON)
-        .handler(routingContext -> {
-          HttpServerResponse response = routingContext.response();
-          response.sendFile("docs/apidocs.yaml");
-        });
+    router
+        .get(ROUTE_STATIC_SPEC)
+        .produces(APPLICATION_JSON)
+        .handler(
+            routingContext -> {
+              HttpServerResponse response = routingContext.response();
+              response.sendFile("docs/openapi.yaml");
+            });
     /* Get redoc */
-    router.get(ROUTE_DOC)
+    router
+        .get(ROUTE_DOC)
         .produces(MIME_TEXT_HTML)
-        .handler(routingContext -> {
-          HttpServerResponse response = routingContext.response();
-          response.sendFile("docs/apidoc.html");
-        });
-
+        .handler(
+            routingContext -> {
+              HttpServerResponse response = routingContext.response();
+              response.sendFile("docs/apidoc.html");
+            });
 
       router.route(PROVIDER_PATH + "/*").subRouter(new ProviderApis(vertx, router, api, pgServiceImpl, authClient, authenticationService).init());
       router.route(CONSUMER_PATH + "/*").subRouter(new ConsumerApis(vertx, router, api, pgServiceImpl, authClient, authenticationService).init());
