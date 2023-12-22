@@ -7,6 +7,9 @@ public enum RequestType {
   POLICY("policy"),
   VERIFY("verify_policy"),
   RESOURCE("resource"),
+  DATASET("dataset"),
+  POLICY("policy"),
+  VERIFY("verify"),
   PROVIDER("provider");
 
   private String filename;
