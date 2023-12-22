@@ -1,4 +1,4 @@
-package iudx.apd.acl.server.authentication.model;
+package iudx.data.marketplace.authenticator.model;
 
 import io.vertx.codegen.annotations.DataObject;
 import io.vertx.core.json.JsonObject;

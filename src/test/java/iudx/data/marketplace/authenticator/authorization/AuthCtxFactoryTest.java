@@ -72,7 +72,7 @@ public class AuthCtxFactoryTest {
         IllegalArgumentException.class,
         () -> {
           authorizationContextFactory = new AuthorizationContextFactory();
-          IudxRole role = IudxRole.ADMIN;
+          IudxRole role = IudxRole.PROVIDER;
           AuthorizationContextFactory.create(role, api);
         });
     vertxTestContext.completeNow();
@@ -81,8 +81,7 @@ public class AuthCtxFactoryTest {
   public static Stream<Arguments> roles() {
     return Stream.of(
         Arguments.of(ProviderAuthStatergy.getInstance(any()),IudxRole.PROVIDER),
-        Arguments.of(ConsumerAuthStatergy.getInstance(any()), IudxRole.CONSUMER),
-        Arguments.of(AdminAuthStatergy.getInstance(any()), IudxRole.ADMIN));
+        Arguments.of(ConsumerAuthStatergy.getInstance(any()), IudxRole.CONSUMER));
   }
 
   @ParameterizedTest
@@ -91,7 +90,7 @@ public class AuthCtxFactoryTest {
   public void testConsumerIsAuthorized(
       AuthorizationStatergy authorizationStatergy, IudxRole role, VertxTestContext testContext) {
 
-    if(role.equals(IudxRole.ADMIN))
+    if(role.equals(IudxRole.PROVIDER))
       authRequest = new AuthorizationRequest(Method.POST, api.getVerifyUrl());
     else
       authRequest = new AuthorizationRequest(Method.POST, api.getProviderProductPath());

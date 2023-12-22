@@ -5,7 +5,7 @@ import iudx.data.marketplace.authenticator.model.JwtData;
 import java.util.stream.Stream;
 
 public enum IudxRole {
-  CONSUMER("consumer"), PROVIDER("provider"), ADMIN("admin"), DELEGATE("delegate");
+  CONSUMER("consumer"), PROVIDER("provider"), DELEGATE("delegate");
 
   private final String role;
 

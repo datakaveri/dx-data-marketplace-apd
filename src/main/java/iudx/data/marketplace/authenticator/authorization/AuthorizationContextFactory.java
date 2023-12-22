@@ -14,9 +14,6 @@ public class AuthorizationContextFactory {
       case CONSUMER: {
         return ConsumerAuthStatergy.getInstance(api);
       }
-      case ADMIN: {
-        return AdminAuthStatergy.getInstance(api);
-      }
       default:
         throw new IllegalArgumentException(role + "role is not defined in IUDX");
     }
