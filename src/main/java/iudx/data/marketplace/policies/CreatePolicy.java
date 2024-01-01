@@ -20,6 +20,7 @@ import org.apache.logging.log4j.Logger;
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
@@ -88,15 +89,15 @@ public class CreatePolicy {
         /* product variant insertion */
         UUID pvId = UUID.randomUUID();
         String productVariantName = UUID.randomUUID().toString();
-        List<String> resourceNames = List.of(resourceName);
-        List<String> resourceIds = List.of(resourceId.toString());
-        List<String> constraint = List.of(String.valueOf(new JsonObject().put("access", "file")));
+        String[] resourceNames = {resourceName};
+        UUID[] resourceIds = {resourceId};
+        String[] constraint = {String.valueOf(new JsonObject().put("access", "file"))};
         String price = "10$";
         int validity = 10;
         String productVariantStatus = "ACTIVE";
-
+        LOGGER.info("RESOURCE Name : " + resourceName);
         Tuple productVariantTuple = Tuple.of(pvId, productVariantName, productId, providerId,
-                resourceNames.toString(), resourceIds.toString(), constraint.toString(), price, validity, productVariantStatus);
+                resourceNames, resourceIds, constraint, price, validity, productVariantStatus);
         String productVariantInsertion = "INSERT INTO public.product_variant(" +
                 "_id, product_variant_name, product_id, provider_id, resource_name, resource_ids, " +
                 "resource_capabilities, price, validity, status)" +
@@ -110,8 +111,8 @@ public class CreatePolicy {
     JsonObject constraints = new JsonObject().put("access", "file");
     LocalDateTime expiry_at = LocalDateTime.of(2025,4, 4, 4, 5,6);
     String policyStatus = "ACTIVE";
-    Tuple policyTuple = Tuple.of(policyId, resourceId, constraints, providerId,consumerEmailId, expiry_at, policyStatus, productId);
-    String insertPolicy = "INSERT INTO POLICY (_id, resource_id, constraints, provider_id, consumer_email_id, expiry_at, status, product_id)" +
+    Tuple policyTuple = Tuple.of(policyId, resourceId, constraints, providerId,consumerEmailId, expiry_at, policyStatus, pvId);
+    String insertPolicy = "INSERT INTO POLICY (_id, resource_id, constraints, provider_id, consumer_email_id, expiry_at, status, product_variant_id)" +
             " VALUES ($1, $2, $3, $4, $5, $6, $7, $8)";
 
     /* purchase related info */

@@ -63,11 +63,9 @@ public class AuthHandler implements Handler<RoutingContext> {
 
     LOGGER.debug("Info : path " + request.path());
 
-    String token = request.headers().get(HEADER_TOKEN);
+    String token = request.headers().get(AUTHORIZATION_KEY);
     final String path = getNormalisedPath(request.path());
     final String method = context.request().method().toString();
-
-    if (token == null) token = "public"; //
 
     JsonObject authInfo =
         new JsonObject().put(API_ENDPOINT, path).put(HEADER_TOKEN, token).put(API_METHOD, method);
