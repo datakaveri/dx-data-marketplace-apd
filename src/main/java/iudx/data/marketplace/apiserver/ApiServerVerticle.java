@@ -65,6 +65,7 @@ public class ApiServerVerticle extends AbstractVerticle {
   private WebClientOptions webClientOptions;
   private AuthenticationService authenticationService;
 
+  //TODO: Remove this method
   public static void callCreatePolicy()
   {
     policyService.createPolicy(new JsonObject(),null).onComplete(handler -> {

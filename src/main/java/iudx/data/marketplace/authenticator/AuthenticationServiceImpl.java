@@ -39,41 +39,6 @@ public class AuthenticationServiceImpl implements AuthenticationService {
     this.apis = apis;
   }
 
-//  @Override
-//  public AuthenticationService tokenIntrospect(
-//      JsonObject request, JsonObject authenticationInfo, Handler<AsyncResult<JsonObject>> handler) {
-//    String endPoint = authenticationInfo.getString(API_ENDPOINT);
-//    String token = authenticationInfo.getString(TOKEN);
-//    String method = authenticationInfo.getString(METHOD);
-//
-//    Future<JwtData> jwtDecodeFuture = decodeJwt(token);
-//
-//    ResultContainer result = new ResultContainer();
-//
-//    jwtDecodeFuture
-//        .compose(
-//            decodeHandler -> {
-//              result.jwtData = decodeHandler;
-//              return isValidAudienceValue(result.jwtData);
-//            })
-//        .compose(
-//            audienceHandler -> {
-//              return isValidEndpoint(endPoint);
-//            })
-//        .compose(
-//            validEndpointHandler -> {
-//              return validateAccess(result.jwtData, authenticationInfo);
-//            })
-//        .onComplete(
-//            completeHandler -> {
-//              if (completeHandler.succeeded()) {
-//                handler.handle(Future.succeededFuture(completeHandler.result()));
-//              } else {
-//                handler.handle(Future.failedFuture(completeHandler.cause().getMessage()));
-//              }
-//            });
-//    return this;
-//  }
   @Override
   public AuthenticationService tokenIntrospect(JsonObject request, JsonObject authenticationInfo, Handler<AsyncResult<JsonObject>> handler) {
     String token = authenticationInfo.getString(TOKEN);
@@ -90,7 +55,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
             .onSuccess(successHandler -> handler.handle(Future.succeededFuture(successHandler)))
             .onFailure(
                     failureHandler -> {
-                      LOGGER.error("error : " + failureHandler.getMessage());
+                      LOGGER.error("error : " + failureHandler.getCause());
                       handler.handle(Future.failedFuture(failureHandler.getMessage()));
                     });
     return this;
@@ -102,7 +67,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
     String api = authInfo.getString(API_ENDPOINT);
     AuthorizationRequest authRequest = new AuthorizationRequest(method, api);
 
-    // converts the delegate user to consumer or provider
+    // converts the delegate user role to consumer or provider
     IudxRole role = IudxRole.fromRole(jwtData);
 
     AuthorizationStatergy authStrategy = AuthorizationContextFactory.create(role, apis);
@@ -217,59 +182,5 @@ public class AuthenticationServiceImpl implements AuthenticationService {
     return promise.future();
   }
 
-//  Future<Boolean> isValidEndpoint(String endPoint) {
-//    Promise<Boolean> promise = Promise.promise();
-//
-//    LOGGER.debug("Endpoint in JWT is : " + endPoint);
-//
-//    if (Api.fromEndpoint(endPoint) != null) {
-//      promise.complete(true);
-//    } else {
-//      LOGGER.error("Incorrect endpoint in jwt");
-//      promise.fail("Incorrect endpoint in jwt");
-//    }
-//    return promise.future();
-//  }
 
-//  public Future<JsonObject> validateAccess(JwtData jwtData, JsonObject authenticationInfo) {
-//    LOGGER.trace("validateAccess() started");
-//    Promise<JsonObject> promise = Promise.promise();
-//
-//    Method method = Method.valueOf(authenticationInfo.getString(METHOD));
-//    Api api = Api.fromEndpoint(authenticationInfo.getString(API_ENDPOINT));
-//
-//    AuthorizationRequest authRequest = new AuthorizationRequest(method, api);
-//
-//    AuthorizationStatergy authStrategy = AuthorizationContextFactory.create(jwtData.getRole());
-//    LOGGER.debug("strategy: " + authStrategy.getClass().getSimpleName());
-//
-//    JwtAuthorization jwtAuthStrategy = new JwtAuthorization(authStrategy);
-//    LOGGER.debug("endpoint: " + authenticationInfo.getString(API_ENDPOINT));
-//
-//    if (jwtAuthStrategy.isAuthorized(authRequest, jwtData)) {
-//      LOGGER.debug("User access is allowed");
-//      JsonObject response = new JsonObject();
-//
-//      response.put(USER_ROLE, jwtData.getRole()).put(USER_ID, jwtData.getSub());
-//      if (jwtData.getRole().equalsIgnoreCase(ADMIN)) {
-//        response.put(IID, "admin");
-//      } else {
-//        if (jwtData.getIid().contains("/")) {
-//          response.put(
-//              IID,
-//              (jwtData.getIid().split(":")[1]).split("/")[0]
-//                  + "/"
-//                  + (jwtData.getIid().split(":")[1]).split("/")[1]);
-//        } else {
-//          response.put(IID, (jwtData.getIid().split(":")[1]));
-//        }
-//      }
-//      promise.complete(response);
-//    } else {
-//      LOGGER.error("user access denied");
-//      JsonObject result = new JsonObject().put("401", "no access provided to endpoint");
-//      promise.fail(result.toString());
-//    }
-//    return promise.future();
-//  }
 }

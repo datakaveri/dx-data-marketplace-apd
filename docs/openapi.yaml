@@ -814,17 +814,13 @@ paths:
                 type: string
               description: application/json
         '401':
-          description: 'Unauthorized - `token` invalid/expired'
+          description: |-
+            Unauthorized
+              - `token` invalid/expired
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/errorResponseWithObjects'
-                examples:
-                  Unauthorized:
-                    value:
-                      type: 'urn:dx:cat:InvalidAuthorizationToken'
-                      title: Token is invalid
-                      detail: failed
+                $ref: '#/components/schemas/Unauthorized'
           headers:
             Content-Type:
               schema:

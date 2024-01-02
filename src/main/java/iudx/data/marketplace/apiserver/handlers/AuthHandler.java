@@ -103,6 +103,7 @@ public class AuthHandler implements Handler<RoutingContext> {
                 context.next();
               })
               .onFailure(failureHandler -> {
+                failureHandler.printStackTrace();
                 LOGGER.error("User verification failure : {}", failureHandler.getMessage());
                 processAuthFailure(context, failureHandler.getMessage());
               });
@@ -148,11 +149,12 @@ public class AuthHandler implements Handler<RoutingContext> {
                 JsonObject userInfo = info.getJsonObject(0);
                 LOGGER.info("User found in Database");
                 JsonObject userJson = new JsonObject()
-                        .put(USERID, userInfo.getJsonObject("_id"))
-                        .put(EMAIL_ID, userInfo.getJsonObject("email_id"))
-                        .put(FIRST_NAME, userInfo.getJsonObject("first_name"))
-                        .put(LAST_NAME, userInfo.getJsonObject("last_name"))
-                        .put(RS_SERVER_URL, tokenIntrospectResult.getString("aud"));
+                        .put(USERID, tokenIntrospectResult.getString(USERID))
+                        .put(USER_ROLE, tokenIntrospectResult.getString(ROLE))
+                        .put(EMAIL_ID, userInfo.getString("email_id"))
+                        .put(FIRST_NAME, userInfo.getString("first_name"))
+                        .put(LAST_NAME, userInfo.getString("last_name"))
+                        .put(RS_SERVER_URL, tokenIntrospectResult.getString(AUD));
                 User user = new User(userJson);
                 promise.complete(user);
               }

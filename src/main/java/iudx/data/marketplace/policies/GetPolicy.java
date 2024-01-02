@@ -2,22 +2,17 @@ package iudx.data.marketplace.policies;
 
 import io.vertx.core.Future;
 import io.vertx.core.Promise;
+import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
-import io.vertx.pgclient.PgPool;
-import io.vertx.sqlclient.Row;
 import io.vertx.sqlclient.Tuple;
 import iudx.data.marketplace.apiserver.util.Role;
 
 import iudx.data.marketplace.common.HttpStatusCode;
 import iudx.data.marketplace.common.ResponseUrn;
-import iudx.data.marketplace.postgres.PostgresService;
 import iudx.data.marketplace.postgres.PostgresServiceImpl;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.List;
-import java.util.stream.Collector;
-import java.util.stream.Collectors;
 
 import static iudx.data.marketplace.apiserver.util.Constants.*;
 import static iudx.data.marketplace.common.HttpStatusCode.BAD_REQUEST;
@@ -79,7 +74,7 @@ public class GetPolicy {
                     .put("lastName", provider.getLastName()))
             .put("id", provider.getUserId());
     JsonObject providerInfo = new JsonObject().put("provider", jsonObject);
-    postgresService.executeGetPolicy(tuple, query, providerInfo, Role.PROVIDER, this)
+    this.executeGetPolicy(tuple, query, providerInfo, Role.PROVIDER)
         .onComplete(
             handler -> {
               if (handler.succeeded()) {
@@ -107,7 +102,8 @@ public class GetPolicy {
     String emailId = consumer.getEmailId();
     String resourceServerUrl = consumer.getResourceServerUrl();
     LOG.trace(consumer.toString());
-    Tuple tuple = Tuple.of(emailId, resourceServerUrl);
+    // TODO: remove consumer@gmail.com with the actual emailId
+    Tuple tuple = Tuple.of("consumer@gmail.com", resourceServerUrl);
     JsonObject jsonObject =
         new JsonObject()
             .put("email", consumer.getEmailId())
@@ -119,7 +115,7 @@ public class GetPolicy {
             .put("id", consumer.getUserId());
     JsonObject consumerInfo = new JsonObject().put("consumer", jsonObject);
 
-    postgresService.executeGetPolicy(tuple, query, consumerInfo, Role.CONSUMER, this)
+    this.executeGetPolicy(tuple, query, consumerInfo, Role.CONSUMER)
         .onComplete(
             handler -> {
               if (handler.succeeded()) {
@@ -133,65 +129,62 @@ public class GetPolicy {
     return promise.future();
   }
 
-//  /**
-//   * Executes the respective queries by using the vertx PgPool instance
-//   *
-//   * @param tuple Exchangeable values of query in the form of Vertx Tuple
-//   * @param query String query to be executed
-//   * @param information Information to be added in the response
-//   * @return the response as Future JsonObject type
-//   */
-//  private Future<JsonObject> executeGetPolicy(
-//      Tuple tuple, String query, JsonObject information, Role role) {
-//    Promise<JsonObject> promise = Promise.promise();
-//    Collector<Row, ?, List<JsonObject>> rowListCollector =
-//        Collectors.mapping(row -> row.toJson(), Collectors.toList());
-//    pool = postgresService.getPool();
-//    pool.withConnection(
-//            sqlConnection ->
-//                sqlConnection
-//                    .preparedQuery(query)
-//                    .collecting(rowListCollector)
-//                    .execute(tuple)
-//                    .map(rows -> rows.value()))
-//        .onComplete(
-//            handler -> {
-//              if (handler.succeeded()) {
-//                if (handler.result().size() > 0) {
-//                  for (JsonObject jsonObject : handler.result()) {
-//                    jsonObject.mergeIn(information).mergeIn(getInformation(jsonObject, role));
-//                  }
-//                  JsonObject result =
-//                      new JsonObject()
-//                          .put(TYPE, ResponseUrn.SUCCESS_URN.getUrn())
-//                          .put(TITLE, ResponseUrn.SUCCESS_URN.getMessage())
-//                          .put(RESULT, handler.result());
-//
-//                  promise.complete(
-//                      new JsonObject()
-//                          .put(RESULT, result)
-//                          .put(STATUS_CODE, HttpStatusCode.SUCCESS.getValue()));
-//                } else {
-//                  JsonObject response =
-//                      new JsonObject()
-//                          .put(TYPE, HttpStatusCode.NOT_FOUND.getValue())
-//                          .put(TITLE, ResponseUrn.RESOURCE_NOT_FOUND_URN.getUrn())
-//                          .put(DETAIL, "Policy not found");
-//                  LOG.error("No policy found!");
-//                  promise.fail(response.encode());
-//                }
-//              } else {
-//                JsonObject response =
-//                    new JsonObject()
-//                        .put(TYPE, HttpStatusCode.INTERNAL_SERVER_ERROR.getValue())
-//                        .put(TITLE, ResponseUrn.DB_ERROR_URN.getUrn())
-//                        .put(DETAIL, FAILURE_MESSAGE + ", Failure while executing query");
-//                promise.fail(response.encode());
-//                LOG.error("Error response : {}", handler.cause().getMessage());
-//              }
-//            });
-//    return promise.future();
-//  }
+  /**
+   * Executes the respective queries by using the vertx PgPool instance
+   *
+   * @param tuple Exchangeable values of query in the form of Vertx Tuple
+   * @param query String query to be executed
+   * @param information Information to be added in the response
+   * @return the response as Future JsonObject type
+   */
+  private Future<JsonObject> executeGetPolicy(
+      Tuple tuple, String query, JsonObject information, Role role) {
+    Promise<JsonObject> promise = Promise.promise();
+    postgresService
+        .executePreparedQuery(query, tuple)
+        .onSuccess(
+            handler -> {
+              JsonArray rows = handler.getJsonArray(RESULTS);
+              boolean isResultFromDbEmpty = rows.isEmpty();
+              if (!isResultFromDbEmpty) {
+                rows.forEach(
+                    row -> {
+                      JsonObject jsonObject = JsonObject.mapFrom(row);
+                      jsonObject.mergeIn(information).mergeIn(getInformation(jsonObject, role));
+                    });
+
+                JsonObject response =
+                    new JsonObject()
+                        .put(TYPE, ResponseUrn.SUCCESS_URN.getUrn())
+                        .put(TITLE, ResponseUrn.SUCCESS_URN.getMessage())
+                        .put(RESULT, rows);
+                promise.complete(
+                    new JsonObject()
+                        .put(RESULT, response)
+                        .put(STATUS_CODE, HttpStatusCode.SUCCESS.getValue()));
+              } else {
+                JsonObject response =
+                    new JsonObject()
+                        .put(TYPE, HttpStatusCode.NOT_FOUND.getValue())
+                        .put(TITLE, ResponseUrn.RESOURCE_NOT_FOUND_URN.getUrn())
+                        .put(DETAIL, "Policy Not found");
+                LOG.error("No policy found!");
+                promise.fail(response.encode());
+              }
+            })
+        .onFailure(
+            failure -> {
+              LOG.error("Failed : " + failure);
+              JsonObject failureMessage =
+                  new JsonObject()
+                      .put(TYPE, HttpStatusCode.INTERNAL_SERVER_ERROR.getValue())
+                      .put(TITLE, ResponseUrn.DB_ERROR_URN.getUrn())
+                      .put(DETAIL, FAILURE_MESSAGE + ", Failure while executing query");
+              promise.fail(failureMessage.encode());
+            });
+
+    return promise.future();
+  }
 
   public JsonObject getInformation(JsonObject jsonObject, Role role) {
     if (role.equals(Role.CONSUMER)) {

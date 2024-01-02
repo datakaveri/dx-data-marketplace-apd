@@ -49,8 +49,8 @@ public class Constants {
           + "ON P.provider_id = U._id \n"
           + "INNER JOIN resource_entity AS RE\n"
           + "ON RE._id = P.resource_id\n"
-          + "AND P.consumer_email_id = '$1' \n"
-          + "AND RE.resource_server_url = '$2';";
+          + "AND P.consumer_email_id = $1  \n"
+          + "AND RE.resource_server_url = $2;";
     public static final String DELETE_POLICY_QUERY =
             "UPDATE policy SET status='DELETED' "
                     + "WHERE _id = $1::uuid AND expiry_at > NOW() RETURNING _id";

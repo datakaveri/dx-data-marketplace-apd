@@ -103,7 +103,16 @@ public class CreatePolicy {
                 "resource_capabilities, price, validity, status)" +
                 " VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10);";
 
-
+        /* purchase related info */
+        UUID purchaseId = UUID.randomUUID();
+        String paymentStatus = "SUCCEEDED";
+        LocalDateTime paymentTime = LocalDateTime.now();
+        int expiry = 4;
+        JsonObject productVariant = new JsonObject().put("someKey", "someValue");
+        Tuple purchaseTuple = Tuple.of(purchaseId, consumerId, productId, paymentStatus, paymentTime, expiry,productVariant);
+        String insertPurchase = "INSERT INTO PURCHASE (_id, consumer_id, product_id, payment_status, " +
+                "payment_time, expiry, " +
+                "product_variant) VALUES ($1, $2, $3, $4,$5, $6, $7);";
 
 
     /* policy related information */
@@ -115,16 +124,6 @@ public class CreatePolicy {
     String insertPolicy = "INSERT INTO POLICY (_id, resource_id, constraints, provider_id, consumer_email_id, expiry_at, status, product_variant_id)" +
             " VALUES ($1, $2, $3, $4, $5, $6, $7, $8)";
 
-    /* purchase related info */
-        UUID purchaseId = UUID.randomUUID();
-        String paymentStatus = "SUCCEEDED";
-        LocalDateTime paymentTime = LocalDateTime.now();
-        int expiry = 4;
-        JsonObject productVariant = new JsonObject().put("someKey", "someValue");
-        Tuple purchaseTuple = Tuple.of(purchaseId, consumerId, productId, paymentStatus, paymentTime, expiry,productVariant);
-        String insertPurchase = "INSERT INTO PURCHASE (_id, consumer_id, product_id, payment_status, " +
-                "payment_time, expiry, " +
-                "product_variant) VALUES ($1, $2, $3, $4,$5, $6, $7);";
 
 
 
@@ -155,19 +154,17 @@ public class CreatePolicy {
         return insertQueries(productVariantInsertion, productVariantTuple, "product variant insertion ");
     });
 
-    var policyInsertion =
-            pvInsertion.compose(
+    var purchaseInsertion =
+        pvInsertion.compose(
             productVariantInsertedSuccessfully -> {
-              return insertQueries(insertPolicy, policyTuple, "policy insertion ");
+              return insertQueries(insertPurchase, purchaseTuple, "purchase insertion");
             });
 
-//        var purchaseInsertion =
-//                policyInsertion.compose(
-//                        policyInsertedSuccessfully -> {
-//                            return insertQueries(insertPurchase, purchaseTuple, "purchase insertion");
-//                        }
-//                );
-
+    var policyInsertion =
+        purchaseInsertion.compose(
+            purchaseDoneSuccessfully -> {
+              return insertQueries(insertPolicy, policyTuple, "policy insertion ");
+            });
         policyInsertion.onComplete(
         handler -> {
           if (handler.succeeded()) {
