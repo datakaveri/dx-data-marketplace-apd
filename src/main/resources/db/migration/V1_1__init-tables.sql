@@ -62,6 +62,7 @@ CREATE TABLE IF NOT EXISTS policy
 (
     _id uuid DEFAULT uuid_generate_v4 () NOT NULL,
     resource_id uuid NOT NULL,
+    purchase_id uuid NOT NULL,
     constraints json NOT NULL,
     provider_id uuid NOT NULL,
     consumer_email_id varchar NOT NULL,
@@ -73,7 +74,8 @@ CREATE TABLE IF NOT EXISTS policy
     modified_at timestamp without time zone NOT NULL,
     CONSTRAINT resource_id_fk FOREIGN KEY(resource_id) REFERENCES resource_entity(_id),
     CONSTRAINT provider_id_fk FOREIGN KEY (provider_id) REFERENCES user_table (_id),
-    CONSTRAINT policy_product_variant_id_fkey FOREIGN KEY (product_variant_id) REFERENCES product_variant (_id)
+    CONSTRAINT policy_product_variant_id_fkey FOREIGN KEY (product_variant_id) REFERENCES product_variant (_id),
+    CONSTRAINT policy_purchase_id_fkey FOREIGN KEY (purchase_id) REFERENCES purchase (_id)
 );
 
 

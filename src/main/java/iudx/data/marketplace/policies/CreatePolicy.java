@@ -95,7 +95,6 @@ public class CreatePolicy {
         String price = "10$";
         int validity = 10;
         String productVariantStatus = "ACTIVE";
-        LOGGER.info("RESOURCE Name : " + resourceName);
         Tuple productVariantTuple = Tuple.of(pvId, productVariantName, productId, providerId,
                 resourceNames, resourceIds, constraint, price, validity, productVariantStatus);
         String productVariantInsertion = "INSERT INTO public.product_variant(" +
@@ -109,8 +108,8 @@ public class CreatePolicy {
         LocalDateTime paymentTime = LocalDateTime.now();
         int expiry = 4;
         JsonObject productVariant = new JsonObject().put("someKey", "someValue");
-        Tuple purchaseTuple = Tuple.of(purchaseId, consumerId, productId, paymentStatus, paymentTime, expiry,productVariant);
-        String insertPurchase = "INSERT INTO PURCHASE (_id, consumer_id, product_id, payment_status, " +
+        Tuple purchaseTuple = Tuple.of(purchaseId, consumerId, pvId, paymentStatus, paymentTime, expiry,productVariant);
+        String insertPurchase = "INSERT INTO PURCHASE (_id, consumer_id, product_variant_id, payment_status, " +
                 "payment_time, expiry, " +
                 "product_variant) VALUES ($1, $2, $3, $4,$5, $6, $7);";
 
@@ -120,9 +119,9 @@ public class CreatePolicy {
     JsonObject constraints = new JsonObject().put("access", "file");
     LocalDateTime expiry_at = LocalDateTime.of(2025,4, 4, 4, 5,6);
     String policyStatus = "ACTIVE";
-    Tuple policyTuple = Tuple.of(policyId, resourceId, constraints, providerId,consumerEmailId, expiry_at, policyStatus, pvId);
-    String insertPolicy = "INSERT INTO POLICY (_id, resource_id, constraints, provider_id, consumer_email_id, expiry_at, status, product_variant_id)" +
-            " VALUES ($1, $2, $3, $4, $5, $6, $7, $8)";
+    Tuple policyTuple = Tuple.of(policyId, resourceId, purchaseId, constraints, providerId,consumerEmailId, expiry_at, policyStatus, pvId);
+    String insertPolicy = "INSERT INTO POLICY (_id, resource_id, purchase_id,  constraints, provider_id, consumer_email_id, expiry_at, status, product_variant_id)" +
+            " VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)";
 
 
 

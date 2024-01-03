@@ -144,20 +144,19 @@ public class GetPolicy {
         .executePreparedQuery(query, tuple)
         .onSuccess(
             handler -> {
-              JsonArray rows = handler.getJsonArray(RESULTS);
-              boolean isResultFromDbEmpty = rows.isEmpty();
+              boolean isResultFromDbEmpty = handler.getJsonArray(RESULTS).isEmpty();
               if (!isResultFromDbEmpty) {
-                rows.forEach(
-                    row -> {
-                      JsonObject jsonObject = JsonObject.mapFrom(row);
-                      jsonObject.mergeIn(information).mergeIn(getInformation(jsonObject, role));
-                    });
+                for(int i = 0; i < handler.getJsonArray(RESULTS).size() ; i++)
+                {
+                  JsonObject jsonObject = handler.getJsonArray(RESULTS).getJsonObject(i);
+                  jsonObject.mergeIn(information).mergeIn(getInformation(jsonObject, role));
+                }
 
                 JsonObject response =
                     new JsonObject()
                         .put(TYPE, ResponseUrn.SUCCESS_URN.getUrn())
                         .put(TITLE, ResponseUrn.SUCCESS_URN.getMessage())
-                        .put(RESULT, rows);
+                        .put(RESULT, handler.getJsonArray(RESULTS));
                 promise.complete(
                     new JsonObject()
                         .put(RESULT, response)

@@ -20,6 +20,7 @@ public class Constants {
   public static final String GET_POLICY_4_PROVIDER_QUERY =
       "SELECT P._id AS \"policyId\", P.resource_id AS \"resourceId\",\n"
           + "RE.resource_server_url AS \"resourceServerUrl\",\n"
+          + "P.purchase_id AS \"purchaseId\",\n"
           + "RE.resource_name AS \"resourceName\",\n"
           + "P.product_variant_id AS \"productVariantId\",\n"
           + "RE.accesspolicy AS \"accessPolicy\",\n"
@@ -37,6 +38,7 @@ public class Constants {
   public static final String GET_POLICY_4_CONSUMER_QUERY =
       "SELECT P._id AS \"policyId\", P.resource_id AS \"resourceId\",\n"
           + "RE.resource_server_url AS \"resourceServerUrl\",\n"
+          + "P.purchase_id AS \"purchaseId\",\n"
           + "RE.resource_name AS \"resourceName\",\n"
           + "P.product_variant_id AS \"productVariantId\",\n"
           + "RE.accesspolicy AS \"accessPolicy\",\n"

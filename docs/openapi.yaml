@@ -1147,25 +1147,42 @@ components:
                 type: string
               constraints:
                 type: object
-      example: { "type": "urn:dx:dmp:success",
-                 "title": "Success",
-                 "results": [ { "policyId": "aaaaaaaa-1234-1234-1234-1234aaaa1234",
-                                "itemId": "cccccccc-4576-3455-5645-3565aaaa4255",
-                                "accessPolicy": "SECURE",
-                                "resourceName": "Surat itms",
-                                "productVariantId": "ddddddd-1234-1234-1234-1234aaaa1234",
-                                "resourceServerUrl": "dummy.resource.server.url",
-                                "expiryAt": "2024-03-05T20:00:19",
-                                "constraints": { access: [ sub ] },
-                                "status": "ACTIVE",
-                                "consumer": { "email": "dummyConsumer@example.com",
-                                              "name": { "firstName": "Some",
-                                                        "lastName": "Consumer" },
-                                              "id": "gklmcd4-4576-3455-5645-3565aaaa4255" },
-                                "provider": { "email": "someProvider@example.com",
-                                              "name": { "firstName": "Some",
-                                                        "lastName": "Provider" },
-                                              "id": "abcdcd4-4576-3455-5645-3565aaaa4255" } } ] }
+      example: {
+        "type": "urn:dx:dmp:success",
+        "title": "Success",
+        "results": [
+          {
+            "policyId": "c0ad9c9e-cdb3-4f08-bb35-7843ee8f8092",
+            "resourceId": "e81fdfb3-695e-4f1e-8458-ecdb2ca813e5",
+            "resourceServerUrl": "rs.iudx.io",
+            "purchaseId": "6eb2428f-6b6f-4b84-a4ef-08d16c312283",
+            "resourceName": "surat-itms",
+            "productVariantId": "c5c32d00-8edf-418e-9f60-953b76887814",
+            "accessPolicy": "SECURE",
+            "status": "ACTIVE",
+            "expiryAt": "2025-04-04T04:05:06",
+            "constraints": {
+              "access": "file"
+            },
+            "consumer": {
+              "email": "vasanth.rajaraman@datakaveri.org",
+              "name": {
+                "firstName": "Vasanth",
+                "lastName": "Rajaraman"
+              },
+              "id": "fd47486b-3497-4248-ac1e-082e4d37a66c"
+            },
+            "provider": {
+              "email": "provider@gmail.com",
+              "name": {
+                "firstName": "Bob",
+                "lastName": "Provider"
+              },
+              "id": "47a77164-15c8-4311-be69-b4c27be570dd"
+            }
+          }
+        ]
+      }
 
     exampleProductPostBody:
       type: object
