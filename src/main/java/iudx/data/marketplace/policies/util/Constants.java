@@ -55,8 +55,8 @@ public class Constants {
             "UPDATE policy SET status='DELETED' "
                     + "WHERE _id = $1::uuid AND expiry_at > NOW() RETURNING _id";
     public static final String CHECK_IF_POLICY_PRESENT_QUERY =
-            "SELECT p.owner_id, p.status, r.resource_server_url"
+            "SELECT p.provider_id, p.status, r.resource_server_url"
                     + " FROM policy p"
-                    + " INNER JOIN resource_entity r ON p.item_id = r._id"
+                    + " INNER JOIN resource_entity r ON p.resource_id = r._id"
                     + " WHERE p._id = $1;";
 }

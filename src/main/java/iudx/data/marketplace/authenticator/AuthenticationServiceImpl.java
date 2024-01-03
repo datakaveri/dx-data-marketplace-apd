@@ -84,8 +84,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
       promise.complete(jsonResponse);
     } else {
       LOGGER.info("Failed in authorization check.");
-      JsonObject result = new JsonObject().put("401", "no access provided to endpoint");
-      promise.fail(result.toString());
+      promise.fail("No access provided to endpoint");
     }
     return promise.future();
   }

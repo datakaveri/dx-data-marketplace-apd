@@ -113,7 +113,7 @@ CREATE TABLE IF NOT EXISTS purchase
 (
     _id uuid DEFAULT uuid_generate_v4 () NOT NULL,
     consumer_id uuid NOT NULL,
-    product_id uuid NOT NULL,
+    product_variant_id uuid NOT NULL,
     payment_status payment_status_type NOT NULL,
     payment_time timestamp without time zone NOT NULL,
     expiry numeric NOT NULL,
@@ -123,8 +123,9 @@ CREATE TABLE IF NOT EXISTS purchase
     CONSTRAINT purchase_id_pk PRIMARY KEY (_id),
     CONSTRAINT consumer_id_fk FOREIGN KEY (consumer_id)
     REFERENCES user_table (_id),
-    CONSTRAINT product_id_fk FOREIGN KEY (product_id)
-    REFERENCES product (product_id)
+    CONSTRAINT purchase_product_variant_id_fkey FOREIGN KEY (product_variant_id)
+    REFERENCES product_variant (_id)
+
 );
 
 
