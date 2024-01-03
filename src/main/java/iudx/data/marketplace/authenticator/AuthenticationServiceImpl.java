@@ -30,7 +30,6 @@ public class AuthenticationServiceImpl implements AuthenticationService {
   final String apdUrl;
   final String issuer;
   final Api apis;
-  // TODO: Update the client credentials and APD url
   public AuthenticationServiceImpl(Vertx vertx, final JWTAuth jwtAuth, final JsonObject config, final Api apis) {
     this.jwtAuth = jwtAuth;
     this.issuer = config.getString("issuer");
