@@ -23,8 +23,6 @@ public class DeployerDev {
 
   public static void recursiveDeploy(Vertx vertx, JsonObject configs, int i) {
     if (i >= configs.getJsonArray("modules").size()) {
-      //TODO: Remove this method
-      ApiServerVerticle.callCreatePolicy();
       LOGGER.info("Deployed all");
       return;
     }

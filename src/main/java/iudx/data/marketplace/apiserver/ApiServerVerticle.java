@@ -50,7 +50,7 @@ import static iudx.data.marketplace.common.HttpStatusCode.BAD_REQUEST;
 public class ApiServerVerticle extends AbstractVerticle {
 
   private static final Logger LOGGER = LogManager.getLogger(ApiServerVerticle.class);
-  private static PolicyService policyService;
+  private PolicyService policyService;
   private HttpServer server;
   private Router router;
   private String detail;
@@ -65,22 +65,6 @@ public class ApiServerVerticle extends AbstractVerticle {
   private WebClientOptions webClientOptions;
   private AuthenticationService authenticationService;
 
-  //TODO: Remove this method
-  public static void callCreatePolicy()
-  {
-    policyService.createPolicy(new JsonObject(),null).onComplete(handler -> {
-      if(handler.succeeded())
-      {
-        LOGGER.info("Insertion Success");
-//        LOGGER.debug(handler.result().encodePrettily());
-      }
-      else
-      {
-        handler.cause().printStackTrace();
-        LOGGER.error("Failure : " + handler.cause().getMessage());
-      }
-    });
-  }
 
   /**
    * This method is used to start the Verticle. It deploys a verticle in a cluster, reads the
@@ -229,6 +213,10 @@ public class ApiServerVerticle extends AbstractVerticle {
             .handler(AuthHandler.create(authenticationService, vertx, api, pgServiceImpl,authClient))
             .handler(this::getPoliciesHandler)
             .failureHandler(exceptionHandler);
+    router
+            .get(api.getPoliciesUrl())
+            .handler(this::createPolicy)
+            .failureHandler(exceptionHandler);
 
     router
             .delete(api.getPoliciesUrl())
@@ -270,6 +258,20 @@ public class ApiServerVerticle extends AbstractVerticle {
     printDeployedEndpoints(router);
     /* Print the deployed endpoints */
     LOGGER.info("API server deployed on: " + port);
+  }
+
+  private void createPolicy(RoutingContext routingContext) {
+    policyService.createPolicy(new JsonObject(),null).onComplete(handler -> {
+      if(handler.succeeded())
+      {
+        LOGGER.info("Insertion Success");
+      }
+      else
+      {
+        handler.cause().printStackTrace();
+        LOGGER.error("Failure : " + handler.cause().getMessage());
+      }
+    });
   }
 
   private void printDeployedEndpoints(Router router) {
