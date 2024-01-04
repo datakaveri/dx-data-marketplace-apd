@@ -214,7 +214,7 @@ public class ApiServerVerticle extends AbstractVerticle {
             .handler(this::getPoliciesHandler)
             .failureHandler(exceptionHandler);
     router
-            .get(api.getPoliciesUrl())
+            .post(api.getPoliciesUrl())
             .handler(this::createPolicy)
             .failureHandler(exceptionHandler);
 
