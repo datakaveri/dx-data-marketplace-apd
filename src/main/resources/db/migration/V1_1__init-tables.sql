@@ -66,7 +66,7 @@ CREATE TABLE IF NOT EXISTS policy
     constraints json NOT NULL,
     provider_id uuid NOT NULL,
     consumer_email_id varchar NOT NULL,
-    expiry_at timestamp without time zone,
+    expiry_at timestamp without time zone NOT NULL,
     status policy_status NOT NULL,
     product_variant_id uuid NOT NULL,
     created_at timestamp without time zone NOT NULL,
