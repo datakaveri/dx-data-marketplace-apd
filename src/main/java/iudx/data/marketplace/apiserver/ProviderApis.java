@@ -20,6 +20,7 @@ import iudx.data.marketplace.authenticator.AuthenticationService;
 import iudx.data.marketplace.common.Api;
 import iudx.data.marketplace.common.RespBuilder;
 import iudx.data.marketplace.common.ResponseUrn;
+import iudx.data.marketplace.policies.User;
 import iudx.data.marketplace.postgres.PostgresService;
 import iudx.data.marketplace.postgres.PostgresServiceImpl;
 import iudx.data.marketplace.product.ProductService;
@@ -120,8 +121,9 @@ public class ProviderApis {
     JsonObject requestBody = routingContext.body().asJsonObject();
     JsonObject authInfo = (JsonObject) routingContext.data().get(AUTH_INFO);
     requestBody.put(AUTH_INFO, authInfo);
-
+    User user = routingContext.get("user");
     productService.createProduct(
+            user,
         requestBody,
         handler -> {
           if (handler.succeeded()) {
@@ -146,8 +148,9 @@ public class ProviderApis {
     JsonObject requestBody = new JsonObject().put(PRODUCT_ID, request.getParam(PRODUCT_ID));
     JsonObject authInfo = (JsonObject) routingContext.data().get(AUTH_INFO);
     requestBody.put(AUTH_INFO, authInfo);
-
+    User user = routingContext.get("user");
     productService.deleteProduct(
+            user,
         requestBody,
         handler -> {
           if (handler.succeeded()) {
@@ -170,7 +173,7 @@ public class ProviderApis {
   private void listProducts(RoutingContext routingContext) {
     HttpServerRequest request = routingContext.request();
     JsonObject requestBody = new JsonObject();
-
+    User user = routingContext.get("user");
     for (Map.Entry<String, String> param : request.params()) {
       requestBody.put(param.getKey(), param.getValue());
     }
@@ -178,6 +181,7 @@ public class ProviderApis {
     requestBody.put(AUTH_INFO, authInfo);
 
     productService.listProducts(
+            user,
         requestBody,
         handler -> {
           if (handler.succeeded()) {
@@ -208,8 +212,10 @@ public class ProviderApis {
     JsonObject requestBody = routingContext.body().asJsonObject();
     JsonObject authInfo = (JsonObject) routingContext.data().get(AUTH_INFO);
     requestBody.put(AUTH_INFO, authInfo);
+    User user = routingContext.get("user");
 
     variantService.createProductVariant(
+            user,
         requestBody,
         handler -> {
           if (handler.succeeded()) {
@@ -234,8 +240,10 @@ public class ProviderApis {
     JsonObject requestBody = routingContext.body().asJsonObject();
     JsonObject authInfo = (JsonObject) routingContext.data().get(AUTH_INFO);
     requestBody.put(AUTH_INFO, authInfo);
+    User user = routingContext.get("user");
 
     variantService.updateProductVariant(
+            user,
         requestBody,
         handler -> {
           if (handler.succeeded()) {
@@ -256,8 +264,10 @@ public class ProviderApis {
             .put(AUTH_INFO, authInfo)
             .put(PRODUCT_ID, request.getParam(PRODUCT_ID))
             .put(PRODUCT_VARIANT_NAME, request.getParam(PRODUCT_VARIANT_NAME));
+    User user = routingContext.get("user");
 
     variantService.deleteProductVariant(
+            user,
         requestBody,
         handler -> {
           if (handler.succeeded()) {

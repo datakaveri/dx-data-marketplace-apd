@@ -8,6 +8,7 @@ import io.vertx.core.AsyncResult;
 import io.vertx.core.Handler;
 import io.vertx.core.Vertx;
 import io.vertx.core.json.JsonObject;
+import iudx.data.marketplace.policies.User;
 
 @VertxGen @ProxyGen
 public interface ProductService {
@@ -33,7 +34,7 @@ public interface ProductService {
    * @return ProductService which is a service
    */
   @Fluent
-  ProductService createProduct(JsonObject request, Handler<AsyncResult<JsonObject>> handler);
+  ProductService createProduct(User user, JsonObject request, Handler<AsyncResult<JsonObject>> handler);
 
   /**
    * The deleteProduct method implements the soft delete of a product on the IUDX data marketplace.
@@ -43,7 +44,7 @@ public interface ProductService {
    * @return ProductService which is a service
    */
   @Fluent
-  ProductService deleteProduct(JsonObject request, Handler<AsyncResult<JsonObject>> handler);
+  ProductService deleteProduct(User user, JsonObject request, Handler<AsyncResult<JsonObject>> handler);
 
   /**
    * The listProduct method fetches some or all the products available on the IUDX data marketplace
@@ -53,5 +54,5 @@ public interface ProductService {
    * @return ProductService which is a service
    */
   @Fluent
-  ProductService listProducts(JsonObject request, Handler<AsyncResult<JsonObject>> handler);
+  ProductService listProducts(User user, JsonObject request, Handler<AsyncResult<JsonObject>> handler);
 }

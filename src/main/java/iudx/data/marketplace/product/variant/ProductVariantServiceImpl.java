@@ -11,6 +11,7 @@ import io.vertx.core.json.JsonObject;
 import iudx.data.marketplace.apiserver.exceptions.DxRuntimeException;
 import iudx.data.marketplace.common.RespBuilder;
 import iudx.data.marketplace.common.ResponseUrn;
+import iudx.data.marketplace.policies.User;
 import iudx.data.marketplace.postgres.PostgresService;
 import iudx.data.marketplace.product.util.QueryBuilder;
 import org.apache.logging.log4j.LogManager;
@@ -28,7 +29,7 @@ public class ProductVariantServiceImpl implements ProductVariantService {
   }
 
   @Override
-  public ProductVariantService createProductVariant(
+  public ProductVariantService createProductVariant(User user,
       JsonObject request, Handler<AsyncResult<JsonObject>> handler) {
     String productID = request.getString(PRODUCT_ID);
     String variantName = request.getString(VARIANT);
@@ -127,7 +128,7 @@ public class ProductVariantServiceImpl implements ProductVariantService {
   }
 
   @Override
-  public ProductVariantService updateProductVariant(
+  public ProductVariantService updateProductVariant(User user,
       JsonObject request, Handler<AsyncResult<JsonObject>> handler) {
 
     String productID = request.getString(PRODUCT_ID);
@@ -138,6 +139,7 @@ public class ProductVariantServiceImpl implements ProductVariantService {
         updateHandler -> {
           if (updateHandler.result()) {
             createProductVariant(
+                    user,
                 request,
                 insertHandler -> {
                   if (insertHandler.succeeded()) {
@@ -174,7 +176,7 @@ public class ProductVariantServiceImpl implements ProductVariantService {
   }
 
   @Override
-  public ProductVariantService deleteProductVariant(
+  public ProductVariantService deleteProductVariant(User user,
       JsonObject request, Handler<AsyncResult<JsonObject>> handler) {
     String productID = request.getString(PRODUCT_ID);
     String variant = request.getString(VARIANT);

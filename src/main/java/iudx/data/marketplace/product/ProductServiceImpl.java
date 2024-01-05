@@ -9,6 +9,7 @@ import io.vertx.core.json.JsonObject;
 import iudx.data.marketplace.apiserver.exceptions.DxRuntimeException;
 import iudx.data.marketplace.common.CatalogueService;
 import iudx.data.marketplace.common.ResponseUrn;
+import iudx.data.marketplace.policies.User;
 import iudx.data.marketplace.postgres.PostgresService;
 import iudx.data.marketplace.product.util.QueryBuilder;
 import iudx.data.marketplace.product.util.Status;
@@ -33,9 +34,9 @@ public class ProductServiceImpl implements ProductService {
   }
 
   @Override
-  public ProductService createProduct(
-      JsonObject request, Handler<AsyncResult<JsonObject>> handler) {
-    String providerID = request.getJsonObject(AUTH_INFO).getString(PROVIDER_ID);
+  public ProductService createProduct(User user,
+                                      JsonObject request, Handler<AsyncResult<JsonObject>> handler) {
+    String providerID = user.getUserId();
     String productID =
         URN_PREFIX.concat(providerID).concat(":").concat(request.getString(PRODUCT_ID));
     request.put(PROVIDER_ID, providerID).put(PRODUCT_ID, productID);
@@ -153,7 +154,7 @@ public class ProductServiceImpl implements ProductService {
   }
 
   @Override
-  public ProductService deleteProduct(
+  public ProductService deleteProduct( User user,
       JsonObject request, Handler<AsyncResult<JsonObject>> handler) {
 
     String providerID = request.getJsonObject(AUTH_INFO).getString(PROVIDER_ID);
@@ -186,7 +187,7 @@ public class ProductServiceImpl implements ProductService {
   }
 
   @Override
-  public ProductService listProducts(JsonObject request, Handler<AsyncResult<JsonObject>> handler) {
+  public ProductService listProducts(User user, JsonObject request, Handler<AsyncResult<JsonObject>> handler) {
 
     String providerID = request.getJsonObject(AUTH_INFO).getString(PROVIDER_ID);
     JsonObject params =

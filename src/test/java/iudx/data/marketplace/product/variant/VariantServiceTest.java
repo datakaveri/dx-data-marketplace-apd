@@ -9,6 +9,7 @@ import io.vertx.core.json.JsonObject;
 import io.vertx.junit5.VertxExtension;
 import io.vertx.junit5.VertxTestContext;
 import iudx.data.marketplace.configuration.Configuration;
+import iudx.data.marketplace.policies.User;
 import iudx.data.marketplace.postgres.PostgresService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -36,6 +37,8 @@ public class VariantServiceTest {
   JsonArray jsonArrayMock;
   @Mock
   AsyncResult<JsonObject> asyncResult;
+  @Mock
+  User user;
 
   @BeforeEach
   @DisplayName("setup")
@@ -103,6 +106,7 @@ public class VariantServiceTest {
         .executeQuery(anyString(), any());
 
     variantServiceSpy.createProductVariant(
+            user,
         jsonObjectMock,
         handler -> {
           if (handler.succeeded()) {
@@ -128,12 +132,12 @@ public class VariantServiceTest {
         ((Handler<AsyncResult<JsonObject>>) invocationOnMock.getArgument(1)).handle(asyncResult);
         return null;
       }
-    }).when(variantServiceSpy).createProductVariant(any(),any());
+    }).when(variantServiceSpy).createProductVariant(any(),any(), any());
 
 
-    variantServiceSpy.updateProductVariant(jsonObjectMock, handler -> {
+    variantServiceSpy.updateProductVariant(user, jsonObjectMock, handler -> {
       if(handler.succeeded()) {
-        verify(variantServiceSpy, times(1)).createProductVariant(any(),any());
+        verify(variantServiceSpy, times(1)).createProductVariant(any(),any(), any());
         verify(variantServiceSpy, times(1)).updateProductVariantStatus(anyString(),anyString());
         testContext.completeNow();
       } else {
@@ -148,7 +152,7 @@ public class VariantServiceTest {
 
     doAnswer(Answer -> Future.succeededFuture(true)).when(variantServiceSpy).updateProductVariantStatus(anyString(),anyString());
 
-    variantServiceSpy.deleteProductVariant(jsonObjectMock, handler -> {
+    variantServiceSpy.deleteProductVariant(user, jsonObjectMock, handler -> {
       if(handler.succeeded()) {
         verify(variantServiceSpy, times(1)).updateProductVariantStatus(anyString(),anyString());
         testContext.completeNow();

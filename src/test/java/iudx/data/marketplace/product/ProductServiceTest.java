@@ -10,6 +10,7 @@ import io.vertx.junit5.VertxExtension;
 import io.vertx.junit5.VertxTestContext;
 import iudx.data.marketplace.common.CatalogueService;
 import iudx.data.marketplace.configuration.Configuration;
+import iudx.data.marketplace.policies.User;
 import iudx.data.marketplace.postgres.PostgresService;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.DisplayName;
@@ -36,6 +37,8 @@ public class ProductServiceTest {
   @Mock JsonObject jsonObjectMock;
   @Mock AsyncResult<JsonObject> asyncResult;
   @Mock Future<Boolean> boolFuture;
+  @Mock
+    User user;
 
   @BeforeAll
   public static void setup(Vertx vertx, VertxTestContext testContext) {
@@ -98,6 +101,7 @@ public class ProductServiceTest {
         .executeTransaction(anyList(), any());
 
     productServiceSpy.createProduct(
+            user,
         jsonObjectMock,
         handler -> {
           if (handler.succeeded()) {
@@ -142,6 +146,7 @@ public class ProductServiceTest {
         .executePreparedQuery(anyString(), any(), any());
 
     productServiceImpl.deleteProduct(
+            user,
         request,
         handler -> {
           if (handler.succeeded()) {
@@ -176,6 +181,7 @@ public class ProductServiceTest {
         .executePreparedQuery(anyString(), any(), any());
 
     productServiceImpl.listProducts(
+            user,
         new JsonObject(),
         handler -> {
           if (handler.succeeded()) {

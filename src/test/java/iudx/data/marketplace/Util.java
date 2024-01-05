@@ -4,6 +4,10 @@ import io.vertx.core.Future;
 import io.vertx.core.Promise;
 import io.vertx.core.Vertx;
 import io.vertx.core.json.JsonObject;
+import io.vertx.pgclient.PgConnectOptions;
+import io.vertx.pgclient.PgPool;
+import io.vertx.sqlclient.PoolOptions;
+import io.vertx.sqlclient.Row;
 import io.vertx.sqlclient.Tuple;
 import iudx.data.marketplace.postgres.PostgresService;
 import iudx.data.marketplace.postgres.PostgresServiceImpl;
@@ -13,8 +17,13 @@ import org.slf4j.LoggerFactory;
 import org.testcontainers.containers.PostgreSQLContainer;
 
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Map;
 import java.util.UUID;
+import java.util.stream.Collector;
+import java.util.stream.Collectors;
+
+import static iudx.data.marketplace.apiserver.util.Constants.RESULT;
 
 
 public class Util {
@@ -53,6 +62,9 @@ public class Util {
     private int expiry;
     private JsonObject productVariant;
     private Tuple purchaseTuple;
+    private PgConnectOptions connectOptions;
+    private PoolOptions poolOptions;
+    private PgPool pool;
 
     private PostgresServiceImpl postgresService;
     public static UUID generateRandomUuid() {
@@ -95,10 +107,21 @@ public class Util {
                         .put("databaseSchema", "public")
                         .put("databasePassword", password)
                         .put("poolSize", 25);
+        this.connectOptions =
+                new PgConnectOptions()
+                        .setPort(port)
+                        .setHost(host)
+                        .setDatabase(db)
+                        .setUser(user)
+                        .setPassword(password)
+                        .setReconnectAttempts(2)
+                        .setReconnectInterval(1000L);
 
+        this.poolOptions = new PoolOptions().setMaxSize(25);
         if (container.isRunning()) {
             LOG.info("container is running....");
-            postgresService = new PostgresServiceImpl(postgresConfig,vertx);
+            this.pool = PgPool.pool(vertx, connectOptions, poolOptions);
+            postgresService = new PostgresServiceImpl(pool);
 
             Flyway flyway =
                     Flyway.configure()
@@ -171,18 +194,18 @@ public class Util {
         LOG.info("inside test insert method");
 
         Promise<Boolean> promise = Promise.promise();
-        var consumerInsertion = postgresService.executePreparedQuery(INSERT_INTO_USER_TABLE, consumerTuple);
+        var consumerInsertion = this.executeQuery(consumerTuple, INSERT_INTO_USER_TABLE);
 
         var providerInsertion = consumerInsertion.
-                compose(handler -> postgresService.executePreparedQuery(INSERT_INTO_USER_TABLE, ownerTuple));
+                compose(handler -> this.executeQuery(ownerTuple, INSERT_INTO_USER_TABLE));
         var resourceInsertion = providerInsertion.
-                compose(handler -> postgresService.executePreparedQuery(INSERT_INTO_RESOURCE_ENTITY_TABLE, resourceInsertionTuple));
+                compose(handler -> this.executeQuery(resourceInsertionTuple, INSERT_INTO_RESOURCE_ENTITY_TABLE));
         var productInsertion = resourceInsertion.
-                compose(handler -> postgresService.executePreparedQuery(INSERT_INTO_PRODUCT_TABLE, productTuple));
+                compose(handler -> this.executeQuery(productTuple, INSERT_INTO_PRODUCT_TABLE));
         var policyInsertion = productInsertion
-                .compose(handler -> postgresService.executePreparedQuery(INSERT_INTO_POLICY_TABLE, policyInsertionTuple));
+                .compose(handler -> this.executeQuery(policyInsertionTuple,INSERT_INTO_POLICY_TABLE));
         var purchaseInsertion = policyInsertion
-                .compose(handler -> postgresService.executePreparedQuery(INSERT_INTO_PURCHASE_TABLE, purchaseTuple));
+                .compose(handler -> this.executeQuery(purchaseTuple, INSERT_INTO_PURCHASE_TABLE));
 
         purchaseInsertion.onComplete(handler -> {
             if(handler.succeeded())
@@ -300,5 +323,53 @@ public class Util {
         return postgresService;
     }
 
+    public Future<JsonObject> executeQuery(Tuple tuple, String query) {
+        Promise<JsonObject> promise = Promise.promise();
+        Collector<Row, ?, List<JsonObject>> rowListCollectors =
+                Collectors.mapping(row -> row.toJson(), Collectors.toList());
 
+        pool.withConnection(
+                        sqlConnection ->
+                                sqlConnection
+                                        .preparedQuery(query)
+                                        .collecting(rowListCollectors)
+                                        .execute(tuple)
+                                        .map(rows -> rows.value()))
+                .onSuccess(
+                        successHandler -> {
+                            promise.complete(
+                                    new JsonObject().put(RESULT, "Success").put("response", successHandler));
+                        })
+                .onFailure(
+                        failureHandler -> {
+                            failureHandler.printStackTrace();
+                            promise.fail("Failure due to: " + failureHandler.getCause().getMessage());
+                        });
+        return promise.future();
+    }
+
+    public Future<JsonObject> executeBatchQuery(List<Tuple> tuple, String query) {
+        Promise<JsonObject> promise = Promise.promise();
+        Collector<Row, ?, List<JsonObject>> rowListCollectors =
+                Collectors.mapping(row -> row.toJson(), Collectors.toList());
+
+        pool.withConnection(
+                        sqlConnection ->
+                                sqlConnection
+                                        .preparedQuery(query)
+                                        .collecting(rowListCollectors)
+                                        .executeBatch(tuple)
+                                        .map(rows -> rows.value()))
+                .onSuccess(
+                        successHandler -> {
+                            promise.complete(
+                                    new JsonObject().put(RESULT, "Success").put("response", successHandler));
+                        })
+                .onFailure(
+                        failureHandler -> {
+                            failureHandler.printStackTrace();
+                            promise.fail("Failure due to: " + failureHandler.getCause().getMessage());
+                        });
+        return promise.future();
+    }
 }
