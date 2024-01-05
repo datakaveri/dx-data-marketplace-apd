@@ -293,50 +293,8 @@ public class CreatePolicy {
                     .put(TITLE, "Failure")
                     .encode());
           }
-        }); /*.onSuccess(handler -> {
-                LOGGER.info("Query insertion successfully done : {}", tag);
-                promise.complete(new JsonObject().put(TYPE, ResponseUrn.SUCCESS_URN.getUrn()).put(TITLE, "Success"));
-
-            }).onFailure(failureHandler -> {
-                LOGGER.error("Failure while executing query : {} ", tag);
-                LOGGER.error("Error : {}", failureHandler.getCause().getMessage());
-                promise.fail(new JsonObject().put(TYPE, ResponseUrn.DB_ERROR_URN.getUrn()).put(TITLE, "Failure").encode());
-            });
-            return promise.future();
-            }*/
+        });
     return promise.future();
     }
 
-    public Future<JsonObject> insertQueries(String query, JsonObject params, String tag) {
-        Promise<JsonObject> promise = Promise.promise();
-        postgresService.executePreparedQuery(
-                query,
-                params,
-                pgHandler -> {
-                    if (pgHandler.succeeded()) {
-                        LOGGER.info("Query insertion successfully done : {}", tag);
-                        promise.complete(
-                                new JsonObject().put(TYPE, ResponseUrn.SUCCESS_URN.getUrn()).put(TITLE, "Success"));
-                    } else {
-                        LOGGER.error("Failure while executing query : {} ", tag);
-                        LOGGER.error("Error : {}", pgHandler.cause().getMessage());
-                        promise.fail(
-                                new JsonObject()
-                                        .put(TYPE, ResponseUrn.DB_ERROR_URN.getUrn())
-                                        .put(TITLE, "Failure")
-                                        .encode());
-                    }
-                }); /*.onSuccess(handler -> {
-                LOGGER.info("Query insertion successfully done : {}", tag);
-                promise.complete(new JsonObject().put(TYPE, ResponseUrn.SUCCESS_URN.getUrn()).put(TITLE, "Success"));
-
-            }).onFailure(failureHandler -> {
-                LOGGER.error("Failure while executing query : {} ", tag);
-                LOGGER.error("Error : {}", failureHandler.getCause().getMessage());
-                promise.fail(new JsonObject().put(TYPE, ResponseUrn.DB_ERROR_URN.getUrn()).put(TITLE, "Failure").encode());
-            });
-            return promise.future();
-            }*/
-        return promise.future();
-    }
 }

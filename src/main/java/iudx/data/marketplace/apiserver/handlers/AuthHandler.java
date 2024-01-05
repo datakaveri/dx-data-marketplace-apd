@@ -141,7 +141,6 @@ public class AuthHandler implements Handler<RoutingContext> {
     LOGGER.info("Getting user info..");
     Promise<User> promise = Promise.promise();
     UserContainer userContainer = new UserContainer();
-//    Tuple tuple = Tuple.of(UUID.fromString(tokenIntrospectResult.getString("userId")));
     postgresServiceImpl
             .executeQuery(GET_USER.replace("$1", "'" + UUID.fromString(tokenIntrospectResult.getString("userId")) + "'"), handler -> {
               if(handler.succeeded())
@@ -184,51 +183,11 @@ public class AuthHandler implements Handler<RoutingContext> {
                 promise.fail(handler.cause().getMessage());
               }
             });
-          /*  .onSuccess(handler -> {
-              JsonArray info = handler.getJsonArray(RESULTS);
-              if(!info.isEmpty())
-              {
-                JsonObject userInfo = info.getJsonObject(0);
-                LOGGER.info("User found in Database");
-                JsonObject userJson = new JsonObject()
-                        .put(USERID, tokenIntrospectResult.getString(USERID))
-                        .put(USER_ROLE, tokenIntrospectResult.getString(ROLE))
-                        .put(EMAIL_ID, userInfo.getString("email_id"))
-                        .put(FIRST_NAME, userInfo.getString("first_name"))
-                        .put(LAST_NAME, userInfo.getString("last_name"))
-                        .put(RS_SERVER_URL, tokenIntrospectResult.getString(AUD));
-                User user = new User(userJson);
-                promise.complete(user);
-              }
-              else
-              {
-                LOGGER.info("user not present in DB, getting user information from Auth");
-                Future<User> getUserFromAuth = authClient.fetchUserInfo(tokenIntrospectResult);
-                Future<Void> insertInDb = getUserFromAuth.compose(user -> {
-                  userContainer.user = user;
-                  return insertUserIntoDb(user);
-                });
-
-                insertInDb.onSuccess(successHandler -> {
-                  LOGGER.debug("User successfully inserted in DB");
-                  promise.complete(userContainer.user);
-                }).onFailure(failureHandler -> {
-                  LOGGER.error("Failed to insert user in DB");
-                  promise.fail(failureHandler.getMessage());
-                });
-
-              }
-            }).onFailure(failureHandler -> {
-              LOGGER.error("Fetch user from DB failure : {}", failureHandler.getMessage());
-              promise.fail(failureHandler.getMessage());
-            });*/
-
     return promise.future();
   }
 
   private Future<Void> insertUserIntoDb(User user) {
     Promise<Void> promise = Promise.promise();
-    Tuple tuple = Tuple.of(user.getUserId(), user.getEmailId(), user.getFirstName(), user.getLastName());
     String query = INSERT_USER_TABLE
         .replace("$1", "'" + user.getUserId() + "'")
         .replace("$2", "'" + user.getEmailId() + "'")
@@ -247,13 +206,6 @@ public class AuthHandler implements Handler<RoutingContext> {
                 promise.fail(handler.cause().getMessage());
               }
             });
-/*            .onSuccess(handler -> {
-              LOGGER.debug("User inserted ");
-              promise.complete();
-            }).onFailure(failureHandler -> {
-              LOGGER.debug("Something went wrong while inserting user in DB : {}", failureHandler.getCause().getMessage());
-              promise.fail(failureHandler.getCause().getMessage());
-            });*/
     return promise.future();
 }
 

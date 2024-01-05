@@ -186,45 +186,6 @@ public class GetPolicy {
             promise.fail(failureMessage.encode());
           }
         });
-/*        .onSuccess(
-            handler -> {
-              boolean isResultFromDbEmpty = handler.getJsonArray(RESULTS).isEmpty();
-              if (!isResultFromDbEmpty) {
-                for(int i = 0; i < handler.getJsonArray(RESULTS).size() ; i++)
-                {
-                  JsonObject jsonObject = handler.getJsonArray(RESULTS).getJsonObject(i);
-                  jsonObject.mergeIn(information).mergeIn(getInformation(jsonObject, role));
-                }
-
-                JsonObject response =
-                    new JsonObject()
-                        .put(TYPE, ResponseUrn.SUCCESS_URN.getUrn())
-                        .put(TITLE, ResponseUrn.SUCCESS_URN.getMessage())
-                        .put(RESULT, handler.getJsonArray(RESULTS));
-                promise.complete(
-                    new JsonObject()
-                        .put(RESULT, response)
-                        .put(STATUS_CODE, HttpStatusCode.SUCCESS.getValue()));
-              } else {
-                JsonObject response =
-                    new JsonObject()
-                        .put(TYPE, HttpStatusCode.NOT_FOUND.getValue())
-                        .put(TITLE, ResponseUrn.RESOURCE_NOT_FOUND_URN.getUrn())
-                        .put(DETAIL, "Policy Not found");
-                LOG.error("No policy found!");
-                promise.fail(response.encode());
-              }
-            })
-        .onFailure(
-            failure -> {
-              LOG.error("Failed : " + failure);
-              JsonObject failureMessage =
-                  new JsonObject()
-                      .put(TYPE, HttpStatusCode.INTERNAL_SERVER_ERROR.getValue())
-                      .put(TITLE, ResponseUrn.DB_ERROR_URN.getUrn())
-                      .put(DETAIL, FAILURE_MESSAGE + ", Failure while executing query");
-              promise.fail(failureMessage.encode());
-            });*/
 
     return promise.future();
   }

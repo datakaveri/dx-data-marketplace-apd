@@ -107,21 +107,7 @@ public class DeletePolicy {
                 handler.handle(Future.failedFuture(response.encode()));
               }
             });
-/*        .executePreparedQuery(query, tuple)
-        .onSuccess(
-            successHandler -> {
-              handler.handle(Future.succeededFuture(successHandler));
-            })
-        .onFailure(
-            failureHandler -> {
-              LOG.error("Failure while executing the query : {}", failureHandler.getMessage());
-              JsonObject response =
-                  new JsonObject()
-                      .put(TYPE, HttpStatusCode.INTERNAL_SERVER_ERROR.getValue())
-                      .put(TITLE, ResponseUrn.DB_ERROR_URN.getUrn())
-                      .put(DETAIL, "Failure while executing query");
-              handler.handle(Future.failedFuture(response.encode()));
-            });*/
+
   }
 
   /**

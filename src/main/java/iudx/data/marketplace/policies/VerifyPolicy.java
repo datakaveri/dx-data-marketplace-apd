@@ -106,32 +106,7 @@ public class VerifyPolicy {
                 }
             }
         });
-/*        .onFailure(
-            failureHandler -> {
-              LOGGER.error(
-                  "isPolicyForIdExist fail, DB execution failed :: {}",
-                  failureHandler.getMessage());
-              promise.fail(
-                  generateErrorResponse(
-                      INTERNAL_SERVER_ERROR, INTERNAL_SERVER_ERROR.getDescription()));
-            })
-        .onSuccess(
-            policyExistsHandler -> {
-              JsonArray policy = policyExistsHandler.getJsonArray(RESULT);
-              boolean isPolicyNotPresent = policy.isEmpty();
-              if (isPolicyNotPresent) {
-                LOGGER.error("No matching policy");
-                promise.complete(new JsonObject());
-              } else {
-                LOGGER.debug("policy exists : {} ", policyExistsHandler.encode());
-                JsonObject result = policyExistsHandler.getJsonArray(RESULT).getJsonObject(0);
-                JsonObject constraints = result.getJsonObject("constraints");
-                String policyId = result.getString("_id");
-                JsonObject response =
-                    new JsonObject().put("constraints", constraints).put("id", policyId);
-                promise.complete(response);
-              }
-            });*/
+
     return promise.future();
   }
 
