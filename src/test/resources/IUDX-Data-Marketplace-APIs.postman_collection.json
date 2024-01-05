@@ -1978,7 +1978,7 @@
 									"// Test the response",
 									"pm.test(\"Check response body\", function () {    ",
 									"    const body = pm.response.json();",
-									"    pm.expect(body).to.have.property(\"type\", \"urn:dx:acl:backend\");",
+									"    pm.expect(body).to.have.property(\"type\", \"urn:dx:dmp:backend\");",
 									"    pm.expect(body).to.have.property(\"title\", \"Bad Request\");",
 									"    pm.expect(body).to.have.property(\"detail\", \"Bad Request\");",
 									"    }",
@@ -2038,7 +2038,7 @@
 									"// Test the response",
 									"pm.test(\"Check response body\", function () {    ",
 									"    const body = pm.response.json();",
-									"    pm.expect(body).to.have.property(\"type\", \"urn:dx:acl:success\");",
+									"    pm.expect(body).to.have.property(\"type\", \"urn:dx:dmp:success\");",
 									"    }",
 									");"
 								],
@@ -2105,7 +2105,7 @@
 									"// Test the response",
 									"pm.test(\"Check response body\", function () {    ",
 									"    const body = pm.response.json();",
-									"    pm.expect(body).to.have.property(\"type\", \"urn:dx:acl:badRequest\");",
+									"    pm.expect(body).to.have.property(\"type\", \"urn:dx:dmp:badRequest\");",
 									"    pm.expect(body).to.have.property(\"title\", \"Bad Request\");",
 									"    pm.expect(body).to.have.property(\"detail\", \"Policy could not be deleted, as policy is not ACTIVE\");",
 									"    }",
@@ -2174,7 +2174,7 @@
 									"// Test the response",
 									"pm.test(\"Check response body\", function () {    ",
 									"    const body = pm.response.json();",
-									"    pm.expect(body).to.have.property(\"type\", \"urn:dx:acl:invalidAuthorizationToken\");",
+									"    pm.expect(body).to.have.property(\"type\", \"urn:dx:dmp:invalidAuthorizationToken\");",
 									"    pm.expect(body).to.have.property(\"title\", \"Not Authorized\");",
 									"    pm.expect(body).to.have.property(\"detail\", \"Not Authorized\");",
 									"});"
@@ -2233,7 +2233,7 @@
 									"// Test the response",
 									"pm.test(\"Check response body\", function () {    ",
 									"    const body = pm.response.json();",
-									"    pm.expect(body).to.have.property(\"type\", \"urn:dx:acl:forbidden\");",
+									"    pm.expect(body).to.have.property(\"type\", \"urn:dx:dmp:forbidden\");",
 									"    pm.expect(body).to.have.property(\"title\", \"Forbidden\");",
 									"    pm.expect(body).to.have.property(\"detail\", \"Access Denied: You do not have ownership rights for this policy.\");",
 									"    }",
@@ -2307,7 +2307,7 @@
 									"// Test the response",
 									"pm.test(\"Check response body\", function () {    ",
 									"    const body = pm.response.json();",
-									"    pm.expect(body).to.have.property(\"type\", \"urn:dx:acl:resourceNotFound\");",
+									"    pm.expect(body).to.have.property(\"type\", \"urn:dx:dmp:resourceNotFound\");",
 									"    pm.expect(body).to.have.property(\"title\", \"Not Found\");",
 									"    pm.expect(body).to.have.property(\"detail\", \"Policy could not be deleted, as it doesn't exist\");",
 									"    }",
@@ -2377,7 +2377,7 @@
 									"// Test the response",
 									"pm.test(\"Check response body\", function () {    ",
 									"    const body = pm.response.json();",
-									"    pm.expect(body).to.have.property(\"type\", \"urn:dx:acl:success\");",
+									"    pm.expect(body).to.have.property(\"type\", \"urn:dx:dmp:success\");",
 									"    pm.expect(body).to.have.property(\"title\", \"Success\");",
 									"    }",
 									");"
@@ -2422,13 +2422,6 @@
 							],
 							"path": [
 								"policies"
-							],
-							"query": [
-								{
-									"key": "asdkfjsklfjdg",
-									"value": "sfl;gjkksfjgksjfgksjfgksf",
-									"disabled": true
-								}
 							]
 						}
 					},
@@ -2454,7 +2447,7 @@
 									"// Test the response",
 									"pm.test(\"Check response body\", function () {    ",
 									"    const body = pm.response.json();",
-									"    pm.expect(body).to.have.property(\"type\", \"urn:dx:acl:invalidAuthorizationToken\");",
+									"    pm.expect(body).to.have.property(\"type\", \"urn:dx:dmp:invalidAuthorizationToken\");",
 									"    pm.expect(body).to.have.property(\"title\", \"Not Authorized\");",
 									"    pm.expect(body).to.have.property(\"detail\", \"Not Authorized\");",
 									"});"
@@ -2504,7 +2497,7 @@
 									"// Test the response",
 									"pm.test(\"Check response body\", function () {    ",
 									"    const body = pm.response.json();",
-									"    pm.expect(body).to.have.property(\"type\", \"urn:dx:acl:resourceNotFound\");",
+									"    pm.expect(body).to.have.property(\"type\", \"urn:dx:dmp:resourceNotFound\");",
 									"    pm.expect(body).to.have.property(\"title\", \"Not Found\");",
 									"    pm.expect(body).to.have.property(\"detail\", \"Policy not found\");",
 									"    }",

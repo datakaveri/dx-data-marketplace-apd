@@ -21,6 +21,7 @@ import iudx.data.marketplace.common.ResponseUrn;
 import iudx.data.marketplace.consumer.ConsumerService;
 import java.util.Map;
 
+import iudx.data.marketplace.postgres.PostgresService;
 import iudx.data.marketplace.postgres.PostgresServiceImpl;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -33,11 +34,11 @@ public class ConsumerApis {
 
   private ConsumerService consumerService;
   private Api api;
-  private PostgresServiceImpl postgresService;
+  private PostgresService postgresService;
   private AuthClient authClient;
   private AuthenticationService authenticationService;
 
-  ConsumerApis(Vertx vertx, Router router, Api apis, PostgresServiceImpl postgresService, AuthClient authClient, AuthenticationService authenticationService) {
+  ConsumerApis(Vertx vertx, Router router, Api apis, PostgresService postgresService, AuthClient authClient, AuthenticationService authenticationService) {
     this.vertx = vertx;
     this.router = router;
     this.api = apis;

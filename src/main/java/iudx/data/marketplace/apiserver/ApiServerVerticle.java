@@ -59,7 +59,6 @@ public class ApiServerVerticle extends AbstractVerticle {
   private String keystore;
   private String keystorePassword;
   private PostgresService postgresService;
-  private PostgresServiceImpl pgServiceImpl;
   private AuthClient authClient;
   private WebClient webClient;
   private WebClientOptions webClientOptions;
@@ -103,7 +102,6 @@ public class ApiServerVerticle extends AbstractVerticle {
     policyService = PolicyService.createProxy(vertx, POLICY_SERVICE_ADDRESS);
     postgresService = PostgresService.createProxy(vertx, POSTGRES_SERVICE_ADDRESS);
 
-    pgServiceImpl = new PostgresServiceImpl(config(), vertx);
     authClient = new AuthClient(config(),webClient);
     authenticationService = AuthenticationService.createProxy(vertx, AUTH_SERVICE_ADDRESS);
 
@@ -202,15 +200,15 @@ public class ApiServerVerticle extends AbstractVerticle {
               response.sendFile("docs/apidoc.html");
             });
 
-      router.route(PROVIDER_PATH + "/*").subRouter(new ProviderApis(vertx, router, api, pgServiceImpl, authClient, authenticationService).init());
-      router.route(CONSUMER_PATH + "/*").subRouter(new ConsumerApis(vertx, router, api, pgServiceImpl, authClient, authenticationService).init());
+      router.route(PROVIDER_PATH + "/*").subRouter(new ProviderApis(vertx, router, api, postgresService, authClient, authenticationService).init());
+      router.route(CONSUMER_PATH + "/*").subRouter(new ConsumerApis(vertx, router, api, postgresService, authClient, authenticationService).init());
 
     ExceptionHandler exceptionHandler = new ExceptionHandler();
     ValidationHandler policyValidationHandler = new ValidationHandler(vertx, RequestType.POLICY);
     ValidationHandler verifyValidationHandler = new ValidationHandler(vertx, RequestType.VERIFY);
     router
             .get(api.getPoliciesUrl())
-            .handler(AuthHandler.create(authenticationService, vertx, api, pgServiceImpl,authClient))
+            .handler(AuthHandler.create(authenticationService, vertx, api, postgresService,authClient))
             .handler(this::getPoliciesHandler)
             .failureHandler(exceptionHandler);
     router
@@ -221,7 +219,7 @@ public class ApiServerVerticle extends AbstractVerticle {
     router
             .delete(api.getPoliciesUrl())
             .handler(policyValidationHandler)
-            .handler(AuthHandler.create(authenticationService, vertx, api, pgServiceImpl, authClient))
+            .handler(AuthHandler.create(authenticationService, vertx, api, postgresService, authClient))
             .handler(this::deletePoliciesHandler)
             .failureHandler(exceptionHandler);
 
@@ -233,7 +231,7 @@ public class ApiServerVerticle extends AbstractVerticle {
     router
         .post(api.getVerifyUrl())
         .handler(verifyValidationHandler)
-        .handler(AuthHandler.create(authenticationService, vertx, api, pgServiceImpl, authClient))
+        .handler(AuthHandler.create(authenticationService, vertx, api, postgresService, authClient))
         .handler(this::handleVerify)
         .failureHandler(exceptionHandler);
 

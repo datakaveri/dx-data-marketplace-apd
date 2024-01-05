@@ -9,6 +9,7 @@ import iudx.data.marketplace.apiserver.util.Role;
 
 import iudx.data.marketplace.common.HttpStatusCode;
 import iudx.data.marketplace.common.ResponseUrn;
+import iudx.data.marketplace.postgres.PostgresService;
 import iudx.data.marketplace.postgres.PostgresServiceImpl;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -23,9 +24,9 @@ public class GetPolicy {
     private static final Logger LOG = LoggerFactory.getLogger(GetPolicy.class);
     public static final String FAILURE_MESSAGE = "Policy could not be fetched";
 
-    private final PostgresServiceImpl postgresService;
+    private final PostgresService postgresService;
 
-  public GetPolicy(PostgresServiceImpl postgresService) {
+  public GetPolicy(PostgresService postgresService) {
     this.postgresService = postgresService;
 }
 
@@ -63,7 +64,9 @@ public class GetPolicy {
     String resourceServerUrl = provider.getResourceServerUrl();
 
     LOG.trace(provider.toString());
-    Tuple tuple = Tuple.of(ownerIdValue, resourceServerUrl);
+    String finalQuery = query.replace("$1", "'" + ownerIdValue + "'")
+            .replace("$2", "'" + resourceServerUrl + "'");
+//    Tuple tuple = Tuple.of(ownerIdValue, resourceServerUrl);
     JsonObject jsonObject =
         new JsonObject()
             .put("email", provider.getEmailId())
@@ -74,7 +77,7 @@ public class GetPolicy {
                     .put("lastName", provider.getLastName()))
             .put("id", provider.getUserId());
     JsonObject providerInfo = new JsonObject().put("provider", jsonObject);
-    this.executeGetPolicy(tuple, query, providerInfo, Role.PROVIDER)
+    this.executeGetPolicy(finalQuery, providerInfo, Role.PROVIDER)
         .onComplete(
             handler -> {
               if (handler.succeeded()) {
@@ -102,8 +105,7 @@ public class GetPolicy {
     String emailId = consumer.getEmailId();
     String resourceServerUrl = consumer.getResourceServerUrl();
     LOG.trace(consumer.toString());
-    // TODO: remove consumer@gmail.com with the actual emailId
-    Tuple tuple = Tuple.of("consumer@gmail.com", resourceServerUrl);
+//    Tuple tuple = Tuple.of("consumer@gmail.com", resourceServerUrl);
     JsonObject jsonObject =
         new JsonObject()
             .put("email", consumer.getEmailId())
@@ -115,7 +117,11 @@ public class GetPolicy {
             .put("id", consumer.getUserId());
     JsonObject consumerInfo = new JsonObject().put("consumer", jsonObject);
 
-    this.executeGetPolicy(tuple, query, consumerInfo, Role.CONSUMER)
+    // TODO: remove consumer@gmail.com with the actual emailId
+    String finalQuery = query
+            .replace("$1", "'" + "consumer@gmail.com" + "'")
+            .replace("$2", "'" + resourceServerUrl + "'");
+    this.executeGetPolicy(finalQuery, consumerInfo, Role.CONSUMER)
         .onComplete(
             handler -> {
               if (handler.succeeded()) {
@@ -132,17 +138,55 @@ public class GetPolicy {
   /**
    * Executes the respective queries by using the vertx PgPool instance
    *
-   * @param tuple Exchangeable values of query in the form of Vertx Tuple
    * @param query String query to be executed
    * @param information Information to be added in the response
    * @return the response as Future JsonObject type
    */
   private Future<JsonObject> executeGetPolicy(
-      Tuple tuple, String query, JsonObject information, Role role) {
+      String query, JsonObject information, Role role) {
     Promise<JsonObject> promise = Promise.promise();
     postgresService
-        .executePreparedQuery(query, tuple)
-        .onSuccess(
+        .executeQuery(query, handler -> {
+          if(handler.succeeded())
+          {
+            boolean isResultFromDbEmpty = handler.result().getJsonArray(RESULTS).isEmpty();
+            if (!isResultFromDbEmpty) {
+              for(int i = 0; i < handler.result().getJsonArray(RESULTS).size() ; i++)
+              {
+                JsonObject jsonObject = handler.result().getJsonArray(RESULTS).getJsonObject(i);
+                jsonObject.mergeIn(information).mergeIn(getInformation(jsonObject, role));
+              }
+
+              JsonObject response =
+                      new JsonObject()
+                              .put(TYPE, ResponseUrn.SUCCESS_URN.getUrn())
+                              .put(TITLE, ResponseUrn.SUCCESS_URN.getMessage())
+                              .put(RESULT, handler.result().getJsonArray(RESULTS));
+              promise.complete(
+                      new JsonObject()
+                              .put(RESULT, response)
+                              .put(STATUS_CODE, HttpStatusCode.SUCCESS.getValue()));
+            } else {
+              JsonObject response =
+                      new JsonObject()
+                              .put(TYPE, HttpStatusCode.NOT_FOUND.getValue())
+                              .put(TITLE, ResponseUrn.RESOURCE_NOT_FOUND_URN.getUrn())
+                              .put(DETAIL, "Policy Not found");
+              LOG.error("No policy found!");
+              promise.fail(response.encode());
+            }
+          }else
+          {
+            LOG.error("Failed : " + handler.cause());
+            JsonObject failureMessage =
+                    new JsonObject()
+                            .put(TYPE, HttpStatusCode.INTERNAL_SERVER_ERROR.getValue())
+                            .put(TITLE, ResponseUrn.DB_ERROR_URN.getUrn())
+                            .put(DETAIL, FAILURE_MESSAGE + ", Failure while executing query");
+            promise.fail(failureMessage.encode());
+          }
+        });
+/*        .onSuccess(
             handler -> {
               boolean isResultFromDbEmpty = handler.getJsonArray(RESULTS).isEmpty();
               if (!isResultFromDbEmpty) {
@@ -180,7 +224,7 @@ public class GetPolicy {
                       .put(TITLE, ResponseUrn.DB_ERROR_URN.getUrn())
                       .put(DETAIL, FAILURE_MESSAGE + ", Failure while executing query");
               promise.fail(failureMessage.encode());
-            });
+            });*/
 
     return promise.future();
   }

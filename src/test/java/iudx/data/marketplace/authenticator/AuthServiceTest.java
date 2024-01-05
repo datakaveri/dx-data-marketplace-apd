@@ -95,27 +95,6 @@ public class AuthServiceTest {
         });
   }
 
-  @Test
-  @DisplayName("test invalid audience in token")
-  public void testInvalidAudience(VertxTestContext testContext) {
-    JwtData jwtData = new JwtData();
-    jwtData.setIss("auth.test.com");
-    jwtData.setAud("abc.iudx.io1");
-    jwtData.setExp(1627408865);
-    jwtData.setIat(1627408865);
-    jwtData.setIid("rs:rs.iudx.io");
-    jwtData.setRole("provider");
-    authenticationServiceImpl
-        .isValidAudienceValue(jwtData)
-        .onComplete(
-            handler -> {
-              if (handler.failed()) {
-                testContext.completeNow();
-              } else {
-                testContext.failNow("fail");
-              }
-            });
-  }
 
   @Test
   @DisplayName("test invalid endpoint")

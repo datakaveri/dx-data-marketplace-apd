@@ -167,18 +167,6 @@ public class AuthenticationServiceImpl implements AuthenticationService {
     return promise.future();
   }
 
-  Future<Boolean> isValidAudienceValue(JwtData jwtData) {
-    Promise<Boolean> promise = Promise.promise();
-
-    LOGGER.debug("Audience in jwt is: " + jwtData.getAud());
-    if (audience != null && audience.equalsIgnoreCase(jwtData.getAud())) {
-      promise.complete(true);
-    } else {
-      LOGGER.error("Incorrect audience value in jwt");
-      promise.fail("Incorrect audience value in jwt");
-    }
-    return promise.future();
-  }
 
 
 }

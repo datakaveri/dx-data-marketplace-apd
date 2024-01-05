@@ -42,29 +42,29 @@ public class PostgresServiceImpl implements PostgresService {
     this.client = pgclient;
   }
 
-  public PostgresServiceImpl(final JsonObject dbConfig, final Vertx vertx)
-  {
-      databaseIP = dbConfig.getString("databaseIP");
-      databasePort = dbConfig.getInteger("databasePort");
-      databaseName = dbConfig.getString("databaseName");
-      databaseUserName = dbConfig.getString("databaseUserName");
-      databasePassword = dbConfig.getString("databasePassword");
-      poolSize = dbConfig.getInteger("poolSize");
-
-      this.connectOptions =
-              new PgConnectOptions()
-                      .setPort(databasePort)
-                      .setHost(databaseIP)
-                      .setDatabase(databaseName)
-                      .setUser(databaseUserName)
-                      .setPassword(databasePassword)
-                      .setReconnectAttempts(2)
-                      .setReconnectInterval(1000L);
-
-      this.poolOptions = new PoolOptions().setMaxSize(poolSize);
-      this.client = PgPool.pool(vertx, connectOptions, poolOptions);
-
-  }
+//  public PostgresServiceImpl(final JsonObject dbConfig, final Vertx vertx)
+//  {
+//      databaseIP = dbConfig.getString("databaseIP");
+//      databasePort = dbConfig.getInteger("databasePort");
+//      databaseName = dbConfig.getString("databaseName");
+//      databaseUserName = dbConfig.getString("databaseUserName");
+//      databasePassword = dbConfig.getString("databasePassword");
+//      poolSize = dbConfig.getInteger("poolSize");
+//
+//      this.connectOptions =
+//              new PgConnectOptions()
+//                      .setPort(databasePort)
+//                      .setHost(databaseIP)
+//                      .setDatabase(databaseName)
+//                      .setUser(databaseUserName)
+//                      .setPassword(databasePassword)
+//                      .setReconnectAttempts(2)
+//                      .setReconnectInterval(1000L);
+//
+//      this.poolOptions = new PoolOptions().setMaxSize(poolSize);
+//      this.client = PgPool.pool(vertx, connectOptions, poolOptions);
+//
+//  }
 
   @Override
   public PostgresService executeQuery(
@@ -244,43 +244,43 @@ public class PostgresServiceImpl implements PostgresService {
     return this;
   }
 
-  public Future<JsonObject> executePreparedQuery(final String query, final Tuple tuple) {
-    Promise<JsonObject> promise = Promise.promise();
-    Collector<Row, ?, List<JsonObject>> rowCollector =
-        Collectors.mapping(row -> row.toJson(), Collectors.toList());
-
-    client
-        .withConnection(
-            connection ->
-                connection
-                    .preparedQuery(query)
-                    .collecting(rowCollector)
-                    .execute(tuple)
-                    .map(rows -> rows.value()))
-        .onSuccess(
-            successHandler -> {
-              JsonArray response = new JsonArray(successHandler);
-              LOGGER.debug("Success response : {}", successHandler);
-              JsonObject responseJson =
-                  new RespBuilder()
-                      .withType(ResponseUrn.SUCCESS_URN.getUrn())
-                      .withTitle(ResponseUrn.SUCCESS_URN.getMessage())
-                      .withResult(response)
-                      .getJsonResponse();
-
-              promise.complete(responseJson);
-            })
-        .onFailure(
-            failureHandler -> {
-              LOGGER.debug("Failure : {}", failureHandler.getMessage());
-              String response =
-                  new RespBuilder()
-                      .withType(ResponseUrn.DB_ERROR_URN.getUrn())
-                      .withTitle(ResponseUrn.DB_ERROR_URN.getMessage())
-                      .withDetail(failureHandler.getLocalizedMessage())
-                      .getResponse();
-              promise.fail(response);
-            });
-    return promise.future();
-  }
+//  public Future<JsonObject> executePreparedQuery(final String query, final Tuple tuple) {
+//    Promise<JsonObject> promise = Promise.promise();
+//    Collector<Row, ?, List<JsonObject>> rowCollector =
+//        Collectors.mapping(row -> row.toJson(), Collectors.toList());
+//
+//    client
+//        .withConnection(
+//            connection ->
+//                connection
+//                    .preparedQuery(query)
+//                    .collecting(rowCollector)
+//                    .execute(tuple)
+//                    .map(rows -> rows.value()))
+//        .onSuccess(
+//            successHandler -> {
+//              JsonArray response = new JsonArray(successHandler);
+//              LOGGER.debug("Success response : {}", successHandler);
+//              JsonObject responseJson =
+//                  new RespBuilder()
+//                      .withType(ResponseUrn.SUCCESS_URN.getUrn())
+//                      .withTitle(ResponseUrn.SUCCESS_URN.getMessage())
+//                      .withResult(response)
+//                      .getJsonResponse();
+//
+//              promise.complete(responseJson);
+//            })
+//        .onFailure(
+//            failureHandler -> {
+//              LOGGER.debug("Failure : {}", failureHandler.getMessage());
+//              String response =
+//                  new RespBuilder()
+//                      .withType(ResponseUrn.DB_ERROR_URN.getUrn())
+//                      .withTitle(ResponseUrn.DB_ERROR_URN.getMessage())
+//                      .withDetail(failureHandler.getLocalizedMessage())
+//                      .getResponse();
+//              promise.fail(response);
+//            });
+//    return promise.future();
+//  }
 }

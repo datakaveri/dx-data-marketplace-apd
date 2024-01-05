@@ -145,10 +145,8 @@ public class CatalogueService {
         .addQueryParam("value", valuesArray.getList().toString())
             .send(searchApiHandler -> {
               if(searchApiHandler.succeeded()) {
-                LOGGER.debug("here");
                 LOGGER.debug(searchApiHandler.result().bodyAsJsonObject());
               } else {
-                LOGGER.debug("here2");
                 LOGGER.error(searchApiHandler.cause());
               }
             });

@@ -20,6 +20,7 @@ import iudx.data.marketplace.authenticator.AuthenticationService;
 import iudx.data.marketplace.common.Api;
 import iudx.data.marketplace.common.RespBuilder;
 import iudx.data.marketplace.common.ResponseUrn;
+import iudx.data.marketplace.postgres.PostgresService;
 import iudx.data.marketplace.postgres.PostgresServiceImpl;
 import iudx.data.marketplace.product.ProductService;
 import iudx.data.marketplace.product.variant.ProductVariantService;
@@ -35,10 +36,10 @@ public class ProviderApis {
   private ProductService productService;
   private ProductVariantService variantService;
   private Api api;
-  private PostgresServiceImpl postgresService;
+  private PostgresService postgresService;
   private AuthClient authClient;
   private AuthenticationService authenticationService;
-  ProviderApis(Vertx vertx, Router router, Api apis, PostgresServiceImpl postgresService, AuthClient authClient, AuthenticationService authenticationService) {
+  ProviderApis(Vertx vertx, Router router, Api apis, PostgresService postgresService, AuthClient authClient, AuthenticationService authenticationService) {
     this.vertx = vertx;
     this.router = router;
     this.api = apis;

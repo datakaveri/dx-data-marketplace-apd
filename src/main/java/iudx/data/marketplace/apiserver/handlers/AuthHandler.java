@@ -16,6 +16,7 @@ import iudx.data.marketplace.authenticator.AuthenticationService;
 import iudx.data.marketplace.common.HttpStatusCode;
 import iudx.data.marketplace.common.ResponseUrn;
 import iudx.data.marketplace.policies.User;
+import iudx.data.marketplace.postgres.PostgresService;
 import iudx.data.marketplace.postgres.PostgresServiceImpl;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -36,11 +37,12 @@ public class AuthHandler implements Handler<RoutingContext> {
 
   static AuthenticationService authenticator;
   private static Api api;
-  private static PostgresServiceImpl postgresServiceImpl;
+  private static PostgresService postgresServiceImpl;
   private static AuthClient authClient;
   private HttpServerRequest request;
 
-  public static AuthHandler create(AuthenticationService authenticationService, Vertx vertx, Api apis, PostgresServiceImpl postgresService, AuthClient authClientObj) {
+  public static AuthHandler create(AuthenticationService authenticationService, Vertx vertx, Api apis,
+          PostgresService postgresService, AuthClient authClientObj) {
     authenticator = authenticationService;
     api = apis;
     postgresServiceImpl = postgresService;
@@ -139,10 +141,50 @@ public class AuthHandler implements Handler<RoutingContext> {
     LOGGER.info("Getting user info..");
     Promise<User> promise = Promise.promise();
     UserContainer userContainer = new UserContainer();
-    Tuple tuple = Tuple.of(UUID.fromString(tokenIntrospectResult.getString("userId")));
+//    Tuple tuple = Tuple.of(UUID.fromString(tokenIntrospectResult.getString("userId")));
     postgresServiceImpl
-            .executePreparedQuery(GET_USER, tuple)
-            .onSuccess(handler -> {
+            .executeQuery(GET_USER.replace("$1", "'" + UUID.fromString(tokenIntrospectResult.getString("userId")) + "'"), handler -> {
+              if(handler.succeeded())
+              {
+                JsonArray info = handler.result().getJsonArray(RESULTS);
+                if(!info.isEmpty())
+                {
+                  JsonObject userInfo = info.getJsonObject(0);
+                  LOGGER.info("User found in Database");
+                  JsonObject userJson = new JsonObject()
+                          .put(USERID, tokenIntrospectResult.getString(USERID))
+                          .put(USER_ROLE, tokenIntrospectResult.getString(ROLE))
+                          .put(EMAIL_ID, userInfo.getString("email_id"))
+                          .put(FIRST_NAME, userInfo.getString("first_name"))
+                          .put(LAST_NAME, userInfo.getString("last_name"))
+                          .put(RS_SERVER_URL, tokenIntrospectResult.getString(AUD));
+                  User user = new User(userJson);
+                  promise.complete(user);
+                }
+                else
+                {
+                  LOGGER.info("user not present in DB, getting user information from Auth");
+                  Future<User> getUserFromAuth = authClient.fetchUserInfo(tokenIntrospectResult);
+                  Future<Void> insertInDb = getUserFromAuth.compose(user -> {
+                    userContainer.user = user;
+                    return insertUserIntoDb(user);
+                  });
+
+                  insertInDb.onSuccess(successHandler -> {
+                    LOGGER.debug("User successfully inserted in DB");
+                    promise.complete(userContainer.user);
+                  }).onFailure(failureHandler -> {
+                    LOGGER.error("Failed to insert user in DB");
+                    promise.fail(failureHandler.getMessage());
+                  });
+
+                }
+              } else {
+                LOGGER.error("Fetch user from DB failure : {}", handler.cause().getMessage());
+                promise.fail(handler.cause().getMessage());
+              }
+            });
+          /*  .onSuccess(handler -> {
               JsonArray info = handler.getJsonArray(RESULTS);
               if(!info.isEmpty())
               {
@@ -179,7 +221,7 @@ public class AuthHandler implements Handler<RoutingContext> {
             }).onFailure(failureHandler -> {
               LOGGER.error("Fetch user from DB failure : {}", failureHandler.getMessage());
               promise.fail(failureHandler.getMessage());
-            });
+            });*/
 
     return promise.future();
   }
@@ -187,15 +229,31 @@ public class AuthHandler implements Handler<RoutingContext> {
   private Future<Void> insertUserIntoDb(User user) {
     Promise<Void> promise = Promise.promise();
     Tuple tuple = Tuple.of(user.getUserId(), user.getEmailId(), user.getFirstName(), user.getLastName());
+    String query = INSERT_USER_TABLE
+        .replace("$1", "'" + user.getUserId() + "'")
+        .replace("$2", "'" + user.getEmailId() + "'")
+        .replace("$3", "'" + user.getFirstName() + "'")
+        .replace("$4", "'" + user.getLastName() + "'");
     postgresServiceImpl
-            .executePreparedQuery(INSERT_USER_TABLE, tuple)
-            .onSuccess(handler -> {
+            .executeQuery(query, handler -> {
+              if(handler.succeeded())
+              {
+                LOGGER.debug("User inserted ");
+                promise.complete();
+              }
+              else
+              {
+                LOGGER.debug("Something went wrong while inserting user in DB : {}", handler.cause().getMessage());
+                promise.fail(handler.cause().getMessage());
+              }
+            });
+/*            .onSuccess(handler -> {
               LOGGER.debug("User inserted ");
               promise.complete();
             }).onFailure(failureHandler -> {
               LOGGER.debug("Something went wrong while inserting user in DB : {}", failureHandler.getCause().getMessage());
               promise.fail(failureHandler.getCause().getMessage());
-            });
+            });*/
     return promise.future();
 }
 
@@ -238,21 +296,23 @@ public class AuthHandler implements Handler<RoutingContext> {
   private void processAuthFailure(RoutingContext ctx, String result) {
     if (result.contains("Not Found")) {
       LOGGER.error("Error : Item Not Found");
+      LOGGER.error("Error : " + result);
       HttpStatusCode statusCode = HttpStatusCode.getByValue(404);
-      generateResponse(ctx, RESOURCE_NOT_FOUND_URN, statusCode, result);
+      generateResponse(ctx, RESOURCE_NOT_FOUND_URN, statusCode);
     } else {
       LOGGER.error("Error : Authentication Failure");
       HttpStatusCode statusCode = HttpStatusCode.getByValue(401);
-      generateResponse(ctx, INVALID_TOKEN_URN, statusCode, result);
+      LOGGER.error("Error : " + result);
+      generateResponse(ctx, INVALID_TOKEN_URN, statusCode);
     }
   }
 
-  private void generateResponse(RoutingContext ctx, ResponseUrn urn, HttpStatusCode statusCode, String errMessage) {
+  private void generateResponse(RoutingContext ctx, ResponseUrn urn, HttpStatusCode statusCode) {
     String response =
         new RespBuilder()
             .withType(urn.getUrn())
             .withTitle(statusCode.getDescription())
-            .withDetail(errMessage)
+            .withDetail(statusCode.getDescription())
             .getResponse();
 
     ctx.response()

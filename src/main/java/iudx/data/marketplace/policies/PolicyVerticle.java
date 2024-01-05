@@ -18,11 +18,12 @@ import iudx.data.marketplace.postgres.PostgresServiceImpl;
 import java.util.Map;
 
 import static iudx.data.marketplace.common.Constants.POLICY_SERVICE_ADDRESS;
+import static iudx.data.marketplace.common.Constants.POSTGRES_SERVICE_ADDRESS;
 import static iudx.data.marketplace.policies.util.Constants.DB_RECONNECT_ATTEMPTS;
 
 public class PolicyVerticle extends AbstractVerticle {
 
-  private PostgresServiceImpl postgresServiceImpl;
+  private PostgresService postgresServiceImpl;
   private PolicyServiceImpl policyService;
   private DeletePolicy deletePolicy;
   private CreatePolicy createPolicy;
@@ -33,7 +34,7 @@ public class PolicyVerticle extends AbstractVerticle {
   @Override
   public void start() {
     catalogueService = new CatalogueService(vertx, config());
-    postgresServiceImpl = new PostgresServiceImpl(config(), vertx);
+    postgresServiceImpl = PostgresService.createProxy(vertx, POSTGRES_SERVICE_ADDRESS);
     deletePolicy = new DeletePolicy(postgresServiceImpl);
     getPolicy = new GetPolicy(postgresServiceImpl);
     createPolicy = new CreatePolicy(postgresServiceImpl, catalogueService);

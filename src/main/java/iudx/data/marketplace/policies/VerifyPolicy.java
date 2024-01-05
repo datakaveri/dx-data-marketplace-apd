@@ -10,6 +10,7 @@ import iudx.data.marketplace.common.CatalogueService;
 import iudx.data.marketplace.common.HttpStatusCode;
 import iudx.data.marketplace.common.ResponseUrn;
 import iudx.data.marketplace.policies.util.Status;
+import iudx.data.marketplace.postgres.PostgresService;
 import iudx.data.marketplace.postgres.PostgresServiceImpl;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -26,9 +27,9 @@ import static iudx.data.marketplace.policies.util.Constants.CHECK_IF_POLICY_PRES
 
 public class VerifyPolicy {
   private static final Logger LOGGER = LogManager.getLogger(VerifyPolicy.class);
-  private final PostgresServiceImpl postgresService;
+  private final PostgresService postgresService;
 
-  public VerifyPolicy(PostgresServiceImpl postgresService) {
+  public VerifyPolicy(PostgresService postgresService) {
     this.postgresService = postgresService;
   }
 
@@ -70,10 +71,42 @@ public class VerifyPolicy {
   private Future<JsonObject> checkExistingPoliciesForId(
       UUID itemId, UUID ownerId, String userEmailId) {
     Tuple selectTuples = Tuple.of(itemId, ownerId, Status.ACTIVE, userEmailId);
+    JsonObject params = new JsonObject()
+            .put("itemId", itemId.toString())
+            .put("ownerId", ownerId.toString())
+            .put("status", Status.ACTIVE)
+            .put("userEmailId", userEmailId);
+
     Promise<JsonObject> promise = Promise.promise();
     postgresService
-        .executePreparedQuery(CHECK_EXISTING_POLICY, selectTuples)
-        .onFailure(
+        .executePreparedQuery(CHECK_EXISTING_POLICY, params, handler -> {
+            if(handler.failed()){
+                LOGGER.error(
+                        "isPolicyForIdExist fail, DB execution failed :: {}",
+                        handler.cause().getMessage());
+                promise.fail(
+                        generateErrorResponse(
+                                INTERNAL_SERVER_ERROR, INTERNAL_SERVER_ERROR.getDescription()));
+            }
+            else
+            {
+                JsonArray policy = handler.result().getJsonArray(RESULT);
+                boolean isPolicyNotPresent = policy.isEmpty();
+                if (isPolicyNotPresent) {
+                    LOGGER.error("No matching policy");
+                    promise.complete(new JsonObject());
+                } else {
+                    LOGGER.debug("policy exists : {} ", handler.result().encode());
+                    JsonObject result = handler.result().getJsonArray(RESULT).getJsonObject(0);
+                    JsonObject constraints = result.getJsonObject("constraints");
+                    String policyId = result.getString("_id");
+                    JsonObject response =
+                            new JsonObject().put("constraints", constraints).put("id", policyId);
+                    promise.complete(response);
+                }
+            }
+        });
+/*        .onFailure(
             failureHandler -> {
               LOGGER.error(
                   "isPolicyForIdExist fail, DB execution failed :: {}",
@@ -98,7 +131,7 @@ public class VerifyPolicy {
                     new JsonObject().put("constraints", constraints).put("id", policyId);
                 promise.complete(response);
               }
-            });
+            });*/
     return promise.future();
   }
 

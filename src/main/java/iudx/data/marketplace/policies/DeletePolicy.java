@@ -16,6 +16,7 @@ import io.vertx.pgclient.PgPool;
 import io.vertx.sqlclient.Tuple;
 import iudx.data.marketplace.common.HttpStatusCode;
 import iudx.data.marketplace.common.ResponseUrn;
+import iudx.data.marketplace.postgres.PostgresService;
 import iudx.data.marketplace.postgres.PostgresServiceImpl;
 import java.util.UUID;
 import org.slf4j.Logger;
@@ -24,10 +25,10 @@ import org.slf4j.LoggerFactory;
 public class DeletePolicy {
   private static final Logger LOG = LoggerFactory.getLogger(DeletePolicy.class);
   private static final String FAILURE_MESSAGE = "Policy could not be deleted";
-  private final PostgresServiceImpl postgresService;
+  private final PostgresService postgresService;
   private PgPool pool;
 
-  public DeletePolicy(PostgresServiceImpl postgresService) {
+  public DeletePolicy(PostgresService postgresService) {
     this.postgresService = postgresService;
   }
 
@@ -51,9 +52,10 @@ public class DeletePolicy {
     LOG.debug("inside executeUpdateQuery");
     Promise<JsonObject> promise = Promise.promise();
     Tuple tuple = Tuple.of(policyUuid);
+    String finalQuery = query
+            .replace("$1", "'" + policyUuid + "'");
     this.executeQuery(
-        query,
-        tuple,
+        finalQuery,
         handler -> {
           if (handler.succeeded()) {
             /* policy has expired */
@@ -83,13 +85,29 @@ public class DeletePolicy {
    * Executes the respective queries
    *
    * @param query SQL Query to be executed
-   * @param tuple exchangeable(s) for the query
    * @param handler Result of the query execution is sent as Json Object in a handler
    */
-  public void executeQuery(String query, Tuple tuple, Handler<AsyncResult<JsonObject>> handler) {
+  public void executeQuery(String query, Handler<AsyncResult<JsonObject>> handler) {
 
     postgresService
-        .executePreparedQuery(query, tuple)
+            .executeQuery(query, queryHandler -> {
+              if(queryHandler.succeeded())
+              {
+                handler.handle(Future.succeededFuture(queryHandler.result()));
+
+              }
+              else
+              {
+                LOG.error("Failure while executing the query : {}", queryHandler.cause().getMessage());
+                JsonObject response =
+                        new JsonObject()
+                                .put(TYPE, HttpStatusCode.INTERNAL_SERVER_ERROR.getValue())
+                                .put(TITLE, ResponseUrn.DB_ERROR_URN.getUrn())
+                                .put(DETAIL, "Failure while executing query");
+                handler.handle(Future.failedFuture(response.encode()));
+              }
+            });
+/*        .executePreparedQuery(query, tuple)
         .onSuccess(
             successHandler -> {
               handler.handle(Future.succeededFuture(successHandler));
@@ -103,7 +121,7 @@ public class DeletePolicy {
                       .put(TITLE, ResponseUrn.DB_ERROR_URN.getUrn())
                       .put(DETAIL, "Failure while executing query");
               handler.handle(Future.failedFuture(response.encode()));
-            });
+            });*/
   }
 
   /**
@@ -121,9 +139,10 @@ public class DeletePolicy {
     String ownerId = user.getUserId();
     LOG.trace("What's the ownerId : " + ownerId);
     Tuple tuple = Tuple.of(policyUuid);
+    String finalQuery = query
+            .replace("$1", "'" + policyUuid + "'");
     executeQuery(
-        query,
-        tuple,
+        finalQuery,
         handler -> {
           if (handler.succeeded()) {
             if (handler.result().getJsonArray(RESULT).isEmpty()) {
