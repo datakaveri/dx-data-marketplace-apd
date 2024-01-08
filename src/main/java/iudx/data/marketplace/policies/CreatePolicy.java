@@ -64,20 +64,19 @@ public class CreatePolicy {
 
         Tuple providerInsertionTuple = Tuple.of(providerId, providerEmailId, providerFirstName, providerLastName);
 
-        String userInsertion = "INSERT INTO user_table (_id, email_id, first_name, last_name) VALUES ('$1', '$2', '$3', '$4')";
+        String userInsertion2 = "INSERT INTO user_table (_id, email_id, first_name, last_name) VALUES ($1, $2, $3, $4)";
 
-        String finalConsumerInsertionQuery = userInsertion
-                .replace("$1", consumerId.toString())
-                .replace("$2", consumerEmailId)
-                .replace("$3", consumerFirstName)
-                .replace("$4", consumerLastName);
+        JsonObject consumerParams = new JsonObject()
+                .put("$1", consumerId.toString())
+                .put("$2", consumerEmailId)
+                .put("$3", consumerFirstName)
+                .put("$4", consumerLastName);
 
-        String finalProviderInsertionQuery = userInsertion
-                .replace("$1", providerId.toString())
-                .replace("$2", providerEmailId)
-                .replace("$3", providerFirstName)
-                .replace("$4", providerLastName);
-
+        JsonObject providerParams = new JsonObject()
+                .put("$1", providerId.toString())
+                .put("$2", providerEmailId)
+                .put("$3", providerFirstName)
+                .put("$4", providerLastName);
 
         /* resource related information */
         UUID resourceId = UUID.randomUUID();
@@ -87,25 +86,27 @@ public class CreatePolicy {
 
         Tuple resourceEntityTuple = Tuple.of(resourceId, resourceName, providerId, resourceServerUrl, accessPolicy);
         String resourceEntityInsertion = "INSERT INTO resource_entity (_id, resource_name, provider_id, resource_server_url, accesspolicy)" +
-                " VALUES ('$1', '$2', '$3', '$4', '$5')";
+                " VALUES ($1, $2, $3, $4, $5)";
 
-        String finalResourceInsertionQuery = resourceEntityInsertion
-                .replace("$1", resourceId.toString())
-                .replace("$2", resourceName)
-                .replace("$3", providerId.toString())
-                .replace("$4", resourceServerUrl)
-                .replace("$5", accessPolicy);
+        JsonObject resourceInsertionParam = new JsonObject()
+                .put("$1", resourceId.toString())
+                .put("$2", resourceName)
+                .put("$3", providerId.toString())
+                .put("$4", resourceServerUrl)
+                .put("$5", accessPolicy);
 
         /* product related info */
         UUID productId = UUID.randomUUID();
         String status = "ACTIVE";
 
         Tuple productTuple = Tuple.of(productId, resourceId, status);
-        String insertProduct = "INSERT INTO PRODUCT (product_id, resource_id, status) VALUES ('$1', '$2', '$3')";
-        String finalProductInsertionQuery = insertProduct
-                .replace("$1", productId.toString())
-                .replace("$2", resourceId.toString())
-                .replace("$3", status);
+//        String insertProduct = "INSERT INTO PRODUCT (product_id, resource_id, status) VALUES ('$1', '$2', '$3')";
+
+        String insertProduct2 = "INSERT INTO PRODUCT (product_id, resource_id, status) VALUES ($1, $2, $3)";
+        JsonObject productParam = new JsonObject()
+                .put("$1", productId.toString())
+                .put("$2", resourceId.toString())
+                .put("$3", status);
 
         /* product variant insertion */
         UUID pvId = UUID.randomUUID();
@@ -181,27 +182,26 @@ public class CreatePolicy {
 
 
 
-
     var consumerInsertion =
-        insertQueries(finalConsumerInsertionQuery, "consumer insertion ");
+        insertQueries(userInsertion2,consumerParams, "consumer insertion ");
 
 
     var providerInsertion =
             consumerInsertion.compose(consumerInsertedSuccessfully -> {
-                return insertQueries(finalProviderInsertionQuery, "provider insertion ");
+                return insertQueries(userInsertion2, providerParams, "provider insertion ");
             });
 
     var resourceInsertion =
         providerInsertion.compose(
             providerInsertedSuccessfully -> {
               return insertQueries(
-                  finalResourceInsertionQuery, "resource insertion");
+                  resourceEntityInsertion, resourceInsertionParam, "resource insertion");
             });
 
     var productInsertion =
         resourceInsertion.compose(
             resourceInsertedSuccessfully -> {
-              return insertQueries(finalProductInsertionQuery, "product insertion ");
+              return insertQueries(insertProduct2, productParam, "product insertion ");
             });
 
     var pvInsertion = productInsertion.compose(productInsertedSuccessfully -> {
@@ -297,4 +297,26 @@ public class CreatePolicy {
     return promise.future();
     }
 
+    public Future<JsonObject> insertQueries(String query,JsonObject param, String tag) {
+        Promise<JsonObject> promise = Promise.promise();
+        postgresService.executePreparedQuery(
+                query,
+                param,
+                pgHandler -> {
+                    if (pgHandler.succeeded()) {
+                        LOGGER.info("Query insertion successfully done : {}", tag);
+                        promise.complete(
+                                new JsonObject().put(TYPE, ResponseUrn.SUCCESS_URN.getUrn()).put(TITLE, "Success"));
+                    } else {
+                        LOGGER.error("Failure while executing query : {} ", tag);
+                        LOGGER.error("Error : {}", pgHandler.cause().getMessage());
+                        promise.fail(
+                                new JsonObject()
+                                        .put(TYPE, ResponseUrn.DB_ERROR_URN.getUrn())
+                                        .put(TITLE, "Failure")
+                                        .encode());
+                    }
+                });
+        return promise.future();
+    }
 }

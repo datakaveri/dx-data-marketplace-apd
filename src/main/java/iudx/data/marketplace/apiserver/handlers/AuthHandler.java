@@ -141,8 +141,10 @@ public class AuthHandler implements Handler<RoutingContext> {
     LOGGER.info("Getting user info..");
     Promise<User> promise = Promise.promise();
     UserContainer userContainer = new UserContainer();
+    JsonObject params = new JsonObject()
+            .put("$1",UUID.fromString(tokenIntrospectResult.getString("userId")));
     postgresServiceImpl
-            .executeQuery(GET_USER.replace("$1", "'" + UUID.fromString(tokenIntrospectResult.getString("userId")) + "'"), handler -> {
+            .executePreparedQuery(GET_USER, params, handler -> {
               if(handler.succeeded())
               {
                 JsonArray info = handler.result().getJsonArray(RESULTS);
@@ -188,13 +190,14 @@ public class AuthHandler implements Handler<RoutingContext> {
 
   private Future<Void> insertUserIntoDb(User user) {
     Promise<Void> promise = Promise.promise();
-    String query = INSERT_USER_TABLE
-        .replace("$1", "'" + user.getUserId() + "'")
-        .replace("$2", "'" + user.getEmailId() + "'")
-        .replace("$3", "'" + user.getFirstName() + "'")
-        .replace("$4", "'" + user.getLastName() + "'");
+
+    JsonObject params = new JsonObject()
+            .put("$1", user.getUserId())
+            .put("$2", user.getEmailId())
+            .put("$3", user.getFirstName())
+            .put("$4", user.getLastName());
     postgresServiceImpl
-            .executeQuery(query, handler -> {
+            .executePreparedQuery(INSERT_USER_TABLE, params, handler -> {
               if(handler.succeeded())
               {
                 LOGGER.debug("User inserted ");
