@@ -48,25 +48,27 @@ public class DeletePolicy {
    * @param policyUuid policy id as type UUID
    * @return The response of the query execution
    */
-  private Future<JsonObject> executeUpdateQuery(String query, UUID policyUuid) {
+  public Future<JsonObject> executeUpdateQuery(String query, UUID policyUuid) {
     LOG.debug("inside executeUpdateQuery");
     Promise<JsonObject> promise = Promise.promise();
     Tuple tuple = Tuple.of(policyUuid);
-    String finalQuery = query
-            .replace("$1", "'" + policyUuid + "'");
-    this.executeQuery(
-        finalQuery,
-        handler -> {
-          if (handler.succeeded()) {
+    JsonObject param = new JsonObject()
+            .put("$1", policyUuid.toString());
+
+    postgresService.executePreparedQuery(
+        query,
+        param,
+        queryHandler -> {
+          if (queryHandler.succeeded()) {
             /* policy has expired */
-            if (handler.result().getJsonArray(RESULT).isEmpty()) {
+            if (queryHandler.result().getJsonArray(RESULT).isEmpty()) {
               promise.fail(
                   getFailureResponse(
                       new JsonObject(), FAILURE_MESSAGE + " , as policy is expired"));
             } else {
               LOG.info("update query succeeded");
               JsonObject responseJson =
-                  handler
+                  queryHandler
                       .result()
                       .put(STATUS_CODE, HttpStatusCode.SUCCESS.getValue())
                       .put(DETAIL, "Policy deleted successfully");
@@ -74,6 +76,7 @@ public class DeletePolicy {
             }
           } else {
             LOG.debug("update query failed");
+            LOG.error("Failure while executing the query : {}", queryHandler.cause().getMessage());
             promise.fail(
                 getFailureResponse(new JsonObject(), FAILURE_MESSAGE + ", update query failed"));
           }
@@ -81,34 +84,6 @@ public class DeletePolicy {
     return promise.future();
   }
 
-  /**
-   * Executes the respective queries
-   *
-   * @param query SQL Query to be executed
-   * @param handler Result of the query execution is sent as Json Object in a handler
-   */
-  public void executeQuery(String query, Handler<AsyncResult<JsonObject>> handler) {
-
-    postgresService
-            .executeQuery(query, queryHandler -> {
-              if(queryHandler.succeeded())
-              {
-                handler.handle(Future.succeededFuture(queryHandler.result()));
-
-              }
-              else
-              {
-                LOG.error("Failure while executing the query : {}", queryHandler.cause().getMessage());
-                JsonObject response =
-                        new JsonObject()
-                                .put(TYPE, HttpStatusCode.INTERNAL_SERVER_ERROR.getValue())
-                                .put(TITLE, ResponseUrn.DB_ERROR_URN.getUrn())
-                                .put(DETAIL, "Failure while executing query");
-                handler.handle(Future.failedFuture(response.encode()));
-              }
-            });
-
-  }
 
   /**
    * Queries postgres table to check if the policy given in the request is owned by the provider or
@@ -119,19 +94,21 @@ public class DeletePolicy {
    * @param policyUuid list of policies of UUID
    * @return true if qualifies all the checks
    */
-  private Future<Boolean> verifyPolicy(User user, String query, UUID policyUuid) {
+  public Future<Boolean> verifyPolicy(User user, String query, UUID policyUuid) {
     LOG.debug("inside verifyPolicy");
     Promise<Boolean> promise = Promise.promise();
     String ownerId = user.getUserId();
     LOG.trace("What's the ownerId : " + ownerId);
     Tuple tuple = Tuple.of(policyUuid);
-    String finalQuery = query
-            .replace("$1", "'" + policyUuid + "'");
-    executeQuery(
-        finalQuery,
-        handler -> {
-          if (handler.succeeded()) {
-            if (handler.result().getJsonArray(RESULT).isEmpty()) {
+
+    JsonObject param = new JsonObject()
+            .put("$1", policyUuid.toString());
+    postgresService.executePreparedQuery(
+       query,
+        param,
+        queryHandler -> {
+          if (queryHandler.succeeded()) {
+            if (queryHandler.result().getJsonArray(RESULT).isEmpty()) {
               JsonObject failureResponse =
                   new JsonObject()
                       .put(TYPE, HttpStatusCode.NOT_FOUND.getValue())
@@ -139,7 +116,7 @@ public class DeletePolicy {
                       .put(DETAIL, FAILURE_MESSAGE + ", as it doesn't exist");
               promise.fail(failureResponse.encode());
             } else {
-              JsonObject result = handler.result().getJsonArray(RESULT).getJsonObject(0);
+              JsonObject result = queryHandler.result().getJsonArray(RESULT).getJsonObject(0);
               String rsServerUrl = result.getString("resource_server_url");
               String ownerIdValue = result.getString("provider_id");
               String status = result.getString("status");
@@ -177,8 +154,14 @@ public class DeletePolicy {
               }
             }
           } else {
-            LOG.error("Failed {}", handler.cause().getMessage());
-            promise.fail(handler.cause().getMessage());
+            LOG.error("Failure while executing the query : {}", queryHandler.cause().getMessage());
+            JsonObject response =
+                new JsonObject()
+                    .put(TYPE, HttpStatusCode.INTERNAL_SERVER_ERROR.getValue())
+                    .put(TITLE, ResponseUrn.DB_ERROR_URN.getUrn())
+                    .put(DETAIL, "Failure while executing query");
+            LOG.error("Failed {}", queryHandler.cause().getMessage());
+            promise.fail(response.encode());
           }
         });
     return promise.future();

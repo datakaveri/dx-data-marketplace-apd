@@ -142,7 +142,7 @@ public class AuthHandler implements Handler<RoutingContext> {
     Promise<User> promise = Promise.promise();
     UserContainer userContainer = new UserContainer();
     JsonObject params = new JsonObject()
-            .put("$1",UUID.fromString(tokenIntrospectResult.getString("userId")));
+            .put("$1",tokenIntrospectResult.getString("userId"));
     postgresServiceImpl
             .executePreparedQuery(GET_USER, params, handler -> {
               if(handler.succeeded())
