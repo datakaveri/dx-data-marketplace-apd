@@ -34,11 +34,29 @@ public class ValidationHandlerFactory {
       case PROVIDER:
         validator = getProviderIDValidators(parameters);
         break;
+      case POLICY:
+        validator: getPolicyValidators(parameters);
+        break;
+      case VERIFY:
+        validator: getVerifyPolicyValidator(parameters, body);
+        break;
+
     }
     return validator;
   }
 
-  private List<Validator> getResourceIDValidators(final MultiMap parameters) {
+  private List<Validator> getVerifyPolicyValidator(MultiMap parameters, JsonObject body) {
+    List<Validator> validators = new ArrayList<>();
+    validators.add(new JsonSchemaTypeValidator(body, RequestType.VERIFY));
+    return validators;
+  }
+
+  private List<Validator> getPolicyValidators(final MultiMap parameters){
+    List<Validator> validators = new ArrayList<>();
+    validators.add(new PolicyIdTypeValidator(parameters.get(POLICY_ID), true));
+    return validators;
+  }
+    private List<Validator> getResourceIDValidators(final MultiMap parameters) {
     List<Validator> validators = new ArrayList<>();
 
     validators.add(new ResourceIDTypeValidator(parameters.get(RESOURCE_ID), false));

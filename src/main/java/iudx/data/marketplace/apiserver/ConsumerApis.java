@@ -13,10 +13,16 @@ import iudx.data.marketplace.apiserver.handlers.AuthHandler;
 import iudx.data.marketplace.apiserver.handlers.ExceptionHandler;
 import iudx.data.marketplace.apiserver.handlers.ValidationHandler;
 import iudx.data.marketplace.apiserver.util.RequestType;
+import iudx.data.marketplace.authenticator.AuthClient;
+import iudx.data.marketplace.authenticator.AuthenticationService;
+import iudx.data.marketplace.common.Api;
 import iudx.data.marketplace.common.RespBuilder;
 import iudx.data.marketplace.common.ResponseUrn;
 import iudx.data.marketplace.consumer.ConsumerService;
 import java.util.Map;
+
+import iudx.data.marketplace.postgres.PostgresService;
+import iudx.data.marketplace.postgres.PostgresServiceImpl;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -27,10 +33,18 @@ public class ConsumerApis {
   private final Router router;
 
   private ConsumerService consumerService;
+  private Api api;
+  private PostgresService postgresService;
+  private AuthClient authClient;
+  private AuthenticationService authenticationService;
 
-  ConsumerApis(Vertx vertx, Router router) {
+  ConsumerApis(Vertx vertx, Router router, Api apis, PostgresService postgresService, AuthClient authClient, AuthenticationService authenticationService) {
     this.vertx = vertx;
     this.router = router;
+    this.api = apis;
+    this.postgresService = postgresService;
+    this.authClient = authClient;
+    this.authenticationService = authenticationService;
   }
 
   Router init() {
@@ -43,28 +57,28 @@ public class ConsumerApis {
     consumerService = ConsumerService.createProxy(vertx, CONSUMER_SERVICE_ADDRESS);
 
     router
-        .get(CONSUMER_BASE_PATH + LIST_PROVIDERS_PATH)
+        .get(CONSUMER_PATH + LIST_PROVIDERS_PATH)
         .handler(providerValidationHandler)
-        .handler(AuthHandler.create(vertx))
+        .handler(AuthHandler.create(authenticationService, vertx, api, postgresService, authClient))
         .handler(this::listProviders)
         .failureHandler(exceptionHandler);
 
     router
-        .get(CONSUMER_BASE_PATH + LIST_RESOURCES_PATH)
+        .get(CONSUMER_PATH + LIST_RESOURCES_PATH)
         .handler(resourceValidationHandler)
-        .handler(AuthHandler.create(vertx))
+        .handler(AuthHandler.create(authenticationService, vertx, api, postgresService, authClient))
         .handler(this::listResources)
         .failureHandler(exceptionHandler);
 
     router
-        .get(CONSUMER_BASE_PATH + LIST_PRODUCTS_PATH)
+        .get(CONSUMER_PATH + LIST_PRODUCTS_PATH)
         .handler(resourceValidationHandler)
-        .handler(AuthHandler.create(vertx))
+        .handler(AuthHandler.create(authenticationService, vertx, api, postgresService, authClient))
         .handler(this::listProducts)
         .failureHandler(exceptionHandler);
 
     router
-        .get(CONSUMER_BASE_PATH + LIST_PURCHASES_PATH)
+        .get(CONSUMER_PATH + LIST_PURCHASES_PATH)
         .handler(this::listPurchases)
         .failureHandler(exceptionHandler);
 

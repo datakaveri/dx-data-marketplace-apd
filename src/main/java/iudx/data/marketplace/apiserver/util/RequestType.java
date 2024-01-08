@@ -4,6 +4,8 @@ public enum RequestType {
   PRODUCT("product"),
   PRODUCT_VARIANT("product_variant"),
   RESOURCE("resource"),
+  POLICY("policy"),
+  VERIFY("verify_policy"),
   PROVIDER("provider");
 
   private String filename;

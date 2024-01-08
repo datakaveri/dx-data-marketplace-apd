@@ -39,10 +39,13 @@ public enum ResponseUrn {
   QUEUE_ERROR_URN("urn:dx:dmp:QueueError", "Queue error"),
   INVALID_RESOURCE_URN("urn:dx:dmp:InvalidResourceID", "Resource ID is invalid"),
   INVALID_PROVIDER_URN("urn:dx:dmp:InvalidProviderID", "Provider ID is invalid"),
-
+  ROLE_NOT_FOUND("urn:dx:dmp:invalidRole", "Role does not exist"),
   BACKING_SERVICE_FORMAT_URN(
       "urn:dx:dmp:backend", "format error from backing service [cat,auth etc.]"),
   SCHEMA_READ_ERROR_URN("urn:dx:dmp:readError", "Fail to read file"),
+  VERIFY_FORBIDDEN_URN("urn:apd:Deny", "Policy does not exist"),
+  FORBIDDEN_URN("urn:dx:dmp:forbidden", "Resource is forbidden to access"),
+  VERIFY_SUCCESS_URN("urn:apd:Allow", "Success"),
   YET_NOT_IMPLEMENTED_URN("urn:dx:dmp:general", "urn yet not implemented in backend verticle.");
 
   private final String urn;

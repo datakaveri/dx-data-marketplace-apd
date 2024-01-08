@@ -1,0 +1,185 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://example.com/example.json",
+  "title": "Root",
+  "type": "object",
+  "examples": [
+    {
+      "user": {
+        "id": "b58da193-23d9-43eb-b98a-a103d4b6103c",
+        "name": {
+          "firstName": "demo",
+          "lastName": "name"
+        },
+        "email": "test_user_1@example.com"
+      },
+      "owner": {
+        "id": "b2c27f3f-2524-4a84-816e-91f9ab23f837",
+        "name": {
+          "firstName": "test",
+          "lastName": "provider"
+        },
+        "email": "test@provider.com"
+      },
+      "item": {
+        "itemId": "b58da193-23d9-43eb-b98a-a103d4b6103c",
+        "itemType": "RESOURCE_GROUP"
+      }
+    }
+  ],
+  "required": [
+    "user",
+    "owner",
+    "item"
+  ],
+  "properties": {
+    "user": {
+      "$id": "#root/user",
+      "title": "User",
+      "type": "object",
+      "required": [
+        "id",
+        "name",
+        "email"
+      ],
+      "properties": {
+        "id": {
+          "$id": "#root/user/id",
+          "title": "Id",
+          "type": "string",
+          "minLength": 36,
+          "maxLength": 36,
+          "pattern": "^[0-9a-f]{8}\\b-[0-9a-f]{4}\\b-[0-9a-f]{4}\\b-[0-9a-f]{4}\\b-[0-9a-f]{12}$"
+        },
+        "name": {
+          "$id": "#root/user/name",
+          "title": "Name",
+          "type": "object",
+          "required": [
+            "firstName",
+            "lastName"
+          ],
+          "properties": {
+            "firstName": {
+              "$id": "#root/user/name/firstName",
+              "title": "Firstname",
+              "type": "string",
+              "minLength": 1,
+              "examples": [
+                "demo"
+              ],
+              "pattern": "^.*$"
+            },
+            "lastName": {
+              "$id": "#root/user/name/lastName",
+              "title": "Lastname",
+              "type": "string",
+              "minLength": 1,
+              "examples": [
+                "name"
+              ],
+              "pattern": "^.*$"
+            }
+          }
+        },
+        "email": {
+          "$id": "#root/user/email",
+          "title": "Email",
+          "type": "string",
+          "minLength": 1,
+          "examples": [
+            "test_user_1@example.com"
+          ],
+          "format": "email"
+        }
+      }
+    },
+    "owner": {
+      "$id": "#root/owner",
+      "title": "Owner",
+      "type": "object",
+      "required": [
+        "id",
+        "name",
+        "email"
+      ],
+      "properties": {
+        "id": {
+          "$id": "#root/owner/id",
+          "title": "Id",
+          "type": "string",
+          "minLength": 36,
+          "maxLength": 36,
+          "pattern": "^[0-9a-f]{8}\\b-[0-9a-f]{4}\\b-[0-9a-f]{4}\\b-[0-9a-f]{4}\\b-[0-9a-f]{12}$"
+        },
+        "name": {
+          "$id": "#root/owner/name",
+          "title": "Name",
+          "type": "object",
+          "required": [
+            "firstName",
+            "lastName"
+          ],
+          "properties": {
+            "firstName": {
+              "$id": "#root/owner/name/firstName",
+              "title": "Firstname",
+              "type": "string",
+              "minLength": 1,
+              "examples": [
+                "test"
+              ],
+              "pattern": "^.*$"
+            },
+            "lastName": {
+              "$id": "#root/owner/name/lastName",
+              "title": "Lastname",
+              "type": "string",
+              "minLength": 1,
+              "examples": [
+                "provider"
+              ],
+              "pattern": "^.*$"
+            }
+          }
+        },
+        "email": {
+          "$id": "#root/owner/email",
+          "title": "Email",
+          "type": "string",
+          "minLength": 1,
+          "examples": [
+            "test@provider.com"
+          ],
+          "format": "email"
+        }
+      }
+    },
+    "item": {
+      "$id": "#root/item",
+      "title": "Item",
+      "type": "object",
+      "required": [
+        "itemId",
+        "itemType"
+      ],
+      "properties": {
+        "itemId": {
+          "$id": "#root/item/itemId",
+          "title": "Itemid",
+          "type": "string",
+          "minLength": 36,
+          "maxLength": 36,
+          "pattern": "^[0-9a-f]{8}\\b-[0-9a-f]{4}\\b-[0-9a-f]{4}\\b-[0-9a-f]{4}\\b-[0-9a-f]{12}$"
+        },
+        "itemType": {
+          "$id": "#root/item/itemType",
+          "title": "Itemtype",
+          "type": "string",
+          "enum": ["resource"],
+          "minLength": 1
+        }
+      }
+    }
+  }
+}

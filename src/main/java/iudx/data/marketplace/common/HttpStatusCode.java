@@ -17,6 +17,8 @@ public enum HttpStatusCode {
   PAYMENT_REQUIRED(402, "Payment Required", "urn:dx:dmp:paymentRequired"),
   FORBIDDEN(403, "Forbidden", "urn:dx:dmp:forbidden"),
   NOT_FOUND(404, "Not Found", "urn:dx:dmp:notFound"),
+  VERIFY_FORBIDDEN(403, "Policy does not exist", "urn:apd:Deny"),
+
   METHOD_NOT_ALLOWED(405, "Method Not Allowed", "urn:dx:dmp:methodNotAllowed"),
   NOT_ACCEPTABLE(406, "Not Acceptable", "urn:dx:dmp:notAcceptable"),
   PROXY_AUTHENTICATION_REQUIRED(
