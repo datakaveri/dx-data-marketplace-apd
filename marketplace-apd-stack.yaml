@@ -27,7 +27,7 @@ services:
         max_attempts: 5
       placement:
         constraints:
-          - "node.labels.adex-consent-node==true"
+          - "node.labels.marketplace-node==true"
     logging:
       driver: "json-file"
       options:
