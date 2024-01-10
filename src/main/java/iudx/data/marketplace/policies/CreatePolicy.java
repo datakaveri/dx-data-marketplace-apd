@@ -6,12 +6,19 @@ import dev.failsafe.RetryPolicy;
 import io.vertx.core.CompositeFuture;
 import io.vertx.core.Future;
 import io.vertx.core.Promise;
+import io.vertx.core.http.HttpMethod;
+import io.vertx.core.http.HttpServerRequest;
+import io.vertx.core.http.HttpServerResponse;
 import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
+import io.vertx.ext.web.RoutingContext;
 import io.vertx.sqlclient.Tuple;
 import iudx.data.marketplace.apiserver.exceptions.DxRuntimeException;
+import iudx.data.marketplace.auditing.AuditingService;
+import iudx.data.marketplace.common.Api;
 import iudx.data.marketplace.common.CatalogueService;
 import iudx.data.marketplace.common.ResponseUrn;
+import iudx.data.marketplace.policies.util.Status;
 import iudx.data.marketplace.postgres.PostgresService;
 import iudx.data.marketplace.postgres.PostgresServiceImpl;
 import org.apache.logging.log4j.LogManager;
@@ -19,6 +26,8 @@ import org.apache.logging.log4j.Logger;
 
 import java.time.Duration;
 import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.Arrays;
 import java.util.List;
@@ -30,16 +39,22 @@ import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 import static iudx.data.marketplace.apiserver.util.Constants.TITLE;
+import static iudx.data.marketplace.auditing.util.Constants.*;
 import static iudx.data.marketplace.product.util.Constants.TYPE;
 
 public class CreatePolicy {
     private static final Logger LOGGER = LogManager.getLogger(CreatePolicy.class);
     private final PostgresService postgresService;
     private final CatalogueService catalogueService;
+    private AuditingService auditingService;
+    private Api api;
 
-    public CreatePolicy(PostgresService postgresService, CatalogueService catalogueService) {
+
+    public CreatePolicy(PostgresService postgresService, CatalogueService catalogueService, AuditingService auditingService, Api api) {
         this.postgresService = postgresService;
         this.catalogueService = catalogueService;
+        this.auditingService = auditingService;
+        this.api = api;
     }
     public Future<JsonObject> initiateCreatePolicy(JsonObject request, User user) {
         Promise<JsonObject> promise = Promise.promise();
@@ -226,6 +241,23 @@ public class CreatePolicy {
                 new JsonObject()
                     .put(TYPE, ResponseUrn.SUCCESS_URN.getUrn())
                     .put(TITLE, "Insertion successful"));
+
+              /* sending information for auditing */
+
+              /* audit info = Request body + response + extra information if any*/
+              JsonObject auditInfo = new JsonObject()
+                      .put("policyId", policyId)
+                      .put("resourceId", resourceId)
+                      .put("purchaseId", purchaseId)
+                      .put("constraints",constraints)
+                      .put("providerId", providerId)
+                      .put("consumerEmailId", consumerEmailId)
+                      .put("expiryAt", expiry_at)
+                      .put("productVariantId", pvId)
+                      .put("resourceServerUrl", resourceServerUrl)
+                      .put("accessPolicy",accessPolicy)
+                      .put("policyStatus", Status.ACTIVE);
+              auditingService.handleAuditLogs(user, auditInfo, api.getPoliciesUrl(), HttpMethod.POST.toString());
           } else {
               handler.cause().printStackTrace();
             promise.fail(

@@ -1,5 +1,6 @@
 package iudx.data.marketplace.product.util;
 
+import static iudx.data.marketplace.auditing.util.Constants.*;
 import static iudx.data.marketplace.common.Constants.*;
 import static iudx.data.marketplace.product.util.Constants.*;
 
@@ -15,7 +16,7 @@ import org.apache.logging.log4j.Logger;
 public class QueryBuilder {
 
   public static final Logger LOGGER = LogManager.getLogger(QueryBuilder.class);
-  private final String productTable, resourceTable, productResourceRelationTable, productVariantTable;
+  private String productTable, resourceTable, productResourceRelationTable, productVariantTable;
 
   public QueryBuilder(JsonArray tables) {
     this.productTable = tables.getString(0);
@@ -24,6 +25,7 @@ public class QueryBuilder {
     this.productVariantTable = tables.getString(3);
   }
 
+  public QueryBuilder(){}
   public List<String> buildCreateProductQueries(JsonObject request, JsonArray resourceDetails) {
     String productID = request.getString(PRODUCT_ID);
     String providerID = request.getString(PROVIDER_ID);
@@ -157,5 +159,14 @@ public class QueryBuilder {
                 .replace("$1", productID)
                 .replace("$2", variantName).replace("$3", Status.ACTIVE.toString()));
     return query.toString();
+  }
+
+  public JsonObject buildMessageForRmq(JsonObject request) {
+    String primaryKey = UUID.randomUUID().toString().replace("-", "");
+    request.put(PRIMARY_KEY, primaryKey);
+    request.put(ORIGIN, ORIGIN_SERVER);
+
+    LOGGER.debug("Info: Request " + request);
+    return request;
   }
 }
