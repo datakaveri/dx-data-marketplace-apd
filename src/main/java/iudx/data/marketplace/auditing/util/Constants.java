@@ -4,7 +4,7 @@ public class Constants {
 
     public static final String PRIMARY_KEY = "primaryKey";
     public static final String ORIGIN = "origin";
-    public static final String ORIGIN_SERVER = "acl-apd-server";
+    public static final String ORIGIN_SERVER = "dmp-apd-server";
     public static final String EXCHANGE_NAME = "auditing";
     public static final String ROUTING_KEY = "#";
     public static final String EPOCH_TIME = "epochTime";
