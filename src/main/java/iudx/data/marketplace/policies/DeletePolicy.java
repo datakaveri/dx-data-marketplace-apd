@@ -95,8 +95,8 @@ public class DeletePolicy {
 
               /* audit info = Request body + response + extra information if any*/
               JsonObject auditInfo = new JsonObject()
-                      .put("policyId", policyUuid)
-                      .put("policyStatus", Status.DELETED);
+                      .put("policyId", policyUuid.toString())
+                      .put("policyStatus", Status.DELETED.toString());
               auditingService.handleAuditLogs(user, auditInfo, api.getPoliciesUrl(), HttpMethod.DELETE.toString());
 
               promise.complete(responseJson);

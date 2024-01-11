@@ -38,7 +38,7 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
-import static iudx.data.marketplace.apiserver.util.Constants.TITLE;
+import static iudx.data.marketplace.apiserver.util.Constants.*;
 import static iudx.data.marketplace.auditing.util.Constants.*;
 import static iudx.data.marketplace.product.util.Constants.TYPE;
 
@@ -78,6 +78,15 @@ public class CreatePolicy {
         String providerLastName = "Provider";
 
         Tuple providerInsertionTuple = Tuple.of(providerId, providerEmailId, providerFirstName, providerLastName);
+
+        JsonObject userJson = new JsonObject()
+                .put("userId", providerId)
+                .put(USER_ROLE, "provider")
+                .put(EMAIL_ID, providerEmailId)
+                .put(FIRST_NAME, providerFirstName)
+                .put(LAST_NAME, providerLastName)
+                .put(RS_SERVER_URL, "rs.iudx.io");
+        User user1 = new User(userJson);
 
         String userInsertion2 = "INSERT INTO user_table (_id, email_id, first_name, last_name) VALUES ($1, $2, $3, $4)";
 
@@ -246,18 +255,18 @@ public class CreatePolicy {
 
               /* audit info = Request body + response + extra information if any*/
               JsonObject auditInfo = new JsonObject()
-                      .put("policyId", policyId)
-                      .put("resourceId", resourceId)
-                      .put("purchaseId", purchaseId)
-                      .put("constraints",constraints)
-                      .put("providerId", providerId)
+                      .put("policyId", policyId.toString())
+                      .put("resourceId", resourceId.toString())
+                      .put("purchaseId", purchaseId.toString())
+                      .put("constraints",constraints.encode())
+                      .put("providerId", providerId.toString())
                       .put("consumerEmailId", consumerEmailId)
-                      .put("expiryAt", expiry_at)
-                      .put("productVariantId", pvId)
+                      .put("expiryAt", expiry_at.toString())
+                      .put("productVariantId", pvId.toString())
                       .put("resourceServerUrl", resourceServerUrl)
                       .put("accessPolicy",accessPolicy)
-                      .put("policyStatus", Status.ACTIVE);
-              auditingService.handleAuditLogs(user, auditInfo, api.getPoliciesUrl(), HttpMethod.POST.toString());
+                      .put("policyStatus", Status.ACTIVE.toString());
+              auditingService.handleAuditLogs(user1, auditInfo, api.getPoliciesUrl(), HttpMethod.POST.toString());
           } else {
               handler.cause().printStackTrace();
             promise.fail(
