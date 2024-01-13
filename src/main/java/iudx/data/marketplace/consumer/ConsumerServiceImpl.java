@@ -34,11 +34,11 @@ public class ConsumerServiceImpl implements ConsumerService {
     if (request.containsKey(RESOURCE_ID)) {
       String resourceID = request.getString(RESOURCE_ID);
       params.put(RESOURCE_ID, resourceID);
-      query.append(" where ").append(RESOURCE_ID).append('=').append("$1");
+      query.append(" where ").append("_id").append('=').append("$1");
     } else if (request.containsKey(PROVIDER_ID)) {
       String providerID = request.getString(PROVIDER_ID);
       params.put(PROVIDER_ID, providerID);
-      query.append(" where ").append(PROVIDER_ID).append('=').append("$1");
+      query.append(" where ").append("provider_id").append('=').append("$1");
     }
 
     pgService.executePreparedQuery(
@@ -66,7 +66,7 @@ public class ConsumerServiceImpl implements ConsumerService {
     if (request.containsKey(PROVIDER_ID)) {
       String providerID = request.getString(PROVIDER_ID);
       params.put(PROVIDER_ID, providerID);
-      query.insert(query.indexOf("group by") - 1, " where " + PROVIDER_ID + '=' + "$1");
+      query.append(" where ").append("provider_id").append('=').append("$1");
     }
 
     pgService.executePreparedQuery(
@@ -119,11 +119,14 @@ public class ConsumerServiceImpl implements ConsumerService {
                 .replace("$9", productResourceRelationTable)
                 .replace("$8", resourceTable));
 
+    LOGGER.debug(finalQuery);
+
     pgService.executePreparedQuery(
         finalQuery.toString(),
         params,
         pgHandler -> {
           if (pgHandler.succeeded()) {
+            LOGGER.debug(pgHandler.result());
             handler.handle(Future.succeededFuture(pgHandler.result()));
           } else {
             LOGGER.error("get resources failed");

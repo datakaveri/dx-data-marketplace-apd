@@ -1,0 +1,1 @@
+ALTER TABLE product DROP COLUMN resource_id;

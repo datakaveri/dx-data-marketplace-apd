@@ -2,13 +2,13 @@ CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
 
 CREATE TABLE IF NOT EXISTS product
 (
-    productID varchar UNIQUE NOT NULL,
+    product_id varchar UNIQUE NOT NULL,
     providerID varchar NOT NULL,
     providerName varchar NOT NULL,
     status varchar NOT NULL,
     created_at timestamp without time zone NOT NULL,
     modified_at timestamp without time zone NOT NULL,
-    CONSTRAINT product_pk PRIMARY KEY (productID)
+    CONSTRAINT product_pk PRIMARY KEY (product_id)
 );
 
 CREATE TABLE IF NOT EXISTS resource
@@ -26,7 +26,7 @@ CREATE TABLE IF NOT EXISTS resource
 
 CREATE TABLE IF NOT EXISTS product_resource_relation
 (
-    productID varchar REFERENCES product (productID),
+    product_id varchar REFERENCES product (product_id),
     resourceID varchar REFERENCES resource (resourceID),
     _id uuid DEFAULT uuid_generate_v4 () NOT NULL,
     CONSTRAINT pkey PRIMARY KEY (_id)
@@ -66,7 +66,7 @@ CREATE TRIGGER update_dataset_modified BEFORE INSERT
 OR UPDATE ON
    dataset FOR EACH ROW EXECUTE PROCEDURE update_modified ();
 
-INSERT INTO product (productID, providerID, providerName, status) VALUES ('product-id-alter', 'provider-id', 'provider-name', 'ACTIVE');
+INSERT INTO product (product_id, providerID, providerName, status) VALUES ('product-id-alter', 'provider-id', 'provider-name', 'ACTIVE');
 
 INSERT INTO dataset (datasetID, datasetName, accessPolicy, providerID, providerName, totalResources) VALUES ('dataset-id-1', 'dat-name-1', 'OPEN', 'provider-id', 'provider-name', 10);
 INSERT INTO dataset (datasetID, datasetName, accessPolicy, providerID, providerName, totalResources) VALUES ('dataset-id-2', 'dat-name-2', 'SECURE', 'provider-id', 'provider-name', 8);

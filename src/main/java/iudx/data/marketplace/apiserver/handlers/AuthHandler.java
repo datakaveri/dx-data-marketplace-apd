@@ -17,17 +17,13 @@ import iudx.data.marketplace.common.HttpStatusCode;
 import iudx.data.marketplace.common.ResponseUrn;
 import iudx.data.marketplace.policies.User;
 import iudx.data.marketplace.postgres.PostgresService;
-import iudx.data.marketplace.postgres.PostgresServiceImpl;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import java.util.UUID;
-
 import static iudx.data.marketplace.apiserver.util.Constants.*;
+import static iudx.data.marketplace.authenticator.util.Constants.TOKEN;
 import static iudx.data.marketplace.authenticator.util.Constants.GET_USER;
 import static iudx.data.marketplace.authenticator.util.Constants.INSERT_USER_TABLE;
-import static iudx.data.marketplace.common.Constants.AUTH_INFO;
-import static iudx.data.marketplace.common.Constants.AUTH_SERVICE_ADDRESS;
 import static iudx.data.marketplace.common.ResponseUrn.INVALID_TOKEN_URN;
 import static iudx.data.marketplace.common.ResponseUrn.RESOURCE_NOT_FOUND_URN;
 
@@ -65,7 +61,7 @@ public class AuthHandler implements Handler<RoutingContext> {
 
     LOGGER.debug("Info : path " + request.path());
 
-    String token = request.headers().get(AUTHORIZATION_KEY);
+    String token = request.headers().get(TOKEN);
     final String path = getNormalisedPath(request.path());
     final String method = context.request().method().toString();
 

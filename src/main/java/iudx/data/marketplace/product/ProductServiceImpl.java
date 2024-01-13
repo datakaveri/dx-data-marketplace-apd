@@ -139,6 +139,8 @@ public class ProductServiceImpl implements ProductService {
                 .replace("$0", productTableName)
                 .replace("$1", providerID)
                 .replace("$2", productID));
+
+    LOGGER.debug("checkQuery: {}",query);
     pgService.executeCountQuery(
         query.toString(),
         handler -> {
@@ -157,7 +159,7 @@ public class ProductServiceImpl implements ProductService {
   public ProductService deleteProduct( User user,
       JsonObject request, Handler<AsyncResult<JsonObject>> handler) {
 
-    String providerID = request.getJsonObject(AUTH_INFO).getString(PROVIDER_ID);
+    String providerID = user.getUserId();
     String productID = request.getString(PRODUCT_ID);
     JsonObject params =
         new JsonObject().put(STATUS, Status.INACTIVE.toString()).put(PRODUCT_ID, productID);
@@ -189,7 +191,7 @@ public class ProductServiceImpl implements ProductService {
   @Override
   public ProductService listProducts(User user, JsonObject request, Handler<AsyncResult<JsonObject>> handler) {
 
-    String providerID = request.getJsonObject(AUTH_INFO).getString(PROVIDER_ID);
+    String providerID = user.getUserId();
     JsonObject params =
         new JsonObject().put(STATUS, Status.ACTIVE.toString()).put(PROVIDER_ID, providerID);
 

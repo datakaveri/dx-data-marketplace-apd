@@ -35,7 +35,7 @@ public class ProductVariantServiceImpl implements ProductVariantService {
     String variantName = request.getString(VARIANT);
     Future<Boolean> checkForExistence = checkIfProductVariantExists(productID, variantName);
     Future<JsonObject> productDetailsFuture = getProductDetails(productID);
-    JsonArray resources = request.getJsonArray(resourceNames);
+    JsonArray resources = request.getJsonArray(RESOURCES_ARRAY);
 
     checkForExistence
         .compose(
@@ -50,7 +50,7 @@ public class ProductVariantServiceImpl implements ProductVariantService {
             pdfHandler -> {
               if (pdfHandler.succeeded()) {
                 JsonObject res = pdfHandler.result().getJsonArray(RESULTS).getJsonObject(0);
-                JsonArray resResources = res.getJsonArray(resourceNames);
+                JsonArray resResources = res.getJsonArray(RESOURCES_ARRAY);
                 if (resources.size() != resResources.size()) {
                   handler.handle(
                       Future.failedFuture(

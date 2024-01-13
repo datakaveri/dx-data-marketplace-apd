@@ -1,0 +1,1 @@
+ALTER TABLE product_variant ALTER COLUMN resource_ids TYPE varchar[];

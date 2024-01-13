@@ -50,9 +50,10 @@ public class QueryBuilder {
                           .replace("$0", resourceTable)
                           .replace("$1", ((JsonObject) resource).getString(RESOURCE_ID))
                           .replace("$2", ((JsonObject) resource).getString(RESOURCE_NAME))
-                          .replace("$3", ((JsonObject) resource).getString("accessPolicy"))
-                          .replace("$4", providerID)
-                          .replace("$5", providerName))
+                          .replace("$3", providerID)
+                          .replace("$4", providerName)
+                          .replace("$5", ((JsonObject) resource).getString(RESOURCE_SERVER))
+                          .replace("$6", ((JsonObject) resource).getString("accessPolicy")))
                   .toString());
 
           // Product-Resource relationship table entry
@@ -98,7 +99,7 @@ public class QueryBuilder {
 
   public String buildCreateProductVariantQuery(JsonObject request) {
 
-    JsonArray resources = request.getJsonArray(resourceNames);
+    JsonArray resources = request.getJsonArray(RESOURCES_ARRAY);
     String resourceIDs =
         resources.stream()
             .map(JsonObject.class::cast)
@@ -118,6 +119,8 @@ public class QueryBuilder {
     // UUID for each product variant.
     String pvID = UUID.randomUUID().toString();
 
+    LOGGER.debug("resourceIds : {} ", resourceIDs);
+
     StringBuilder query =
         new StringBuilder(
             INSERT_PV_QUERY
@@ -133,6 +136,7 @@ public class QueryBuilder {
                 .replace("$9", request.getInteger(DURATION).toString())
                 .replace("$s", Status.ACTIVE.toString()));
 
+    LOGGER.debug(query);
     return query.toString();
   }
 

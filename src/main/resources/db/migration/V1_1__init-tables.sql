@@ -48,7 +48,7 @@ CREATE TABLE IF NOT EXISTS resource_entity
 
 CREATE TABLE IF NOT EXISTS product
 (
-    product_id uuid UNIQUE NOT NULL,
+    product_id varchar UNIQUE NOT NULL,
     resource_id uuid NOT NULL,
     status status_type NOT NULL,
     created_at timestamp without time zone NOT NULL,
@@ -58,30 +58,12 @@ CREATE TABLE IF NOT EXISTS product
 
 
 
-CREATE TABLE IF NOT EXISTS policy
-(
-    _id uuid DEFAULT uuid_generate_v4 () NOT NULL,
-    resource_id uuid NOT NULL,
-    purchase_id uuid NOT NULL,
-    constraints json NOT NULL,
-    provider_id uuid NOT NULL,
-    consumer_email_id varchar NOT NULL,
-    expiry_at timestamp without time zone NOT NULL,
-    status policy_status NOT NULL,
-    product_variant_id uuid NOT NULL,
-    created_at timestamp without time zone NOT NULL,
-    modified_at timestamp without time zone NOT NULL,
-    CONSTRAINT resource_id_fk FOREIGN KEY(resource_id) REFERENCES resource_entity(_id),
-    CONSTRAINT provider_id_fk FOREIGN KEY (provider_id) REFERENCES user_table (_id),
-    CONSTRAINT policy_product_variant_id_fkey FOREIGN KEY (product_variant_id) REFERENCES product_variant (_id),
-    CONSTRAINT policy_purchase_id_fkey FOREIGN KEY (purchase_id) REFERENCES purchase (_id)
-);
 
 
 
 CREATE TABLE IF NOT EXISTS product_resource_relation
 (
-    product_id uuid REFERENCES product (product_id),
+    product_id varchar REFERENCES product (product_id),
     resource_id uuid REFERENCES resource_entity (_id),
     _id uuid DEFAULT uuid_generate_v4 () NOT NULL,
     CONSTRAINT _id_pkey PRIMARY KEY (_id)
@@ -92,7 +74,7 @@ CREATE TABLE IF NOT EXISTS product_variant
 (
     _id uuid NOT NULL PRIMARY KEY,
     product_variant_name varchar NOT NULL,
-    product_id uuid NOT NULL,
+    product_id varchar NOT NULL,
     provider_id uuid NOT NULL,
     resource_name varchar[] NOT NULL,
     resource_ids uuid[] NOT NULL,
@@ -129,6 +111,24 @@ CREATE TABLE IF NOT EXISTS purchase
 
 );
 
+CREATE TABLE IF NOT EXISTS policy
+(
+    _id uuid DEFAULT uuid_generate_v4 () NOT NULL,
+    resource_id uuid NOT NULL,
+    purchase_id uuid NOT NULL,
+    constraints json NOT NULL,
+    provider_id uuid NOT NULL,
+    consumer_email_id varchar NOT NULL,
+    expiry_at timestamp without time zone NOT NULL,
+    status policy_status NOT NULL,
+    product_variant_id uuid NOT NULL,
+    created_at timestamp without time zone NOT NULL,
+    modified_at timestamp without time zone NOT NULL,
+    CONSTRAINT resource_id_fk FOREIGN KEY(resource_id) REFERENCES resource_entity(_id),
+    CONSTRAINT provider_id_fk FOREIGN KEY (provider_id) REFERENCES user_table (_id),
+    CONSTRAINT policy_product_variant_id_fkey FOREIGN KEY (product_variant_id) REFERENCES product_variant (_id),
+    CONSTRAINT policy_purchase_id_fkey FOREIGN KEY (purchase_id) REFERENCES purchase (_id)
+);
 
 
 -- modified_at column function
