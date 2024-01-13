@@ -1,0 +1,1 @@
+ALTER TABLE resource_entity RENAME COLUMN resource_server_url TO resource_server;
