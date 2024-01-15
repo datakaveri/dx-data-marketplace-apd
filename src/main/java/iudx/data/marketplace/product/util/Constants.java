@@ -27,7 +27,7 @@ public class Constants {
   public static final String INSERT_PRODUCT_QUERY =
       "insert into $0 (product_id, providerID, providerName, status) values ('$1', '$2', '$3', '$4')";
   public static final String INSERT_RESOURCE_QUERY =
-      "insert into $0 (_id, resource_name, provider_id, providerName, resource_server_url, accessPolicy) values ('$1', '$2', '$3', '$4', '$5', '$6')";
+      "insert into $0 (_id, resource_name, provider_id, providerName, resource_server, accessPolicy) values ('$1', '$2', '$3', '$4', '$5', '$6')";
 
   public static final String INSERT_P_R_REL_QUERY =
       "insert into $0 (product_id, resource_id) values ('$1', '$2')";
