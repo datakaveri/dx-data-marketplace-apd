@@ -14,5 +14,22 @@ public class Constants {
   public static final String LIST_PRODUCTS_FOR_RESOURCE =
       "select pt.product_id, pt.providerName from $0 as pt inner join $9 as dpt on pt.product_id=dpt.product_id inner join $8 as dt on dpt.resource_id=dt._id where pt.status=$1 and dt._id=$2";
 
+  public static final String GET_PRODUCT_VARIANT_INFO =
+      "select pv._id, pv.product_variant_name, pv.product_id, pv.provider_id, pv.price, m.account_id " +
+          "from $0 as pv inner join $9 as m on pv.provider_id = m.provider_id " +
+          "where pv._id='22f7907d-d602-4455-9181-96e75b3df9b7' and pv.status='ACTIVE'";
+
+  public static final String INSERT_ORDER_QUERY =
+      "insert into $0 (order_id, amount, currency, account_id, notes) values ($1, $2, $3, $4, $5)";
+
+  public static final String TRANSFER_ID = "id";
+  public static final String SOURCE = "source";
+  public static final String AMOUNT = "amount";
+  public static final String CURRENCY = "currency";
+  public static final String INR = "INR";
+  public static final String ACCOUNT_ID = "account_id";
+  public static final String RECIPIENT = "recipient";
+  public static final String NOTES = "notes";
+  public static final String TRANSFERS = "transfers";
   public static final String TABLES = "tables";
 }

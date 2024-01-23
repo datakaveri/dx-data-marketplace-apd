@@ -1,21 +1,21 @@
 package iudx.data.marketplace.apiserver.validation.types;
 
+import static iudx.data.marketplace.apiserver.util.Constants.*;
+import static iudx.data.marketplace.common.ResponseUrn.INVALID_PROVIDER_URN;
+
 import iudx.data.marketplace.apiserver.exceptions.DxRuntimeException;
 import iudx.data.marketplace.common.HttpStatusCode;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import static iudx.data.marketplace.apiserver.util.Constants.*;
-import static iudx.data.marketplace.common.ResponseUrn.INVALID_PROVIDER_URN;
+public class UUIDTypeValidator implements Validator {
 
-public class ProviderIDTypeValidator implements Validator {
-
-  public static final Logger LOGGER = LogManager.getLogger(ProviderIDTypeValidator.class);
+  public static final Logger LOGGER = LogManager.getLogger(UUIDTypeValidator.class);
 
   private final String value;
   private final boolean required;
 
-  public ProviderIDTypeValidator(final String value, final boolean required) {
+  public UUIDTypeValidator(final String value, final boolean required) {
     this.value = value;
     this.required = required;
   }

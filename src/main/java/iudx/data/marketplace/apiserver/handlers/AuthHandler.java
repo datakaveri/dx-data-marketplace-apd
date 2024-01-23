@@ -94,6 +94,7 @@ public class AuthHandler implements Handler<RoutingContext> {
     }
     else // for all the other endpoints
     {
+      LOGGER.error("hre");
       checkAuth(requestJson, authInfo)
               .onSuccess(userObject -> {
                 LOGGER.info("User verification successful");
@@ -240,6 +241,8 @@ public class AuthHandler implements Handler<RoutingContext> {
       return api.getConsumerListPurchases();
     } else if (url.matches(api.getConsumerListProducts())) {
       return api.getConsumerListProducts();
+    } else if (url.contains(api.getConsumerOrderApi())) {
+      return api.getConsumerOrderApi();
     }
     return null;
   }

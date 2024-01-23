@@ -65,6 +65,7 @@ public class Constants {
   public static final String CONSUMER_PATH = "/consumer";
   public static final String LIST_PROVIDERS_PATH = "/list/providers";
   public static final String LIST_RESOURCES_PATH = "/list/resources";
+  public static final String ORDERS_PATH = "/order";
   public static final String USERMAPS_PATH = "/product/usermaps";
   public static final String VERIFY_PATH = "/verify";
   public static final String POLICIES_API = "/policies";

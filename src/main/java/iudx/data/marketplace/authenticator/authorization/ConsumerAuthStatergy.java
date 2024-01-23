@@ -13,6 +13,7 @@ import java.util.Map;
 
 
 import static iudx.data.marketplace.authenticator.authorization.Method.GET;
+import static iudx.data.marketplace.authenticator.authorization.Method.POST;
 
 public class ConsumerAuthStatergy implements AuthorizationStatergy {
   private static final Logger LOGGER = LogManager.getLogger(ConsumerAuthStatergy.class);
@@ -39,6 +40,7 @@ public class ConsumerAuthStatergy implements AuthorizationStatergy {
     apiAccessList.add(new AuthorizationRequest(GET, apis.getConsumerListProviders()));
     apiAccessList.add(new AuthorizationRequest(GET, apis.getConsumerListProducts()));
     apiAccessList.add(new AuthorizationRequest(GET, apis.getConsumerListPurchases()));
+    apiAccessList.add(new AuthorizationRequest(POST, apis.getConsumerOrderApi()));
     // policy
     apiAccessList.add(new AuthorizationRequest(GET, apis.getPoliciesUrl()));
     consumerAuthorizationRules.put("api", apiAccessList);

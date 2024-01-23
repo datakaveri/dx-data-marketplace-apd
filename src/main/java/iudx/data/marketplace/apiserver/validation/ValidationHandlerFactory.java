@@ -35,14 +35,22 @@ public class ValidationHandlerFactory {
         validator = getProviderIDValidators(parameters);
         break;
       case POLICY:
-        validator: getPolicyValidators(parameters);
+        validator = getPolicyValidators(parameters);
         break;
       case VERIFY:
-        validator: getVerifyPolicyValidator(parameters, body);
+        validator = getVerifyPolicyValidator(parameters, body);
         break;
-
+      case ORDER:
+        validator = getOrderValidator(parameters);
+        break;
     }
     return validator;
+  }
+
+  private List<Validator> getOrderValidator(MultiMap parameters) {
+    List<Validator> validators = new ArrayList<>();
+    validators.add(new UUIDTypeValidator(parameters.get(PRODUCT_VARIANT_NAME), true));
+    return validators;
   }
 
   private List<Validator> getVerifyPolicyValidator(MultiMap parameters, JsonObject body) {
@@ -51,23 +59,24 @@ public class ValidationHandlerFactory {
     return validators;
   }
 
-  private List<Validator> getPolicyValidators(final MultiMap parameters){
+  private List<Validator> getPolicyValidators(final MultiMap parameters) {
     List<Validator> validators = new ArrayList<>();
     validators.add(new PolicyIdTypeValidator(parameters.get(POLICY_ID), true));
     return validators;
   }
-    private List<Validator> getResourceIDValidators(final MultiMap parameters) {
+
+  private List<Validator> getResourceIDValidators(final MultiMap parameters) {
     List<Validator> validators = new ArrayList<>();
 
-    validators.add(new ResourceIDTypeValidator(parameters.get(RESOURCE_ID), false));
-    validators.add(new ProviderIDTypeValidator(parameters.get(PROVIDER_ID), false));
+    validators.add(new UUIDTypeValidator(parameters.get(RESOURCE_ID), false));
+    validators.add(new UUIDTypeValidator(parameters.get(PROVIDER_ID), false));
     return validators;
   }
 
   private List<Validator> getProviderIDValidators(final MultiMap parameters) {
     List<Validator> validators = new ArrayList<>();
 
-    validators.add(new ProviderIDTypeValidator(parameters.get(PROVIDER_ID), false));
+    validators.add(new UUIDTypeValidator(parameters.get(PROVIDER_ID), false));
     return validators;
   }
 
