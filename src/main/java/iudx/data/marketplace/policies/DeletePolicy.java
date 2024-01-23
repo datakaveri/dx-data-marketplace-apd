@@ -1,6 +1,9 @@
 package iudx.data.marketplace.policies;
 
 import static iudx.data.marketplace.apiserver.util.Constants.*;
+import static iudx.data.marketplace.auditing.util.Constants.*;
+import static iudx.data.marketplace.auditing.util.Constants.RESPONSE_SIZE;
+import static iudx.data.marketplace.auditing.util.Constants.USERID;
 import static iudx.data.marketplace.common.HttpStatusCode.BAD_REQUEST;
 import static iudx.data.marketplace.common.HttpStatusCode.FORBIDDEN;
 import static iudx.data.marketplace.common.ResponseUrn.FORBIDDEN_URN;
@@ -11,13 +14,24 @@ import io.vertx.core.AsyncResult;
 import io.vertx.core.Future;
 import io.vertx.core.Handler;
 import io.vertx.core.Promise;
+import io.vertx.core.http.HttpMethod;
+import io.vertx.core.http.HttpServerRequest;
+import io.vertx.core.http.HttpServerResponse;
 import io.vertx.core.json.JsonObject;
+import io.vertx.ext.web.RoutingContext;
 import io.vertx.pgclient.PgPool;
 import io.vertx.sqlclient.Tuple;
+import iudx.data.marketplace.auditing.AuditingService;
+import iudx.data.marketplace.common.Api;
 import iudx.data.marketplace.common.HttpStatusCode;
 import iudx.data.marketplace.common.ResponseUrn;
+import iudx.data.marketplace.policies.util.Status;
 import iudx.data.marketplace.postgres.PostgresService;
 import iudx.data.marketplace.postgres.PostgresServiceImpl;
+
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
+import java.time.temporal.ChronoUnit;
 import java.util.UUID;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -27,9 +41,13 @@ public class DeletePolicy {
   private static final String FAILURE_MESSAGE = "Policy could not be deleted";
   private final PostgresService postgresService;
   private PgPool pool;
+  private AuditingService auditingService;
+  private Api api;
 
-  public DeletePolicy(PostgresService postgresService) {
+  public DeletePolicy(PostgresService postgresService, AuditingService auditingService, Api api) {
     this.postgresService = postgresService;
+    this.auditingService = auditingService;
+    this.api = api;
   }
 
   private String getFailureResponse(JsonObject response, String detail) {
@@ -48,7 +66,7 @@ public class DeletePolicy {
    * @param policyUuid policy id as type UUID
    * @return The response of the query execution
    */
-  public Future<JsonObject> executeUpdateQuery(String query, UUID policyUuid) {
+  public Future<JsonObject> executeUpdateQuery(String query, UUID policyUuid, User user) {
     LOG.debug("inside executeUpdateQuery");
     Promise<JsonObject> promise = Promise.promise();
     Tuple tuple = Tuple.of(policyUuid);
@@ -72,6 +90,15 @@ public class DeletePolicy {
                       .result()
                       .put(STATUS_CODE, HttpStatusCode.SUCCESS.getValue())
                       .put(DETAIL, "Policy deleted successfully");
+
+              /* sending information for auditing */
+
+              /* audit info = Request body + response + extra information if any*/
+              JsonObject auditInfo = new JsonObject()
+                      .put("policyId", policyUuid.toString())
+                      .put("policyStatus", Status.DELETED.toString());
+              auditingService.handleAuditLogs(user, auditInfo, api.getPoliciesUrl(), HttpMethod.DELETE.toString());
+
               promise.complete(responseJson);
             }
           } else {
@@ -180,7 +207,7 @@ public class DeletePolicy {
     return policyVerificationFuture.compose(
         isVerified -> {
           if (isVerified) {
-            return executeUpdateQuery(DELETE_POLICY_QUERY, policyUuid);
+            return executeUpdateQuery(DELETE_POLICY_QUERY, policyUuid, user);
           }
           return Future.failedFuture(policyVerificationFuture.cause().getMessage());
         });
