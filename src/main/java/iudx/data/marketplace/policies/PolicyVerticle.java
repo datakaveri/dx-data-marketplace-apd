@@ -7,6 +7,8 @@ import io.vertx.pgclient.PgPool;
 import io.vertx.serviceproxy.ServiceBinder;
 import io.vertx.sqlclient.PoolOptions;
 import iudx.data.marketplace.apiserver.ApiServerVerticle;
+import iudx.data.marketplace.auditing.AuditingService;
+import iudx.data.marketplace.common.Api;
 import iudx.data.marketplace.common.CatalogueService;
 import iudx.data.marketplace.postgres.PostgresService;
 import iudx.data.marketplace.postgres.PostgresServiceImpl;
@@ -17,8 +19,7 @@ import iudx.data.marketplace.postgres.PostgresServiceImpl;
 
 import java.util.Map;
 
-import static iudx.data.marketplace.common.Constants.POLICY_SERVICE_ADDRESS;
-import static iudx.data.marketplace.common.Constants.POSTGRES_SERVICE_ADDRESS;
+import static iudx.data.marketplace.common.Constants.*;
 import static iudx.data.marketplace.policies.util.Constants.DB_RECONNECT_ATTEMPTS;
 
 public class PolicyVerticle extends AbstractVerticle {
@@ -30,14 +31,18 @@ public class PolicyVerticle extends AbstractVerticle {
   private VerifyPolicy verifyPolicy;
   private GetPolicy getPolicy;
   private CatalogueService catalogueService;
+  private AuditingService auditingService;
+  private Api api;
 
   @Override
   public void start() {
     catalogueService = new CatalogueService(vertx, config());
     postgresServiceImpl = PostgresService.createProxy(vertx, POSTGRES_SERVICE_ADDRESS);
-    deletePolicy = new DeletePolicy(postgresServiceImpl);
+    auditingService = AuditingService.createProxy(vertx, AUDITING_SERVICE_ADDRESS);
+    api = Api.getInstance(config().getString("dxApiBasePath"));
+    deletePolicy = new DeletePolicy(postgresServiceImpl, auditingService, api);
     getPolicy = new GetPolicy(postgresServiceImpl);
-    createPolicy = new CreatePolicy(postgresServiceImpl, catalogueService);
+    createPolicy = new CreatePolicy(postgresServiceImpl, catalogueService, auditingService, api);
     verifyPolicy = new VerifyPolicy(postgresServiceImpl);
     policyService =
         new PolicyServiceImpl(deletePolicy, createPolicy, getPolicy, verifyPolicy, config());
