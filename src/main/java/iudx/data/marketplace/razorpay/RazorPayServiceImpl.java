@@ -54,7 +54,7 @@ public class RazorPayServiceImpl implements RazorPayService {
                                     .put("VARIANT", request.getString("product_variant_name"))
                                     .put("PRODUCT", request.getString("product_id"))
                                     .put("PROVIDER", request.getString("provider_id")))
-                            .put(ON_HOLD, 0)));
+                            .put(ON_HOLD, ZERO)));
 
     try {
       LOGGER.debug("order request at razorpay: {} ", orderRequest);
@@ -71,14 +71,26 @@ public class RazorPayServiceImpl implements RazorPayService {
       JSONObject responseError = transferResponse.getJSONObject(ERROR);
       LOGGER.debug("error response from razorpay : {}", responseError);
 
-      // TODO: find type of reason object (it is not a string)
-      /*
-      String reason = responseError.getString(REASON);
+      Object reason =  responseError.get(REASON);
       if(reason!=null) {
         LOGGER.error("razorpay error : ", responseError);
-        throw new DxRuntimeException(400, ResponseUrn.ORDER_CREATION_FAILED, responseError.toString());
+        String message;
+        switch ((String) reason) {
+          case "amount_less_than_minimum_amount":
+          case "authentication_failed":
+          case "gateway_technical_error":
+          case "invalid_response_from_gateway":
+          case "server_error":
+            message = "RazorPay Error - Try again later";
+            break;
+          case "invalid_request":
+            message = "Invalid Request Made to RazorPay";
+            break;
+          default:
+            message = "Unexpected Error while order creation - Try again later";
+        }
+        throw new DxRuntimeException(400, ResponseUrn.ORDER_CREATION_FAILED, message);
       }
-       */
 
       LOGGER.info("order response razorpay : {}", order.toJson());
 
