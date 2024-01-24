@@ -1,7 +1,7 @@
 package iudx.data.marketplace.consumer;
 
-import static iudx.data.marketplace.common.Constants.RESOURCE_ID;
 import static iudx.data.marketplace.common.Constants.PROVIDER_ID;
+import static iudx.data.marketplace.common.Constants.RESOURCE_ID;
 import static iudx.data.marketplace.consumer.util.Constants.*;
 import static iudx.data.marketplace.product.util.Constants.STATUS;
 
@@ -97,32 +97,30 @@ public class ConsumerServiceImpl implements ConsumerService {
     String productResourceRelationTable = config.getJsonArray(TABLES).getString(2);
 
     JsonObject params = new JsonObject();
-    String query;
-
-    if (request.containsKey(RESOURCE_ID)) {
-      String resourceID = request.getString(RESOURCE_ID);
-      params.put(STATUS, Status.ACTIVE.toString()).put(RESOURCE_ID, resourceID);
-      query = LIST_PRODUCTS_FOR_RESOURCE;
-    } else if (request.containsKey(PROVIDER_ID)) {
-      String providerID = request.getString(PROVIDER_ID);
-      params.put(STATUS, Status.ACTIVE.toString()).put(PROVIDER_ID, providerID);
-      query = LIST_PRODUCTS_FOR_PROVIDER;
-    } else {
-      params.put(STATUS, Status.ACTIVE.toString());
-      query = LIST_ALL_PRODUCTS_QUERY;
-    }
-
-    StringBuilder finalQuery =
+    StringBuilder query =
         new StringBuilder(
-            query
+            LIST_PRODUCTS
                 .replace("$0", productTable)
                 .replace("$9", productResourceRelationTable)
                 .replace("$8", resourceTable));
 
-    LOGGER.debug(finalQuery);
+    if (request.containsKey(RESOURCE_ID)) {
+      String resourceID = request.getString(RESOURCE_ID);
+      params.put(STATUS, Status.ACTIVE.toString()).put(RESOURCE_ID, resourceID);
+      query.append(" and rt._id=$2");
+    } else if (request.containsKey(PROVIDER_ID)) {
+      String providerID = request.getString(PROVIDER_ID);
+      params.put(STATUS, Status.ACTIVE.toString()).put(PROVIDER_ID, providerID);
+      query.append(" and pt.providerId=$2");
+    } else {
+      params.put(STATUS, Status.ACTIVE.toString());
+    }
+    query.append(" group by pt.product_id");
+
+    LOGGER.debug(query);
 
     pgService.executePreparedQuery(
-        finalQuery.toString(),
+        query.toString(),
         params,
         pgHandler -> {
           if (pgHandler.succeeded()) {

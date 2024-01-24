@@ -25,7 +25,8 @@ public class QueryBuilder {
     this.productVariantTable = tables.getString(3);
   }
 
-  public QueryBuilder(){}
+  public QueryBuilder() {}
+
   public List<String> buildCreateProductQueries(JsonObject request, JsonArray resourceDetails) {
     String productID = request.getString(PRODUCT_ID);
     String providerID = request.getString(PROVIDER_ID);
@@ -74,16 +75,17 @@ public class QueryBuilder {
   public String buildListProductsQuery(JsonObject request) {
 
     StringBuilder query;
+    query =
+        new StringBuilder(
+            LIST_PRODUCT_FOR_RESOURCE
+                .replace("$0", productTable)
+                .replace("$9", productResourceRelationTable)
+                .replace("$8", resourceTable));
     if (request.containsKey(RESOURCE_ID)) {
-      query =
-          new StringBuilder(
-              LIST_PRODUCT_FOR_RESOURCE
-                  .replace("$0", productTable)
-                  .replace("$9", productResourceRelationTable)
-                  .replace("$8", resourceTable));
-    } else {
-      query = new StringBuilder(LIST_ALL_PRODUCTS.replace("$0", productTable));
+      query.append(" and rt._id=$3");
     }
+    query.append(" group by pt.product_id");
+    
     return query.toString();
   }
 
@@ -142,7 +144,7 @@ public class QueryBuilder {
     return query.toString();
   }
 
-  public String   updateProductVariantStatusQuery(String productID, String variant) {
+  public String updateProductVariantStatusQuery(String productID, String variant) {
     StringBuilder query =
         new StringBuilder(
             UPDATE_PV_STATUS_QUERY
@@ -161,7 +163,8 @@ public class QueryBuilder {
             SELECT_PV_QUERY
                 .replace("$0", productVariantTable)
                 .replace("$1", productID)
-                .replace("$2", variantName).replace("$3", Status.ACTIVE.toString()));
+                .replace("$2", variantName)
+                .replace("$3", Status.ACTIVE.toString()));
     return query.toString();
   }
 
