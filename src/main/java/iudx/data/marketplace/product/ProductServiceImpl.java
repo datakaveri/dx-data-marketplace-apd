@@ -34,8 +34,8 @@ public class ProductServiceImpl implements ProductService {
   }
 
   @Override
-  public ProductService createProduct(User user,
-                                      JsonObject request, Handler<AsyncResult<JsonObject>> handler) {
+  public ProductService createProduct(
+      User user, JsonObject request, Handler<AsyncResult<JsonObject>> handler) {
     String providerID = user.getUserId();
     String productID =
         URN_PREFIX.concat(providerID).concat(":").concat(request.getString(PRODUCT_ID));
@@ -140,7 +140,7 @@ public class ProductServiceImpl implements ProductService {
                 .replace("$1", providerID)
                 .replace("$2", productID));
 
-    LOGGER.debug("checkQuery: {}",query);
+    LOGGER.debug("checkQuery: {}", query);
     pgService.executeCountQuery(
         query.toString(),
         handler -> {
@@ -156,8 +156,8 @@ public class ProductServiceImpl implements ProductService {
   }
 
   @Override
-  public ProductService deleteProduct( User user,
-      JsonObject request, Handler<AsyncResult<JsonObject>> handler) {
+  public ProductService deleteProduct(
+      User user, JsonObject request, Handler<AsyncResult<JsonObject>> handler) {
 
     String providerID = user.getUserId();
     String productID = request.getString(PRODUCT_ID);
@@ -189,7 +189,8 @@ public class ProductServiceImpl implements ProductService {
   }
 
   @Override
-  public ProductService listProducts(User user, JsonObject request, Handler<AsyncResult<JsonObject>> handler) {
+  public ProductService listProducts(
+      User user, JsonObject request, Handler<AsyncResult<JsonObject>> handler) {
 
     String providerID = user.getUserId();
     JsonObject params =
@@ -201,6 +202,7 @@ public class ProductServiceImpl implements ProductService {
 
     String query = queryBuilder.buildListProductsQuery(request);
 
+    LOGGER.debug(query);
     pgService.executePreparedQuery(
         query,
         params,

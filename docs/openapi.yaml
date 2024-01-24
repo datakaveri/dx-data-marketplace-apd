@@ -11,9 +11,11 @@ paths:
     post:
       tags:
         - provider
+      summary: ''
       description: |-
         Create a product where the body contains the name and the array of resources that will be part of the product. 
-        The name cannot be updated once the product is created as it is a unique identifier for a product of a provider. The name is stored as a URN(for eg: a product named flood-sensors hosted by the provider iisc.ac.in/123qwerty is represented as urn:datakaveri.org:iisc.ac.in/123qwerty:flood-sensors)
+        The name cannot be updated once the product is created as it is a unique identifier for a product of a provider. The name is stored as a URN(for eg: a product named flood-sensors hosted by the provider with id 4efde16f-96cd-4b86-b6ee-ca5102413ff6 is represented as urn:datakaveri.org:4efde16f-96cd-4b86-b6ee-ca5102413ff6:flood-sensors)
+      operationId: Create Product
       parameters:
         - name: token
           in: header
@@ -85,6 +87,8 @@ paths:
     delete:
       tags:
         - provider
+      summary: ''
+      operationId: Delete Product
       parameters:
         - name: token
           in: header
@@ -100,9 +104,9 @@ paths:
           required: true
           schema:
             type: string
-            pattern: '^[a-zA-Z0-9/.:-]{3,150}$'
-            minLength: 3
-            maxLength: 150
+            pattern: '^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$'
+            minLength: 36
+            maxLength: 36
       responses:
         '200':
           description: success
@@ -147,6 +151,7 @@ paths:
     get:
       tags:
         - provider
+      operationId: List Products
       parameters:
         - name: token
           in: header
@@ -162,13 +167,84 @@ paths:
           required: false
           schema:
             type: string
+            pattern: '[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}'
+            minLength: 36
+            maxLength: 36
       responses:
         '200':
           description: success
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/successResponseWithObjects'
+                type: object
+                properties:
+                  type:
+                    type: string
+                  title:
+                    type: string
+                  results:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        productid:
+                          type: string
+                        providername:
+                          type: string
+                        resources:
+                          type: array
+                          items:
+                            type: object
+                            properties:
+                              id:
+                                type: string
+                              name:
+                                type: string
+                x-examples:
+                  Example 1:
+                    type: 'urn:dx:dmp:success'
+                    title: Success
+                    results:
+                      - productid: 'urn:datakaveri.org:b2c27f3f-2524-4a84-816e-91f9ab23f837:testProduct1'
+                        providername: Administrator of the IUDX platform
+                        resources:
+                          - id: 2d043bdb-fc62-4650-8426-dc72492cd621
+                            name: TEST ITEM FOR APD /verify TESTS
+                          - id: a347c5b6-5281-4749-9eab-89784d8f8f9a
+                            name: Chandigarh Paid Parking Locations
+                      - productid: 'urn:datakaveri.org:b2c27f3f-2524-4a84-816e-91f9ab23f837:testProduct5ui'
+                        providername: Administrator of the IUDX platform
+                        resources:
+                          - id: b58da193-23d9-43eb-b98a-a103d4b6103c
+                            name: FW055 Environment-UUID
+              examples:
+                List All Products:
+                  value:
+                    type: 'urn:dx:dmp:success'
+                    title: Success
+                    results:
+                      - productid: 'urn:datakaveri.org:b2c27f3f-2524-4a84-816e-91f9ab23f837:testProduct1'
+                        providername: Administrator of the IUDX platform
+                        resources:
+                          - id: 2d043bdb-fc62-4650-8426-dc72492cd621
+                            name: TEST ITEM FOR APD /verify TESTS
+                          - id: a347c5b6-5281-4749-9eab-89784d8f8f9a
+                            name: Chandigarh Paid Parking Locations
+                      - productid: 'urn:datakaveri.org:b2c27f3f-2524-4a84-816e-91f9ab23f837:testProduct5ui'
+                        providername: Administrator of the IUDX platform
+                        resources:
+                          - id: b58da193-23d9-43eb-b98a-a103d4b6103c
+                            name: FW055 Environment-UUID
+                List Products for Resource:
+                  value:
+                    type: 'urn:dx:dmp:success'
+                    title: Success
+                    results:
+                      - productid: 'urn:datakaveri.org:b2c27f3f-2524-4a84-816e-91f9ab23f837:testProduct1'
+                        providername: Administrator of the IUDX platform
+                        resources:
+                          - id: a347c5b6-5281-4749-9eab-89784d8f8f9a
+                            name: Chandigarh Paid Parking Locations
         '204':
           description: no content
         '400':
@@ -199,6 +275,7 @@ paths:
     get:
       tags:
         - provider
+      operationId: List Purchases
       parameters:
         - name: token
           in: header
@@ -214,9 +291,9 @@ paths:
           required: false
           schema:
             type: string
-            pattern: '^[a-zA-Z0-9/.:-]{3,150}$'
-            minLength: 3
-            maxLength: 150
+            pattern: '^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$'
+            minLength: 36
+            maxLength: 36
         - name: resourceID
           in: query
           description: 'If resourceID is provided for listing, then purchases are filtered to show purchases against that resource'
@@ -271,7 +348,7 @@ paths:
         - provider
       summary: ''
       description: 'Create a product variant where the body contains details about the variant such as price, duration, resources and their capabilities. Along with the name of the variant and the product it belongs to.'
-      operationId: post-provider-product-variant
+      operationId: Create Product Variant
       parameters:
         - name: token
           in: header
@@ -299,10 +376,19 @@ paths:
                         type: array
                         items:
                           type: string
+                    required:
+                      - id
+                      - capabilities
                 price:
                   type: integer
                 validity:
                   type: integer
+              required:
+                - id
+                - variant
+                - resources
+                - price
+                - validity
               x-examples:
                 Example 1:
                   id: 'urn:datakaveri.org:iisc.ac.in/123qwerty:flood-sensors'
@@ -351,7 +437,7 @@ paths:
       tags:
         - provider
       summary: ''
-      operationId: get-provider-product-variant
+      operationId: Get Product Variant
       parameters:
         - name: token
           in: header
@@ -377,7 +463,7 @@ paths:
       tags:
         - provider
       summary: ''
-      operationId: put-provider-product-variant
+      operationId: Update Product Variant
       parameters:
         - name: token
           in: header
@@ -405,10 +491,19 @@ paths:
                         type: array
                         items:
                           type: string
+                    required:
+                      - id
+                      - capabilities
                 price:
                   type: integer
                 validity:
                   type: integer
+              required:
+                - id
+                - variant
+                - resources
+                - price
+                - validity
               x-examples:
                 Example 1:
                   id: 'urn:datakaveri.org:iisc.ac.in/123qwerty:flood-sensors'
@@ -435,7 +530,7 @@ paths:
       tags:
         - provider
       summary: ''
-      operationId: delete-provider-product-variant
+      operationId: Delete Product Variant
       parameters:
         - name: token
           in: header
@@ -488,7 +583,98 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/exampleListResourcesResponse'
+                type: object
+                properties:
+                  type:
+                    type: string
+                  title:
+                    type: string
+                  results:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        _id:
+                          type: string
+                        resource_name:
+                          type: string
+                        accesspolicy:
+                          type: string
+                        providername:
+                          type: string
+                x-examples:
+                  Example 1:
+                    type: 'urn:dx:dmp:success'
+                    title: Success
+                    results:
+                      - _id: a347c5b6-5281-4749-9eab-89784d8f8f9a
+                        resource_name: Chandigarh Paid Parking Locations
+                        accesspolicy: OPEN
+                        providername: Administrator of the IUDX platform
+                      - _id: 2d043bdb-fc62-4650-8426-dc72492cd621
+                        resource_name: TEST ITEM FOR APD /verify TESTS
+                        accesspolicy: SECURE
+                        providername: Administrator of the IUDX platform
+                      - _id: b58da193-23d9-43eb-b98a-a103d4b6103c
+                        resource_name: FW055 Environment-UUID
+                        accesspolicy: OPEN
+                        providername: Administrator of the IUDX platform
+                      - _id: ae2b8b01-f642-411a-babb-cbd1b75fa2a1
+                        resource_name: Flood level data from FWR055
+                        accesspolicy: SECURE
+                        providername: Administrator of the IUDX platform
+              examples:
+                List All Resources:
+                  value:
+                    type: 'urn:dx:dmp:success'
+                    title: Success
+                    results:
+                      - _id: a347c5b6-5281-4749-9eab-89784d8f8f9a
+                        resource_name: Chandigarh Paid Parking Locations
+                        accesspolicy: OPEN
+                        providername: Administrator of the IUDX platform
+                      - _id: 2d043bdb-fc62-4650-8426-dc72492cd621
+                        resource_name: TEST ITEM FOR APD /verify TESTS
+                        accesspolicy: SECURE
+                        providername: Administrator of the IUDX platform
+                      - _id: b58da193-23d9-43eb-b98a-a103d4b6103c
+                        resource_name: FW055 Environment-UUID
+                        accesspolicy: OPEN
+                        providername: Administrator of the IUDX platform
+                      - _id: ae2b8b01-f642-411a-babb-cbd1b75fa2a1
+                        resource_name: Flood level data from FWR055
+                        accesspolicy: SECURE
+                        providername: Administrator of the IUDX platform
+                List Resource of Provider:
+                  value:
+                    type: 'urn:dx:dmp:success'
+                    title: Success
+                    results:
+                      - _id: a347c5b6-5281-4749-9eab-89784d8f8f9a
+                        resource_name: Chandigarh Paid Parking Locations
+                        accesspolicy: OPEN
+                        providername: Administrator of the IUDX platform
+                      - _id: 2d043bdb-fc62-4650-8426-dc72492cd621
+                        resource_name: TEST ITEM FOR APD /verify TESTS
+                        accesspolicy: SECURE
+                        providername: Administrator of the IUDX platform
+                      - _id: b58da193-23d9-43eb-b98a-a103d4b6103c
+                        resource_name: FW055 Environment-UUID
+                        accesspolicy: OPEN
+                        providername: Administrator of the IUDX platform
+                      - _id: ae2b8b01-f642-411a-babb-cbd1b75fa2a1
+                        resource_name: Flood level data from FWR055
+                        accesspolicy: SECURE
+                        providername: Administrator of the IUDX platform
+                List Resource by ID:
+                  value:
+                    type: 'urn:dx:dmp:success'
+                    title: Success
+                    results:
+                      - _id: a347c5b6-5281-4749-9eab-89784d8f8f9a
+                        resource_name: Chandigarh Paid Parking Locations
+                        accesspolicy: OPEN
+                        providername: Administrator of the IUDX platform
         '204':
           description: no content
         '400':
@@ -545,7 +731,51 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/exampleListProviderResponse'
+                type: object
+                properties:
+                  type:
+                    type: string
+                  title:
+                    type: string
+                  results:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        provider_id:
+                          type: string
+                        providername:
+                          type: string
+                        resource_server:
+                          type: string
+                x-examples:
+                  Example 1:
+                    type: 'urn:dx:dmp:success'
+                    title: Success
+                    results:
+                      - provider_id: b2c27f3f-2524-4a84-816e-91f9ab23f837
+                        providername: Administrator of the IUDX platform
+                        resource_server: 49cf5c76-09de-11ee-be56-0242ac120002
+              examples:
+                List All Providers:
+                  value:
+                    type: 'urn:dx:dmp:success'
+                    title: Success
+                    results:
+                      - provider_id: b2c27f3f-2524-4a84-816e-91f9ab23f837
+                        providername: Administrator of the IUDX platform
+                        resource_server: 49cf5c76-09de-11ee-be56-0242ac120002
+                      - provider_id: c3a2af3f-2524-4a84-816e-91f9ab23d375
+                        providername: Administrator of platform
+                        resource_server: 49cf5c76-09de-11ee-be56-0242ac120002
+                List Provider by ID:
+                  value:
+                    type: 'urn:dx:dmp:success'
+                    title: Success
+                    results:
+                      - provider_id: b2c27f3f-2524-4a84-816e-91f9ab23f837
+                        providername: Administrator of the IUDX platform
+                        resource_server: 49cf5c76-09de-11ee-be56-0242ac120002
         '204':
           description: no content
         '401':
@@ -625,7 +855,92 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/successResponseWithObjects'
+                type: object
+                properties:
+                  type:
+                    type: string
+                  title:
+                    type: string
+                  results:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        productid:
+                          type: string
+                        providername:
+                          type: string
+                        resources:
+                          type: array
+                          items:
+                            type: object
+                            properties:
+                              id:
+                                type: string
+                              name:
+                                type: string
+                x-examples:
+                  Example 1:
+                    type: 'urn:dx:dmp:success'
+                    title: Success
+                    results:
+                      - productid: 'urn:datakaveri.org:b2c27f3f-2524-4a84-816e-91f9ab23f837:testProduct1'
+                        providername: Administrator of the IUDX platform
+                        resources:
+                          - id: 2d043bdb-fc62-4650-8426-dc72492cd621
+                            name: TEST ITEM FOR APD /verify TESTS
+                          - id: a347c5b6-5281-4749-9eab-89784d8f8f9a
+                            name: Chandigarh Paid Parking Locations
+                      - productid: 'urn:datakaveri.org:b2c27f3f-2524-4a84-816e-91f9ab23f837:testProduct5ui'
+                        providername: Administrator of the IUDX platform
+                        resources:
+                          - id: b58da193-23d9-43eb-b98a-a103d4b6103c
+                            name: FW055 Environment-UUID
+              examples:
+                List All Products:
+                  value:
+                    type: 'urn:dx:dmp:success'
+                    title: Success
+                    results:
+                      - productid: 'urn:datakaveri.org:b2c27f3f-2524-4a84-816e-91f9ab23f837:testProduct1'
+                        providername: Administrator of the IUDX platform
+                        resources:
+                          - id: 2d043bdb-fc62-4650-8426-dc72492cd621
+                            name: TEST ITEM FOR APD /verify TESTS
+                          - id: a347c5b6-5281-4749-9eab-89784d8f8f9a
+                            name: Chandigarh Paid Parking Locations
+                      - productid: 'urn:datakaveri.org:b2c27f3f-2524-4a84-816e-91f9ab23f837:testProduct5ui'
+                        providername: Administrator of the IUDX platform
+                        resources:
+                          - id: b58da193-23d9-43eb-b98a-a103d4b6103c
+                            name: FW055 Environment-UUID
+                List Products with Resource ID:
+                  value:
+                    type: 'urn:dx:dmp:success'
+                    title: Success
+                    results:
+                      - productid: 'urn:datakaveri.org:b2c27f3f-2524-4a84-816e-91f9ab23f837:testProduct1'
+                        providername: Administrator of the IUDX platform
+                        resources:
+                          - id: a347c5b6-5281-4749-9eab-89784d8f8f9a
+                            name: Chandigarh Paid Parking Locations
+                List Products with Provider ID:
+                  value:
+                    type: 'urn:dx:dmp:success'
+                    title: Success
+                    results:
+                      - productid: 'urn:datakaveri.org:b2c27f3f-2524-4a84-816e-91f9ab23f837:testProduct1'
+                        providername: Administrator of the IUDX platform
+                        resources:
+                          - id: 2d043bdb-fc62-4650-8426-dc72492cd621
+                            name: TEST ITEM FOR APD /verify TESTS
+                          - id: a347c5b6-5281-4749-9eab-89784d8f8f9a
+                            name: Chandigarh Paid Parking Locations
+                      - productid: 'urn:datakaveri.org:b2c27f3f-2524-4a84-816e-91f9ab23f837:testProduct5ui'
+                        providername: Administrator of the IUDX platform
+                        resources:
+                          - id: b58da193-23d9-43eb-b98a-a103d4b6103c
+                            name: FW055 Environment-UUID
         '204':
           description: no content
         '400':
@@ -676,7 +991,6 @@ paths:
                   type: string
                   description: |
                     Generated at UI to maintain state of a purchase
-
       responses:
         '202':
           description: Accepted
@@ -687,24 +1001,17 @@ paths:
                 properties:
                   purchaseID:
                     type: string
-                    x-stoplight:
-                      id: lovxsd0sofs7p
                   variantID:
                     type: string
-                    x-stoplight:
-                      id: crxqfci74zbxn
                   purchasedAt:
                     type: string
-                    x-stoplight:
-                      id: j1wfk87bielyn
                   status:
                     type: string
-                    x-stoplight:
-                      id: vf4copthw9pbt
   /verify:
     post:
       tags:
         - Policies
+      summary: Verify Policy
       description: |
         Verify API endpoint is used by DX AAA Server to check if a policy is present for a given consumer for the given 
         resource with a specified provider of the resource. This check is done by DX AAA Server before issuing 
@@ -712,7 +1019,6 @@ paths:
 
         DMP Data Marketplace APD Server creates policy for a given item with type `resource`
       operationId: post-verify-policy
-      summary: Verify Policy
       parameters:
         - name: Authorization
           in: header
@@ -774,7 +1080,6 @@ paths:
       security:
         - authorization: []
       x-internal: false
-
   /policy:
     get:
       tags:
@@ -782,13 +1087,12 @@ paths:
       summary: Get Policies
       description: |
         Get policies associated with a specific user. The response is determined by the user's roles:
-        
+
         - If the user is a `provider`, the response includes all policies created by the provider or their delegates.
         - If the user is a `delegate`, the response comprises policies set by the delegate or set for the consumer on whose behalf the delegate is acting.
         - If the user is a `consumer`, the response includes policies set for the consumer.
-        
-        `Note`: Please note that the response displays the policies for a user concerning a specific server.
 
+        `Note`: Please note that the response displays the policies for a user concerning a specific server.
       operationId: get-auth-v1-policies
       parameters:
         - name: Authorization
@@ -797,13 +1101,12 @@ paths:
           required: true
           schema:
             type: string
+            pattern: '^[a-zA-Z0-9_*\-*\.\/]+$'
             minLength: 1
             maxLength: 512
-            pattern: '^[a-zA-Z0-9_*\-*\.\/]+$'
       responses:
         '200':
-          description: |-
-            Policies have been successfully listed.
+          description: Policies have been successfully listed.
           content:
             application/json:
               schema:
@@ -827,7 +1130,7 @@ paths:
                 type: string
               description: application/json
         '404':
-          description: 'Not Found - Policy not found'
+          description: Not Found - Policy not found
           content:
             application/json:
               schema:
@@ -838,7 +1141,7 @@ paths:
                 type: string
               description: application/json
       security:
-        - authorization: [ ]
+        - authorization: []
     delete:
       tags:
         - Policies
@@ -856,9 +1159,9 @@ paths:
           required: true
           schema:
             type: string
+            pattern: '^[a-zA-Z0-9_*\-*\.\/]+$'
             minLength: 1
             maxLength: 512
-            pattern: '^[a-zA-Z0-9_*\-*\.\/]+$'
       requestBody:
         description: Request body is a JsonObject containing ID whose value is the policy ID.
         content:
@@ -872,7 +1175,6 @@ paths:
                   pattern: '^[0-9a-f]{8}\b-[0-9a-f]{4}\b-[0-9a-f]{4}\b-[0-9a-f]{4}\b-[0-9a-f]{12}$'
                   minLength: 36
                   maxLength: 36
-
               required:
                 - id
             examples:
@@ -897,24 +1199,10 @@ paths:
             - Id is not a valid policyId
             - Policy has expired
             - Policy was previously deleted
-
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/deletePolicyErrorResponse'
-          headers:
-            Content-Type:
-              schema:
-                type: string
-              description: application/json
-        '404':
-          description: |-
-            Not Found
-              - Policy id does not exist
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/deletePolicyNotFoundErrorResponse'
           headers:
             Content-Type:
               schema:
@@ -933,13 +1221,21 @@ paths:
               schema:
                 type: string
               description: application/json
+        '404':
+          description: |-
+            Not Found
+              - Policy id does not exist
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/deletePolicyNotFoundErrorResponse'
+          headers:
+            Content-Type:
+              schema:
+                type: string
+              description: application/json
       security:
-        - authorization: [ ]
-
-
-
-
-
+        - authorization: []
 tags:
   - name: provider
     description: |
@@ -955,235 +1251,6 @@ components:
       type: http
       scheme: bearer
   schemas:
-
-    Unauthorized:
-      type: object
-      properties:
-        type:
-          type: string
-          minLength: 1
-        title:
-          type: string
-          minLength: 1
-        detail:
-          type: string
-          minLength: 1
-      required:
-        - type
-        - title
-        - detail
-      example:
-        type: urn:dx:dmp:invalidAuthorizationToken
-        title: Not Authorized
-        detail: Not Authorized
-    deletePolicyNotFoundErrorResponse:
-      title: deletePolicyNotFoundErrorResponse
-      type: object
-      properties:
-        type:
-          type: string
-          minLength: 1
-        title:
-          type: string
-          minLength: 1
-        detail:
-          type: string
-          minLength: 1
-      required:
-        - type
-        - title
-        - detail
-      example:
-        type: urn:dx:dmp:resourceNotFound
-        title: Not Found
-        detail: Policy could not be deleted, as it doesn't exist
-
-    deletePolicyErrorResponse:
-      title: deletePolicyErrorResponse
-      type: object
-      properties:
-        type:
-          type: string
-          minLength: 1
-        title:
-          type: string
-          minLength: 1
-        detail:
-          type: string
-          minLength: 1
-      required:
-        - type
-        - title
-        - detail
-      example:
-        type: urn:dx:dmp:badRequest
-        title: Bad Request
-        detail: Policy could not be deleted, as policy is not ACTIVE
-
-    deletePolicy:
-      title: deletePolicy
-      type: object
-      properties:
-        type:
-          type: string
-          minLength: 1
-        title:
-          type: string
-          minLength: 1
-        detail:
-          type: string
-          minLength: 1
-      required:
-        - type
-        - title
-        - detail
-      example:
-        type: urn:dx:dmp:success
-        title: Success
-        detail: Policy deleted successfully
-    policyNotFound:
-      title: policyNotFound
-      type: object
-      properties:
-        type:
-          type: string
-          minLength: 1
-        title:
-          type: string
-          minLength: 1
-        detail:
-          type: string
-          minLength: 1
-      required:
-        - type
-        - title
-        - detail
-      example:
-        type: urn:dx:dmp:resourceNotFound
-        title: Not Found
-        detail: Policy Not Found
-
-    getPolicySuccessResponseWithResourceType:
-      title: get policy for resource item type.
-      required:
-        - type
-        - title
-        - results
-      properties:
-        type:
-          type: string
-          minLength: 1
-        title:
-          type: string
-          minLength: 1
-        results:
-          type: array
-          minLength: 1
-          items:
-            type: object
-            properties:
-              policyId:
-                type: string
-              itemId:
-                type: string
-              accessPolicy:
-                type: string
-              resourceName:
-                type: string
-              productVariantId:
-                type: string
-              resourceServerUrl:
-                type: string
-              consumer:
-                type: array
-                items:
-                  type: object
-                  properties:
-                    name:
-                      type: array
-                      items:
-                        type: object
-                        properties:
-                          email:
-                            type: string
-                          name:
-                            type: array
-                            items:
-                              type: object
-                              properties:
-                                firstName:
-                                  type: string
-                                lastName:
-                                  type: string
-                          id:
-                            type: string
-              provider:
-                type: array
-                items:
-                  type: object
-                  properties:
-                    name:
-                      type: array
-                      items:
-                        type: object
-                        properties:
-                          email:
-                            type: string
-                          name:
-                            type: array
-                            items:
-                              type: object
-                              properties:
-                                firstName:
-                                  type: string
-                                lastName:
-                                  type: string
-                          id:
-                            type: string
-              status:
-                type: string
-                enum: [ "ACTIVE","DELETED" ]
-              expiryAt:
-                type: string
-              constraints:
-                type: object
-      example: {
-        "type": "urn:dx:dmp:success",
-        "title": "Success",
-        "results": [
-          {
-            "policyId": "c0ad9c9e-cdb3-4f08-bb35-7843ee8f8092",
-            "resourceId": "e81fdfb3-695e-4f1e-8458-ecdb2ca813e5",
-            "resourceServerUrl": "rs.iudx.io",
-            "purchaseId": "6eb2428f-6b6f-4b84-a4ef-08d16c312283",
-            "resourceName": "surat-itms",
-            "productVariantId": "c5c32d00-8edf-418e-9f60-953b76887814",
-            "accessPolicy": "SECURE",
-            "status": "ACTIVE",
-            "expiryAt": "2025-04-04T04:05:06",
-            "constraints": {
-              "access": "file"
-            },
-            "consumer": {
-              "email": "vasanth.rajaraman@datakaveri.org",
-              "name": {
-                "firstName": "Vasanth",
-                "lastName": "Rajaraman"
-              },
-              "id": "fd47486b-3497-4248-ac1e-082e4d37a66c"
-            },
-            "provider": {
-              "email": "provider@gmail.com",
-              "name": {
-                "firstName": "Bob",
-                "lastName": "Provider"
-              },
-              "id": "47a77164-15c8-4311-be69-b4c27be570dd"
-            }
-          }
-        ]
-      }
-
     exampleProductPostBody:
       type: object
       title: Root type for product body
@@ -1198,6 +1265,7 @@ components:
             properties:
               resourceID:
                 type: string
+                format: uuid
       example:
         name: flood-sensors
         description: some description for flod-sensors
@@ -1309,62 +1377,6 @@ components:
             paymentTime: '2022-11-23T09:00:00Z'
             expiry: '2023-11-22T09:00:00Z'
             status: active/expired
-    exampleListResourcesResponse:
-      type: object
-      title: Root type for list resources API response
-      description: example response for list resources
-      properties:
-        type:
-          type: string
-          description: URN type of the response indicating if the query was successful or if any errors have been triggered.
-        title:
-          description: A human readable title to the message response.
-        totalHits:
-          type: integer
-          description: Total number of documents which matched the query.
-          format: int32
-        results:
-          type: array
-          description: Results which matched the query. This is an array of objects.
-          items:
-            type: object
-      example:
-        type: 'urn:dx:rs:success'
-        title: success
-        results:
-          - resourceID: abc1
-            resourceName: abc–flood
-            accessPolicy: secure
-            providerID: iisc.ac.in/123qwerty
-            totalResources: 12
-        totalHits: 1
-    exampleListProviderResponse:
-      type: object
-      title: Root type for list resources API response
-      description: example response for list resources
-      properties:
-        type:
-          type: string
-          description: URN type of the response indicating if the query was successful or if any errors have been triggered.
-        title:
-          description: A human readable title to the message response.
-        totalHits:
-          type: integer
-          description: Total number of documents which matched the query.
-          format: int32
-        results:
-          type: array
-          description: Results which matched the query. This is an array of objects.
-          items:
-            type: object
-      example:
-        type: 'urn:dx:rs:success'
-        title: success
-        results:
-          - providerID: abc1
-            providerName: abc–flood
-            totalResources: 5
-        totalHits: 1
     exampleVerifyRequestBody:
       type: object
       title: Root type for verify API body
@@ -1504,3 +1516,220 @@ components:
         type: 'urn:apd:Deny'
         title: Forbidden
         detail: No policy exists for the given resource
+    getPolicySuccessResponseWithResourceType:
+      type: object
+      title: get policy for resource item type.
+      properties:
+        type:
+          type: string
+          minLength: 1
+        title:
+          type: string
+          minLength: 1
+        results:
+          type: array
+          items:
+            type: object
+            properties:
+              policyId:
+                type: string
+              itemId:
+                type: string
+              accessPolicy:
+                type: string
+              resourceName:
+                type: string
+              productVariantId:
+                type: string
+              resourceServerUrl:
+                type: string
+              consumer:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    name:
+                      type: array
+                      items:
+                        type: object
+                        properties:
+                          email:
+                            type: string
+                          name:
+                            type: array
+                            items:
+                              type: object
+                              properties:
+                                firstName:
+                                  type: string
+                                lastName:
+                                  type: string
+                          id:
+                            type: string
+              provider:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    name:
+                      type: array
+                      items:
+                        type: object
+                        properties:
+                          email:
+                            type: string
+                          name:
+                            type: array
+                            items:
+                              type: object
+                              properties:
+                                firstName:
+                                  type: string
+                                lastName:
+                                  type: string
+                          id:
+                            type: string
+              status:
+                type: string
+                enum:
+                  - ACTIVE
+                  - DELETED
+              expiryAt:
+                type: string
+              constraints:
+                type: object
+      required:
+        - type
+        - title
+        - results
+      example:
+        type: 'urn:dx:dmp:success'
+        title: Success
+        results:
+          - policyId: c0ad9c9e-cdb3-4f08-bb35-7843ee8f8092
+            resourceId: e81fdfb3-695e-4f1e-8458-ecdb2ca813e5
+            resourceServerUrl: rs.iudx.io
+            purchaseId: 6eb2428f-6b6f-4b84-a4ef-08d16c312283
+            resourceName: surat-itms
+            productVariantId: c5c32d00-8edf-418e-9f60-953b76887814
+            accessPolicy: SECURE
+            status: ACTIVE
+            expiryAt: '2025-04-04T04:05:06'
+            constraints:
+              access: file
+            consumer:
+              email: vasanth.rajaraman@datakaveri.org
+              name:
+                firstName: Vasanth
+                lastName: Rajaraman
+              id: fd47486b-3497-4248-ac1e-082e4d37a66c
+            provider:
+              email: provider@gmail.com
+              name:
+                firstName: Bob
+                lastName: Provider
+              id: 47a77164-15c8-4311-be69-b4c27be570dd
+    Unauthorized:
+      type: object
+      properties:
+        type:
+          type: string
+          minLength: 1
+        title:
+          type: string
+          minLength: 1
+        detail:
+          type: string
+          minLength: 1
+      required:
+        - type
+        - title
+        - detail
+      example:
+        type: 'urn:dx:dmp:invalidAuthorizationToken'
+        title: Not Authorized
+        detail: Not Authorized
+    policyNotFound:
+      type: object
+      title: policyNotFound
+      properties:
+        type:
+          type: string
+          minLength: 1
+        title:
+          type: string
+          minLength: 1
+        detail:
+          type: string
+          minLength: 1
+      required:
+        - type
+        - title
+        - detail
+      example:
+        type: 'urn:dx:dmp:resourceNotFound'
+        title: Not Found
+        detail: Policy Not Found
+    deletePolicy:
+      type: object
+      title: deletePolicy
+      properties:
+        type:
+          type: string
+          minLength: 1
+        title:
+          type: string
+          minLength: 1
+        detail:
+          type: string
+          minLength: 1
+      required:
+        - type
+        - title
+        - detail
+      example:
+        type: 'urn:dx:dmp:success'
+        title: Success
+        detail: Policy deleted successfully
+    deletePolicyErrorResponse:
+      type: object
+      title: deletePolicyErrorResponse
+      properties:
+        type:
+          type: string
+          minLength: 1
+        title:
+          type: string
+          minLength: 1
+        detail:
+          type: string
+          minLength: 1
+      required:
+        - type
+        - title
+        - detail
+      example:
+        type: 'urn:dx:dmp:badRequest'
+        title: Bad Request
+        detail: 'Policy could not be deleted, as policy is not ACTIVE'
+    deletePolicyNotFoundErrorResponse:
+      type: object
+      title: deletePolicyNotFoundErrorResponse
+      properties:
+        type:
+          type: string
+          minLength: 1
+        title:
+          type: string
+          minLength: 1
+        detail:
+          type: string
+          minLength: 1
+      required:
+        - type
+        - title
+        - detail
+      example:
+        type: 'urn:dx:dmp:resourceNotFound'
+        title: Not Found
+        detail: 'Policy could not be deleted, as it doesn''t exist'
