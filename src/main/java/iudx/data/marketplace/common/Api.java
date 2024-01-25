@@ -95,9 +95,10 @@ public class Api {
   public String getConsumerListProducts() {
     return consumerListProducts.toString();
   }
-  public String getLinkedAccountService(){
-    return linkedAccountService.toString();
 
+  public String getLinkedAccountService() {
+    return linkedAccountService.toString();
+}
   public String getConsumerOrderApi() {
     return consumerOrdersApi.toString();
   }

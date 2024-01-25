@@ -44,6 +44,8 @@ public class ValidationHandlerFactory {
         validator = getLinkedAccountValidator(parameters, body, requestType);
       case ORDER:
         validator = getOrderValidator(parameters);
+      case ACCOUNT:
+        validator = getLinkedAccountValidator(parameters, body, requestType);
         break;
     }
     return validator;
@@ -59,6 +61,12 @@ public class ValidationHandlerFactory {
     List<Validator> validators = new ArrayList<>();
     validators.add(new UUIDTypeValidator(parameters.get(PRODUCT_VARIANT_NAME), true));
     return validators;
+    }
+  private List<Validator> getLinkedAccountValidator(MultiMap parameters, JsonObject body, RequestType requestType) {
+    List<Validator> validators = new ArrayList<>();
+    validators.add(new AccountIdTypeValidator(parameters.get(ACCOUNT_ID), false));
+
+    return null;
   }
 
   private List<Validator> getVerifyPolicyValidator(MultiMap parameters, JsonObject body) {
