@@ -49,6 +49,7 @@ public class Constants {
   public static final String FIRST_NAME = "firstName";
   public static final String LAST_NAME = "lastName";
   public static final String POLICY_ID = "id";
+  public static final String ACCOUNT_ID = "account_id";
 
 
   // paths
@@ -68,6 +69,7 @@ public class Constants {
   public static final String USERMAPS_PATH = "/product/usermaps";
   public static final String VERIFY_PATH = "/verify";
   public static final String POLICIES_API = "/policies";
+  public static final String ACCOUNTS_API = "/account";
 
   // query parameters | request body
 

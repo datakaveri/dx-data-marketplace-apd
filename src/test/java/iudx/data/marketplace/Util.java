@@ -11,7 +11,7 @@ import io.vertx.sqlclient.Row;
 import io.vertx.sqlclient.Tuple;
 import iudx.data.marketplace.postgres.PostgresService;
 import iudx.data.marketplace.postgres.PostgresServiceImpl;
-import org.flywaydb.core.Flyway;
+//import org.flywaydb.core.Flyway;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.testcontainers.containers.PostgreSQLContainer;
@@ -123,19 +123,19 @@ public class Util {
             this.pool = PgPool.pool(vertx, connectOptions, poolOptions);
             postgresService = new PostgresServiceImpl(pool);
 
-            Flyway flyway =
-                    Flyway.configure()
-                            .dataSource(
-                                    jdbcUrl,
-                                    postgresConfig.getString("databaseUserName"),
-                                    postgresConfig.getString("databasePassword"))
-                            .placeholders(Map.of("user", user, "dmp_user", user))
-                            .locations("db/migration/")
-                            .load();
-            flyway.repair();
-            var migrationResult = flyway.migrate();
-            LOG.info("Migration result {}", migrationResult.migrationsExecuted);
-            LOG.info("Migration details {}", migrationResult.getTotalMigrationTime());
+//            Flyway flyway =
+//                    Flyway.configure()
+//                            .dataSource(
+//                                    jdbcUrl,
+//                                    postgresConfig.getString("databaseUserName"),
+//                                    postgresConfig.getString("databasePassword"))
+//                            .placeholders(Map.of("user", user, "dmp_user", user))
+//                            .locations("db/migration/")
+//                            .load();
+//            flyway.repair();
+//            var migrationResult = flyway.migrate();
+//            LOG.info("Migration result {}", migrationResult.migrationsExecuted);
+//            LOG.info("Migration details {}", migrationResult.getTotalMigrationTime());
 
             initialize();
             return postgresService;

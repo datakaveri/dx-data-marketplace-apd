@@ -29,5 +29,6 @@ public class Constants {
   public static final String POLICY_SERVICE_ADDRESS = "iudx.data.marketplace.policy.service";
   public static final String AUDITING_SERVICE_ADDRESS = "iudx.data.marketplace.server.auditing";
 
+  public static final String LINKED_ACCOUNT_ADDRESS = "iudx.data.marketplace.apiserver.provider.linked.account.service";
 
 }

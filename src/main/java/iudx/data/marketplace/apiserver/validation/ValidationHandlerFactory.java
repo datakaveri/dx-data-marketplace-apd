@@ -35,14 +35,23 @@ public class ValidationHandlerFactory {
         validator = getProviderIDValidators(parameters);
         break;
       case POLICY:
-        validator: getPolicyValidators(parameters);
+        validator = getPolicyValidators(parameters);
         break;
       case VERIFY:
-        validator: getVerifyPolicyValidator(parameters, body);
+        validator = getVerifyPolicyValidator(parameters, body);
         break;
-
+      case ACCOUNT:
+        validator = getLinkedAccountValidator(parameters, body, requestType);
+        break;
     }
     return validator;
+  }
+
+  private List<Validator> getLinkedAccountValidator(MultiMap parameters, JsonObject body, RequestType requestType) {
+    List<Validator> validators = new ArrayList<>();
+    validators.add(new AccountIdTypeValidator(parameters.get(ACCOUNT_ID), false));
+
+    return null;
   }
 
   private List<Validator> getVerifyPolicyValidator(MultiMap parameters, JsonObject body) {

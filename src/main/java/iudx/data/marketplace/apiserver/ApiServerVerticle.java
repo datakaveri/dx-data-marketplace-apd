@@ -16,6 +16,7 @@ import io.vertx.ext.web.handler.TimeoutHandler;
 import iudx.data.marketplace.apiserver.handlers.AuthHandler;
 import iudx.data.marketplace.apiserver.handlers.ExceptionHandler;
 import iudx.data.marketplace.apiserver.handlers.ValidationHandler;
+import iudx.data.marketplace.apiserver.provider.LinkedAccountService;
 import iudx.data.marketplace.apiserver.util.RequestType;
 import iudx.data.marketplace.authenticator.AuthClient;
 import iudx.data.marketplace.authenticator.AuthenticationService;
@@ -63,6 +64,7 @@ public class ApiServerVerticle extends AbstractVerticle {
   private WebClient webClient;
   private WebClientOptions webClientOptions;
   private AuthenticationService authenticationService;
+  private LinkedAccountService linkedAccountService;
 
 
   /**
@@ -104,7 +106,7 @@ public class ApiServerVerticle extends AbstractVerticle {
 
     authClient = new AuthClient(config(),webClient);
     authenticationService = AuthenticationService.createProxy(vertx, AUTH_SERVICE_ADDRESS);
-
+    linkedAccountService = LinkedAccountService.createProxy(vertx, LINKED_ACCOUNT_ADDRESS);
     router = Router.router(vertx);
 
     router
@@ -206,6 +208,8 @@ public class ApiServerVerticle extends AbstractVerticle {
     ExceptionHandler exceptionHandler = new ExceptionHandler();
     ValidationHandler policyValidationHandler = new ValidationHandler(vertx, RequestType.POLICY);
     ValidationHandler verifyValidationHandler = new ValidationHandler(vertx, RequestType.VERIFY);
+    ValidationHandler linkedAccountHandler = new ValidationHandler(vertx, RequestType.ACCOUNT);
+
     router
             .get(api.getPoliciesUrl())
             .handler(AuthHandler.create(authenticationService, vertx, api, postgresService,authClient))
@@ -235,6 +239,9 @@ public class ApiServerVerticle extends AbstractVerticle {
         .handler(this::handleVerify)
         .failureHandler(exceptionHandler);
 
+//    router
+//            .post(api.getLinkedAccountService())
+//                    .handler()
     //  Documentation routes
 
     /* Static Resource Handler */
