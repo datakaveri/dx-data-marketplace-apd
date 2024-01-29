@@ -14,6 +14,7 @@ import iudx.data.marketplace.common.ResponseUrn;
 import iudx.data.marketplace.policies.User;
 import iudx.data.marketplace.postgres.PostgresService;
 import iudx.data.marketplace.product.util.QueryBuilder;
+import iudx.data.marketplace.product.util.Status;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -196,6 +197,32 @@ public class ProductVariantServiceImpl implements ProductVariantService {
                 500, ResponseUrn.DB_ERROR_URN, ResponseUrn.DB_ERROR_URN.getMessage());
           }
         });
+    return this;
+  }
+
+  @Override
+  public ProductVariantService listProductVariants(User user, JsonObject request, Handler<AsyncResult<JsonObject>> handler) {
+
+    LOGGER.debug(request);
+    String query = queryBuilder.listProductVariants(request);
+
+    JsonObject params = new JsonObject()
+        .put(PRODUCT_ID, request.getString(PRODUCT_ID))
+        .put(STATUS, Status.ACTIVE.toString());
+
+    if(request.containsKey(VARIANT)) {
+      params.put(VARIANT, request.getString(VARIANT));
+    }
+
+    pgService.executePreparedQuery(query, params, pgHandler -> {
+
+      if (pgHandler.succeeded()) {
+        handler.handle(Future.succeededFuture(pgHandler.result()));
+      } else {
+        handler.handle(Future.failedFuture(pgHandler.cause()));
+      }
+    });
+
     return this;
   }
 }

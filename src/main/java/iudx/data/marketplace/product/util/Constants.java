@@ -53,10 +53,9 @@ public class Constants {
           + "where pt.product_id = '$1' "
           + "group by pt.product_id";
 
-  public static final String INSERT_PV_QUERY =
-      "insert into $0 (_id, provider_id, product_id, product_variant_name, resource_name, resource_ids, resource_capabilities, price, validity, status) values ('$1', '$2', '$3', '$4', ARRAY[$5],ARRAY[$6], ARRAY[$7], $8, $9, '$s')";
-  public static final String UPDATE_PV_STATUS_QUERY =
-      "update $0 set status='$4' where product_id='$1' and product_variant_name='$2' and status='$3'";
-  public static final String SELECT_PV_QUERY =
-      "select count(*) from $0 where product_id='$1' and product_variant_name='$2' and status='$3'";
+  public static final String INSERT_PV_QUERY  = "insert into $0 (_id, provider_id, product_id, product_variant_name, resource_name, resource_ids, resource_capabilities, price, validity, status) values ('$1', '$2', '$3', '$4', ARRAY[$5],ARRAY[$6], ARRAY[$7], $8, $9, '$s')";
+  public static final String UPDATE_PV_STATUS_QUERY = "update $0 set status='$4' where product_id='$1' and product_variant_name='$2' and status='$3'";
+  public static final String SELECT_PV_QUERY = "select count(*) from $0 where product_id='$1' and product_variant_name='$2' and status='$3'";
+
+  public static final String LIST_PVS_QUERY = "select product_variant_name, product_id, resource_name from $0 where product_id=$1 and status=$2";
 }

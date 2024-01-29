@@ -11,7 +11,7 @@ import static iudx.data.marketplace.common.ResponseUrn.INVALID_NAME_URN;
 
 public class VariantNameTypeValidator implements Validator{
 
-  private static final Logger LOGGER = LogManager.getLogger(ProductIDTypeValidator.class);
+  private static final Logger LOGGER = LogManager.getLogger(VariantNameTypeValidator.class);
 
   private final String value;
   private final boolean required;

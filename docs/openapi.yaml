@@ -446,6 +446,7 @@ paths:
             type: string
         - name: id
           in: query
+          required: true
           schema:
             type: string
         - name: variant
@@ -459,6 +460,70 @@ paths:
             application/json:
               schema:
                 type: object
+                properties:
+                  type:
+                    type: string
+                  title:
+                    type: string
+                  results:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        product_variant_name:
+                          type: string
+                        product_id:
+                          type: string
+                        resource_name:
+                          type: array
+                          items:
+                            type: string
+                x-examples:
+                  Example 1:
+                    type: 'urn:dx:dmp:success'
+                    title: Success
+                    results:
+                      - product_variant_name: variant1
+                        product_id: 'urn:datakaveri.org:b2c27f3f-2524-4a84-816e-91f9ab23f837:testProduct1'
+                        resource_name:
+                          - Chandigarh Paid Parking Locations
+                          - TEST ITEM FOR APD /verify TESTS
+              examples:
+                Get a Product Variant:
+                  value:
+                    type: 'urn:dx:dmp:success'
+                    title: Success
+                    results:
+                      - product_variant_name: variant1
+                        product_id: 'urn:datakaveri.org:b2c27f3f-2524-4a84-816e-91f9ab23f837:testProduct1'
+                        resource_name:
+                          - Chandigarh Paid Parking Locations
+                          - TEST ITEM FOR APD /verify TESTS
+                List all variants of the product:
+                  value:
+                    type: 'urn:dx:dmp:success'
+                    title: Success
+                    results:
+                      - product_variant_name: variant2
+                        product_id: 'urn:datakaveri.org:b2c27f3f-2524-4a84-816e-91f9ab23f837:testProduct1'
+                        resource_name:
+                          - Chandigarh Paid Parking Locations
+                          - TEST ITEM FOR APD /verify TESTS
+                      - product_variant_name: variant3
+                        product_id: 'urn:datakaveri.org:b2c27f3f-2524-4a84-816e-91f9ab23f837:testProduct1'
+                        resource_name:
+                          - Chandigarh Paid Parking Locations
+                          - TEST ITEM FOR APD /verify TESTS
+                      - product_variant_name: variant2X
+                        product_id: 'urn:datakaveri.org:b2c27f3f-2524-4a84-816e-91f9ab23f837:testProduct1'
+                        resource_name:
+                          - Chandigarh Paid Parking Locations
+                          - TEST ITEM FOR APD /verify TESTS
+                      - product_variant_name: variant1
+                        product_id: 'urn:datakaveri.org:b2c27f3f-2524-4a84-816e-91f9ab23f837:testProduct1'
+                        resource_name:
+                          - Chandigarh Paid Parking Locations
+                          - TEST ITEM FOR APD /verify TESTS
     put:
       tags:
         - provider
