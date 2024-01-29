@@ -707,6 +707,38 @@
 									"response": []
 								}
 							]
+						},
+						{
+							"name": "List P.V.",
+							"item": [
+								{
+									"name": "200 - List All Product Variants",
+									"request": {
+										"method": "GET",
+										"header": [],
+										"url": {
+											"raw": "{{localhost}}provider/product-variant?id=urn:datakaveri.org:b2c27f3f-2524-4a84-816e-91f9ab23f837:testProduct1&variant=variant1",
+											"host": [
+												"{{localhost}}provider"
+											],
+											"path": [
+												"product-variant"
+											],
+											"query": [
+												{
+													"key": "id",
+													"value": "urn:datakaveri.org:b2c27f3f-2524-4a84-816e-91f9ab23f837:testProduct1"
+												},
+												{
+													"key": "variant",
+													"value": "variant1"
+												}
+											]
+										}
+									},
+									"response": []
+								}
+							]
 						}
 					]
 				},
@@ -1484,6 +1516,25 @@
 							"response": []
 						}
 					]
+				},
+				{
+					"name": "Create Order",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"url": {
+							"raw": "{{localhost}}/consumer/order/22f7907d-d602-4455-9181-96e75b3df9b7",
+							"host": [
+								"{{localhost}}"
+							],
+							"path": [
+								"consumer",
+								"order",
+								"22f7907d-d602-4455-9181-96e75b3df9b7"
+							]
+						}
+					},
+					"response": []
 				}
 			],
 			"auth": {
