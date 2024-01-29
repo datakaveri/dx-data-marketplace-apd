@@ -1,5 +1,6 @@
 package iudx.data.marketplace.razorpay;
 
+import com.razorpay.Account;
 import com.razorpay.Order;
 import com.razorpay.RazorpayClient;
 import com.razorpay.RazorpayException;
@@ -33,10 +34,10 @@ public class RazorPayServiceImpl implements RazorPayService {
   public Future<JsonObject> createOrder(JsonObject request) {
     Promise<JsonObject> promise = Promise.promise();
 
-    Integer amount = (int) (request.getDouble(PRICE) * 100);
+    Integer amountInPaise = (int) (request.getDouble(PRICE) * 100);
     JSONObject orderRequest =
         new JSONObject()
-            .put(AMOUNT, amount)
+            .put(AMOUNT, amountInPaise)
             .put(CURRENCY, INR)
             .put(RECEIPT, "receipt") // TODO: what is receipt?
             .put(
@@ -46,7 +47,7 @@ public class RazorPayServiceImpl implements RazorPayService {
                         0,
                         new JSONObject()
                             .put(ACCOUNT, request.getString(ACCOUNT_ID))
-                            .put(AMOUNT, amount)
+                            .put(AMOUNT, amountInPaise)
                             .put(CURRENCY, INR)
                             .put(
                                 NOTES,
@@ -59,6 +60,8 @@ public class RazorPayServiceImpl implements RazorPayService {
     try {
       LOGGER.debug("order request at razorpay: {} ", orderRequest);
       Order order = razorpayClient.orders.create(orderRequest);
+      JSONObject accountRequest = new JSONObject();
+      Account account = razorpayClient.account.create(accountRequest);
       String status = order.get(STATUS);
       if (!status.equals(CREATED)) {
         throw new DxRuntimeException(

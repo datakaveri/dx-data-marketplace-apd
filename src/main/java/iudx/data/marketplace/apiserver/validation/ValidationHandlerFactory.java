@@ -99,7 +99,7 @@ public class ValidationHandlerFactory {
 
     if (body == null || body.isEmpty()) {
       validators.add(new ProductIDTypeValidator(parameters.get(PRODUCT_ID), true));
-      validators.add(new VariantNameTypeValidator(parameters.get(PRODUCT_VARIANT_NAME), true));
+      validators.add(new VariantNameTypeValidator(parameters.get(PRODUCT_VARIANT_NAME), false));
     } else {
       validators.add(new JsonSchemaTypeValidator(body, requestType));
     }
