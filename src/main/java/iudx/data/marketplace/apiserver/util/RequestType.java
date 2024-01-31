@@ -6,10 +6,10 @@ public enum RequestType {
   RESOURCE("resource"),
   POLICY("policy"),
   VERIFY("verify_policy"),
-  ACCOUNT("account"),
-  PROVIDER("provider"),
   ORDER("order"),
-  ACCOUNT("account");
+  POST_ACCOUNT("post_account"),
+  PUT_ACCOUNT("put_account"),
+  PROVIDER("provider");
 
   private String filename;
 

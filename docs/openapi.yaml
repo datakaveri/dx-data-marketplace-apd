@@ -650,11 +650,6 @@ paths:
             schema:
               type: object
               properties:
-                email:
-                  type: string
-                  pattern: '^([a-zA-Z0-9_\-\.]+)@([a-zA-Z0-9_\-\.]+)\.([a-zA-Z]{2,5})$'
-                  minLength: 1
-                  description: A valid business email account
                 phone:
                   type: string
                   minLength: 8
@@ -759,7 +754,6 @@ paths:
                       maxLength: 15
                       pattern: '/^[0123][0-9][a-z]{5}[0-9]{4}[a-z][0-9][a-z0-9][a-z0-9]$/gi'
               required:
-                - email
                 - phone
                 - legalBusinessName
                 - businessType
@@ -768,7 +762,6 @@ paths:
             examples:
               Request body for Create Linked Account:
                 value:
-                  email: test.provider@gmail.com
                   phone: 9000090000
                   legalBusinessName: Dummy Corp V1
                   customerFacingBusinessName: Dummy Service Corp V1
@@ -778,12 +771,13 @@ paths:
                     category: healthcare
                     subcategory: clinic
                     addresses:
-                      street1: 507, Koramangala 1st block
-                      street2: MG Road
-                      city: Bengaluru
-                      state: KARNATAKA
-                      postalCode: 560034
-                      country: IN
+                      registered:
+                        street1: 507, Koramangala 1st block
+                        street2: MG Road
+                        city: Bengaluru
+                        state: KARNATAKA
+                        postalCode: 560034
+                        country: IN
                   legalInfo:
                     pan: AAACL1234C
                     gst: 18AABCU9603R1ZM
@@ -2466,7 +2460,7 @@ components:
       example:
         type: urn:dx:dmp:success
         title: Success
-        detail: Linked account created successfully with accountId - acc_NSQXtot69r4Sw3
+        detail: Linked account created successfully
 
     createLinkedAccountErrorResponse:
       title: createLinkedAccountErrorResponse

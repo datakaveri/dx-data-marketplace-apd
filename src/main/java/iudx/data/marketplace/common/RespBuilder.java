@@ -13,6 +13,11 @@ public class RespBuilder {
     response.put(JSON_TYPE, type);
     return this;
   }
+  public RespBuilder withType(int statusCode)
+  {
+    response.put(JSON_TYPE, statusCode);
+    return this;
+  }
 
   public RespBuilder withTitle(String title) {
     response.put(JSON_TITLE, title);

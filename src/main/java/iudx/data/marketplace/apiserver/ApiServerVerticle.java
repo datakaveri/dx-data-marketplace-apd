@@ -16,7 +16,7 @@ import io.vertx.ext.web.handler.TimeoutHandler;
 import iudx.data.marketplace.apiserver.handlers.AuthHandler;
 import iudx.data.marketplace.apiserver.handlers.ExceptionHandler;
 import iudx.data.marketplace.apiserver.handlers.ValidationHandler;
-import iudx.data.marketplace.apiserver.provider.LinkedAccountService;
+import iudx.data.marketplace.apiserver.provider.linkedAccount.LinkedAccountService;
 import iudx.data.marketplace.apiserver.util.RequestType;
 import iudx.data.marketplace.authenticator.AuthClient;
 import iudx.data.marketplace.authenticator.AuthenticationService;
@@ -24,7 +24,6 @@ import iudx.data.marketplace.common.*;
 import iudx.data.marketplace.policies.PolicyService;
 import iudx.data.marketplace.policies.User;
 import iudx.data.marketplace.postgres.PostgresService;
-import iudx.data.marketplace.postgres.PostgresServiceImpl;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -208,7 +207,8 @@ public class ApiServerVerticle extends AbstractVerticle {
     ExceptionHandler exceptionHandler = new ExceptionHandler();
     ValidationHandler policyValidationHandler = new ValidationHandler(vertx, RequestType.POLICY);
     ValidationHandler verifyValidationHandler = new ValidationHandler(vertx, RequestType.VERIFY);
-    ValidationHandler linkedAccountHandler = new ValidationHandler(vertx, RequestType.ACCOUNT);
+    ValidationHandler postLinkedAccountHandler = new ValidationHandler(vertx, RequestType.POST_ACCOUNT);
+    ValidationHandler putLinkedAccountHandler = new ValidationHandler(vertx, RequestType.PUT_ACCOUNT);
 
     router
             .get(api.getPoliciesUrl())
@@ -239,9 +239,26 @@ public class ApiServerVerticle extends AbstractVerticle {
         .handler(this::handleVerify)
         .failureHandler(exceptionHandler);
 
-//    router
-//            .post(api.getLinkedAccountService())
-//                    .handler()
+      router
+              .post(api.getLinkedAccountService())
+              .handler(postLinkedAccountHandler)
+              .handler(AuthHandler.create(authenticationService, vertx, api, postgresService, authClient))
+              .handler(this::handlePostLinkedAccount)
+              .failureHandler(exceptionHandler);
+
+    router
+            .post(api.getLinkedAccountService())
+            .handler(putLinkedAccountHandler)
+            .handler(AuthHandler.create(authenticationService, vertx, api, postgresService, authClient))
+            .handler(this::handlePutLinkedAccount)
+            .failureHandler(exceptionHandler);
+
+    router
+            .post(api.getLinkedAccountService())
+            .handler(AuthHandler.create(authenticationService, vertx, api, postgresService, authClient))
+            .handler(this::handleFetchLinkedAccount)
+            .failureHandler(exceptionHandler);
+
     //  Documentation routes
 
     /* Static Resource Handler */
@@ -332,6 +349,64 @@ public class ApiServerVerticle extends AbstractVerticle {
 
   }
 
+//  TODO: add auditing after success response
+  private void handlePostLinkedAccount(RoutingContext routingContext) {
+    JsonObject requestBody = routingContext.body().asJsonObject();
+    User user = routingContext.get("user");
+    HttpServerResponse response = routingContext.response();
+    linkedAccountService
+            .createLinkedAccount(requestBody, user)
+            .onComplete(
+                    handler -> {
+                      if (handler.succeeded()) {
+                        LOGGER.info("Linked account created successfully ");
+                        handleSuccessResponse(
+                                response, HttpStatusCode.SUCCESS.getValue(), handler.result().toString());
+
+                      } else {
+                        LOGGER.error("Linked account could not be created {}", handler.cause().getMessage());
+                        handleFailureResponse(routingContext, handler.cause().getMessage());
+                      }
+                    });
+  }
+  private void handlePutLinkedAccount(RoutingContext routingContext) {
+    JsonObject requestBody = routingContext.body().asJsonObject();
+    HttpServerResponse response = routingContext.response();
+    User user = routingContext.get("user");
+
+    linkedAccountService
+            .updateLinkedAccount(requestBody, user)
+            .onComplete(
+                    handler -> {
+                      if (handler.succeeded()) {
+                        LOGGER.info("Linked account updated successfully ");
+                        handleSuccessResponse(
+                                response, HttpStatusCode.SUCCESS.getValue(), handler.result().toString());
+                      } else {
+                        LOGGER.error("Linked account could not be updated {}", handler.cause().getMessage());
+                        handleFailureResponse(routingContext, handler.cause().getMessage());
+                      }
+                    });
+  }
+
+  private void handleFetchLinkedAccount(RoutingContext routingContext) {
+    JsonObject requestBody = routingContext.body().asJsonObject();
+    HttpServerResponse response = routingContext.response();
+    User user = routingContext.get("user");
+    linkedAccountService
+            .fetchLinkedAccount(user)
+            .onComplete(
+                    handler -> {
+                      if (handler.succeeded()) {
+                        LOGGER.info("Linked account fetched successfully ");
+                        handleSuccessResponse(
+                                response, HttpStatusCode.SUCCESS.getValue(), handler.result().toString());
+                      } else {
+                        LOGGER.error("Linked account could not be fetched {}", handler.cause().getMessage());
+                        handleFailureResponse(routingContext, handler.cause().getMessage());
+                      }
+                    });
+  }
   private void handleVerify(RoutingContext routingContext) {
     JsonObject requestBody = routingContext.body().asJsonObject();
     HttpServerResponse response = routingContext.response();

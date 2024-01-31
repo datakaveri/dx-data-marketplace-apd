@@ -1,4 +1,4 @@
-package iudx.data.marketplace.apiserver.provider;
+package iudx.data.marketplace.apiserver.provider.linkedAccount;
 
 
 import io.vertx.codegen.annotations.GenIgnore;

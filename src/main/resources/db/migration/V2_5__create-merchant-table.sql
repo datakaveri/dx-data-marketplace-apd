@@ -1,13 +1,12 @@
 CREATE type linked_account_status_type AS ENUM
 	(
 		'CREATED',
-		'ACTIVATED',
-		'SUSPENDED'
+		'ACTIVATED'
 	);
 
 	CREATE TABLE IF NOT EXISTS merchant_table
 	(
-		reference_id varchar NOT NULL PRIMARY KEY,
+		reference_id varchar(20) NOT NULL PRIMARY KEY,
 		phone_number numeric NOT NULL,
 		email varchar NOT NULL,
 		legal_business_name varchar NOT NULL,
@@ -35,3 +34,8 @@ OR UPDATE ON
 --   grant privileges
 ---
 GRANT INSERT, SELECT, UPDATE, DELETE, REFERENCES, TRIGGER ON TABLE merchant_table TO dmp_user;
+
+---
+--   constraint
+---
+ALTER TABLE merchant_table ADD CONSTRAINT check_min_length CHECK (length(reference_id) = 20);
