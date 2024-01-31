@@ -46,7 +46,11 @@ public enum ResponseUrn {
   VERIFY_FORBIDDEN_URN("urn:apd:Deny", "Policy does not exist"),
   FORBIDDEN_URN("urn:dx:dmp:forbidden", "Resource is forbidden to access"),
   VERIFY_SUCCESS_URN("urn:apd:Allow", "Success"),
-  YET_NOT_IMPLEMENTED_URN("urn:dx:dmp:general", "urn yet not implemented in backend verticle.");
+  YET_NOT_IMPLEMENTED_URN("urn:dx:dmp:general", "urn yet not implemented in backend verticle."),
+
+  //RazorPay related URNs
+  ORDER_NOT_CREATED("urn:dx:dmp:RazorPay:OrderNotCreatedError", "Order Not Created"),
+  ORDER_CREATION_FAILED("urn:dx:dmp:RazorPay:OrderCreationFailedError", "Order creation returned with error");
 
   private final String urn;
   private final String message;

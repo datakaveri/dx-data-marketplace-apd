@@ -3,7 +3,7 @@ package iudx.data.marketplace.apiserver.validation;
 import io.vertx.junit5.VertxExtension;
 import io.vertx.junit5.VertxTestContext;
 import iudx.data.marketplace.apiserver.exceptions.DxRuntimeException;
-import iudx.data.marketplace.apiserver.validation.types.ProviderIDTypeValidator;
+import iudx.data.marketplace.apiserver.validation.types.UUIDTypeValidator;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -20,9 +20,9 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @ExtendWith(VertxExtension.class)
 @ExtendWith(MockitoExtension.class)
-public class ProviderIDTypeValidatorTest {
+public class UUIDTypeValidatorTest {
 
-    ProviderIDTypeValidator providerIDTypeValidator;
+    UUIDTypeValidator UUIDTypeValidator;
     String value;
     boolean required;
 
@@ -30,9 +30,9 @@ public class ProviderIDTypeValidatorTest {
     @DisplayName("Test for valid ID")
     public void testForValidId(VertxTestContext testContext) {
     value = UUID.randomUUID().toString();
-        providerIDTypeValidator = new ProviderIDTypeValidator(value, true);
+        UUIDTypeValidator = new UUIDTypeValidator(value, true);
 
-        boolean valid = providerIDTypeValidator.isValid();
+        boolean valid = UUIDTypeValidator.isValid();
         assertTrue(valid);
         testContext.completeNow();
     }
@@ -53,9 +53,9 @@ public class ProviderIDTypeValidatorTest {
     public void failureTestIDValidator(String id, VertxTestContext testContext) {
         value = id;
 
-        providerIDTypeValidator = new ProviderIDTypeValidator(value, true);
+        UUIDTypeValidator = new UUIDTypeValidator(value, true);
         Exception exception = assertThrows(DxRuntimeException.class, () -> {
-            providerIDTypeValidator.isValid();
+            UUIDTypeValidator.isValid();
         });
         testContext.completeNow();
     }

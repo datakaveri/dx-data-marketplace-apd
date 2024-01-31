@@ -19,10 +19,8 @@ import iudx.data.marketplace.common.Api;
 import iudx.data.marketplace.common.RespBuilder;
 import iudx.data.marketplace.common.ResponseUrn;
 import iudx.data.marketplace.consumer.ConsumerService;
-import java.util.Map;
-
 import iudx.data.marketplace.postgres.PostgresService;
-import iudx.data.marketplace.postgres.PostgresServiceImpl;
+import java.util.Map;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -52,6 +50,7 @@ public class ConsumerApis {
     ValidationHandler resourceValidationHandler = new ValidationHandler(vertx, RequestType.RESOURCE);
     ValidationHandler providerValidationHandler =
         new ValidationHandler(vertx, RequestType.PROVIDER);
+    ValidationHandler orderValidationHandler = new ValidationHandler(vertx, RequestType.ORDER);
     ExceptionHandler exceptionHandler = new ExceptionHandler();
 
     consumerService = ConsumerService.createProxy(vertx, CONSUMER_SERVICE_ADDRESS);
@@ -82,7 +81,32 @@ public class ConsumerApis {
         .handler(this::listPurchases)
         .failureHandler(exceptionHandler);
 
+    router
+        .post(CONSUMER_PATH + ORDERS_PATH + "/:variant")
+        .handler(orderValidationHandler)
+        .handler(AuthHandler.create(authenticationService, vertx, api, postgresService, authClient))
+        .handler(this::createOrder)
+        .failureHandler(exceptionHandler);
     return this.router;
+  }
+
+  private void createOrder(RoutingContext routingContext) {
+    LOGGER.info("hre");
+    Map<String, String> pathParams = routingContext.pathParams();
+    String variantId = pathParams.get(PRODUCT_VARIANT_NAME);
+
+    JsonObject requestBody = new JsonObject()
+        .put(AUTH_INFO, routingContext.data().get(AUTH_INFO))
+        .put(PRODUCT_VARIANT_NAME, variantId);
+
+    consumerService.createOrder(requestBody, handler -> {
+      if(handler.succeeded()) {
+        handleSuccessResponse(routingContext, 201, handler.result());
+      } else {
+        LOGGER.error("here");
+        handleFailureResponse(routingContext, handler.cause());
+      }
+    });
   }
 
   private void listProviders(RoutingContext routingContext) {
