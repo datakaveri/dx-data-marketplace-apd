@@ -180,18 +180,6 @@ public class QueryBuilder {
     return query.toString();
   }
 
-  public String listProductVariants(JsonObject request) {
-
-    StringBuilder query = new StringBuilder(
-          LIST_PVS_QUERY.replace("$0", productVariantTable));
-    if(request.containsKey(VARIANT)) {
-      query.append(" and product_variant_name=$3");
-    }
-
-    LOGGER.debug(query);
-    return query.toString();
-  }
-
   public JsonObject buildMessageForRmq(JsonObject request) {
     String primaryKey = UUID.randomUUID().toString().replace("-", "");
     request.put(PRIMARY_KEY, primaryKey);
