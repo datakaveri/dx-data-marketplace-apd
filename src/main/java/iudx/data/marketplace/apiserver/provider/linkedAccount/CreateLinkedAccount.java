@@ -1,7 +1,6 @@
 package iudx.data.marketplace.apiserver.provider.linkedAccount;
 
 
-import com.google.common.hash.HashFunction;
 import com.google.common.hash.Hashing;
 import com.razorpay.Account;
 import com.razorpay.RazorpayClient;
@@ -9,7 +8,6 @@ import com.razorpay.RazorpayException;
 import io.vertx.core.Future;
 import io.vertx.core.Promise;
 import io.vertx.core.json.JsonObject;
-import io.vertx.ext.web.client.WebClient;
 import iudx.data.marketplace.auditing.AuditingService;
 import iudx.data.marketplace.common.Api;
 import iudx.data.marketplace.common.HttpStatusCode;
@@ -34,9 +32,6 @@ public class CreateLinkedAccount {
   public static final String ACCOUNT_TYPE = "route";
   private static final String FAILURE_MESSAGE = "User registration incomplete : ";
   private static final Logger LOGGER = LogManager.getLogger(CreateLinkedAccount.class);
-  private final WebClient webClient;
-  private final String razorpayKey;
-  private final String razorpaySecret;
   PostgresService postgresService;
   Api api;
   AuditingService auditingService;
@@ -52,10 +47,7 @@ public class CreateLinkedAccount {
     this.postgresService = builder.postgresService;
     this.api = builder.api;
     this.auditingService = builder.auditingService;
-    this.webClient = builder.webClient;
     this.razorpayClient = builder.razorpayClient;
-    this.razorpayKey = builder.razorpayKey;
-    this.razorpaySecret = builder.razorpaySecret;
   }
 
 
@@ -68,6 +60,7 @@ public class CreateLinkedAccount {
     setProviderId(provider.getUserId());
     JsonObject response = null;
     try {
+//      TODO: Remove reinitialisation
       razorpayClient =
           new RazorpayClient("rzp_test_kbgO0jNB4Q4loL", "Qi7uOrDcXF5Ll6PRwiWCEDWx", true);
 
@@ -337,9 +330,6 @@ public class CreateLinkedAccount {
     private final PostgresService postgresService;
     private final Api api;
     private final AuditingService auditingService;
-    private String razorpayKey;
-    private String razorpaySecret;
-    private WebClient webClient;
     private RazorpayClient razorpayClient;
 
     public CreateLinkedAccountBuilder(
@@ -349,15 +339,6 @@ public class CreateLinkedAccount {
       this.auditingService = auditingService;
     }
 
-    public CreateLinkedAccountBuilder setKey(String key) {
-      this.razorpayKey = key;
-      return this;
-    }
-
-    public CreateLinkedAccountBuilder setSecret(String secret) {
-      this.razorpaySecret = secret;
-      return this;
-    }
 
     public CreateLinkedAccountBuilder setRazorpayClient(RazorpayClient razorpayClient)
     {
@@ -365,10 +346,6 @@ public class CreateLinkedAccount {
       return this;
     }
 
-    public CreateLinkedAccountBuilder setWebClient(WebClient webClient) {
-      this.webClient = webClient;
-      return this;
-    }
 
     public CreateLinkedAccount build() {
       return new CreateLinkedAccount(this);

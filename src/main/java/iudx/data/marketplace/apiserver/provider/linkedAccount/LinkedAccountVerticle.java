@@ -11,8 +11,11 @@ import io.vertx.serviceproxy.ServiceBinder;
 import iudx.data.marketplace.auditing.AuditingService;
 import iudx.data.marketplace.common.Api;
 import iudx.data.marketplace.postgres.PostgresService;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 public class LinkedAccountVerticle extends AbstractVerticle {
+  private static final Logger LOGGER = LogManager.getLogger(LinkedAccountVerticle.class);
 
   private PostgresService postgresService;
   private LinkedAccountServiceImpl linkedAccountService;
@@ -22,28 +25,27 @@ public class LinkedAccountVerticle extends AbstractVerticle {
   private AuditingService auditingService;
 
   private Api api;
-  private WebClient webClient;
-  private WebClientOptions webClientOptions;
   private RazorpayClient razorpayClient;
 
   @Override
   public void start(Promise<Void> startPromise) throws Exception {
     postgresService = PostgresService.createProxy(vertx, POSTGRES_SERVICE_ADDRESS);
     api = Api.getInstance(config().getString("dxApiBasePath"));
-    String razorpayId = config().getString("razorpayTestId");
-    String razorpaySecret = config().getString("razorpayTestSecret");
-    webClientOptions = new WebClientOptions();
-    webClientOptions.setTrustAll(false).setVerifyHost(true).setSsl(true);
-    webClient = WebClient.create(vertx, webClientOptions);
+    String razorPayKey = config().getString("razorPayKey");
+    String razorPaySecret = config().getString("razorPaySecret");
 
-    razorpayClient = new RazorpayClient(razorpayId, razorpaySecret, true);
+
+    Boolean enableLogging = config().getBoolean("enableLogging", false);
+    if (enableLogging) {
+      LOGGER.warn("RazorPay enable logging set to true, do not set in production!!");
+      razorpayClient = new RazorpayClient(razorPayKey, razorPaySecret, true);
+    } else {
+      razorpayClient = new RazorpayClient(razorPayKey, razorPaySecret);
+    }
     auditingService = AuditingService.createProxy(vertx, AUDITING_SERVICE_ADDRESS);
 
     createLinkedAccount =
         new CreateLinkedAccount.CreateLinkedAccountBuilder(postgresService, api, auditingService)
-            .setKey(razorpayId)
-            .setSecret(razorpaySecret)
-            .setWebClient(webClient)
             .setRazorpayClient(razorpayClient)
             .build();
 
