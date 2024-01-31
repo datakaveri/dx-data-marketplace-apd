@@ -42,6 +42,8 @@ public class ValidationHandlerFactory {
         break;
       case ACCOUNT:
         validator = getLinkedAccountValidator(parameters, body, requestType);
+      case ORDER:
+        validator = getOrderValidator(parameters);
         break;
     }
     return validator;
@@ -52,6 +54,11 @@ public class ValidationHandlerFactory {
     validators.add(new AccountIdTypeValidator(parameters.get(ACCOUNT_ID), false));
 
     return null;
+}
+  private List<Validator> getOrderValidator(MultiMap parameters) {
+    List<Validator> validators = new ArrayList<>();
+    validators.add(new UUIDTypeValidator(parameters.get(PRODUCT_VARIANT_NAME), true));
+    return validators;
   }
 
   private List<Validator> getVerifyPolicyValidator(MultiMap parameters, JsonObject body) {
@@ -60,23 +67,24 @@ public class ValidationHandlerFactory {
     return validators;
   }
 
-  private List<Validator> getPolicyValidators(final MultiMap parameters){
+  private List<Validator> getPolicyValidators(final MultiMap parameters) {
     List<Validator> validators = new ArrayList<>();
     validators.add(new PolicyIdTypeValidator(parameters.get(POLICY_ID), true));
     return validators;
   }
-    private List<Validator> getResourceIDValidators(final MultiMap parameters) {
+
+  private List<Validator> getResourceIDValidators(final MultiMap parameters) {
     List<Validator> validators = new ArrayList<>();
 
-    validators.add(new ResourceIDTypeValidator(parameters.get(RESOURCE_ID), false));
-    validators.add(new ProviderIDTypeValidator(parameters.get(PROVIDER_ID), false));
+    validators.add(new UUIDTypeValidator(parameters.get(RESOURCE_ID), false));
+    validators.add(new UUIDTypeValidator(parameters.get(PROVIDER_ID), false));
     return validators;
   }
 
   private List<Validator> getProviderIDValidators(final MultiMap parameters) {
     List<Validator> validators = new ArrayList<>();
 
-    validators.add(new ProviderIDTypeValidator(parameters.get(PROVIDER_ID), false));
+    validators.add(new UUIDTypeValidator(parameters.get(PROVIDER_ID), false));
     return validators;
   }
 
@@ -99,7 +107,7 @@ public class ValidationHandlerFactory {
 
     if (body == null || body.isEmpty()) {
       validators.add(new ProductIDTypeValidator(parameters.get(PRODUCT_ID), true));
-      validators.add(new VariantNameTypeValidator(parameters.get(PRODUCT_VARIANT_NAME), true));
+      validators.add(new VariantNameTypeValidator(parameters.get(PRODUCT_VARIANT_NAME), false));
     } else {
       validators.add(new JsonSchemaTypeValidator(body, requestType));
     }

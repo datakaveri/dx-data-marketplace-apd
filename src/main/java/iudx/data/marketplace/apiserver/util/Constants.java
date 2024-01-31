@@ -66,6 +66,7 @@ public class Constants {
   public static final String CONSUMER_PATH = "/consumer";
   public static final String LIST_PROVIDERS_PATH = "/list/providers";
   public static final String LIST_RESOURCES_PATH = "/list/resources";
+  public static final String ORDERS_PATH = "/order";
   public static final String USERMAPS_PATH = "/product/usermaps";
   public static final String VERIFY_PATH = "/verify";
   public static final String POLICIES_API = "/policies";
@@ -83,7 +84,7 @@ public class Constants {
   public static final int VALIDATION_URN_DELIMITER_COUNT = 3;
 
   public static final int VALIDATION_PRODUCT_ID_MAXLEN = 150;
-  public static final Pattern VALIDATION_PRODUCT_ID_REGEX = Pattern.compile("^[a-zA-Z0-9/.:-]{3,150}$");
+  public static final Pattern VALIDATION_PRODUCT_ID_REGEX = Pattern.compile("^[a-zA-Z0-9.:-]{3,150}$");
   public static final int VALIDATION_VARIANT_NAME_MAX_LEN = 100;
   public static final Pattern VALIDATION_VARIANT_NAME_REGEX = Pattern.compile("^[a-zA-Z0-9-]{3,100}$");
   public static final int VALIDATION_ID_LENGTH = 36;

@@ -7,7 +7,8 @@ public enum RequestType {
   POLICY("policy"),
   VERIFY("verify_policy"),
   ACCOUNT("account"),
-  PROVIDER("provider");
+  PROVIDER("provider"),
+  ORDER("order");
 
   private String filename;
 

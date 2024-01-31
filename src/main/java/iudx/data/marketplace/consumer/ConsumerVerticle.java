@@ -5,11 +5,11 @@ import io.vertx.core.eventbus.MessageConsumer;
 import io.vertx.core.json.JsonObject;
 import io.vertx.serviceproxy.ServiceBinder;
 import iudx.data.marketplace.postgres.PostgresService;
+import iudx.data.marketplace.razorpay.RazorPayService;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import static iudx.data.marketplace.common.Constants.CONSUMER_SERVICE_ADDRESS;
-import static iudx.data.marketplace.common.Constants.POSTGRES_SERVICE_ADDRESS;
+import static iudx.data.marketplace.common.Constants.*;
 
 public class ConsumerVerticle extends AbstractVerticle {
   public static final Logger LOGGER = LogManager.getLogger(ConsumerVerticle.class);
@@ -18,12 +18,14 @@ public class ConsumerVerticle extends AbstractVerticle {
 
   private PostgresService postgresService;
   private ConsumerService consumerService;
+  private RazorPayService razorPayService;
 
   @Override
   public void start() throws Exception {
     postgresService = PostgresService.createProxy(vertx, POSTGRES_SERVICE_ADDRESS);
+    razorPayService = RazorPayService.createProxy(vertx, RAZORPAY_SERVICE_ADDRESS);
 
-    consumerService = new ConsumerServiceImpl(config(), postgresService);
+    consumerService = new ConsumerServiceImpl(config(), postgresService, razorPayService);
     binder = new ServiceBinder(vertx);
     consumer = binder.setAddress(CONSUMER_SERVICE_ADDRESS).register(ConsumerService.class, consumerService);
     LOGGER.info("Consumer Service started");

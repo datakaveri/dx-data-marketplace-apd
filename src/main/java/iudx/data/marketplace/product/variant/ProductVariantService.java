@@ -54,4 +54,14 @@ public interface ProductVariantService {
    */
   @Fluent
   ProductVariantService deleteProductVariant(User user, JsonObject request, Handler<AsyncResult<JsonObject>> handler);
+
+  /**
+   * The listProductVariant method implements the fetch of product variant(s) on the IUDX data marketplace.
+   * @param user which is the calling user Object
+   * @param request which is a JsonObject
+   * @param handler which is a Request Handler
+   * @return ProductVariantService which is a service
+   */
+  @Fluent
+  ProductVariantService listProductVariants(User user, JsonObject request, Handler<AsyncResult<JsonObject>> handler);
 }

@@ -40,7 +40,14 @@ public class ProviderApis {
   private PostgresService postgresService;
   private AuthClient authClient;
   private AuthenticationService authenticationService;
-  ProviderApis(Vertx vertx, Router router, Api apis, PostgresService postgresService, AuthClient authClient, AuthenticationService authenticationService) {
+
+  ProviderApis(
+      Vertx vertx,
+      Router router,
+      Api apis,
+      PostgresService postgresService,
+      AuthClient authClient,
+      AuthenticationService authenticationService) {
     this.vertx = vertx;
     this.router = router;
     this.api = apis;
@@ -54,7 +61,8 @@ public class ProviderApis {
     ValidationHandler productValidationHandler = new ValidationHandler(vertx, RequestType.PRODUCT);
     ValidationHandler variantValidationHandler =
         new ValidationHandler(vertx, RequestType.PRODUCT_VARIANT);
-    ValidationHandler resourceValidationHandler = new ValidationHandler(vertx, RequestType.RESOURCE);
+    ValidationHandler resourceValidationHandler =
+        new ValidationHandler(vertx, RequestType.RESOURCE);
     ExceptionHandler exceptionHandler = new ExceptionHandler();
 
     productService = ProductService.createProxy(vertx, PRODUCT_SERVICE_ADDRESS);
@@ -104,6 +112,7 @@ public class ProviderApis {
 
     router
         .get(PROVIDER_PATH + PRODUCT_VARIANT_PATH)
+        .handler(variantValidationHandler)
         .handler(AuthHandler.create(authenticationService, vertx, api, postgresService, authClient))
         .handler(this::handleGetProductVariants)
         .failureHandler(exceptionHandler);
@@ -123,7 +132,7 @@ public class ProviderApis {
     requestBody.put(AUTH_INFO, authInfo);
     User user = routingContext.get("user");
     productService.createProduct(
-            user,
+        user,
         requestBody,
         handler -> {
           if (handler.succeeded()) {
@@ -150,7 +159,7 @@ public class ProviderApis {
     requestBody.put(AUTH_INFO, authInfo);
     User user = routingContext.get("user");
     productService.deleteProduct(
-            user,
+        user,
         requestBody,
         handler -> {
           if (handler.succeeded()) {
@@ -181,7 +190,7 @@ public class ProviderApis {
     requestBody.put(AUTH_INFO, authInfo);
 
     productService.listProducts(
-            user,
+        user,
         requestBody,
         handler -> {
           if (handler.succeeded()) {
@@ -215,7 +224,7 @@ public class ProviderApis {
     User user = routingContext.get("user");
 
     variantService.createProductVariant(
-            user,
+        user,
         requestBody,
         handler -> {
           if (handler.succeeded()) {
@@ -243,7 +252,7 @@ public class ProviderApis {
     User user = routingContext.get("user");
 
     variantService.updateProductVariant(
-            user,
+        user,
         requestBody,
         handler -> {
           if (handler.succeeded()) {
@@ -254,7 +263,28 @@ public class ProviderApis {
         });
   }
 
-  private void handleGetProductVariants(RoutingContext routingContext) {}
+  private void handleGetProductVariants(RoutingContext routingContext) {
+    HttpServerRequest request = routingContext.request();
+    JsonObject authInfo = (JsonObject) routingContext.data().get(AUTH_INFO);
+    JsonObject requestBody = new JsonObject();
+    User user = routingContext.get("user");
+    for (Map.Entry<String, String> param : request.params()) {
+      requestBody.put(param.getKey(), param.getValue());
+    }
+
+    requestBody.put(AUTH_INFO, authInfo);
+
+    variantService.listProductVariants(
+        user,
+        requestBody,
+        handler -> {
+          if (handler.succeeded()) {
+            handleSuccessResponse(routingContext, 200, handler.result());
+          } else {
+            handleFailureResponse(routingContext, handler.cause());
+          }
+        });
+  }
 
   private void handleDeleteProductVariant(RoutingContext routingContext) {
     HttpServerRequest request = routingContext.request();
@@ -267,7 +297,7 @@ public class ProviderApis {
     User user = routingContext.get("user");
 
     variantService.deleteProductVariant(
-            user,
+        user,
         requestBody,
         handler -> {
           if (handler.succeeded()) {
