@@ -18,6 +18,7 @@ public class Api {
   private StringBuilder consumerListPurchases;
   private StringBuilder consumerListProducts;
   private StringBuilder consumerOrdersApi;
+  private StringBuilder verifyPaymentApi;
 
   private Api(String dxApiBasePath) {
     this.dxApiBasePath = dxApiBasePath;
@@ -48,6 +49,7 @@ public class Api {
     consumerListPurchases = new StringBuilder(CONSUMER_PATH + LIST_PURCHASES_PATH);
     consumerListProducts = new StringBuilder(CONSUMER_PATH + LIST_PRODUCTS_PATH);
     consumerOrdersApi = new StringBuilder(CONSUMER_PATH + ORDERS_PATH);
+    verifyPaymentApi = new StringBuilder(VERIFY_PAYMENTS_PATH);
   }
 
   public String getPoliciesUrl() {
@@ -96,5 +98,9 @@ public class Api {
 
   public String getConsumerOrderApi() {
     return consumerOrdersApi.toString();
+  }
+
+  public String getVerifyPaymentApi() {
+    return verifyPaymentApi.toString();
   }
 }

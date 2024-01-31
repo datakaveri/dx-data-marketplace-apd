@@ -4,6 +4,7 @@ import com.razorpay.Account;
 import com.razorpay.Order;
 import com.razorpay.RazorpayClient;
 import com.razorpay.RazorpayException;
+import com.razorpay.Utils;
 import io.vertx.core.Future;
 import io.vertx.core.Promise;
 import io.vertx.core.json.JsonObject;
@@ -17,17 +18,23 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import static iudx.data.marketplace.product.util.Constants.PRICE;
-import static iudx.data.marketplace.product.util.Constants.STATUS;
+import static iudx.data.marketplace.product.util.Constants.*;
 import static iudx.data.marketplace.razorpay.Constants.*;
 
 public class RazorPayServiceImpl implements RazorPayService {
 
   private static Logger LOGGER = LogManager.getLogger(RazorPayServiceImpl.class);
+  private final PostgresService postgresService;
+  private final String razorPaySecret;
+  private final String paymentTable;
   RazorpayClient razorpayClient;
 
-  RazorPayServiceImpl(RazorpayClient razorpayClient, PostgresService postgresService) {
+  RazorPayServiceImpl(
+      RazorpayClient razorpayClient, PostgresService postgresService, final JsonObject config) {
     this.razorpayClient = razorpayClient;
+    this.postgresService = postgresService;
+    this.razorPaySecret = config.getString(RAZORPAY_SECRET);
+    this.paymentTable = config.getJsonArray(TABLES).getString(9);
   }
 
   @Override
@@ -74,8 +81,8 @@ public class RazorPayServiceImpl implements RazorPayService {
       JSONObject responseError = transferResponse.getJSONObject(ERROR);
       LOGGER.debug("error response from razorpay : {}", responseError);
 
-      Object reason =  responseError.get(REASON);
-      if(reason!=null) {
+      Object reason = responseError.get(REASON);
+      if (reason != null) {
         LOGGER.error("razorpay error : ", responseError);
         String message;
         switch ((String) reason) {
@@ -126,6 +133,62 @@ public class RazorPayServiceImpl implements RazorPayService {
       promise.fail(respBuilder.getResponse());
     }
 
+    return promise.future();
+  }
+
+  @Override
+  public Future<JsonObject> verifyPayment(JsonObject request) {
+    Promise<JsonObject> promise = Promise.promise();
+
+    JSONObject verifyOption =
+        new JSONObject()
+            .put(RAZORPAY_ORDER_ID, request.getString(RAZORPAY_ORDER_ID))
+            .put(RAZORPAY_PAYMENT_ID, request.getString(RAZORPAY_PAYMENT_ID))
+            .put(RAZORPAY_SIGNATURE, request.getString(RAZORPAY_SIGNATURE));
+
+    try {
+      boolean status = Utils.verifyPaymentSignature(verifyOption, razorPaySecret);
+
+      if (status) {
+        recordPayment(request).onSuccess(promise::complete).onFailure(promise::fail);
+      } else {
+        throw new DxRuntimeException(400, ResponseUrn.INVALID_PAYMENT, ResponseUrn.INVALID_PAYMENT.getMessage());
+      }
+    } catch (RazorpayException e) {
+      throw new DxRuntimeException(400, ResponseUrn.INVALID_PAYMENT, ResponseUrn.INVALID_PAYMENT.getMessage());
+    } catch (DxRuntimeException e) {
+      LOGGER.error("payment not verified on razorpay, : {}", e.getMessage());
+      RespBuilder respBuilder =
+          new RespBuilder()
+              .withType(e.getUrn().getUrn())
+              .withTitle("RazorPay Error")
+              .withDetail(e.getUrn().getMessage());
+      promise.fail(respBuilder.getResponse());
+    }
+    return promise.future();
+  }
+
+  private Future<JsonObject> recordPayment(JsonObject request) {
+    Promise<JsonObject> promise = Promise.promise();
+
+    StringBuilder query = new StringBuilder(RECORD_PAYMENT.replace("$0", paymentTable));
+
+    JsonObject params =
+        new JsonObject()
+            .put(RAZORPAY_ORDER_ID, request.getString(RAZORPAY_ORDER_ID))
+            .put(RAZORPAY_PAYMENT_ID, request.getString(RAZORPAY_PAYMENT_ID))
+            .put(RAZORPAY_SIGNATURE, request.getString(RAZORPAY_SIGNATURE));
+
+    postgresService.executePreparedQuery(
+        query.toString(),
+        params,
+        pgHandler -> {
+          if (pgHandler.succeeded()) {
+            promise.complete(pgHandler.result());
+          } else {
+            promise.fail(pgHandler.cause());
+          }
+        });
     return promise.future();
   }
 }

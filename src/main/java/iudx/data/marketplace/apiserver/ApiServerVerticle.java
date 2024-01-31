@@ -64,7 +64,6 @@ public class ApiServerVerticle extends AbstractVerticle {
   private WebClientOptions webClientOptions;
   private AuthenticationService authenticationService;
 
-
   /**
    * This method is used to start the Verticle. It deploys a verticle in a cluster, reads the
    * configuration, obtains a proxy for the Event Bus services exposed through service discovery,
@@ -102,7 +101,7 @@ public class ApiServerVerticle extends AbstractVerticle {
     policyService = PolicyService.createProxy(vertx, POLICY_SERVICE_ADDRESS);
     postgresService = PostgresService.createProxy(vertx, POSTGRES_SERVICE_ADDRESS);
 
-    authClient = new AuthClient(config(),webClient);
+    authClient = new AuthClient(config(), webClient);
     authenticationService = AuthenticationService.createProxy(vertx, AUTH_SERVICE_ADDRESS);
 
     router = Router.router(vertx);
@@ -200,28 +199,33 @@ public class ApiServerVerticle extends AbstractVerticle {
               response.sendFile("docs/apidoc.html");
             });
 
-      router.route(PROVIDER_PATH + "/*").subRouter(new ProviderApis(vertx, router, api, postgresService, authClient, authenticationService).init());
-      router.route(CONSUMER_PATH + "/*").subRouter(new ConsumerApis(vertx, router, api, postgresService, authClient, authenticationService).init());
+    router
+        .route(PROVIDER_PATH + "/*")
+        .subRouter(
+            new ProviderApis(vertx, router, api, postgresService, authClient, authenticationService)
+                .init());
+    router
+        .route(CONSUMER_PATH + "/*")
+        .subRouter(
+            new ConsumerApis(vertx, router, api, postgresService, authClient, authenticationService)
+                .init());
 
     ExceptionHandler exceptionHandler = new ExceptionHandler();
     ValidationHandler policyValidationHandler = new ValidationHandler(vertx, RequestType.POLICY);
     ValidationHandler verifyValidationHandler = new ValidationHandler(vertx, RequestType.VERIFY);
     router
-            .get(api.getPoliciesUrl())
-            .handler(AuthHandler.create(authenticationService, vertx, api, postgresService,authClient))
-            .handler(this::getPoliciesHandler)
-            .failureHandler(exceptionHandler);
-    router
-            .post(api.getPoliciesUrl())
-            .handler(this::createPolicy)
-            .failureHandler(exceptionHandler);
+        .get(api.getPoliciesUrl())
+        .handler(AuthHandler.create(authenticationService, vertx, api, postgresService, authClient))
+        .handler(this::getPoliciesHandler)
+        .failureHandler(exceptionHandler);
+    router.post(api.getPoliciesUrl()).handler(this::createPolicy).failureHandler(exceptionHandler);
 
     router
-            .delete(api.getPoliciesUrl())
-            .handler(policyValidationHandler)
-            .handler(AuthHandler.create(authenticationService, vertx, api, postgresService, authClient))
-            .handler(this::deletePoliciesHandler)
-            .failureHandler(exceptionHandler);
+        .delete(api.getPoliciesUrl())
+        .handler(policyValidationHandler)
+        .handler(AuthHandler.create(authenticationService, vertx, api, postgresService, authClient))
+        .handler(this::deletePoliciesHandler)
+        .failureHandler(exceptionHandler);
 
     router
         .post(api.getProductUserMapsPath())
@@ -235,20 +239,33 @@ public class ApiServerVerticle extends AbstractVerticle {
         .handler(this::handleVerify)
         .failureHandler(exceptionHandler);
 
+    ValidationHandler verifyPaymentValidationHandler =
+        new ValidationHandler(vertx, RequestType.VERIFY_PAYMENT);
+    router
+        .post(api.getVerifyPaymentApi())
+        .handler(verifyPaymentValidationHandler)
+        .handler(AuthHandler.create(authenticationService, vertx, api, postgresService, authClient))
+        .handler(this::handleVerifyPayment)
+        .failureHandler(exceptionHandler);
+
     //  Documentation routes
 
     /* Static Resource Handler */
     /* Get openapiv3 spec */
-    router.get(ROUTE_STATIC_SPEC)
-            .produces(MIME_APPLICATION_JSON)
-            .handler(routingContext -> {
+    router
+        .get(ROUTE_STATIC_SPEC)
+        .produces(MIME_APPLICATION_JSON)
+        .handler(
+            routingContext -> {
               HttpServerResponse response = routingContext.response();
               response.sendFile("docs/openapi.yaml");
             });
     /* Get redoc */
-    router.get(ROUTE_DOC)
-            .produces(MIME_TEXT_HTML)
-            .handler(routingContext -> {
+    router
+        .get(ROUTE_DOC)
+        .produces(MIME_TEXT_HTML)
+        .handler(
+            routingContext -> {
               HttpServerResponse response = routingContext.response();
               response.sendFile("docs/apidoc.html");
             });
@@ -258,18 +275,22 @@ public class ApiServerVerticle extends AbstractVerticle {
     LOGGER.info("API server deployed on: " + port);
   }
 
+  private void handleVerifyPayment(RoutingContext routingContext) {
+
+  }
+
   private void createPolicy(RoutingContext routingContext) {
-    policyService.createPolicy(new JsonObject(),null).onComplete(handler -> {
-      if(handler.succeeded())
-      {
-        LOGGER.info("Insertion Success");
-      }
-      else
-      {
-        handler.cause().printStackTrace();
-        LOGGER.error("Failure : " + handler.cause().getMessage());
-      }
-    });
+    policyService
+        .createPolicy(new JsonObject(), null)
+        .onComplete(
+            handler -> {
+              if (handler.succeeded()) {
+                LOGGER.info("Insertion Success");
+              } else {
+                handler.cause().printStackTrace();
+                LOGGER.error("Failure : " + handler.cause().getMessage());
+              }
+            });
   }
 
   private void printDeployedEndpoints(Router router) {
@@ -286,23 +307,23 @@ public class ApiServerVerticle extends AbstractVerticle {
 
     User user = routingContext.get("user");
     policyService
-            .deletePolicy(policy, user)
-            .onComplete(
-                    handler -> {
-                      if (handler.succeeded()) {
-                        LOGGER.info("Delete policy succeeded : {} ", handler.result().encode());
-                        JsonObject responseJson =
-                                new JsonObject()
-                                        .put(TYPE, handler.result().getString(TYPE))
-                                        .put(TITLE, handler.result().getString(TITLE))
-                                        .put(DETAIL, handler.result().getValue(DETAIL));
-                        handleSuccessResponse(
-                                response, handler.result().getInteger(STATUS_CODE), responseJson.toString());
-                      } else {
-                        LOGGER.error("Delete policy failed : {} ", handler.cause().getMessage());
-                        handleFailureResponse(routingContext, handler.cause().getMessage());
-                      }
-                    });
+        .deletePolicy(policy, user)
+        .onComplete(
+            handler -> {
+              if (handler.succeeded()) {
+                LOGGER.info("Delete policy succeeded : {} ", handler.result().encode());
+                JsonObject responseJson =
+                    new JsonObject()
+                        .put(TYPE, handler.result().getString(TYPE))
+                        .put(TITLE, handler.result().getString(TITLE))
+                        .put(DETAIL, handler.result().getValue(DETAIL));
+                handleSuccessResponse(
+                    response, handler.result().getInteger(STATUS_CODE), responseJson.toString());
+              } else {
+                LOGGER.error("Delete policy failed : {} ", handler.cause().getMessage());
+                handleFailureResponse(routingContext, handler.cause().getMessage());
+              }
+            });
   }
 
   private void getPoliciesHandler(RoutingContext routingContext) {
@@ -310,37 +331,36 @@ public class ApiServerVerticle extends AbstractVerticle {
 
     User user = routingContext.get("user");
     policyService
-            .getPolicies(user)
-            .onComplete(
-                    handler -> {
-                      if (handler.succeeded()) {
-                        String result = handler.result().getJsonObject(RESULT).encode();
-                        handleSuccessResponse(response, handler.result().getInteger(STATUS_CODE), result);
-                      } else {
-                        handleFailureResponse(routingContext, handler.cause().getMessage());
-                      }
-                    });
+        .getPolicies(user)
+        .onComplete(
+            handler -> {
+              if (handler.succeeded()) {
+                String result = handler.result().getJsonObject(RESULT).encode();
+                handleSuccessResponse(response, handler.result().getInteger(STATUS_CODE), result);
+              } else {
+                handleFailureResponse(routingContext, handler.cause().getMessage());
+              }
+            });
   }
-  private void mapUserToProduct(RoutingContext routingContext) {
 
-  }
+  private void mapUserToProduct(RoutingContext routingContext) {}
 
   private void handleVerify(RoutingContext routingContext) {
     JsonObject requestBody = routingContext.body().asJsonObject();
     HttpServerResponse response = routingContext.response();
     policyService
-            .verifyPolicy(requestBody)
-            .onComplete(
-                    handler -> {
-                      if (handler.succeeded()) {
-                        LOGGER.info("Policy verified successfully ");
-                        handleSuccessResponse(
-                                response, HttpStatusCode.SUCCESS.getValue(), handler.result().toString());
-                      } else {
-                        LOGGER.error("Policy could not be verified {}", handler.cause().getMessage());
-                        handleFailureResponse(routingContext, handler.cause().getMessage());
-                      }
-                    });
+        .verifyPolicy(requestBody)
+        .onComplete(
+            handler -> {
+              if (handler.succeeded()) {
+                LOGGER.info("Policy verified successfully ");
+                handleSuccessResponse(
+                    response, HttpStatusCode.SUCCESS.getValue(), handler.result().toString());
+              } else {
+                LOGGER.error("Policy could not be verified {}", handler.cause().getMessage());
+                handleFailureResponse(routingContext, handler.cause().getMessage());
+              }
+            });
   }
 
   /**
@@ -383,14 +403,14 @@ public class ApiServerVerticle extends AbstractVerticle {
       if (jsonObject.getString(DETAIL) != null) {
         detail = jsonObject.getString(DETAIL);
         response
-                .putHeader(CONTENT_TYPE, APPLICATION_JSON)
-                .setStatusCode(type)
-                .end(generateResponse(status, urn, detail).toString());
+            .putHeader(CONTENT_TYPE, APPLICATION_JSON)
+            .setStatusCode(type)
+            .end(generateResponse(status, urn, detail).toString());
       } else {
         response
-                .putHeader(CONTENT_TYPE, APPLICATION_JSON)
-                .setStatusCode(type)
-                .end(generateResponse(status, urn).toString());
+            .putHeader(CONTENT_TYPE, APPLICATION_JSON)
+            .setStatusCode(type)
+            .end(generateResponse(status, urn).toString());
       }
 
     } catch (DecodeException exception) {
@@ -400,20 +420,18 @@ public class ApiServerVerticle extends AbstractVerticle {
   }
 
   private void handleResponse(
-          HttpServerResponse response, HttpStatusCode statusCode, ResponseUrn urn) {
+      HttpServerResponse response, HttpStatusCode statusCode, ResponseUrn urn) {
     handleResponse(response, statusCode, urn, statusCode.getDescription());
   }
 
   private void handleResponse(
-          HttpServerResponse response,
-          HttpStatusCode statusCode,
-          ResponseUrn urn,
-          String failureMessage) {
+      HttpServerResponse response,
+      HttpStatusCode statusCode,
+      ResponseUrn urn,
+      String failureMessage) {
     response
-            .putHeader(CONTENT_TYPE, APPLICATION_JSON)
-            .setStatusCode(statusCode.getValue())
-            .end(generateResponse(statusCode, urn, failureMessage).toString());
+        .putHeader(CONTENT_TYPE, APPLICATION_JSON)
+        .setStatusCode(statusCode.getValue())
+        .end(generateResponse(statusCode, urn, failureMessage).toString());
   }
-
-
 }

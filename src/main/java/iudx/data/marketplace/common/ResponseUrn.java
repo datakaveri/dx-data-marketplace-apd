@@ -50,7 +50,8 @@ public enum ResponseUrn {
 
   //RazorPay related URNs
   ORDER_NOT_CREATED("urn:dx:dmp:RazorPay:OrderNotCreatedError", "Order Not Created"),
-  ORDER_CREATION_FAILED("urn:dx:dmp:RazorPay:OrderCreationFailedError", "Order creation returned with error");
+  ORDER_CREATION_FAILED("urn:dx:dmp:RazorPay:OrderCreationFailedError", "Order creation returned with error"),
+  INVALID_PAYMENT("urn:dx:dmp:RazorPay:InvalidPayment", "Payment Signature verification failed");
 
   private final String urn;
   private final String message;
