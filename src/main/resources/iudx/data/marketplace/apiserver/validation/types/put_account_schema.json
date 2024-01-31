@@ -1,0 +1,244 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://example.com/example.json",
+  "title": "Root",
+  "type": "object",
+  "examples": [
+    {
+      "accountId": "acc_GRWKk7qQsLnDjX",
+      "email": "test.provider@gmail.com",
+      "phone": 9000090000,
+      "legalBusinessName": "Dummy Corp V1",
+      "customerFacingBusinessName": "Dummy Service Corp V1",
+      "businessType": "partnership",
+      "contactName": "Bob Davis",
+      "profile": {
+        "category": "healthcare",
+        "subcategory": "clinic",
+        "addresses": {
+          "registered": {
+            "street1": "507, Koramangala 1st block",
+            "street2": "MG Road",
+            "city": "Bengaluru",
+            "state": "KARNATAKA",
+            "postalCode": 560034,
+            "country": "IN"
+          }
+        }
+      },
+      "legalInfo": {
+        "pan": "AAACL1234C",
+        "gst": "18AABCU9603R1ZM"
+      }
+    }
+  ],
+  "required": [
+    "accountId",
+    "email",
+    "phone",
+    "legalBusinessName",
+    "businessType",
+    "profile"
+  ],
+  "properties": {
+    "accountId": {
+      "$id": "#root/accountId",
+      "title": "accountId",
+      "type": "string",
+      "minLength": 18,
+      "maxLength": 18
+    },
+    "email": {
+      "$id": "#root/email",
+      "title": "email",
+      "type": "string",
+      "format": "email",
+      "examples": [
+        "test.provider@gmail.com"
+      ]
+    },
+    "phone": {
+      "$id": "#root/phone",
+      "title": "phone",
+      "type": "string",
+      "minLength": 8,
+      "maxLength": 15,
+      "examples": [
+        9000090000
+      ]
+    },
+    "legalBusinessName": {
+      "$id": "#root/legalBusinessName",
+      "title": "legalBusinessName",
+      "type": "string",
+      "minLength": 4,
+      "maxLength": 200,
+      "examples": [
+        "Some Corp"
+      ]
+    },
+    "customerFacingBusinessName": {
+      "$id": "#root/customerFacingBusinessName",
+      "title": "customerFacingBusinessName",
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 255,
+      "examples": [
+        "Some other corp"
+      ]
+    },
+    "businessType": {
+      "$id": "#root/businessType",
+      "title": "businessType",
+      "type": "string",
+      "enum": [
+        "llp",
+        "ngo",
+        "other",
+        "individual",
+        "partnership",
+        "proprietorship",
+        "public_limited",
+        "private_limited",
+        "trust",
+        "society",
+        "not_yet_registered",
+        "educational_institutes"
+      ]
+    },
+    "contactName": {
+      "$id": "#root/contactName",
+      "title": "contactName",
+      "type": "string",
+      "minLength": 4,
+      "maxLength": 255,
+      "examples": [
+        "Dummy contactName"
+      ]
+    },
+    "profile": {
+      "$id": "#root/profile",
+      "title": "profile",
+      "type": "object",
+      "required": [
+        "category",
+        "subcategory",
+        "addresses"
+      ],
+      "properties": {
+        "category": {
+          "$id": "#root/profile/category",
+          "title": "category",
+          "type": "string",
+          "minLength": 1,
+          "examples": [
+            "healthcare"
+          ]
+        },
+        "subcategory": {
+          "$id": "#root/profile/subcategory",
+          "title": "subcategory",
+          "type": "string",
+          "minLength": 1,
+          "examples": [
+            "clinic",
+            "doctor"
+          ]
+        },
+        "addresses": {
+          "$id": "#root/profile/addresses",
+          "title": "addresses",
+          "type": "object",
+          "required": [
+            "registered"
+          ],
+          "properties": {
+            "registered": {
+              "$id": "#root/profile/addresses/registered",
+              "title": "registered",
+              "type": "object",
+              "required": [
+                "street1",
+                "street2",
+                "city",
+                "state",
+                "postalCode",
+                "country"
+              ],
+              "properties": {
+                "street1": {
+                  "$id": "#root/profile/addresses/registered/street1",
+                  "title": "street1",
+                  "type": "string",
+                  "maxLength": 100,
+                  "examples": ["Outer Ring Road"]
+                },
+                "street2": {
+                  "$id": "#root/profile/addresses/registered/street2",
+                  "title": "street1",
+                  "type": "string",
+                  "maxLength": 100,
+                  "examples": ["C V Raman Road"]
+                },
+                "city": {
+                  "$id": "#root/profile/addresses/registered/city",
+                  "title": "city",
+                  "type": "string",
+                  "maxLength": 100,
+                  "examples": ["Bengaluru"]
+                },
+                "state": {
+                  "$id": "#root/profile/addresses/registered/state",
+                  "title": "state",
+                  "type": "string",
+                  "minLength": 2,
+                  "maxLength": 100,
+                  "examples": ["KARNATAKA"]
+                },
+                "postalCode": {
+                  "$id": "#root/profile/addresses/registered/postalCode",
+                  "title": "postalCode",
+                  "type": "string",
+                  "minLength": 6,
+                  "maxLength": 6,
+                  "examples": ["560038"]
+                },
+                "country": {
+                  "$id": "#root/profile/addresses/registered/country",
+                  "title": "country",
+                  "type": "string",
+                  "minLength": 2,
+                  "maxLength": 64,
+                  "examples": ["IN", "india"]
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "legalInfo": {
+      "$id": "#root/legalInfo",
+      "title": "legalInfo",
+      "type": "object",
+      "properties": {
+        "pan": {
+          "$id": "#root/legalInfo/pan",
+          "title": "pan",
+          "format": "/^[a-zA-z]{5}\\d{4}[a-zA-Z]{1}$/",
+          "minLength": 10,
+          "maxLength": 10,
+          "examples": ["AAACL1234C"]
+        },
+        "gst": {
+          "$id": "#root/legalInfo/gst",
+          "title": "pan",
+          "format": "/^[0123][0-9][a-z]{5}[0-9]{4}[a-z][0-9][a-z0-9][a-z0-9]$/gi",
+          "minLength": 15,
+          "maxLength": 15,
+          "examples": ["18AABCU9603R1ZM"]
+        }
+      }
+    }
+  }
+}

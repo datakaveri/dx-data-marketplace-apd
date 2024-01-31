@@ -58,26 +58,6 @@ public class CreateLinkedAccount {
     this.razorpaySecret = builder.razorpaySecret;
   }
 
-  /*
-   * Step1 : verify the structure of the request body json | DONE
-   * Step2 : authenticate and authorise the token, user, endpoint | DONE
-   * Step3 : Get Razorpay credentials through builder class getter and setter | DONE
-   * Step4 : Look into Razorpay client create linked account method | DONE | Accounts
-   * Step5 : Write all the steps here
-   *  1: Get the request Body
-   *  2: Make a response JSON
-   *  3: Store it in the Database
-   *  4: Handle different types of errors from Razorpay
-   *  5: What are the possible error description after code : error_message
-   *      Invalid Parameters | Authentication Failure | Insufficient Permissions |
-   *      Duplicate Account | Invalid Bank Account Details | Account Verification Failure
-   *  6: Try changing all the limited number of parameters that we give to razorpay while creating linked account
-   *    To See all the possible errors
-   * 7: In none of the failure case, we've to insert a record in the table
-   * 8: Generate 20 character length string from
-   * 9: Update the flow diagram to not include email + PATCH instead of PUT
-   *
-   * */
 
   public Future<JsonObject> initiateCreatingLinkedAccount(JsonObject request, User provider) {
 
