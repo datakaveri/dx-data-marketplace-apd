@@ -11,6 +11,7 @@ import io.vertx.serviceproxy.ServiceBinder;
 import iudx.data.marketplace.auditing.AuditingService;
 import iudx.data.marketplace.common.Api;
 import iudx.data.marketplace.postgres.PostgresService;
+import iudx.data.marketplace.razorpay.RazorPayService;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -25,29 +26,17 @@ public class LinkedAccountVerticle extends AbstractVerticle {
   private AuditingService auditingService;
 
   private Api api;
-  private RazorpayClient razorpayClient;
+  private RazorPayService razorPayService;
 
   @Override
   public void start(Promise<Void> startPromise) throws Exception {
     postgresService = PostgresService.createProxy(vertx, POSTGRES_SERVICE_ADDRESS);
     api = Api.getInstance(config().getString("dxApiBasePath"));
-    String razorPayKey = config().getString("razorPayKey");
-    String razorPaySecret = config().getString("razorPaySecret");
-
-
-    Boolean enableLogging = config().getBoolean("enableLogging", false);
-    if (enableLogging) {
-      LOGGER.warn("RazorPay enable logging set to true, do not set in production!!");
-      razorpayClient = new RazorpayClient(razorPayKey, razorPaySecret, true);
-    } else {
-      razorpayClient = new RazorpayClient(razorPayKey, razorPaySecret);
-    }
     auditingService = AuditingService.createProxy(vertx, AUDITING_SERVICE_ADDRESS);
 
+    razorPayService = RazorPayService.createProxy(vertx, RAZORPAY_SERVICE_ADDRESS);
     createLinkedAccount =
-        new CreateLinkedAccount.CreateLinkedAccountBuilder(postgresService, api, auditingService)
-            .setRazorpayClient(razorpayClient)
-            .build();
+        new CreateLinkedAccount(postgresService, api, auditingService,razorPayService);
 
     fetchLinkedAccount = new FetchLinkedAccount(postgresService, api);
     updateLinkedAccount = new UpdateLinkedAccount(postgresService, api, auditingService);

@@ -75,6 +75,7 @@ public class AuthHandler implements Handler<RoutingContext> {
 
     if (path.equals(api.getVerifyUrl())) {
       // removes `bearer` from the token by trimming the leading and trailing spaces
+      token = request.headers().get(AUTHORIZATION_KEY);
       if (token.trim().split(" ").length == 2) {
         token = token.trim().split(" ")[1];
         authInfo.put(HEADER_TOKEN, token);
@@ -95,7 +96,6 @@ public class AuthHandler implements Handler<RoutingContext> {
       }
     } else // for all the other endpoints
     {
-      LOGGER.error("hre");
       checkAuth(requestJson, authInfo)
           .onSuccess(
               userObject -> {

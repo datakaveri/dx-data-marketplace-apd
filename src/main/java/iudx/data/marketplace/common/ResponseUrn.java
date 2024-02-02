@@ -48,6 +48,7 @@ public enum ResponseUrn {
   VERIFY_SUCCESS_URN("urn:apd:Allow", "Success"),
   YET_NOT_IMPLEMENTED_URN("urn:dx:dmp:general", "urn yet not implemented in backend verticle."),
 
+  FORBIDDEN_PRODUCT_CREATION("urn:dx:dmp:forbidden", "Product creation is forbidden"),
   //RazorPay related URNs
   ORDER_NOT_CREATED("urn:dx:dmp:RazorPay:OrderNotCreatedError", "Order Not Created"),
   ORDER_CREATION_FAILED("urn:dx:dmp:RazorPay:OrderCreationFailedError", "Order creation returned with error");

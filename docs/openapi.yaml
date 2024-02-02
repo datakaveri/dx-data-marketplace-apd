@@ -84,6 +84,18 @@ paths:
                     type: 'urn:dx:cat:InvalidAuthorizationToken'
                     title: Token is invalid
                     detail: failed
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/createProductForbiddenResponse'
+              examples:
+                Unauthorized:
+                  value:
+                    type: 'urn:dx:dmp:forbidden'
+                    title: Product creation is forbidden
+                    detail: To activate linked account please complete the KYC, filling account information etc., in your Razorpay merchant dashboard
     delete:
       tags:
         - provider
@@ -632,6 +644,7 @@ paths:
         their dashboard.
         <br>
         <br>
+        `Note`: By creating a linked account, the provider is accepting the terms and conditions of the respective payment gateway
       operationId: post-linked-account-v1
       parameters:
         - name: token
@@ -2158,6 +2171,24 @@ components:
         type: 'urn:dx:dm:invalidPayloadFormat'
         title: Bad Request
         detail: 'Invalid json format in post request [schema mismatch]'
+
+    createProductForbiddenResponse:
+      type: object
+      title: 403 Forbidden response for product creation
+      properties:
+        type:
+          type: string
+          description: URN type of error response
+        title:
+          type: string
+          description: title of the error message
+        detail:
+          type: string
+          description: Description of error message
+      required:
+        - type
+        - title
+        - detail
     verifyPolicyForbiddenResponse:
       type: object
       title: 403 Response for verify policy

@@ -8,12 +8,13 @@ CREATE type linked_account_status_type AS ENUM
 	(
 		reference_id varchar(20) NOT NULL PRIMARY KEY,
 		phone_number numeric NOT NULL,
-		email varchar NOT NULL,
+		email varchar NOT NULL UNIQUE,
 		legal_business_name varchar NOT NULL,
 		customer_facing_business_name varchar NOT NULL,
-		account_id varchar NOT NULL,
-		provider_id UUID NOT NULL,
+		account_id varchar NOT NULL UNIQUE,
+		provider_id UUID NOT NULL UNIQUE,
 		status linked_account_status_type NOT NULL,
+		rzp_account_product_id varchar NOT NULL UNIQUE,
 		created_at timestamp without time zone NOT NULL,
 		modified_at timestamp without time zone NOT NULL,
 		CONSTRAINT provider_id_fk FOREIGN KEY (provider_id) REFERENCES user_table(_id)

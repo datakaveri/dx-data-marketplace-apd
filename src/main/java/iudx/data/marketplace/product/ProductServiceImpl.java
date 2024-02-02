@@ -1,5 +1,8 @@
 package iudx.data.marketplace.product;
 
+import static iudx.data.marketplace.apiserver.provider.linkedAccount.util.Constants.*;
+import static iudx.data.marketplace.apiserver.provider.linkedAccount.util.Constants.FAILURE_MESSAGE;
+import static iudx.data.marketplace.apiserver.util.Constants.RESULTS;
 import static iudx.data.marketplace.common.Constants.*;
 import static iudx.data.marketplace.product.util.Constants.*;
 
@@ -8,6 +11,8 @@ import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
 import iudx.data.marketplace.apiserver.exceptions.DxRuntimeException;
 import iudx.data.marketplace.common.CatalogueService;
+import iudx.data.marketplace.common.HttpStatusCode;
+import iudx.data.marketplace.common.RespBuilder;
 import iudx.data.marketplace.common.ResponseUrn;
 import iudx.data.marketplace.policies.User;
 import iudx.data.marketplace.postgres.PostgresService;
@@ -15,6 +20,8 @@ import iudx.data.marketplace.product.util.QueryBuilder;
 import iudx.data.marketplace.product.util.Status;
 import java.util.ArrayList;
 import java.util.List;
+
+import iudx.data.marketplace.razorpay.RazorPayService;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -24,14 +31,19 @@ public class ProductServiceImpl implements ProductService {
   private final String productTableName;
   private CatalogueService catService;
   private QueryBuilder queryBuilder;
+  private RazorPayService razorPayService;
+  private boolean isAccountActivationCheckBeingDone;
 
   public ProductServiceImpl(
-      JsonObject config, PostgresService pgService, CatalogueService catService) {
+          JsonObject config, PostgresService pgService, CatalogueService catService, RazorPayService razorPayService, boolean isAccountActivationCheckBeingDone) {
     this.pgService = pgService;
     this.catService = catService;
     this.queryBuilder = new QueryBuilder(config.getJsonArray(TABLES));
     this.productTableName = config.getJsonArray(TABLES).getString(0);
+    this.razorPayService = razorPayService;
+    this.isAccountActivationCheckBeingDone = isAccountActivationCheckBeingDone;
   }
+
 
   @Override
   public ProductService createProduct(
@@ -216,4 +228,136 @@ public class ProductServiceImpl implements ProductService {
         });
     return this;
   }
+
+  @Override
+  public ProductService checkMerchantAccountStatus(
+      User user, Handler<AsyncResult<Boolean>> handler) {
+    if (isAccountActivationCheckBeingDone) {
+      /* ideal flow to simulate synchronisation */
+      //      TODO: Replace this with the providerId from the token
+      //        String providerId = user.getUserId();
+      String dummyProviderId = "8afb4269-bee4-4a88-9947-128315479eb6";
+      Future<JsonObject> providerDetailsFuture =
+          fetchRazorpayDetailsOfProvider(FETCH_MERCHANT_INFO, dummyProviderId);
+      /* checkIfAccountIsActivated */
+      Future<Boolean> linkedAccountActivationFuture =
+          providerDetailsFuture.compose(
+              providerDetailsJson ->
+                  razorPayService.fetchProductConfiguration(providerDetailsJson));
+      /* update status in merchant_table */
+      Future<Boolean> updateStatusFuture =
+          linkedAccountActivationFuture.compose(
+              isLinkedAccountActivated -> {
+                return updateStatusOfLinkedAccount(UPDATE_LINKED_ACCOUNT_STATUS, dummyProviderId);
+              });
+      updateStatusFuture.onComplete(
+          updateStatusHandler -> {
+            if (updateStatusHandler.succeeded()) {
+              handler.handle(Future.succeededFuture(true));
+            } else {
+              handler.handle(Future.failedFuture(updateStatusFuture.cause().getMessage()));
+            }
+          });
+    } else {
+      handler.handle(Future.succeededFuture(true));
+    }
+    return this;
+  }
+
+    public Future<JsonObject> fetchRazorpayDetailsOfProvider(String query, String providerId) {
+        Promise<JsonObject> promise = Promise.promise();
+
+        String finalQuery = query.replace("$1", providerId);
+        pgService.executeQuery(
+                finalQuery,
+                handler -> {
+                    if (handler.succeeded()) {
+                        /*  check if response is empty*/
+                        if (!handler.result().getJsonArray(RESULTS).isEmpty()) {
+                            JsonObject result = handler.result().getJsonArray(RESULTS).getJsonObject(0);
+                            String accountId = result.getString("account_id");
+                            String rzp_account_product_id = result.getString("rzp_account_product_id");
+                            String status = result.getString("status");
+                            LOGGER.info(
+                                    "Provider with _id : {} , with accountId {}, accountProductId {} has status : {}",
+                                    providerId,
+                                    accountId,
+                                    rzp_account_product_id,
+                                    status);
+                            promise.complete(result);
+                        } else {
+                            LOGGER.fatal(
+                                    "The provider information is not inserted in the table after a linked account is "
+                                            + "created given that "
+                                            + "linked account creation,accepting tnc, insertion of information in table and fetching that "
+                                            + "provider info"
+                                            + " before product creation is done serially");
+                            promise.fail(
+                                    new RespBuilder()
+                                            .withType(HttpStatusCode.INTERNAL_SERVER_ERROR.getValue())
+                                            .withTitle(ResponseUrn.DB_ERROR_URN.getUrn())
+                                            .withDetail(FAILURE_MESSAGE + "Internal Server Error")
+                                            .getResponse());
+                        }
+                    } else {
+                        LOGGER.info(
+                                "Failed to fetch razorpay details of provider : " + handler.cause().getMessage());
+                        promise.fail(
+                                new RespBuilder()
+                                        .withType(HttpStatusCode.INTERNAL_SERVER_ERROR.getValue())
+                                        .withTitle(ResponseUrn.DB_ERROR_URN.getUrn())
+                                        .withDetail(FAILURE_MESSAGE + "Internal Server Error")
+                                        .getResponse());
+                    }
+                });
+        return promise.future();
+    }
+
+    public Future<Boolean> updateStatusOfLinkedAccount(String query, String providerId)
+    {
+        Promise<Boolean> promise = Promise.promise();
+        String finalQuery =
+                query.replace("$1", providerId);
+        pgService.executeQuery(
+                finalQuery,
+                handler -> {
+                    if (handler.succeeded()) {
+                        /*  check if response is empty*/
+                        if (!handler.result().getJsonArray(RESULTS).isEmpty()) {
+                            JsonObject result = handler.result().getJsonArray(RESULTS).getJsonObject(0);
+                            String referenceId = result.getString("reference_id");
+                            LOGGER.info(
+                                    "Provider with _id : {} , with referenceId {}, has status of the linked account : {}",
+                                    providerId,
+                                    referenceId,
+                                    "activated");
+                            promise.complete(true);
+                        } else {
+                            LOGGER.fatal(
+                                    "The provider linked account status is not updated in the table after a linked account is "
+                                            + "created given that "
+                                            + "linked account creation, accepting tnc, insertion of information in table and fetching that "
+                                            + "provider info"
+                                            + " before product creation is done serially");
+                            promise.fail(
+                                    new RespBuilder()
+                                            .withType(HttpStatusCode.INTERNAL_SERVER_ERROR.getValue())
+                                            .withTitle(ResponseUrn.DB_ERROR_URN.getUrn())
+                                            .withDetail(FAILURE_MESSAGE + "Internal Server Error")
+                                            .getResponse());
+                        }
+                    } else {
+                        LOGGER.info(
+                                "Failed to fetch razorpay details of provider : " + handler.cause().getMessage());
+                        promise.fail(
+                                new RespBuilder()
+                                        .withType(HttpStatusCode.INTERNAL_SERVER_ERROR.getValue())
+                                        .withTitle(ResponseUrn.DB_ERROR_URN.getUrn())
+                                        .withDetail(FAILURE_MESSAGE + "Internal Server Error")
+                                        .getResponse());
+                    }
+                });
+        return promise.future();
+    }
+
 }

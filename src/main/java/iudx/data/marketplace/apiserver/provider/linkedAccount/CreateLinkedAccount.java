@@ -15,6 +15,7 @@ import iudx.data.marketplace.common.RespBuilder;
 import iudx.data.marketplace.common.ResponseUrn;
 import iudx.data.marketplace.policies.User;
 import iudx.data.marketplace.postgres.PostgresService;
+import iudx.data.marketplace.razorpay.RazorPayService;
 import org.apache.commons.lang.StringUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -24,18 +25,16 @@ import java.nio.charset.StandardCharsets;
 import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.UUID;
 
-import static iudx.data.marketplace.apiserver.provider.linkedAccount.util.Constants.INSERT_MERCHANT_INFO;
+import static iudx.data.marketplace.apiserver.provider.linkedAccount.util.Constants.*;
 import static iudx.data.marketplace.apiserver.util.Constants.*;
 
 public class CreateLinkedAccount {
-  public static final String ACCOUNT_TYPE = "route";
-  private static final String FAILURE_MESSAGE = "User registration incomplete : ";
   private static final Logger LOGGER = LogManager.getLogger(CreateLinkedAccount.class);
-  PostgresService postgresService;
-  Api api;
-  AuditingService auditingService;
-  RazorpayClient razorpayClient;
+  private PostgresService postgresService;
+  private Api api;
+  private AuditingService auditingService;
   private String legalBusinessName;
   private String customerFacingBusinessName;
   private String phoneNumber;
@@ -43,83 +42,118 @@ public class CreateLinkedAccount {
   private String accountId;
   private String providerId;
   private String status;
-  private CreateLinkedAccount(CreateLinkedAccountBuilder builder) {
-    this.postgresService = builder.postgresService;
-    this.api = builder.api;
-    this.auditingService = builder.auditingService;
-    this.razorpayClient = builder.razorpayClient;
+  private String accountProductId;
+  private RazorPayService razorPayService;
+
+  public CreateLinkedAccount(
+      PostgresService postgresService,
+      Api api,
+      AuditingService auditingService,
+      RazorPayService razorPayService) {
+    this.postgresService = postgresService;
+    this.api = api;
+    this.auditingService = auditingService;
+    this.razorPayService = razorPayService;
   }
 
+  /**
+   * Initiates provider registration flow
+   * @param request Information used to create linked account present in payload
+   * @param provider User object
+   * @return Successful or failure response of type Future JsonObject
+   */
 
   public Future<JsonObject> initiateCreatingLinkedAccount(JsonObject request, User provider) {
-
     String referenceId = createReferenceId();
-//    TODO: Change emailId
+    //    TODO: Change emailId
     String emailId = request.getString("email");
     JSONObject merchantDetails = getLinkedAccountDetails(request, referenceId, emailId);
-    setProviderId(provider.getUserId());
-    JsonObject response = null;
-    try {
-//      TODO: Remove reinitialisation
-      razorpayClient =
-          new RazorpayClient("rzp_test_kbgO0jNB4Q4loL", "Qi7uOrDcXF5Ll6PRwiWCEDWx", true);
+    //    TODO: Get this provider Id from token and set it
+    String dummyProviderId = getRandomUuid();
+    setProviderId(dummyProviderId);
+    //    setProviderId(provider.getUserId());
 
-      Account account = razorpayClient.account.create(merchantDetails);
-      response = new JsonObject(account.toString());
-      String accountId = response.getString(ID);
+    Future<Boolean> insertProviderFuture = insertDummyRowInUserTable(emailId);
 
-      LOGGER.info("Linked account created with accountId : {}", accountId);
+    var razorpayFlowFuture =
+        insertProviderFuture.compose(
+            providerInsertedSuccessfully -> {
+              if (providerInsertedSuccessfully) {
+                return createLinkedAccount(merchantDetails);
+              } else {
+                return Future.failedFuture(insertProviderFuture.cause().getMessage());
+              }
+            });
+    Future<JsonObject> userResponse =
+        razorpayFlowFuture.compose(
+            abcd -> {
+              if (abcd) {
+                /* insert in DB */
+                return insertInfoInDB(INSERT_MERCHANT_INFO, referenceId);
+              } else {
+                return Future.failedFuture(razorpayFlowFuture.cause().getMessage());
+              }
+            });
+
+    return userResponse;
+  }
+
+  /**
+   * Initiates creating linked account and accepting terms and conditions
+   * Fetches and sets accountId, accountProductId after creating linked account and after accepting TnC respectively
+   *
+   * @param merchantDetails of type JSONObject to required to create linked account through Razorpay
+   * @return true if the flow is successful, respective failure response if any
+   * of type Future
+   */
+  private Future<Boolean> createLinkedAccount(JSONObject merchantDetails) {
+
+    Future<JsonObject> linkedAccountCreationFuture = razorPayService.createLinkedAccount(merchantDetails.toString());
+    Future<JsonObject> productConfigurationFuture = linkedAccountCreationFuture.compose(linkedAccountJson -> {
+      String accountId = linkedAccountJson.getString("accountId");
       setAccountId(accountId);
-      return insertInfoInDB(INSERT_MERCHANT_INFO, referenceId);
-
-    } catch (RazorpayException e) {
-      LOGGER.error("Razorpay error message: {}", e.getMessage());
-      String errorMessage = errorHandler(e.getMessage());
-      return Future.failedFuture(errorMessage);
-    }
+      return razorPayService.requestProductConfiguration(linkedAccountJson);
+    });
+    Future<Boolean> requestProductConfigurationFuture =
+            productConfigurationFuture.compose(productConfigJson -> {
+    String accountProductId = productConfigJson.getString("razorpayAccountProductId");
+    setAccountProductId(accountProductId);
+    return Future.succeededFuture(true);
+    });
+    return requestProductConfigurationFuture;
   }
 
-  public String errorHandler(String rzpFailureMessage)
-  {
-    Map<String, String> errorMap = new HashMap<>();
-    errorMap.put("Merchant email already exists for account", FAILURE_MESSAGE +"merchant email already exists for account");
-    errorMap.put("The phone format is invalid", FAILURE_MESSAGE + "phone format is invalid");
-    errorMap.put("The contact name may only contain alphabets and spaces", FAILURE_MESSAGE + "name is invalid");
-    errorMap.put("Invalid business subcategory for business category", FAILURE_MESSAGE+ "subcategory or category is invalid");
-    errorMap.put("The street2 field is required", FAILURE_MESSAGE+ "street2 field is required");
-    errorMap.put("The street1 field is required", FAILURE_MESSAGE+ "street1 field is required");
-    errorMap.put("The city field is required", FAILURE_MESSAGE+ "city field is required");
-    errorMap.put("The business registered city may only contain alphabets, digits and spaces", FAILURE_MESSAGE + "city name is invalid");
-    errorMap.put("State name entered is incorrect. Please provide correct state name", FAILURE_MESSAGE+ "state name is invalid");
-    errorMap.put("The postal code must be an integer", FAILURE_MESSAGE + "postal code is invalid");
-    errorMap.put("The business registered country may only contain alphabets and spaces", FAILURE_MESSAGE + "country name is invalid");
-    errorMap.put("The pan field is invalid", FAILURE_MESSAGE+"pan field is invalid");
-    errorMap.put("The gst field is invalid", FAILURE_MESSAGE+ "gst field is invalid");
-    errorMap.put("Route code Support feature not enabled to add account code", FAILURE_MESSAGE + "route code support feature not enabled to add account code");
-    errorMap.put("The api key/secret provided is invalid", FAILURE_MESSAGE + ResponseUrn.INTERNAL_SERVER_ERR_URN.getMessage());
-//    errorMap.put("Invalid type: route", FAILURE_MESSAGE  + ResponseUrn.INTERNAL_SERVER_ERR_URN.getMessage());
-//    errorMap.put("The code format is invalid", FAILURE_MESSAGE  + ResponseUrn.INTERNAL_SERVER_ERR_URN.getMessage());
-//    errorMap.put("The code must be at least 3 characters",FAILURE_MESSAGE  + ResponseUrn.INTERNAL_SERVER_ERR_URN.getMessage());
+  // TODO: Insert dummy record in user_table with email given request body + dummy providerId +
+  // Dummy (Fname) + testProvider123 (Lname)
+  //  TODO: This is for testing, delete this
+  public Future<Boolean> insertDummyRowInUserTable(String emailId) {
+    Promise<Boolean> promise = Promise.promise();
+    String query =
+        "INSERT INTO public.user_table"
+            + " (_id, email_id, first_name, last_name)"
+            + " VALUES ('$1', '$2', 'Dummy', 'testProvider123');";
 
-
-    String failureMessage  = new RespBuilder()
-            .withType(HttpStatusCode.INTERNAL_SERVER_ERROR.getValue())
-            .withTitle(ResponseUrn.INTERNAL_SERVER_ERR_URN.getUrn())
-            .withDetail(FAILURE_MESSAGE  + ResponseUrn.INTERNAL_SERVER_ERR_URN.getMessage())
-            .getResponse();;
-    for (var error : errorMap.entrySet()) {
-      boolean isErrorPresent = StringUtils.containsIgnoreCase(rzpFailureMessage, error.getKey());
-      if (isErrorPresent) {
-        failureMessage =
-            new RespBuilder()
-                .withType(HttpStatusCode.BAD_REQUEST.getValue())
-                .withTitle(ResponseUrn.BAD_REQUEST_URN.getUrn())
-                .withDetail(error.getValue())
-                .getResponse();
-      }
-    }
-    return failureMessage;
+    String finalQuery = query.replace("$1", getProviderId()).replace("$2", getEmailId());
+    postgresService.executeQuery(
+        finalQuery,
+        handler -> {
+          if (handler.succeeded()) {
+            LOGGER.info("Provider with _id : {} , inserted successfully", getProviderId());
+            promise.complete(true);
+          } else {
+            LOGGER.info("Failed to insert Provider in user table : " + handler.cause().getMessage());
+            promise.fail(
+                new RespBuilder()
+                    .withType(HttpStatusCode.INTERNAL_SERVER_ERROR.getValue())
+                    .withTitle(ResponseUrn.DB_ERROR_URN.getUrn())
+                    .withDetail(FAILURE_MESSAGE + "Internal Server Error")
+                    .getResponse());
+          }
+        });
+    return promise.future();
   }
+
+
   /**
    * Creates a request body to create linked account through Razorpay based on the request
    * payload <br>
@@ -228,7 +262,8 @@ public class CreateLinkedAccount {
             .replace("$5", getCustomerFacingBusinessName())
             .replace("$6", getAccountId())
             .replace("$7", getProviderId())
-            .replace("$8", "CREATED");
+            .replace("$8", "CREATED")
+            .replace("$9", getAccountProductId());
 
     postgresService.executeQuery(
         finalQuery,
@@ -254,6 +289,14 @@ public class CreateLinkedAccount {
         });
     return promise.future();
   }
+
+//  TODO: Remove this, it is for testing
+
+  private String getRandomUuid() {
+    String pk = UUID.randomUUID().toString();
+    return pk;
+  }
+
 
   /**
    * Creates a referenceId of length = 20 based on present time as seed. This referenceId could be sent to Razorpay
@@ -325,30 +368,12 @@ public class CreateLinkedAccount {
   public void setStatus(String status) {
     this.status = status;
   }
+  public void setAccountProductId(String rzpAccountProductId){
+    this.accountProductId = rzpAccountProductId;
+  }
 
-  public static class CreateLinkedAccountBuilder {
-    private final PostgresService postgresService;
-    private final Api api;
-    private final AuditingService auditingService;
-    private RazorpayClient razorpayClient;
-
-    public CreateLinkedAccountBuilder(
-        PostgresService postgresService, Api api, AuditingService auditingService) {
-      this.postgresService = postgresService;
-      this.api = api;
-      this.auditingService = auditingService;
-    }
-
-
-    public CreateLinkedAccountBuilder setRazorpayClient(RazorpayClient razorpayClient)
-    {
-      this.razorpayClient = razorpayClient;
-      return this;
-    }
-
-
-    public CreateLinkedAccount build() {
-      return new CreateLinkedAccount(this);
-    }
+  public String getAccountProductId()
+  {
+    return this.accountProductId;
   }
 }

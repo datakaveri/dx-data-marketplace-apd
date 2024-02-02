@@ -55,4 +55,14 @@ public interface ProductService {
    */
   @Fluent
   ProductService listProducts(User user, JsonObject request, Handler<AsyncResult<JsonObject>> handler);
+
+  /**
+   * Checks if the provider / merchant have filled their account details in Razorpay and completed their
+   * KYC before creating a product on Data Market place server
+   * @param user Provider user object
+   * @param handler request handler that contains failure or success response
+   * @return ProductService object
+   */
+  @Fluent
+  ProductService checkMerchantAccountStatus(User user, Handler<AsyncResult<Boolean>> handler);
 }
