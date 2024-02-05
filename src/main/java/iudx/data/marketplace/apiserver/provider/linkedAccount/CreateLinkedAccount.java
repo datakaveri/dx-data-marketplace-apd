@@ -307,7 +307,7 @@ public class CreateLinkedAccount {
   private String createReferenceId() {
     String referenceId =
         Hashing.sha256()
-            .hashString(LocalDateTime.now().toString(), StandardCharsets.UTF_8)
+            .hashString(LocalDateTime.now().toString() + UUID.randomUUID(), StandardCharsets.UTF_8)
             .toString()
             .substring(0, 20);
     return referenceId;
