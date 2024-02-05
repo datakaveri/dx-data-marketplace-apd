@@ -31,8 +31,11 @@ public class RazorPayServiceImpl implements RazorPayService {
 
   private static Logger LOGGER = LogManager.getLogger(RazorPayServiceImpl.class);
   RazorpayClient razorpayClient;
-
+  Map<String, String> errorMap;
+  PostgresService postgresService;
   RazorPayServiceImpl(RazorpayClient razorpayClient, PostgresService postgresService) {
+    this.errorMap = new HashMap<>();
+    this.postgresService = postgresService;
     this.razorpayClient = razorpayClient;
   }
 
@@ -219,7 +222,6 @@ public class RazorPayServiceImpl implements RazorPayService {
   }
 
   public String errorHandler(String rzpFailureMessage) {
-    Map<String, String> errorMap = new HashMap<>();
     errorMap.put("Merchant email already exists for account", FAILURE_MESSAGE +"merchant email already exists for account");
     errorMap.put("The phone format is invalid", FAILURE_MESSAGE + "phone format is invalid");
     errorMap.put("The contact name may only contain alphabets and spaces", FAILURE_MESSAGE + "name is invalid");
