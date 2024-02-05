@@ -22,7 +22,9 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import java.nio.charset.StandardCharsets;
+import java.security.SecureRandom;
 import java.time.LocalDateTime;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
@@ -305,9 +307,12 @@ public class CreateLinkedAccount {
    * @return referenceId as string which to act as primary key to store record in DB
    */
   private String createReferenceId() {
+    SecureRandom random = new SecureRandom();
+    byte[] bytes = new byte[40];
+    random.nextBytes(bytes);
     String referenceId =
-        Hashing.sha256()
-            .hashString(LocalDateTime.now().toString() + UUID.randomUUID(), StandardCharsets.UTF_8)
+        Hashing.sha512()
+            .hashString(Arrays.toString(bytes), StandardCharsets.UTF_8)
             .toString()
             .substring(0, 20);
     return referenceId;
