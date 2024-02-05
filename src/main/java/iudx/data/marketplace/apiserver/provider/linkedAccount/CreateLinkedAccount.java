@@ -7,6 +7,7 @@ import com.razorpay.RazorpayClient;
 import com.razorpay.RazorpayException;
 import io.vertx.core.Future;
 import io.vertx.core.Promise;
+import io.vertx.core.http.HttpMethod;
 import io.vertx.core.json.JsonObject;
 import iudx.data.marketplace.auditing.AuditingService;
 import iudx.data.marketplace.common.Api;
@@ -19,7 +20,6 @@ import iudx.data.marketplace.razorpay.RazorPayService;
 import org.apache.commons.lang.StringUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.json.JSONObject;
 
 import java.nio.charset.StandardCharsets;
 import java.time.LocalDateTime;
@@ -67,7 +67,7 @@ public class CreateLinkedAccount {
     String referenceId = createReferenceId();
     //    TODO: Change emailId
     String emailId = request.getString("email");
-    JSONObject merchantDetails = getLinkedAccountDetails(request, referenceId, emailId);
+    JsonObject merchantDetails = getLinkedAccountDetails(request, referenceId, emailId);
     //    TODO: Get this provider Id from token and set it
     String dummyProviderId = getRandomUuid();
     setProviderId(dummyProviderId);
@@ -102,11 +102,11 @@ public class CreateLinkedAccount {
    * Initiates creating linked account and accepting terms and conditions
    * Fetches and sets accountId, accountProductId after creating linked account and after accepting TnC respectively
    *
-   * @param merchantDetails of type JSONObject to required to create linked account through Razorpay
+   * @param merchantDetails of type JsonObject to required to create linked account through Razorpay
    * @return true if the flow is successful, respective failure response if any
    * of type Future
    */
-  private Future<Boolean> createLinkedAccount(JSONObject merchantDetails) {
+  private Future<Boolean> createLinkedAccount(JsonObject merchantDetails) {
 
     Future<JsonObject> linkedAccountCreationFuture = razorPayService.createLinkedAccount(merchantDetails.toString());
     Future<JsonObject> productConfigurationFuture = linkedAccountCreationFuture.compose(linkedAccountJson -> {
@@ -168,7 +168,7 @@ public class CreateLinkedAccount {
    * @param emailId provider email Id
    * @return request body of type JSONObject with required fields
    */
-  public JSONObject getLinkedAccountDetails(
+  public JsonObject getLinkedAccountDetails(
       JsonObject request, String referenceId, String emailId) {
     String businessType = request.getString("businessType");
     String category = request.getJsonObject("profile").getString("category");
@@ -183,8 +183,8 @@ public class CreateLinkedAccount {
     String country = registered.getString("country");
     String contactName = request.getString("contactName");
 
-    JSONObject registeredJson =
-        new JSONObject()
+    JsonObject registeredJson =
+        new JsonObject()
             .put("street1", street1)
             .put("street2", street2)
             .put("city", city)
@@ -192,14 +192,14 @@ public class CreateLinkedAccount {
             .put("postal_code", postalCode)
             .put("country", country);
 
-    JSONObject addressJson = new JSONObject().put("registered", registeredJson);
-    JSONObject profileJson =
-        new JSONObject()
+    JsonObject addressJson = new JsonObject().put("registered", registeredJson);
+    JsonObject profileJson =
+        new JsonObject()
             .put("category", category)
             .put("subcategory", subcategory)
             .put("addresses", addressJson);
 
-    JSONObject legalInfoJson = new JSONObject();
+    JsonObject legalInfoJson = new JsonObject();
     /* checks if optional field legal info is null */
     if (request.getJsonObject("legalInfo") != null) {
       String pan = request.getJsonObject("legalInfo").getString("pan");
@@ -219,8 +219,8 @@ public class CreateLinkedAccount {
     setEmailId(emailId);
     setPhoneNumber(phoneNumber);
 
-    JSONObject details =
-        new JSONObject()
+    JsonObject details =
+        new JsonObject()
             .put("email", emailId)
             .put("phone", phoneNumber)
             .put("legal_business_name", legalBusinessName)
