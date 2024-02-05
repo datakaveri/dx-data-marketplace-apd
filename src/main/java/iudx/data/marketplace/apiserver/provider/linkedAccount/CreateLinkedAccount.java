@@ -86,8 +86,8 @@ public class CreateLinkedAccount {
             });
     Future<JsonObject> userResponse =
         razorpayFlowFuture.compose(
-            abcd -> {
-              if (abcd) {
+            isRazorpayFlowSuccessful -> {
+              if (isRazorpayFlowSuccessful) {
                 /* insert in DB */
                 return insertInfoInDB(INSERT_MERCHANT_INFO, referenceId);
               } else {
@@ -203,11 +203,11 @@ public class CreateLinkedAccount {
     /* checks if optional field legal info is null */
     if (request.getJsonObject("legalInfo") != null) {
       String pan = request.getJsonObject("legalInfo").getString("pan");
-      if (!StringUtils.isBlank(pan)) {
+      if (StringUtils.isNotBlank(pan)) {
         legalInfoJson.put("pan", pan);
       }
       String gst = request.getJsonObject("legalInfo").getString("gst");
-      if (!StringUtils.isBlank(gst)) {
+      if (StringUtils.isNotBlank(gst)) {
         legalInfoJson.put("gst", gst);
       }
     }
@@ -234,11 +234,11 @@ public class CreateLinkedAccount {
     /* customer facing business name is not a necessary field in the request body
     * while inserting in the DB, if customer facing business name is null, it is
     * replaced with the legal business name */
-    if (!StringUtils.isBlank(customerFacingBusinessName)) {
+    if (StringUtils.isNotBlank(customerFacingBusinessName)) {
       setCustomerFacingBusinessName(customerFacingBusinessName);
       details.put("customer_facing_business_name", customerFacingBusinessName);
     }
-    if (!StringUtils.isBlank(contactName)) {
+    if (StringUtils.isNotBlank(contactName)) {
       details.put("contact_name", contactName);
     }
     return details;
