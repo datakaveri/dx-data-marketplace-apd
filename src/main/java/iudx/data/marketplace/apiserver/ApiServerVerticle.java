@@ -247,14 +247,14 @@ public class ApiServerVerticle extends AbstractVerticle {
               .failureHandler(exceptionHandler);
 
     router
-            .post(api.getLinkedAccountService())
+            .put(api.getLinkedAccountService())
             .handler(putLinkedAccountHandler)
             .handler(AuthHandler.create(authenticationService, vertx, api, postgresService, authClient))
             .handler(this::handlePutLinkedAccount)
             .failureHandler(exceptionHandler);
 
     router
-            .post(api.getLinkedAccountService())
+            .get(api.getLinkedAccountService())
             .handler(AuthHandler.create(authenticationService, vertx, api, postgresService, authClient))
             .handler(this::handleFetchLinkedAccount)
             .failureHandler(exceptionHandler);
