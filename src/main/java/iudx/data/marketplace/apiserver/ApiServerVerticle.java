@@ -18,6 +18,7 @@ import iudx.data.marketplace.apiserver.handlers.ExceptionHandler;
 import iudx.data.marketplace.apiserver.handlers.ValidationHandler;
 import iudx.data.marketplace.apiserver.provider.linkedAccount.LinkedAccountService;
 import iudx.data.marketplace.apiserver.util.RequestType;
+import iudx.data.marketplace.auditing.AuditingService;
 import iudx.data.marketplace.authenticator.AuthClient;
 import iudx.data.marketplace.authenticator.AuthenticationService;
 import iudx.data.marketplace.common.*;
@@ -64,6 +65,7 @@ public class ApiServerVerticle extends AbstractVerticle {
   private WebClientOptions webClientOptions;
   private AuthenticationService authenticationService;
   private LinkedAccountService linkedAccountService;
+  private AuditingService auditingService;
 
 
   /**
@@ -390,7 +392,6 @@ public class ApiServerVerticle extends AbstractVerticle {
   }
 
   private void handleFetchLinkedAccount(RoutingContext routingContext) {
-    JsonObject requestBody = routingContext.body().asJsonObject();
     HttpServerResponse response = routingContext.response();
     User user = routingContext.get("user");
     linkedAccountService
