@@ -775,7 +775,7 @@ paths:
             examples:
               Request body for Create Linked Account:
                 value:
-                  phone: 9000090000
+                  phone: "9000090000"
                   legalBusinessName: Dummy Corp V1
                   customerFacingBusinessName: Dummy Service Corp V1
                   businessType: partnership
@@ -789,7 +789,7 @@ paths:
                         street2: MG Road
                         city: Bengaluru
                         state: KARNATAKA
-                        postalCode: 560034
+                        postalCode: "560034"
                         country: IN
                   legalInfo:
                     pan: AAACL1234C
@@ -2995,7 +2995,7 @@ components:
                   "street2": "MG Road",
                   "city": "Bengaluru",
                   "state": "KARNATAKA",
-                  "postalCode": 560038,
+                  "postalCode": "560038",
                   "country": "india"
                 },
                 "operation": {
