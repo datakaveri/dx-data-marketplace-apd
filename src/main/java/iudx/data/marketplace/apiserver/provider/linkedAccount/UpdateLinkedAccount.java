@@ -2,6 +2,7 @@ package iudx.data.marketplace.apiserver.provider.linkedAccount;
 
 import io.vertx.core.Future;
 import io.vertx.core.Promise;
+import io.vertx.core.http.HttpMethod;
 import io.vertx.core.json.JsonObject;
 import iudx.data.marketplace.auditing.AuditingService;
 import iudx.data.marketplace.common.Api;
@@ -28,6 +29,9 @@ public class UpdateLinkedAccount {
   String phoneNumber;
   String referenceId;
   String customerFacingBusinessName;
+  String emailId;
+  String rzpAccountId;
+  String providerId;
 
   public UpdateLinkedAccount(
       PostgresService postgresService, Api api, AuditingService auditingService, RazorPayService razorPayService) {
@@ -40,15 +44,19 @@ public class UpdateLinkedAccount {
 
     String accountRequest = getAccountRequest(request);
     // TODO: Replace this with actual provider Id
-    String dummyProviderId = "29de4016-6737-4501-8fb2-81d79e2e4398";
+    String dummyProviderId = "da4fd01e-0fac-4e07-8778-52b1bd41267e";
 //    String providerId = provider.getUserId();
+    setProviderId(dummyProviderId);
 //    TODO: Replace this with actual email id
-    String dummyEmail = "01efghseller1@gmail.com";
+    String dummyEmail = "testSeller002@gmail.com";
 //    String emailId = provider.getEmailId();
+    setEmailId(dummyEmail);
 
     Future<JsonObject> accountInfoFuture = getAccountId(GET_MERCHANT_INFO_QUERY, dummyProviderId, dummyEmail);
     Future<Boolean> updateAccountInfoInRzpFuture = accountInfoFuture.compose(accountInfoJson -> {
       String accountId = accountInfoJson.getString("accountId");
+      /* set account id */
+      setRzpAccountId(accountId);
       return razorPayService.updateLinkedAccount(accountRequest,accountId);
     });
     Future<JsonObject> userResponseFuture = updateAccountInfoInRzpFuture.compose(isEditInRazorpaySuccessful -> {
@@ -58,6 +66,14 @@ public class UpdateLinkedAccount {
       }
       return Future.failedFuture(updateAccountInfoInRzpFuture.cause().getMessage());
     });
+
+    /* send the information for auditing */
+    /* accountId, referenceId, Non-sensitive PII */
+    userResponseFuture.compose(insertInDbSuccessful -> {
+      Future<Void> auditFuture = addAuditLogs(provider);
+      return auditFuture;
+    });
+
     return userResponseFuture;
   }
 
@@ -264,5 +280,46 @@ public class UpdateLinkedAccount {
     this.customerFacingBusinessName = customerFacingBusinessName;
   }
 
+  public void setEmailId(String emailId)
+  {
+    this.emailId = emailId;
+  }
+  public String getEmailId()
+  {
+    return this.emailId;
+  }
 
+  public void setRzpAccountId(String rzpAccountId)
+  {
+    this.rzpAccountId = rzpAccountId;
+  }
+
+  public String getRzpAccountId()
+  {
+    return this.rzpAccountId;
+  }
+
+  public void setProviderId(String providerId)
+  {
+    this.providerId = providerId;
+  }
+
+  public String getProviderId()
+  {
+    return this.providerId;
+  }
+
+  public Future<Void> addAuditLogs(User provider) {
+    JsonObject auditInfo =
+            new JsonObject()
+                    .put("referenceId", getReferenceId())
+                    .put("email", getEmailId())
+                    .put("phoneNumber", getPhoneNumber())
+                    .put("legalBusinessName", getLegalBusinessName())
+                    .put("customerFacingBusinessName", getCustomerFacingBusinessName())
+                    .put("accountId", getRzpAccountId())
+                    .put("providerId", getProviderId());
+    return auditingService.handleAuditLogs(
+            provider, auditInfo, api.getLinkedAccountService(), HttpMethod.PUT.toString());
+  }
 }
