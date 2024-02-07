@@ -294,9 +294,9 @@ public class ProductServiceImpl implements ProductService {
                                             + " before product creation is done serially");
                             promise.fail(
                                     new RespBuilder()
-                                            .withType(HttpStatusCode.INTERNAL_SERVER_ERROR.getValue())
-                                            .withTitle(ResponseUrn.DB_ERROR_URN.getUrn())
-                                            .withDetail(FAILURE_MESSAGE + "Internal Server Error")
+                                            .withType(HttpStatusCode.FORBIDDEN.getValue())
+                                            .withTitle(ResponseUrn.FORBIDDEN_PRODUCT_CREATION.getUrn())
+                                            .withDetail(ResponseUrn.FORBIDDEN_PRODUCT_CREATION.getMessage() + " as, linked account is not created")
                                             .getResponse());
                         }
                     } else {
