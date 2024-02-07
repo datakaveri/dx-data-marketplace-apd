@@ -64,4 +64,22 @@ public interface RazorPayService {
    * @return Future of type JsonObject as success response, failure if any
    */
   Future<JsonObject> createLinkedAccount(String request);
+
+
+  /**
+   * Fetches a linked account from Razorpay
+   * @param accountId Razorpay ID generated after creating a linked account
+   * @return Linked account information as Future of type JsonObject when as success response.
+   * Failure if any
+   */
+  Future<JsonObject> fetchLinkedAccount(String accountId);
+
+  /**
+   * Updates the account information after creating a linked account
+   * <br> All the information except <i>businessType</i>, <i>email</i> could be updated
+   * @param request Fields to be updated as JSON string
+   * @param accountId Razorpay generated ID after creating a linked account
+   * @return Future of type boolean after updating successfully or failure if any
+   */
+  Future<Boolean> updateLinkedAccount(String request, String accountId);
 }

@@ -5,12 +5,9 @@
   "type": "object",
   "examples": [
     {
-      "accountId": "acc_GRWKk7qQsLnDjX",
-      "email": "test.provider@gmail.com",
       "phone": 9000090000,
       "legalBusinessName": "Dummy Corp V1",
       "customerFacingBusinessName": "Dummy Service Corp V1",
-      "businessType": "partnership",
       "contactName": "Bob Davis",
       "profile": {
         "category": "healthcare",
@@ -33,30 +30,11 @@
     }
   ],
   "required": [
-    "accountId",
-    "email",
     "phone",
     "legalBusinessName",
-    "businessType",
     "profile"
   ],
   "properties": {
-    "accountId": {
-      "$id": "#root/accountId",
-      "title": "accountId",
-      "type": "string",
-      "minLength": 18,
-      "maxLength": 18
-    },
-    "email": {
-      "$id": "#root/email",
-      "title": "email",
-      "type": "string",
-      "format": "email",
-      "examples": [
-        "test.provider@gmail.com"
-      ]
-    },
     "phone": {
       "$id": "#root/phone",
       "title": "phone",
@@ -85,25 +63,6 @@
       "maxLength": 255,
       "examples": [
         "Some other corp"
-      ]
-    },
-    "businessType": {
-      "$id": "#root/businessType",
-      "title": "businessType",
-      "type": "string",
-      "enum": [
-        "llp",
-        "ngo",
-        "other",
-        "individual",
-        "partnership",
-        "proprietorship",
-        "public_limited",
-        "private_limited",
-        "trust",
-        "society",
-        "not_yet_registered",
-        "educational_institutes"
       ]
     },
     "contactName": {
