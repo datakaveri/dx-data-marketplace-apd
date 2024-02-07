@@ -870,11 +870,6 @@ paths:
             schema:
               type: object
               properties:
-                accountId:
-                  type: string
-                  minLength: 18
-                  maxLength: 18
-                  description: ID generated after creating a linked account
                 phone:
                   type: string
                   minLength: 8
@@ -975,7 +970,6 @@ paths:
                       maxLength: 15
                       pattern: '/^[0123][0-9][a-z]{5}[0-9]{4}[a-z][0-9][a-z0-9][a-z0-9]$/gi'
               required:
-                - accountId
                 - phone
                 - legalBusinessName
                 - profile
@@ -983,24 +977,30 @@ paths:
             examples:
               Request body for Update Linked Account:
                 value:
-                  accountId: acc_GRWKk7qQsLnDjX
-                  phone: 9100090000
-                  legalBusinessName: Dummy Corp V2
-                  customerFacingBusinessName: Some Other Corp
-                  contactName: Test Name
-                  profile:
-                    category: healthcare
-                    subcategory: doctors
-                    addresses:
-                      street1: Outer Ring road
-                      street2: MG Road
-                      city: Bengaluru
-                      state: KARNATAKA
-                      postalCode: 560038
-                      country: india
-                  legalInfo:
-                    pan: ABACL1234C
-                    gst: 19AABCU9603R1ZM
+                  {
+                    "phone": "9100090000",
+                    "legalBusinessName": "Dummy Corp V2",
+                    "customerFacingBusinessName": "Some Other Corp",
+                    "contactName": "Test Name",
+                    "profile": {
+                      "category": "healthcare",
+                      "subcategory": "doctors",
+                      "addresses": {
+                        "registered": {
+                          "street1": "Outer Ring road",
+                          "street2": "MG Road",
+                          "city": "Bengaluru",
+                          "state": "KARNATAKA",
+                          "postalCode": "560038",
+                          "country": "india"
+                        }
+                      }
+                    },
+                    "legalInfo": {
+                      "pan": "ABACL1234C",
+                      "gst": "19AABCU9603R1ZM"
+                    }
+                  }
 
       responses:
         '200':
@@ -1085,9 +1085,10 @@ paths:
           content:
             application/json:
               schema:
-                oneOf:
-                  - $ref: '#/components/schemas/fetchLinkedAccountWithGivenFields'
-                  - $ref: '#/components/schemas/fetchLinkedAccountWithOtherFields'
+                $ref: '#/components/schemas/fetchLinkedAccountWithGivenFields'
+#                oneOf:
+#                  - $ref: '#/components/schemas/fetchLinkedAccountWithGivenFields'
+#                  - $ref: '#/components/schemas/fetchLinkedAccountWithOtherFields'
 
           headers:
             Content-Type:
@@ -2655,10 +2656,6 @@ components:
                 - category
                 - subcategory
                 - addresses
-            notes:
-              type: array
-              items:
-                type: string
             phone:
               type: string
               minLength: 8
@@ -2694,23 +2691,17 @@ components:
                   minLength: 15
                   maxLength: 15
                   pattern: '/^[0123][0-9][a-z]{5}[0-9]{4}[a-z][0-9][a-z0-9][a-z0-9]$/gi'
-              required:
-                - pan
-                - gst
           required:
             - id
             - type
             - status
             - email
             - profile
-            - notes
             - phone
-            - contactName
             - referenceId
             - businessType
             - legalBusinessName
             - customerFacingBusinessName
-            - legalInfo
       required:
         - type
         - title
@@ -2738,7 +2729,6 @@ components:
                 }
               }
             },
-            "notes": [ ],
             "phone": "9100090000",
             "contactName": "Test Name",
             "referenceId": "9db3e89b9db3e89b85e1",
@@ -3018,9 +3008,6 @@ components:
               },
               "businessModel": null
             },
-            "notes": [
-
-            ],
             "phone": "9100090000",
             "contactName": "Test Name",
             "referenceId": "12345678912345678912",

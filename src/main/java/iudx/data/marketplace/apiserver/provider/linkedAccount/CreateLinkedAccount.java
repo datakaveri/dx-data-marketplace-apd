@@ -2,12 +2,8 @@ package iudx.data.marketplace.apiserver.provider.linkedAccount;
 
 
 import com.google.common.hash.Hashing;
-import com.razorpay.Account;
-import com.razorpay.RazorpayClient;
-import com.razorpay.RazorpayException;
 import io.vertx.core.Future;
 import io.vertx.core.Promise;
-import io.vertx.core.http.HttpMethod;
 import io.vertx.core.json.JsonObject;
 import iudx.data.marketplace.auditing.AuditingService;
 import iudx.data.marketplace.common.Api;
@@ -23,10 +19,7 @@ import org.apache.logging.log4j.Logger;
 
 import java.nio.charset.StandardCharsets;
 import java.security.SecureRandom;
-import java.time.LocalDateTime;
 import java.util.Arrays;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.UUID;
 
 import static iudx.data.marketplace.apiserver.provider.linkedAccount.util.Constants.*;
@@ -91,7 +84,7 @@ public class CreateLinkedAccount {
             isRazorpayFlowSuccessful -> {
               if (isRazorpayFlowSuccessful) {
                 /* insert in DB */
-                return insertInfoInDB(INSERT_MERCHANT_INFO, referenceId);
+                return insertInfoInDB(INSERT_MERCHANT_INFO_QUERY, referenceId);
               } else {
                 return Future.failedFuture(razorpayFlowFuture.cause().getMessage());
               }

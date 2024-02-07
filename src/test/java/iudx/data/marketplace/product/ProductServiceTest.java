@@ -12,6 +12,7 @@ import iudx.data.marketplace.common.CatalogueService;
 import iudx.data.marketplace.configuration.Configuration;
 import iudx.data.marketplace.policies.User;
 import iudx.data.marketplace.postgres.PostgresService;
+import iudx.data.marketplace.razorpay.RazorPayService;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -39,6 +40,8 @@ public class ProductServiceTest {
   @Mock Future<Boolean> boolFuture;
   @Mock
     User user;
+  @Mock
+  static RazorPayService razorPayService;
 
   @BeforeAll
   public static void setup(Vertx vertx, VertxTestContext testContext) {
@@ -48,7 +51,7 @@ public class ProductServiceTest {
     catService = mock(CatalogueService.class);
     //    queryBuilder = new QueryBuilder(config.getJsonArray(TABLES));
     //    productTableName = config.getJsonArray(TABLES).getString(0);
-    productServiceImpl = new ProductServiceImpl(config, postgresService, catService);
+    productServiceImpl = new ProductServiceImpl(config, postgresService, catService, razorPayService, true);
     testContext.completeNow();
   }
 

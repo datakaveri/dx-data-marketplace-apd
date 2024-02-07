@@ -238,7 +238,7 @@ public class ProductServiceImpl implements ProductService {
       //        String providerId = user.getUserId();
       String dummyProviderId = "8afb4269-bee4-4a88-9947-128315479eb6";
       Future<JsonObject> providerDetailsFuture =
-          fetchRazorpayDetailsOfProvider(FETCH_MERCHANT_INFO, dummyProviderId);
+          fetchRazorpayDetailsOfProvider(FETCH_MERCHANT_INFO_QUERY, dummyProviderId);
       /* checkIfAccountIsActivated */
       Future<Boolean> linkedAccountActivationFuture =
           providerDetailsFuture.compose(
@@ -248,7 +248,7 @@ public class ProductServiceImpl implements ProductService {
       Future<Boolean> updateStatusFuture =
           linkedAccountActivationFuture.compose(
               isLinkedAccountActivated -> {
-                return updateStatusOfLinkedAccount(UPDATE_LINKED_ACCOUNT_STATUS, dummyProviderId);
+                return updateStatusOfLinkedAccount(UPDATE_LINKED_ACCOUNT_STATUS_QUERY, dummyProviderId);
               });
       updateStatusFuture.onComplete(
           updateStatusHandler -> {

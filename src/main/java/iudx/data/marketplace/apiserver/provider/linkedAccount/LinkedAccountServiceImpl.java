@@ -32,10 +32,8 @@ public class LinkedAccountServiceImpl implements LinkedAccountService {
         .onComplete(
             handler -> {
               if (handler.succeeded()) {
-                LOG.info("Success ---->");
                 promise.complete(handler.result());
               } else {
-                LOG.error("Failure --->");
                 promise.fail(handler.cause().getMessage());
               }
             });
@@ -44,11 +42,35 @@ public class LinkedAccountServiceImpl implements LinkedAccountService {
 
   @Override
   public Future<JsonObject> fetchLinkedAccount(User user) {
-    return null;
+    Promise<JsonObject> promise = Promise.promise();
+
+    this.fetchLinkedAccount
+            .initiateFetchingLinkedAccount(user)
+            .onComplete(
+                    handler -> {
+                      if (handler.succeeded()) {
+                        promise.complete(handler.result());
+                      } else {
+                        promise.fail(handler.cause().getMessage());
+                      }
+                    });
+    return promise.future();
   }
 
   @Override
   public Future<JsonObject> updateLinkedAccount(JsonObject request, User user) {
-    return null;
+    Promise<JsonObject> promise = Promise.promise();
+
+    this.updateLinkedAccount
+            .initiateUpdatingLinkedAccount(request, user)
+            .onComplete(
+                    handler -> {
+                      if (handler.succeeded()) {
+                        promise.complete(handler.result());
+                      } else {
+                        promise.fail(handler.cause().getMessage());
+                      }
+                    });
+    return promise.future();
   }
 }

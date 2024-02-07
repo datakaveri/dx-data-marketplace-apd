@@ -34,6 +34,10 @@ public class RespBuilder {
     return this;
   }
 
+  public RespBuilder withResult(JsonObject result) {
+    response.put(RESULTS, result);
+    return this;
+  }
   public JsonObject getJsonResponse() {
     return response;
   }
