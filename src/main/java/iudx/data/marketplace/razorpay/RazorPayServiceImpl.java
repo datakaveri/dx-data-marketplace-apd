@@ -1,6 +1,8 @@
 package iudx.data.marketplace.razorpay;
 
-import com.razorpay.Account;
+import static iudx.data.marketplace.product.util.Constants.*;
+import static iudx.data.marketplace.razorpay.Constants.*;
+
 import com.razorpay.Order;
 import com.razorpay.RazorpayClient;
 import com.razorpay.RazorpayException;
@@ -17,9 +19,6 @@ import org.apache.logging.log4j.Logger;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
-
-import static iudx.data.marketplace.product.util.Constants.*;
-import static iudx.data.marketplace.razorpay.Constants.*;
 
 public class RazorPayServiceImpl implements RazorPayService {
 
@@ -40,8 +39,9 @@ public class RazorPayServiceImpl implements RazorPayService {
   @Override
   public Future<JsonObject> createOrder(JsonObject request) {
     Promise<JsonObject> promise = Promise.promise();
+    LOGGER.debug(request);
 
-    Integer amountInPaise = (int) (request.getDouble(PRICE) * 100);
+    Integer amountInPaise = (int) (Double.parseDouble((request.getString(PRICE))) * 100);
     JSONObject orderRequest =
         new JSONObject()
             .put(AMOUNT, amountInPaise)
@@ -67,8 +67,6 @@ public class RazorPayServiceImpl implements RazorPayService {
     try {
       LOGGER.debug("order request at razorpay: {} ", orderRequest);
       Order order = razorpayClient.orders.create(orderRequest);
-      JSONObject accountRequest = new JSONObject();
-      Account account = razorpayClient.account.create(accountRequest);
       String status = order.get(STATUS);
       if (!status.equals(CREATED)) {
         throw new DxRuntimeException(
@@ -123,7 +121,7 @@ public class RazorPayServiceImpl implements RazorPayService {
               .withDetail(e.getUrn().getMessage());
       promise.fail(respBuilder.getResponse());
     } catch (JSONException e) {
-      LOGGER.error("parse execption during order creation, : {}", e.getMessage());
+      LOGGER.error("parse exception during order creation, : {}", e.getMessage());
 
       RespBuilder respBuilder =
           new RespBuilder()
@@ -152,10 +150,12 @@ public class RazorPayServiceImpl implements RazorPayService {
       if (status) {
         recordPayment(request).onSuccess(promise::complete).onFailure(promise::fail);
       } else {
-        throw new DxRuntimeException(400, ResponseUrn.INVALID_PAYMENT, ResponseUrn.INVALID_PAYMENT.getMessage());
+        throw new DxRuntimeException(
+            400, ResponseUrn.INVALID_PAYMENT, ResponseUrn.INVALID_PAYMENT.getMessage());
       }
     } catch (RazorpayException e) {
-      throw new DxRuntimeException(400, ResponseUrn.INVALID_PAYMENT, ResponseUrn.INVALID_PAYMENT.getMessage());
+      throw new DxRuntimeException(
+          400, ResponseUrn.INVALID_PAYMENT, ResponseUrn.INVALID_PAYMENT.getMessage());
     } catch (DxRuntimeException e) {
       LOGGER.error("payment not verified on razorpay, : {}", e.getMessage());
       RespBuilder respBuilder =
