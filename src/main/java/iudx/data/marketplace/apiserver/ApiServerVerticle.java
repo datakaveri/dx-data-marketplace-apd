@@ -24,6 +24,7 @@ import iudx.data.marketplace.policies.PolicyService;
 import iudx.data.marketplace.policies.User;
 import iudx.data.marketplace.postgres.PostgresService;
 import iudx.data.marketplace.postgres.PostgresServiceImpl;
+import iudx.data.marketplace.razorpay.RazorPayService;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -59,6 +60,7 @@ public class ApiServerVerticle extends AbstractVerticle {
   private String keystore;
   private String keystorePassword;
   private PostgresService postgresService;
+  private RazorPayService razorPayService;
   private AuthClient authClient;
   private WebClient webClient;
   private WebClientOptions webClientOptions;
@@ -100,6 +102,7 @@ public class ApiServerVerticle extends AbstractVerticle {
     /* Initialize service proxy */
     policyService = PolicyService.createProxy(vertx, POLICY_SERVICE_ADDRESS);
     postgresService = PostgresService.createProxy(vertx, POSTGRES_SERVICE_ADDRESS);
+    razorPayService = RazorPayService.createProxy(vertx, RAZORPAY_SERVICE_ADDRESS);
 
     authClient = new AuthClient(config(), webClient);
     authenticationService = AuthenticationService.createProxy(vertx, AUTH_SERVICE_ADDRESS);
@@ -244,7 +247,8 @@ public class ApiServerVerticle extends AbstractVerticle {
     router
         .post(api.getVerifyPaymentApi())
         .handler(verifyPaymentValidationHandler)
-        .handler(AuthHandler.create(authenticationService, vertx, api, postgresService, authClient))
+        // TODO : handle authentication and authorization for verify payment api
+//        .handler(AuthHandler.create(authenticationService, vertx, api, postgresService, authClient))
         .handler(this::handleVerifyPayment)
         .failureHandler(exceptionHandler);
 
@@ -277,6 +281,19 @@ public class ApiServerVerticle extends AbstractVerticle {
 
   private void handleVerifyPayment(RoutingContext routingContext) {
 
+    JsonObject requestBody = routingContext.body().asJsonObject();
+    HttpServerResponse response = routingContext.response();
+
+    razorPayService
+        .verifyPayment(requestBody)
+        .onSuccess(
+            paymentVerified -> {
+              handleSuccessResponse(response, 200, paymentVerified.encode());
+            })
+        .onFailure(
+            verifyFailed -> {
+              handleFailureResponse(routingContext, verifyFailed.getMessage());
+            });
   }
 
   private void createPolicy(RoutingContext routingContext) {

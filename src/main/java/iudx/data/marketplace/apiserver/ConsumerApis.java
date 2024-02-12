@@ -103,7 +103,6 @@ public class ConsumerApis {
       if(handler.succeeded()) {
         handleSuccessResponse(routingContext, 201, handler.result());
       } else {
-        LOGGER.error("here");
         handleFailureResponse(routingContext, handler.cause());
       }
     });

@@ -80,10 +80,11 @@ public class RazorPayServiceImpl implements RazorPayService {
       LOGGER.debug("error response from razorpay : {}", responseError);
 
       Object reason = responseError.get(REASON);
-      if (reason != null) {
+      LOGGER.debug(JSONObject.NULL.equals(reason));
+      if (!JSONObject.NULL.equals(reason)) {
         LOGGER.error("razorpay error : ", responseError);
         String message;
-        switch ((String) reason) {
+        switch (reason.toString()) {
           case "amount_less_than_minimum_amount":
           case "authentication_failed":
           case "gateway_technical_error":
@@ -148,7 +149,20 @@ public class RazorPayServiceImpl implements RazorPayService {
       boolean status = Utils.verifyPaymentSignature(verifyOption, razorPaySecret);
 
       if (status) {
-        recordPayment(request).onSuccess(promise::complete).onFailure(promise::fail);
+        recordPayment(request)
+            .onSuccess(
+                successHandler -> {
+                  promise.complete(
+                      new RespBuilder()
+                          .withType(ResponseUrn.SUCCESS_URN.getUrn())
+                          .withTitle(ResponseUrn.SUCCESS_URN.getMessage())
+                          .withDetail(
+                              String.format(
+                                  "Payment Verified for order id %s",
+                                  request.getString(RAZORPAY_ORDER_ID)))
+                          .getJsonResponse());
+                })
+            .onFailure(promise::fail);
       } else {
         throw new DxRuntimeException(
             400, ResponseUrn.INVALID_PAYMENT, ResponseUrn.INVALID_PAYMENT.getMessage());

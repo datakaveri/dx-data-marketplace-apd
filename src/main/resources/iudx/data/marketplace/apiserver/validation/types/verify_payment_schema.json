@@ -1,0 +1,38 @@
+{
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "$id": "https://example.com/example.json",
+    "title": "Root",
+    "type": "object",
+    "examples": [
+        {
+            "razorpay_order_id": "dummy-order-id",
+            "razorpay_payment_id": "dummy-payment-id",
+            "razorpay_signature": "dummy-signature"
+        }
+    ],
+    "required": [
+        "razorpay_order_id",
+        "razorpay_payment_id",
+        "razorpay_signature"
+    ],
+    "properties": {
+        "razorpay_order_id": {
+            "$id": "#/root/properties/orderid",
+            "title": "orderid",
+            "type": "string",
+            "pattern": "^order_.*$"
+        },
+        "razorpay_payment_id": {
+            "$id": "#/root/properties/paymentid",
+            "title": "paymentid",
+            "type": "string",
+            "pattern": "^pay_.*$"
+        },
+        "razorpay_signature": {
+            "$id": "#/root/properties/paysign",
+            "title": "paysign",
+            "type": "string",
+            "pattern": "[A-Fa-f0-9]{64}"
+        }
+    }
+}

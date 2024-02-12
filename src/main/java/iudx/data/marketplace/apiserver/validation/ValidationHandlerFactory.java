@@ -43,8 +43,16 @@ public class ValidationHandlerFactory {
       case ORDER:
         validator = getOrderValidator(parameters);
         break;
+      case VERIFY_PAYMENT:
+        validator = getVerfiyPaymentValidator(parameters, body);
     }
     return validator;
+  }
+
+  private List<Validator> getVerfiyPaymentValidator(MultiMap parameters, JsonObject body) {
+    List<Validator> validators = new ArrayList<>();
+    validators.add(new JsonSchemaTypeValidator(body, RequestType.VERIFY_PAYMENT));
+    return validators;
   }
 
   private List<Validator> getOrderValidator(MultiMap parameters) {
