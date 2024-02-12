@@ -92,10 +92,11 @@ CREATE TABLE IF NOT EXISTS product_variant
 
 
 
-CREATE TABLE IF NOT EXISTS purchase
+CREATE TABLE IF NOT EXISTS invoice
 (
     _id uuid DEFAULT uuid_generate_v4 () NOT NULL,
     consumer_id uuid NOT NULL,
+    order_id varchar NOT NULL,
     product_variant_id uuid NOT NULL,
     payment_status payment_status_type NOT NULL,
     payment_time timestamp without time zone NOT NULL,
@@ -103,10 +104,10 @@ CREATE TABLE IF NOT EXISTS purchase
     product_variant json NOT NULL,
     created_at timestamp without time zone NOT NULL,
     modified_at timestamp without time zone NOT NULL,
-    CONSTRAINT purchase_id_pk PRIMARY KEY (_id),
+    CONSTRAINT invoice_id_pk PRIMARY KEY (_id),
     CONSTRAINT consumer_id_fk FOREIGN KEY (consumer_id)
     REFERENCES user_table (_id),
-    CONSTRAINT purchase_product_variant_id_fkey FOREIGN KEY (product_variant_id)
+    CONSTRAINT invoice_product_variant_id_fkey FOREIGN KEY (product_variant_id)
     REFERENCES product_variant (_id)
 
 );
@@ -115,7 +116,7 @@ CREATE TABLE IF NOT EXISTS policy
 (
     _id uuid DEFAULT uuid_generate_v4 () NOT NULL,
     resource_id uuid NOT NULL,
-    purchase_id uuid NOT NULL,
+    invoice_id uuid NOT NULL,
     constraints json NOT NULL,
     provider_id uuid NOT NULL,
     consumer_email_id varchar NOT NULL,
@@ -127,7 +128,7 @@ CREATE TABLE IF NOT EXISTS policy
     CONSTRAINT resource_id_fk FOREIGN KEY(resource_id) REFERENCES resource_entity(_id),
     CONSTRAINT provider_id_fk FOREIGN KEY (provider_id) REFERENCES user_table (_id),
     CONSTRAINT policy_product_variant_id_fkey FOREIGN KEY (product_variant_id) REFERENCES product_variant (_id),
-    CONSTRAINT policy_purchase_id_fkey FOREIGN KEY (purchase_id) REFERENCES purchase (_id)
+    CONSTRAINT policy_invoice_id_fkey FOREIGN KEY (invoice_id) REFERENCES invoice (_id)
 );
 
 
@@ -176,11 +177,11 @@ CREATE TRIGGER update_pv_modified BEFORE INSERT
 OR UPDATE ON
    product_variant FOR EACH ROW EXECUTE PROCEDURE update_modified ();
 
--- purchase
-CREATE TRIGGER update_purchase_created BEFORE INSERT ON purchase FOR EACH ROW EXECUTE PROCEDURE update_created ();
-CREATE TRIGGER update_purchase_modified BEFORE INSERT
+-- invoice
+CREATE TRIGGER update_invoice_created BEFORE INSERT ON invoice FOR EACH ROW EXECUTE PROCEDURE update_created ();
+CREATE TRIGGER update_invoice_modified BEFORE INSERT
 OR UPDATE ON
-   purchase FOR EACH ROW EXECUTE PROCEDURE update_modified ();
+   invoice FOR EACH ROW EXECUTE PROCEDURE update_modified ();
 
 ---
 --   grant privileges
@@ -190,6 +191,6 @@ GRANT INSERT, SELECT, UPDATE, DELETE, REFERENCES, TRIGGER ON TABLE policy TO dmp
 GRANT INSERT, SELECT, UPDATE, DELETE, REFERENCES, TRIGGER ON TABLE product TO dmp_user;
 GRANT INSERT, SELECT, UPDATE, DELETE, REFERENCES, TRIGGER ON TABLE resource_entity TO dmp_user;
 GRANT INSERT, SELECT, UPDATE, DELETE, REFERENCES, TRIGGER ON TABLE user_table TO dmp_user;
-GRANT INSERT, SELECT, UPDATE, DELETE, REFERENCES, TRIGGER ON TABLE purchase TO dmp_user;
+GRANT INSERT, SELECT, UPDATE, DELETE, REFERENCES, TRIGGER ON TABLE invoice TO dmp_user;
 GRANT INSERT, SELECT, UPDATE, DELETE, REFERENCES, TRIGGER ON TABLE product_resource_relation TO dmp_user;
 GRANT INSERT, SELECT, UPDATE, DELETE, REFERENCES, TRIGGER ON TABLE product_variant TO dmp_user;
