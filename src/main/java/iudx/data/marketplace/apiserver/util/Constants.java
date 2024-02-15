@@ -42,7 +42,7 @@ public class Constants {
 
   public static final String IS_DELEGATE = "isDelegate";
 
-  public static final String RESOURCE_SERVER_URL = "resourceServer";
+  public static final String RESOURCE_SERVER_URL = "resourceServerRegURL";
   public static final String USER_ROLE = "userRole";
   public static final String EMAIL_ID = "emailId";
   public static final String RS_SERVER_URL = "resourceServerUrl";

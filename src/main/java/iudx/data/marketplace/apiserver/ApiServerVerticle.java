@@ -285,7 +285,9 @@ public class ApiServerVerticle extends AbstractVerticle {
   }
 
   private void createPolicy(RoutingContext routingContext) {
-    policyService.createPolicy(new JsonObject(),null).onComplete(handler -> {
+    JsonObject order = routingContext.body().asJsonObject();
+    String orderId = order.getString("orderId");
+    policyService.createPolicy(orderId).onComplete(handler -> {
       if(handler.succeeded())
       {
         LOGGER.info("Insertion Success");

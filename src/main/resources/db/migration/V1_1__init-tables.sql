@@ -103,7 +103,7 @@ CREATE TABLE IF NOT EXISTS product_variant
     provider_id uuid NOT NULL,
     resource_name varchar[] NOT NULL,
     resource_ids_and_capabilities jsonb NOT NULL,
-    price varchar NOT NULL,
+    price numeric NOT NULL,
     validity numeric NOT NULL,
     status status_type NOT NULL,
     created_at timestamp without time zone NOT NULL,

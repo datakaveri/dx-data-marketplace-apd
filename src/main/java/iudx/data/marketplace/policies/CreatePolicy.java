@@ -19,7 +19,6 @@ import java.util.stream.Collectors;
 
 import static iudx.data.marketplace.apiserver.util.Constants.*;
 import static iudx.data.marketplace.policies.util.Constants.*;
-import static iudx.data.marketplace.product.util.Constants.TYPE;
 
 public class CreatePolicy {
   private static final Logger LOGGER = LogManager.getLogger(CreatePolicy.class);

@@ -18,7 +18,7 @@ public interface PolicyService {
   }
 
   /*service operation*/
-  Future<JsonObject> createPolicy(JsonObject request, User user);
+  Future<JsonObject> createPolicy(String orderId);
 
   Future<JsonObject> deletePolicy(JsonObject policy, User user);
 

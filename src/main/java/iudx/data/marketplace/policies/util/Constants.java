@@ -1,22 +1,17 @@
 package iudx.data.marketplace.policies.util;
 
 public class Constants {
-    public static final int DB_RECONNECT_ATTEMPTS = 2;
-    public static final long DB_RECONNECT_INTERVAL_MS = 10;
     public static final String CHECK_EXISTING_POLICY =
             "SELECT _id,constraints FROM policy "
                     + "WHERE resource_id =$1::UUID AND provider_id = $2::UUID  AND status = $3::policy_status"
                     + " AND consumer_email_id = $4::text AND expiry_at > now()";
 
-    public static final String ENTITY_TABLE_CHECK =
-            "Select _id,provider_id,item_type,resource_server_url from resource_entity where _id = ANY ($1::UUID[]);";
-    public static final String INSERT_ENTITY_TABLE =
-            "insert into resource_entity(_id,provider_id,resource_group_id,item_type,resource_server_url)"
-                    + " values ($1,$2,$3,$4,$5);";
-
     public static final String CREATE_POLICY_QUERY =
-            "insert into policy (user_emailid, item_id, owner_id,expiry_at, constraints,status) "
-                    + "values ($1, $2, $3, $4, $5,'ACTIVE') returning *;";
+            "INSERT INTO public.policy( " +
+                    " _id, resource_id, invoice_id, constraints, provider_id, consumer_email_id, expiry_at, " +
+                    " status, product_variant_id) " +
+                    " VALUES ('$1', '$2', '$3', '$4'::JSON, '$5', '$6', '$7', '$8', '$9') RETURNING _id;";
+
   public static final String GET_POLICY_4_PROVIDER_QUERY =
       "SELECT P._id AS \"policyId\", P.resource_id AS \"resourceId\",\n"
           + "RE.resource_server_url AS \"resourceServerUrl\",\n"
@@ -61,4 +56,22 @@ public class Constants {
                     + " FROM policy p"
                     + " INNER JOIN resource_entity r ON p.resource_id = r._id"
                     + " WHERE p._id = $1;";
+
+
+  public static final String GET_REQUIRED_INFO_QUERY =
+      "SELECT DISTINCT I._id AS \"invoiceId\", I.product_variant_id AS \"productVariantId\", I.expiry, "
+          + " PV.provider_id AS \"providerId\", U.email_id AS \"consumerEmailId\", "
+          + " PV.resource_ids_and_capabilities AS \"resourceIdsAndConstraints\", "
+          + " U.email_id AS \"emailId\", U.first_name AS \"firstName\", U.last_name AS \"lastName\", "
+          + " R.resource_server AS \"resourceServerUrl\""
+          + " FROM invoice AS I "
+          + " INNER JOIN product_variant AS PV "
+          + " ON I.product_variant_id = PV._id "
+          + " INNER JOIN user_table AS U "
+          + " ON I.consumer_id = U._id "
+          + " INNER JOIN resource_entity  R "
+          + " ON PV.provider_id = R.provider_id "
+          + " WHERE payment_status = 'SUCCEEDED' "
+          + " AND order_id = '$1';";
+
 }
