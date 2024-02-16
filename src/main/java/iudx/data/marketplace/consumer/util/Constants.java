@@ -3,12 +3,12 @@ package iudx.data.marketplace.consumer.util;
 public class Constants {
 
   public static final String LIST_RESOURCES_QUERY =
-      "select _id, resource_name, accessPolicy, providerName from $0";
+      "select _id, resource_name, accessPolicy, provider_name from $0";
   public static final String LIST_PROVIDERS_QUERY =
-      "select distinct provider_id, providerName, resource_server from $0";
+      "select distinct provider_id, provider_name, resource_server from $0";
 
   public static final String LIST_PRODUCTS =
-      "select pt.product_id as productId, pt.providerName, "
+      "select pt.product_id as productId, pt.provider_name, "
           + "array_agg(json_build_object('id', rt._id, 'name', rt.resource_name)) as resources "
           + "from $0 as pt "
           + "inner join $9 as dpt on pt.product_id = dpt.product_id "

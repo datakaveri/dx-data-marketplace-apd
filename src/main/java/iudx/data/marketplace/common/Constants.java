@@ -7,6 +7,7 @@ public class Constants {
   public static final String CAT_ITEM_PATH = "catItemPath";
   public static final String CAT_REL_PATH = "catRelPath";
   public static final String TYPE_PROVIDER = "iudx:Provider";
+  public static final String TYPE_RESOURCE_SERVER = "iudx:ResourceServer";
   public static final String TYPE_RG = "iudx:ResourceGroup";
   public static final String TYPE_RI = "iudx:Resource";
   public static final String PROVIDER_ID = "providerID";

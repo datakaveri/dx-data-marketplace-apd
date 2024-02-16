@@ -138,36 +138,25 @@ public class ProviderApis {
     requestBody.put(AUTH_INFO, authInfo);
     User user = routingContext.get("user");
 
-    productService
-            .checkMerchantAccountStatus(user, accountStatusHandler -> {
-              if(accountStatusHandler.succeeded())
-              {
-                productService.createProduct(
-                        user,
-                        requestBody,
-                        handler -> {
-                          if (handler.succeeded()) {
-                            handleSuccessResponse(routingContext, 201, handler.result());
-                          } else {
-                            String errorMessage = handler.cause().getMessage();
-                            if (errorMessage.equalsIgnoreCase(ResponseUrn.RESOURCE_ALREADY_EXISTS_URN.getUrn())) {
-                              routingContext.fail(
-                                      new DxRuntimeException(
-                                              409,
-                                              ResponseUrn.RESOURCE_ALREADY_EXISTS_URN,
-                                              ResponseUrn.RESOURCE_ALREADY_EXISTS_URN.getMessage()));
-                            } else {
-                              handleFailureResponse(routingContext, handler.cause());
-                            }
-                          }
-                        });
-              }
-              else
-              {
-                handleFailure(routingContext, accountStatusHandler.cause().getMessage());
-              }
-            });
-
+    productService.createProduct(
+        user,
+        requestBody,
+        handler -> {
+          if (handler.succeeded()) {
+            handleSuccessResponse(routingContext, 201, handler.result());
+          } else {
+            String errorMessage = handler.cause().getMessage();
+            if (errorMessage.equalsIgnoreCase(ResponseUrn.RESOURCE_ALREADY_EXISTS_URN.getUrn())) {
+              routingContext.fail(
+                  new DxRuntimeException(
+                      409,
+                      ResponseUrn.RESOURCE_ALREADY_EXISTS_URN,
+                      ResponseUrn.RESOURCE_ALREADY_EXISTS_URN.getMessage()));
+            } else {
+              handleFailureResponse(routingContext, handler.cause());
+            }
+          }
+        });
   }
 
   private void handleDeleteProduct(RoutingContext routingContext) {

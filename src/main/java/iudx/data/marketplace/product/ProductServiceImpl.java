@@ -44,101 +44,119 @@ public class ProductServiceImpl implements ProductService {
     this.isAccountActivationCheckBeingDone = isAccountActivationCheckBeingDone;
   }
 
-
   @Override
   public ProductService createProduct(
       User user, JsonObject request, Handler<AsyncResult<JsonObject>> handler) {
-    String providerID = user.getUserId();
-    String productID =
-        URN_PREFIX.concat(providerID).concat(":").concat(request.getString(PRODUCT_ID));
-    request.put(PROVIDER_ID, providerID).put(PRODUCT_ID, productID);
 
-    Future<Boolean> checkForExistence = checkIfProductExists(providerID, productID);
-    JsonArray resourceIds = request.getJsonArray(RESOURCE_IDS);
-    JsonArray resourceDetails = new JsonArray();
+    this.checkMerchantAccountStatus(
+        user,
+        accountStatusHandler -> {
+          if (accountStatusHandler.succeeded()) {
+            String providerID = user.getUserId();
+            String productID =
+                URN_PREFIX.concat(providerID).concat(":").concat(request.getString(PRODUCT_ID));
+            request.put(PROVIDER_ID, providerID).put(PRODUCT_ID, productID);
 
-    List<Future> itemFutures = new ArrayList<>();
-    resourceIds.forEach(
-        resourceID -> {
-          Future<JsonObject> getResourceDetails = catService.getItemDetails((String) resourceID);
-          itemFutures.add(getResourceDetails);
-        });
+            Future<Boolean> checkForExistence = checkIfProductExists(providerID, productID);
+            JsonArray resourceIds = request.getJsonArray(RESOURCE_IDS);
+            JsonArray resourceDetails = new JsonArray();
 
-    itemFutures.forEach(
-        fr -> {
-          fr.onSuccess(
-              h -> {
-                JsonObject res = (JsonObject) h;
-                resourceDetails.add(res);
-              });
-        });
+            List<Future> itemFutures = new ArrayList<>();
+            resourceIds.forEach(
+                resourceID -> {
+                  Future<JsonObject> getResourceDetails =
+                      catService.getItemDetails((String) resourceID);
+                  itemFutures.add(getResourceDetails);
+                });
 
-    CompositeFuture.all(itemFutures)
-        .onComplete(
-            ar -> {
-              LOGGER.debug(resourceDetails);
-              String providerOfFirstResource = resourceDetails.getJsonObject(0).getString(PROVIDER);
-              boolean sameProviderForAll = true;
-              for (int i = 1; i < resourceDetails.size() && sameProviderForAll; i++) {
-                sameProviderForAll =
-                    resourceDetails
-                        .getJsonObject(i)
-                        .getString(PROVIDER)
-                        .equalsIgnoreCase(providerOfFirstResource);
-              }
-              if (!sameProviderForAll) {
-                handler.handle(
-                    Future.failedFuture("The resources listed belong to different providers"));
-              } else {
-                String providerItemId = providerOfFirstResource;
-                Future<JsonObject> getProviderDetails = catService.getItemDetails(providerItemId);
-                checkForExistence
-                    .compose(
-                        existenceHandler -> {
-                          if (existenceHandler) {
-                            return Future.failedFuture(
-                                ResponseUrn.RESOURCE_ALREADY_EXISTS_URN.getUrn());
-                          } else {
-                            return getProviderDetails;
-                          }
-                        })
-                    .onComplete(
-                        completeHandler -> {
-                          if (completeHandler.succeeded()) {
-                            if (!completeHandler
-                                .result()
-                                .getString("ownerUserId")
-                                .equalsIgnoreCase(providerID)) {
-                              handler.handle(
-                                  Future.failedFuture(
-                                      "The user with given token does not own the resource listed"));
-                            } else {
-                              request.put(
-                                  PROVIDER_NAME,
-                                  completeHandler.result().getString(PROVIDER_NAME, ""));
+            itemFutures.forEach(
+                fr -> {
+                  fr.onSuccess(
+                      h -> {
+                        JsonObject res = (JsonObject) h;
+                        resourceDetails.add(res);
+                      });
+                });
 
-                              List<String> queries =
-                                  queryBuilder.buildCreateProductQueries(request, resourceDetails);
-
-                              pgService.executeTransaction(
-                                  queries,
-                                  pgHandler -> {
-                                    if (pgHandler.succeeded()) {
+            CompositeFuture.all(itemFutures)
+                .onComplete(
+                    ar -> {
+                      LOGGER.debug(resourceDetails);
+                      String providerOfFirstResource =
+                          resourceDetails.getJsonObject(0).getString(PROVIDER);
+                      boolean sameProviderForAll = true;
+                      for (int i = 1; i < resourceDetails.size() && sameProviderForAll; i++) {
+                        sameProviderForAll =
+                            resourceDetails
+                                .getJsonObject(i)
+                                .getString(PROVIDER)
+                                .equalsIgnoreCase(providerOfFirstResource);
+                      }
+                      if (!sameProviderForAll) {
+                        handler.handle(
+                            Future.failedFuture(
+                                "The resources listed belong to different providers"));
+                      } else {
+                        String providerItemId = providerOfFirstResource;
+                        Future<JsonObject> getProviderDetails =
+                            catService.getItemDetails(providerItemId);
+                        checkForExistence
+                            .compose(
+                                existenceHandler -> {
+                                  if (existenceHandler) {
+                                    return Future.failedFuture(
+                                        ResponseUrn.RESOURCE_ALREADY_EXISTS_URN.getUrn());
+                                  } else {
+                                    return getProviderDetails;
+                                  }
+                                })
+                            .onComplete(
+                                completeHandler -> {
+                                  if (completeHandler.succeeded()) {
+                                    if (!completeHandler
+                                        .result()
+                                        .getString("ownerUserId")
+                                        .equalsIgnoreCase(providerID)) {
                                       handler.handle(
-                                          Future.succeededFuture(
-                                              pgHandler.result().put(PRODUCT_ID, productID)));
+                                          Future.failedFuture(
+                                              "The user with given token does not own the resource listed"));
                                     } else {
-                                      LOGGER.error(pgHandler.cause());
-                                      handler.handle(Future.failedFuture(pgHandler.cause()));
+                                      request.put(
+                                          PROVIDER_NAME,
+                                          completeHandler.result().getString(PROVIDER_NAME, ""))
+                                              .put(RESOURCE_SERVER, user.getResourceServerUrl());
+
+                                      List<String> queries =
+                                          queryBuilder.buildCreateProductQueries(
+                                              request, resourceDetails);
+
+                                      pgService.executeTransaction(
+                                          queries,
+                                          pgHandler -> {
+                                            if (pgHandler.succeeded()) {
+                                              handler.handle(
+                                                  Future.succeededFuture(
+                                                      pgHandler
+                                                          .result()
+                                                          .put(PRODUCT_ID, productID)));
+                                            } else {
+                                              LOGGER.error(pgHandler.cause());
+                                              handler.handle(
+                                                  Future.failedFuture(pgHandler.cause()));
+                                            }
+                                          });
                                     }
-                                  });
-                            }
-                          } else {
-                            handler.handle(Future.failedFuture(completeHandler.cause()));
-                          }
-                        });
-              }
-            });
+                                  } else {
+                                    handler.handle(Future.failedFuture(completeHandler.cause()));
+                                  }
+                                });
+                      }
+                    });
+
+          } else {
+            handler.handle(Future.failedFuture(accountStatusHandler.cause().getMessage()));
+          }
+        });
 
     return this;
   }
@@ -229,35 +247,63 @@ public class ProductServiceImpl implements ProductService {
     return this;
   }
 
-  @Override
+  /**
+   * Checks if the provider / merchant have filled their account details in Razorpay and completed
+   * their KYC before creating a product on Data Market place server
+   *
+   * @param user Provider user object
+   * @param handler request handler that contains failure or success response
+   * @return ProductService object
+   */
   public ProductService checkMerchantAccountStatus(
       User user, Handler<AsyncResult<Boolean>> handler) {
     if (isAccountActivationCheckBeingDone) {
       /* ideal flow to simulate synchronisation */
       //      TODO: Replace this with the providerId from the token
       //        String providerId = user.getUserId();
+      //        TODO: Update the KYC to remove the hard-coding
       String dummyProviderId = "8afb4269-bee4-4a88-9947-128315479eb6";
       Future<JsonObject> providerDetailsFuture =
           fetchRazorpayDetailsOfProvider(FETCH_MERCHANT_INFO_QUERY, dummyProviderId);
-      /* checkIfAccountIsActivated */
-      Future<Boolean> linkedAccountActivationFuture =
+
+      /* check if account status is activated in database */
+      Future<Boolean> accountStatusInDbFuture =
           providerDetailsFuture.compose(
-              providerDetailsJson ->
-                  razorPayService.fetchProductConfiguration(providerDetailsJson));
-      /* update status in merchant_table */
-      Future<Boolean> updateStatusFuture =
-          linkedAccountActivationFuture.compose(
-              isLinkedAccountActivated -> {
-                return updateStatusOfLinkedAccount(UPDATE_LINKED_ACCOUNT_STATUS_QUERY, dummyProviderId);
+              json -> {
+                boolean isStatusActivated = json.getString("status").equalsIgnoreCase("ACTIVATED");
+                if (isStatusActivated) {
+                  return Future.succeededFuture(true);
+                }
+                return Future.succeededFuture(false);
               });
-      updateStatusFuture.onComplete(
-          updateStatusHandler -> {
-            if (updateStatusHandler.succeeded()) {
-              handler.handle(Future.succeededFuture(true));
-            } else {
-              handler.handle(Future.failedFuture(updateStatusFuture.cause().getMessage()));
+      accountStatusInDbFuture.compose(
+          isAccountStatusActive -> {
+            if (!isAccountStatusActive) {
+              /* check if account is activated in Razorpay */
+              Future<Boolean> linkedAccountActivationFuture =
+                  providerDetailsFuture.compose(
+                      providerDetailsJson ->
+                          razorPayService.fetchProductConfiguration(providerDetailsJson));
+              /* update status in merchant_table */
+              Future<Boolean> updateStatusFuture =
+                  linkedAccountActivationFuture.compose(
+                      isLinkedAccountActivated -> {
+                        return updateStatusOfLinkedAccount(
+                            UPDATE_LINKED_ACCOUNT_STATUS_QUERY, dummyProviderId);
+                      });
+              updateStatusFuture.onComplete(
+                  updateStatusHandler -> {
+                    if (updateStatusHandler.succeeded()) {
+                      handler.handle(Future.succeededFuture(true));
+                    } else {
+                      handler.handle(Future.failedFuture(updateStatusFuture.cause().getMessage()));
+                    }
+                  });
             }
+            /* account is activated */
+            return Future.succeededFuture(true);
           });
+
     } else {
       handler.handle(Future.succeededFuture(true));
     }
