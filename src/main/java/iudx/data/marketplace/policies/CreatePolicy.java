@@ -169,6 +169,7 @@ public class CreatePolicy {
 
   public Future<JsonObject> executePostgresQuery(String query, String detail) {
     Promise<JsonObject> promise = Promise.promise();
+    LOGGER.debug("Query : {}", query);
     postgresService.executeQuery(
         query,
         pgHandler -> {
