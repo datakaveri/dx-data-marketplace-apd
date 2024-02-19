@@ -41,20 +41,17 @@ public class CreateLinkedAccount {
   private String accountProductId;
   private RazorPayService razorPayService;
   private String businessType;
-  private static SecureRandom random;
-  private static byte[] bytes;
+  private static final SecureRandom random = new SecureRandom();
+
   public CreateLinkedAccount(
       PostgresService postgresService,
       Api api,
       AuditingService auditingService,
-      RazorPayService razorPayService,
-      SecureRandom secureRandom,  byte[] byteArray ) {
+      RazorPayService razorPayService ) {
     this.postgresService = postgresService;
     this.api = api;
     this.auditingService = auditingService;
     this.razorPayService = razorPayService;
-    random = secureRandom;
-    bytes = byteArray;
   }
 
   /**
@@ -315,6 +312,7 @@ public class CreateLinkedAccount {
    */
   private String createReferenceId() {
 
+    byte[] bytes = new byte[40];
     random.nextBytes(bytes);
     String referenceId =
         Hashing.sha512()
