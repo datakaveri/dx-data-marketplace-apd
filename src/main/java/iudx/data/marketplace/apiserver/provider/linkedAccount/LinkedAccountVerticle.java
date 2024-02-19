@@ -15,6 +15,8 @@ import iudx.data.marketplace.razorpay.RazorPayService;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import java.security.SecureRandom;
+
 public class LinkedAccountVerticle extends AbstractVerticle {
   private static final Logger LOGGER = LogManager.getLogger(LinkedAccountVerticle.class);
 
@@ -35,8 +37,10 @@ public class LinkedAccountVerticle extends AbstractVerticle {
     auditingService = AuditingService.createProxy(vertx, AUDITING_SERVICE_ADDRESS);
 
     razorPayService = RazorPayService.createProxy(vertx, RAZORPAY_SERVICE_ADDRESS);
+    SecureRandom random = new SecureRandom();
+    byte[] bytes = new byte[40];
     createLinkedAccount =
-        new CreateLinkedAccount(postgresService, api, auditingService,razorPayService);
+        new CreateLinkedAccount(postgresService, api, auditingService,razorPayService, random, bytes);
 
     fetchLinkedAccount = new FetchLinkedAccount(postgresService, api, razorPayService, auditingService);
     updateLinkedAccount = new UpdateLinkedAccount(postgresService, api, auditingService, razorPayService);
