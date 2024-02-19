@@ -55,4 +55,5 @@ public interface ProductService {
    */
   @Fluent
   ProductService listProducts(User user, JsonObject request, Handler<AsyncResult<JsonObject>> handler);
+
 }

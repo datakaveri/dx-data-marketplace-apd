@@ -17,6 +17,7 @@ public class Api {
   private StringBuilder consumerListProviders;
   private StringBuilder consumerListPurchases;
   private StringBuilder consumerListProducts;
+  private StringBuilder linkedAccountService;
   private StringBuilder consumerOrdersApi;
 
   private Api(String dxApiBasePath) {
@@ -47,6 +48,7 @@ public class Api {
     consumerListProviders = new StringBuilder(CONSUMER_PATH + LIST_PROVIDERS_PATH);
     consumerListPurchases = new StringBuilder(CONSUMER_PATH + LIST_PURCHASES_PATH);
     consumerListProducts = new StringBuilder(CONSUMER_PATH + LIST_PRODUCTS_PATH);
+    linkedAccountService = new StringBuilder(dxApiBasePath).append(ACCOUNTS_API);
     consumerOrdersApi = new StringBuilder(CONSUMER_PATH + ORDERS_PATH);
   }
 
@@ -94,6 +96,9 @@ public class Api {
     return consumerListProducts.toString();
   }
 
+  public String getLinkedAccountService() {
+    return linkedAccountService.toString();
+}
   public String getConsumerOrderApi() {
     return consumerOrdersApi.toString();
   }

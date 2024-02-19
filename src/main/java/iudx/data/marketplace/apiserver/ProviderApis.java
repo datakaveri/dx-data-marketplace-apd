@@ -1,12 +1,16 @@
 package iudx.data.marketplace.apiserver;
 
+import static iudx.data.marketplace.apiserver.response.ResponseUtil.generateResponse;
 import static iudx.data.marketplace.apiserver.util.Constants.*;
 import static iudx.data.marketplace.common.Constants.AUTH_INFO;
 import static iudx.data.marketplace.common.Constants.PRODUCT_SERVICE_ADDRESS;
 import static iudx.data.marketplace.common.Constants.PRODUCT_VARIANT_SERVICE_ADDRESS;
+import static iudx.data.marketplace.common.HttpStatusCode.BAD_REQUEST;
 
 import io.vertx.core.Vertx;
 import io.vertx.core.http.HttpServerRequest;
+import io.vertx.core.http.HttpServerResponse;
+import io.vertx.core.json.DecodeException;
 import io.vertx.core.json.JsonObject;
 import io.vertx.ext.web.Router;
 import io.vertx.ext.web.RoutingContext;
@@ -18,6 +22,7 @@ import iudx.data.marketplace.apiserver.util.RequestType;
 import iudx.data.marketplace.authenticator.AuthClient;
 import iudx.data.marketplace.authenticator.AuthenticationService;
 import iudx.data.marketplace.common.Api;
+import iudx.data.marketplace.common.HttpStatusCode;
 import iudx.data.marketplace.common.RespBuilder;
 import iudx.data.marketplace.common.ResponseUrn;
 import iudx.data.marketplace.policies.User;
@@ -38,6 +43,7 @@ public class ProviderApis {
   private ProductVariantService variantService;
   private Api api;
   private PostgresService postgresService;
+  private String detail;
   private AuthClient authClient;
   private AuthenticationService authenticationService;
 
@@ -131,6 +137,7 @@ public class ProviderApis {
     JsonObject authInfo = (JsonObject) routingContext.data().get(AUTH_INFO);
     requestBody.put(AUTH_INFO, authInfo);
     User user = routingContext.get("user");
+
     productService.createProduct(
         user,
         requestBody,
@@ -315,7 +322,59 @@ public class ProviderApis {
         .setStatusCode(400)
         .end(cause.getMessage());
   }
+  private void handleFailure(RoutingContext routingContext, String failureMessage) {
+    HttpServerResponse response = routingContext.response();
+    LOGGER.debug("Failure Message : {} ", failureMessage);
 
+    try {
+      JsonObject jsonObject = new JsonObject(failureMessage);
+      int type = jsonObject.getInteger(TYPE);
+      String title = jsonObject.getString(TITLE);
+
+      HttpStatusCode status = HttpStatusCode.getByValue(type);
+
+      ResponseUrn urn;
+
+      // get the urn by either type or title
+      if (title != null) {
+        urn = ResponseUrn.fromCode(title);
+      } else {
+
+        urn = ResponseUrn.fromCode(String.valueOf(type));
+      }
+      if (jsonObject.getString(DETAIL) != null) {
+        detail = jsonObject.getString(DETAIL);
+        response
+                .putHeader(CONTENT_TYPE, APPLICATION_JSON)
+                .setStatusCode(type)
+                .end(generateResponse(status, urn, detail).toString());
+      } else {
+        response
+                .putHeader(CONTENT_TYPE, APPLICATION_JSON)
+                .setStatusCode(type)
+                .end(generateResponse(status, urn).toString());
+      }
+
+    } catch (DecodeException exception) {
+      LOGGER.error("Error : Expecting JSON from backend service [ jsonFormattingException ] ");
+      handleResponse(response, BAD_REQUEST, ResponseUrn.BACKING_SERVICE_FORMAT_URN);
+    }
+  }
+  private void handleResponse(
+          HttpServerResponse response, HttpStatusCode statusCode, ResponseUrn urn) {
+    handleResponse(response, statusCode, urn, statusCode.getDescription());
+  }
+
+  private void handleResponse(
+          HttpServerResponse response,
+          HttpStatusCode statusCode,
+          ResponseUrn urn,
+          String failureMessage) {
+    response
+            .putHeader(CONTENT_TYPE, APPLICATION_JSON)
+            .setStatusCode(statusCode.getValue())
+            .end(generateResponse(statusCode, urn, failureMessage).toString());
+  }
   private void handleSuccessResponse(
       RoutingContext routingContext, int statusCode, JsonObject result) {
 

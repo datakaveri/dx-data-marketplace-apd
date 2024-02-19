@@ -42,13 +42,14 @@ public class Constants {
 
   public static final String IS_DELEGATE = "isDelegate";
 
-  public static final String RESOURCE_SERVER_URL = "resourceServer";
+  public static final String RESOURCE_SERVER_URL = "resourceServerRegURL";
   public static final String USER_ROLE = "userRole";
   public static final String EMAIL_ID = "emailId";
   public static final String RS_SERVER_URL = "resourceServerUrl";
   public static final String FIRST_NAME = "firstName";
   public static final String LAST_NAME = "lastName";
   public static final String POLICY_ID = "id";
+  public static final String ACCOUNT_ID = "account_id";
 
 
   // paths
@@ -69,6 +70,7 @@ public class Constants {
   public static final String USERMAPS_PATH = "/product/usermaps";
   public static final String VERIFY_PATH = "/verify";
   public static final String POLICIES_API = "/policies";
+  public static final String ACCOUNTS_API = "/account";
 
   // query parameters | request body
 

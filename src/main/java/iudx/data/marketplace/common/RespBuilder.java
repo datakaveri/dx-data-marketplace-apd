@@ -13,6 +13,11 @@ public class RespBuilder {
     response.put(JSON_TYPE, type);
     return this;
   }
+  public RespBuilder withType(int statusCode)
+  {
+    response.put(JSON_TYPE, statusCode);
+    return this;
+  }
 
   public RespBuilder withTitle(String title) {
     response.put(JSON_TITLE, title);
@@ -29,6 +34,10 @@ public class RespBuilder {
     return this;
   }
 
+  public RespBuilder withResult(JsonObject result) {
+    response.put(RESULTS, result);
+    return this;
+  }
   public JsonObject getJsonResponse() {
     return response;
   }

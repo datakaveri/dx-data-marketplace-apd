@@ -49,6 +49,11 @@ public class ProviderAuthStatergy implements AuthorizationStatergy {
     apiAccessList.add(new AuthorizationRequest(GET, api.getProviderProductVariantPath()));
     apiAccessList.add(new AuthorizationRequest(DELETE, api.getProviderProductVariantPath()));
 
+//    Linked Account APIs
+    apiAccessList.add(new AuthorizationRequest(POST, api.getLinkedAccountService()));
+    apiAccessList.add(new AuthorizationRequest(PUT, api.getLinkedAccountService()));
+    apiAccessList.add(new AuthorizationRequest(GET, api.getLinkedAccountService()));
+
     //    policies
     apiAccessList.add(new AuthorizationRequest(GET, api.getPoliciesUrl()));
     apiAccessList.add(new AuthorizationRequest(DELETE, api.getPoliciesUrl()));

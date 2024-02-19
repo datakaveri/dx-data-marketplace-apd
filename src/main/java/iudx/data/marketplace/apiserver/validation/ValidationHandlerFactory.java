@@ -16,7 +16,7 @@ public class ValidationHandlerFactory {
   private static final Logger LOGGER = LogManager.getLogger(ValidationHandlerFactory.class);
 
   public List<Validator> build(
-      final RequestType requestType, final MultiMap parameters, final JsonObject body) {
+          final RequestType requestType, final MultiMap parameters, final JsonObject body) {
     LOGGER.debug("getValidation4Context() started for : " + requestType);
     LOGGER.debug("type : " + requestType);
     List<Validator> validator = null;
@@ -43,10 +43,27 @@ public class ValidationHandlerFactory {
       case ORDER:
         validator = getOrderValidator(parameters);
         break;
+      case POST_ACCOUNT:
+        validator = getPostLinkedAccountValidator(body, requestType);
+        break;
+      case PUT_ACCOUNT:
+        validator = getPutLinkedAccountValidator(body, requestType);
     }
     return validator;
   }
 
+  private List<Validator> getPostLinkedAccountValidator(JsonObject body, RequestType requestType) {
+    List<Validator> validators = new ArrayList<>();
+    validators.add(new JsonSchemaTypeValidator(body, requestType));
+    return validators;
+  }
+
+  private List<Validator> getPutLinkedAccountValidator(JsonObject body, RequestType requestType)
+  {
+    List<Validator> validators = new ArrayList<>();
+    validators.add(new JsonSchemaTypeValidator(body, requestType));
+    return validators;
+  }
   private List<Validator> getOrderValidator(MultiMap parameters) {
     List<Validator> validators = new ArrayList<>();
     validators.add(new UUIDTypeValidator(parameters.get(PRODUCT_VARIANT_NAME), true));
@@ -81,7 +98,7 @@ public class ValidationHandlerFactory {
   }
 
   private List<Validator> getProductValidators(
-      final MultiMap parameters, final JsonObject body, final RequestType requestType) {
+          final MultiMap parameters, final JsonObject body, final RequestType requestType) {
     List<Validator> validators = new ArrayList<>();
 
     if (body == null || body.isEmpty()) {
@@ -94,7 +111,7 @@ public class ValidationHandlerFactory {
   }
 
   private List<Validator> getProductVariantValidators(
-      final MultiMap parameters, final JsonObject body, final RequestType requestType) {
+          final MultiMap parameters, final JsonObject body, final RequestType requestType) {
     List<Validator> validators = new ArrayList<>();
 
     if (body == null || body.isEmpty()) {
