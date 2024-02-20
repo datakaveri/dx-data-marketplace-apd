@@ -5,7 +5,6 @@
   "type": "object",
   "examples": [
     {
-      "email": "test.provider@gmail.com",
       "phone": 9000090000,
       "legalBusinessName": "Dummy Corp V1",
       "customerFacingBusinessName": "Dummy Service Corp V1",
@@ -32,22 +31,12 @@
     }
   ],
   "required": [
-    "email",
     "phone",
     "legalBusinessName",
     "businessType",
     "profile"
   ],
   "properties": {
-    "email": {
-      "$id": "#root/email",
-      "title": "email",
-      "type": "string",
-      "format": "email",
-      "examples": [
-        "test.provider@gmail.com"
-      ]
-    },
     "phone": {
       "$id": "#root/phone",
       "title": "phone",

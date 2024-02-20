@@ -117,9 +117,8 @@ public class GetPolicy {
             .put("id", consumer.getUserId());
     JsonObject consumerInfo = new JsonObject().put("consumer", jsonObject);
 
-    // TODO: remove consumer@gmail.com with the actual emailId
     String finalQuery = query
-            .replace("$1", "'" + "consumer@gmail.com" + "'")
+            .replace("$1", "'" + consumer.getEmailId() + "'")
             .replace("$2", "'" + resourceServerUrl + "'");
     this.executeGetPolicy(finalQuery, consumerInfo, Role.CONSUMER)
         .onComplete(
