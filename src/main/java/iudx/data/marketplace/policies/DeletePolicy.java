@@ -158,8 +158,7 @@ public class DeletePolicy {
                             DETAIL,
                             "Access Denied: You do not have ownership rights for this policy.")
                         .encode());
-                // TODO replace the OwnerIdValue to ownerId
-              } else if (ownerIdValue.equals(ownerIdValue)) {
+              } else if (ownerId.equals(ownerIdValue)) {
                 /* is policy in ACTIVE status */
                 if (status.equals("ACTIVE")) {
                   LOG.info("Success : policy verified");

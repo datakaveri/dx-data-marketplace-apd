@@ -43,16 +43,12 @@ public class UpdateLinkedAccount {
   public Future<JsonObject> initiateUpdatingLinkedAccount(JsonObject request, User provider) {
 
     String accountRequest = getAccountRequest(request);
-    // TODO: Replace this with actual provider Id
-    String dummyProviderId = "da4fd01e-0fac-4e07-8778-52b1bd41267e";
-//    String providerId = provider.getUserId();
-    setProviderId(dummyProviderId);
-//    TODO: Replace this with actual email id
-    String dummyEmail = "testSeller002@gmail.com";
-//    String emailId = provider.getEmailId();
-    setEmailId(dummyEmail);
+    String providerId = provider.getUserId();
+    setProviderId(providerId);
+    String emailId = provider.getEmailId();
+    setEmailId(emailId);
 
-    Future<JsonObject> accountInfoFuture = getAccountId(GET_MERCHANT_INFO_QUERY, dummyProviderId, dummyEmail);
+    Future<JsonObject> accountInfoFuture = getAccountId(GET_MERCHANT_INFO_QUERY, providerId, emailId);
     Future<Boolean> updateAccountInfoInRzpFuture = accountInfoFuture.compose(accountInfoJson -> {
       String accountId = accountInfoJson.getString("accountId");
       /* set account id */
@@ -62,7 +58,7 @@ public class UpdateLinkedAccount {
     Future<JsonObject> userResponseFuture = updateAccountInfoInRzpFuture.compose(isEditInRazorpaySuccessful -> {
       if(isEditInRazorpaySuccessful)
       {
-        return updateMerchantInfo(UPDATE_MERCHANT_INFO_QUERY, dummyProviderId, dummyEmail);
+        return updateMerchantInfo(UPDATE_MERCHANT_INFO_QUERY, providerId, emailId);
       }
       return Future.failedFuture(updateAccountInfoInRzpFuture.cause().getMessage());
     });
@@ -280,18 +276,14 @@ public class UpdateLinkedAccount {
     this.customerFacingBusinessName = customerFacingBusinessName;
   }
 
-  public void setEmailId(String emailId)
-  {
-    this.emailId = emailId;
-  }
   public String getEmailId()
   {
     return this.emailId;
   }
 
-  public void setRzpAccountId(String rzpAccountId)
+  public void setEmailId(String emailId)
   {
-    this.rzpAccountId = rzpAccountId;
+    this.emailId = emailId;
   }
 
   public String getRzpAccountId()
@@ -299,14 +291,19 @@ public class UpdateLinkedAccount {
     return this.rzpAccountId;
   }
 
-  public void setProviderId(String providerId)
+  public void setRzpAccountId(String rzpAccountId)
   {
-    this.providerId = providerId;
+    this.rzpAccountId = rzpAccountId;
   }
 
   public String getProviderId()
   {
     return this.providerId;
+  }
+
+  public void setProviderId(String providerId)
+  {
+    this.providerId = providerId;
   }
 
   public Future<Void> addAuditLogs(User provider) {

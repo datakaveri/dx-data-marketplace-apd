@@ -21,13 +21,13 @@ import org.apache.logging.log4j.Logger;
 import java.nio.charset.StandardCharsets;
 import java.security.SecureRandom;
 import java.util.Arrays;
-import java.util.UUID;
 
 import static iudx.data.marketplace.apiserver.provider.linkedAccount.util.Constants.*;
 import static iudx.data.marketplace.apiserver.util.Constants.*;
 
 public class CreateLinkedAccount {
   private static final Logger LOGGER = LogManager.getLogger(CreateLinkedAccount.class);
+  private static final SecureRandom random = new SecureRandom();
   private PostgresService postgresService;
   private Api api;
   private AuditingService auditingService;
@@ -41,7 +41,6 @@ public class CreateLinkedAccount {
   private String accountProductId;
   private RazorPayService razorPayService;
   private String businessType;
-  private static final SecureRandom random = new SecureRandom();
 
   public CreateLinkedAccount(
       PostgresService postgresService,
@@ -63,25 +62,13 @@ public class CreateLinkedAccount {
 
   public Future<JsonObject> initiateCreatingLinkedAccount(JsonObject request, User provider) {
     String referenceId = createReferenceId();
-    //    TODO: Change emailId
-    String emailId = request.getString("email");
+    String emailId = provider.getEmailId();
     JsonObject merchantDetails = getLinkedAccountDetails(request, referenceId, emailId);
-    //    TODO: Get this provider Id from token and set it
-    String dummyProviderId = getRandomUuid();
-    setProviderId(dummyProviderId);
-    //    setProviderId(provider.getUserId());
+    String providerId  =  provider.getUserId();
+    setProviderId(providerId);
 
-    Future<Boolean> insertProviderFuture = insertDummyRowInUserTable(emailId);
+    var razorpayFlowFuture = createLinkedAccount(merchantDetails);
 
-    var razorpayFlowFuture =
-        insertProviderFuture.compose(
-            providerInsertedSuccessfully -> {
-              if (providerInsertedSuccessfully) {
-                return createLinkedAccount(merchantDetails);
-              } else {
-                return Future.failedFuture(insertProviderFuture.cause().getMessage());
-              }
-            });
     Future<JsonObject> userResponse =
         razorpayFlowFuture.compose(
             isRazorpayFlowSuccessful -> {
@@ -124,36 +111,6 @@ public class CreateLinkedAccount {
     return Future.succeededFuture(true);
     });
     return requestProductConfigurationFuture;
-  }
-
-  // TODO: Insert dummy record in user_table with email given request body + dummy providerId +
-  // Dummy (Fname) + testProvider123 (Lname)
-  //  TODO: This is for testing, delete this
-  public Future<Boolean> insertDummyRowInUserTable(String emailId) {
-    Promise<Boolean> promise = Promise.promise();
-    String query =
-        "INSERT INTO public.user_table"
-            + " (_id, email_id, first_name, last_name)"
-            + " VALUES ('$1', '$2', 'Dummy', 'testProvider123');";
-
-    String finalQuery = query.replace("$1", getProviderId()).replace("$2", getEmailId());
-    postgresService.executeQuery(
-        finalQuery,
-        handler -> {
-          if (handler.succeeded()) {
-            LOGGER.info("Provider with _id : {} , inserted successfully", getProviderId());
-            promise.complete(true);
-          } else {
-            LOGGER.info("Failed to insert Provider in user table : " + handler.cause().getMessage());
-            promise.fail(
-                new RespBuilder()
-                    .withType(HttpStatusCode.INTERNAL_SERVER_ERROR.getValue())
-                    .withTitle(ResponseUrn.DB_ERROR_URN.getUrn())
-                    .withDetail(FAILURE_MESSAGE + "Internal Server Error")
-                    .getResponse());
-          }
-        });
-    return promise.future();
   }
 
 
@@ -295,14 +252,6 @@ public class CreateLinkedAccount {
         });
     return promise.future();
   }
-
-//  TODO: Remove this, it is for testing
-
-  private String getRandomUuid() {
-    String pk = UUID.randomUUID().toString();
-    return pk;
-  }
-
 
   /**
    * Creates a referenceId of length = 20 based on present time as seed. This referenceId could be sent to Razorpay
