@@ -84,6 +84,18 @@ paths:
                     type: 'urn:dx:cat:InvalidAuthorizationToken'
                     title: Token is invalid
                     detail: failed
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/createProductForbiddenResponse'
+              examples:
+                Unauthorized:
+                  value:
+                    type: 'urn:dx:dmp:forbidden'
+                    title: Product creation is forbidden
+                    detail: To activate linked account please complete the KYC, filling account information etc., in your Razorpay merchant dashboard
     delete:
       tags:
         - provider
@@ -617,6 +629,503 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/successResponseForDeleteProduct'
+
+
+  /account:
+    post:
+      tags:
+        - provider
+      summary: Create Linked account
+      description: |-
+        A provider could create a linked account to start the process of receiving payments via Payment Gateway. A provider or provider 
+        delegate could use this API to provide their business related information. Once a linked account is created, the provider can
+        visit their payment gateway related dashboard to switch their merchant account, monitor payment done to their account 
+        and refund amount if a customer raises a dispute. A provider could update their account related information like account number, IFSC code through
+        their dashboard.
+        <br>
+        <br>
+        `Note`: By creating a linked account, the provider is accepting the terms and conditions of the respective payment gateway
+      operationId: post-linked-account-v1
+      parameters:
+        - name: token
+          in: header
+          description: AAA issued identity token
+          required: true
+          schema:
+            type: string
+            minLength: 1
+            maxLength: 512
+            pattern: '^[a-zA-Z0-9_*\-*\.\/]+$'
+      requestBody:
+        description: Request body is a JsonObject containing ID whose value is the policy ID.
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                phone:
+                  type: string
+                  minLength: 8
+                  maxLength: 15
+                  description: Business phone number
+                legalBusinessName:
+                  type: string
+                  minLength: 4
+                  maxLength: 200
+                  description: Linked Account's business
+                customerFacingBusinessName:
+                  type: string
+                  minLength: 1
+                  maxLength: 255
+                  description: Linked account billing label
+                businessType:
+                  type: string
+                  enum: [llp, ngo, other, individual, partnership, proprietorship, public_limited, private_limited, trust, society, not_yet_registered, educational_institutes]
+                  description: Provider's business type. Here are the list of values - [link](https://razorpay.com/docs/payments/route/integration-guide/#business-type)
+                contactName:
+                  type: string
+                  description: name of the contact
+                  minLength: 4
+                  maxLength: 255
+                profile:
+                  description: Business profile for linked account
+                  type: object
+                  properties:
+                    category:
+                      type: string
+                      enum: [financial_services, education, healthcare, utilities, government, logistics, tours_and_travel ,transport ,ecommerce ,food ,it_and_software ,gaming ,media_and_entertainment ,services ,housing ,not_for_profit ,social ,others]
+                      description: business category of the account holder. Please refer the given link to look at updated list of suitable values for category field - [link](https://razorpay.com/docs/payments/route/integration-guide/#business-category)
+                      minLength: 1
+                      required: true
+                    subcategory:
+                      type: string
+                      description: |-
+                        business sub-category of the account holder
+                        Please refer the given link to find suitable list of values - [link](https://razorpay.com/docs/payments/route/integration-guide/#business-sub-category)
+                    addresses:
+                      type: object
+                      properties:
+                        registered:
+                          type: object
+                          description: Details of account holder's registered address
+                          properties:
+                            street1:
+                              type: string
+                              maxLength: 100
+                              description: Address Line 1
+                            street2:
+                              type: string
+                              maxLength: 100
+                              description: Address Line 2
+                            city:
+                              type: string
+                              maxLength: 100
+                              description: city name
+                            state:
+                              type: string
+                              minLength: 2
+                              maxLength: 32
+                              description: state name
+                            postalCode:
+                              type: string
+                              minLength: 6
+                              maxLength: 6
+                            country:
+                              type: string
+                              minLength: 2
+                              maxLength: 64
+                              description: |-
+                                country code in capital letters `IN` or full name of the country in lower case letters `india`
+                                <br>
+                                Here is a list of support countries - [link](https://razorpay.com/docs/partners/aggregators/onboarding-api/appendix/#country-list)
+
+                          required:
+                            - street1
+                            - street2
+                            - city
+                            - state
+                            - postalCode
+                            - country
+                      required:
+                        - registered
+                  required:
+                    - category
+                    - subcategory
+                    - addresses
+                legalInfo:
+                  type: object
+                  description:
+                  properties:
+                    pan:
+                      type: string
+                      minLength: 10
+                      maxLength: 10
+                      pattern: '/^[a-zA-z]{5}\d{4}[a-zA-Z]{1}$/'
+                    gst:
+                      type: string
+                      minLength: 15
+                      maxLength: 15
+                      pattern: '/^[0123][0-9][a-z]{5}[0-9]{4}[a-z][0-9][a-z0-9][a-z0-9]$/gi'
+              required:
+                - phone
+                - legalBusinessName
+                - businessType
+                - profile
+
+            examples:
+              Request body for Create Linked Account:
+                value:
+                  phone: "9000090000"
+                  legalBusinessName: Dummy Corp V1
+                  customerFacingBusinessName: Dummy Service Corp V1
+                  businessType: partnership
+                  contactName: Bob Davis
+                  profile:
+                    category: healthcare
+                    subcategory: clinic
+                    addresses:
+                      registered:
+                        street1: 507, Koramangala 1st block
+                        street2: MG Road
+                        city: Bengaluru
+                        state: KARNATAKA
+                        postalCode: "560034"
+                        country: IN
+                  legalInfo:
+                    pan: AAACL1234C
+                    gst: 18AABCU9603R1ZM
+
+      responses:
+        '200':
+          description: Linked account creation successful
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/createLinkedAccount'
+          headers:
+            Content-Type:
+              schema:
+                type: string
+              description: application/json
+        '400':
+          description: |-
+            Bad Request
+            - Provider's email was used to create a linked account through DMP Server previously
+            - Route code support feature could be enabled by the provider
+            - Invalid IFSC code
+            - account_code feature not enabled
+            - Invalid name, email
+            - Enter a valid name with alphanumerics and spaces
+            - Account might be suspended
+
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/createLinkedAccountErrorResponse'
+          headers:
+            Content-Type:
+              schema:
+                type: string
+              description: application/json
+        '401':
+          description: |-
+            Unauthorized
+              - `token` invalid/expired
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Unauthorized'
+          headers:
+            Content-Type:
+              schema:
+                type: string
+              description: application/json
+      security:
+        - authorization: [ ]
+    put:
+      tags:
+        - provider
+      summary: Update Linked account
+      description: |-
+        A provider could update details related to their linked account. After creating a linked account through DMP, 
+        all the details except `businessType`, `email` could be changed. The accountId could be sent in the request body
+        to update the linked account related information. The accountId could be fetched from GET `/account` API
+        <br>
+        <br>
+      operationId: update-linked-account-v1
+      parameters:
+        - name: token
+          in: header
+          description: AAA issued identity token
+          required: true
+          schema:
+            type: string
+            minLength: 1
+            maxLength: 512
+            pattern: '^[a-zA-Z0-9_*\-*\.\/]+$'
+      requestBody:
+        description: Request body is a JsonObject containing ID whose value is the policy ID.
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                phone:
+                  type: string
+                  minLength: 8
+                  maxLength: 15
+                  description: Business phone number
+                legalBusinessName:
+                  type: string
+                  minLength: 4
+                  maxLength: 200
+                  description: Linked Account's business
+                customerFacingBusinessName:
+                  type: string
+                  minLength: 1
+                  maxLength: 255
+                  description: Linked account billing label
+                contactName:
+                  type: string
+                  description: name of the contact
+                  minLength: 4
+                  maxLength: 255
+                profile:
+                  description: Business profile for linked account
+                  type: object
+                  properties:
+                    category:
+                      type: string
+                      enum: [ financial_services, education, healthcare, utilities, government, logistics, tours_and_travel ,transport ,ecommerce ,food ,it_and_software ,gaming ,media_and_entertainment ,services ,housing ,not_for_profit ,social ,others ]
+                      description: business category of the account holder. Please refer the given link to look at updated list of suitable values for category field - [link](https://razorpay.com/docs/payments/route/integration-guide/#business-category)
+                      minLength: 1
+                      required: true
+                    subcategory:
+                      type: string
+                      description: |-
+                        business sub-category of the account holder
+                        Please refer the given link to find suitable list of values - [link](https://razorpay.com/docs/payments/route/integration-guide/#business-sub-category)
+                    addresses:
+                      type: object
+                      properties:
+                        registered:
+                          type: object
+                          description: Details of account holder's registered address
+                          properties:
+                            street1:
+                              type: string
+                              maxLength: 100
+                              description: Address Line 1
+                            street2:
+                              type: string
+                              maxLength: 100
+                              description: Address Line 2
+                            city:
+                              type: string
+                              maxLength: 100
+                              description: city name
+                            state:
+                              type: string
+                              minLength: 2
+                              maxLength: 32
+                              description: state name
+                            postalCode:
+                              type: string
+                              minLength: 6
+                              maxLength: 6
+                            country:
+                              type: string
+                              minLength: 2
+                              maxLength: 64
+                              description: |-
+                                country code in capital letters `IN` or full name of the country in lower case letters `india`
+                                <br>
+                                Here is a list of support countries - [link](https://razorpay.com/docs/partners/aggregators/onboarding-api/appendix/#country-list)
+
+                          required:
+                            - street1
+                            - street2
+                            - city
+                            - state
+                            - postalCode
+                            - country
+                      required:
+                        - registered
+                  required:
+                    - category
+                    - subcategory
+                    - addresses
+                legalInfo:
+                  type: object
+                  description:
+                  properties:
+                    pan:
+                      type: string
+                      minLength: 10
+                      maxLength: 10
+                      pattern: '/^[a-zA-z]{5}\d{4}[a-zA-Z]{1}$/'
+                    gst:
+                      type: string
+                      minLength: 15
+                      maxLength: 15
+                      pattern: '/^[0123][0-9][a-z]{5}[0-9]{4}[a-z][0-9][a-z0-9][a-z0-9]$/gi'
+              required:
+                - phone
+                - legalBusinessName
+                - profile
+
+            examples:
+              Request body for Update Linked Account:
+                value:
+                  {
+                    "phone": "9100090000",
+                    "legalBusinessName": "Dummy Corp V2",
+                    "customerFacingBusinessName": "Some Other Corp",
+                    "contactName": "Test Name",
+                    "profile": {
+                      "category": "healthcare",
+                      "subcategory": "doctors",
+                      "addresses": {
+                        "registered": {
+                          "street1": "Outer Ring road",
+                          "street2": "MG Road",
+                          "city": "Bengaluru",
+                          "state": "KARNATAKA",
+                          "postalCode": "560038",
+                          "country": "india"
+                        }
+                      }
+                    },
+                    "legalInfo": {
+                      "pan": "ABACL1234C",
+                      "gst": "19AABCU9603R1ZM"
+                    }
+                  }
+
+      responses:
+        '200':
+          description: Linked account creation successful
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/updateLinkedAccount'
+          headers:
+            Content-Type:
+              schema:
+                type: string
+              description: application/json
+        '400':
+          description: |-
+            Bad Request
+            - Merchant account has been locked by the admin when extra fields are submitted and are under review
+            - Invalid name, email
+            - Enter a valid name with alphanumerics and spaces
+
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/updateLinkedAccountErrorResponse'
+          headers:
+            Content-Type:
+              schema:
+                type: string
+              description: application/json
+        '401':
+          description: |-
+            Unauthorized
+              - `token` invalid/expired
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Unauthorized'
+          headers:
+            Content-Type:
+              schema:
+                type: string
+              description: application/json
+        '404':
+          description: |-
+            Not Found
+              - A linked account for the given provider was not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/updateLinkedAccountNotFoundResponse'
+          headers:
+            Content-Type:
+              schema:
+                type: string
+              description: application/json
+      security:
+        - authorization: [ ]
+    get:
+      tags:
+        - provider
+      summary: Fetch Linked account
+      description: |-
+        A provider could fetch the information related to their linked account provided while creating the 
+        linked account to the Payment Gateway through this endpoint. 
+        <br>
+        `Note`: This API is only called after calling POST `/account` API through DMP
+        <br>
+      operationId: get-linked-account-v1
+      parameters:
+        - name: token
+          in: header
+          description: AAA issued identity token
+          required: true
+          schema:
+            type: string
+            minLength: 1
+            maxLength: 512
+            pattern: '^[a-zA-Z0-9_*\-*\.\/]+$'
+      responses:
+        '200':
+          description: Linked account creation successful
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/fetchLinkedAccountWithGivenFields'
+#                oneOf:
+#                  - $ref: '#/components/schemas/fetchLinkedAccountWithGivenFields'
+#                  - $ref: '#/components/schemas/fetchLinkedAccountWithOtherFields'
+
+          headers:
+            Content-Type:
+              schema:
+                type: string
+              description: application/json
+
+        '401':
+          description: |-
+            Unauthorized
+              - `token` invalid/expired
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Unauthorized'
+          headers:
+            Content-Type:
+              schema:
+                type: string
+              description: application/json
+        '404':
+          description: |-
+            Not Found
+              - Linked account for the given provider is not found if it we try fetching it before a linked account is successfully created
+                or if linked account is yet to be to be approved by Payment Gateway
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/fetchLinkedAccountNotFound'
+          headers:
+            Content-Type:
+              schema:
+                type: string
+              description: application/json
+      security:
+        - authorization: [ ]
+
   /consumer/list/resources:
     get:
       tags:
@@ -1301,6 +1810,109 @@ paths:
               description: application/json
       security:
         - authorization: []
+    post:
+      tags:
+        - Policies
+      summary: Create Policy
+      description: |-
+        This API is called when a consumer successful purchase against a product variant. 
+        A policy is created for each resource in the product variant for the consumer on behalf of the provider and 
+        provider cannot directly create a policy for a consumer. 
+        
+        <br>
+      operationId: post-auth-v1-policies
+      parameters:
+        - name: token
+          in: header
+          description: AAA issued identity token
+          required: true
+          schema:
+            type: string
+            minLength: 1
+            maxLength: 512
+            pattern: '^[a-zA-Z0-9_*\-*\.\/]+$'
+      requestBody:
+        description: Request body contains payment related information and product related information
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                orderId:
+                  type: string
+                  minLength: 1
+                  description: orderId generated before a payment
+                paymentId:
+                  type: string
+                  minLength: 1
+                  description: paymentId generated after a successful payment
+                paymentSignature:
+                  type: string
+                  minLength: 1
+                  description: payment signature generated after a successful payment
+                productVariantId:
+                  type: string
+                  format: uuid
+                  pattern: '^[0-9a-f]{8}\b-[0-9a-f]{4}\b-[0-9a-f]{4}\b-[0-9a-f]{4}\b-[0-9a-f]{12}$'
+                  minLength: 36
+                  maxLength: 36
+
+              required:
+                - orderId
+                - paymentId
+                - paymentSignature
+                - productVariantId
+            examples:
+              Request body for Create Policy:
+                value:
+                  orderId: order_NSajISG3GuJZpO
+                  paymentId: pay_NSmdXTf3ivKwBv
+                  paymentSignature: 0d4e745a1838664ad6c9c9902212a32d627d68e917290b0ad5f08ff4561bc50f
+                  productVariantId: 05f1765f-0fc9-41c2-dmfc-1dec2c168919
+
+      responses:
+        '200':
+          description: User Policy created successfully.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/createPolicy'
+          headers:
+            Content-Type:
+              schema:
+                type: string
+              description: application/json
+        '400':
+          description: |-
+            Bad Request
+            - Missing or invalid fields
+
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/createPolicyErrorResponse'
+          headers:
+            Content-Type:
+              schema:
+                type: string
+              description: application/json
+
+        '401':
+          description: |-
+            Unauthorized
+              - `token` invalid/expired
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Unauthorized'
+          headers:
+            Content-Type:
+              schema:
+                type: string
+              description: application/json
+      security:
+        - authorization: [ ]
+
 tags:
   - name: provider
     description: |
@@ -1560,6 +2172,24 @@ components:
         type: 'urn:dx:dm:invalidPayloadFormat'
         title: Bad Request
         detail: 'Invalid json format in post request [schema mismatch]'
+
+    createProductForbiddenResponse:
+      type: object
+      title: 403 Forbidden response for product creation
+      properties:
+        type:
+          type: string
+          description: URN type of error response
+        title:
+          type: string
+          description: title of the error message
+        detail:
+          type: string
+          description: Description of error message
+      required:
+        - type
+        - title
+        - detail
     verifyPolicyForbiddenResponse:
       type: object
       title: 403 Response for verify policy
@@ -1798,3 +2428,657 @@ components:
         type: 'urn:dx:dmp:resourceNotFound'
         title: Not Found
         detail: 'Policy could not be deleted, as it doesn''t exist'
+    createPolicy:
+      title: createPolicy
+      type: object
+      properties:
+        type:
+          type: string
+          minLength: 1
+        title:
+          type: string
+          minLength: 1
+        detail:
+          type: string
+          minLength: 1
+      required:
+        - type
+        - title
+        - detail
+      example:
+        type: urn:dx:dmp:success
+        title: Success
+        detail: Policy created successfully
+
+    createPolicyErrorResponse:
+      title: createPolicyErrorResponse
+      type: object
+      properties:
+        type:
+          type: string
+          minLength: 1
+        title:
+          type: string
+          minLength: 1
+        detail:
+          type: string
+          minLength: 1
+      required:
+        - type
+        - title
+        - detail
+      example:
+        type: urn:dx:dmp:badRequest
+        title: Bad Request
+        detail: Invalid json format in post request [schema mismatch]
+
+    createLinkedAccount:
+      title: createLinkedAccount
+      type: object
+      properties:
+        type:
+          type: string
+          minLength: 1
+        title:
+          type: string
+          minLength: 1
+        detail:
+          type: string
+          minLength: 1
+      required:
+        - type
+        - title
+        - detail
+      example:
+        type: urn:dx:dmp:success
+        title: Success
+        detail: Linked account created successfully
+
+    createLinkedAccountErrorResponse:
+      title: createLinkedAccountErrorResponse
+      type: object
+      properties:
+        type:
+          type: string
+          minLength: 1
+        title:
+          type: string
+          minLength: 1
+        detail:
+          type: string
+          minLength: 1
+      required:
+        - type
+        - title
+        - detail
+      example:
+        type: urn:dx:dmp:badRequest
+        title: Bad Request
+        detail: Linked account could not be as, the legal business name field is required.
+
+    updateLinkedAccount:
+      title: updateLinkedAccount
+      type: object
+      properties:
+        type:
+          type: string
+          minLength: 1
+        title:
+          type: string
+          minLength: 1
+        detail:
+          type: string
+          minLength: 1
+      required:
+        - type
+        - title
+        - detail
+      example:
+        type: urn:dx:dmp:success
+        title: Success
+        detail: Linked account updated successfully
+
+    updateLinkedAccountErrorResponse:
+      title: updateLinkedAccountErrorResponse
+      type: object
+      properties:
+        type:
+          type: string
+          minLength: 1
+        title:
+          type: string
+          minLength: 1
+        detail:
+          type: string
+          minLength: 1
+      required:
+        - type
+        - title
+        - detail
+      example:
+        type: urn:dx:dmp:success
+        title: Bad Request
+        detail: Linked account could not be updated as, the pan field is invalid
+
+    updateLinkedAccountNotFoundResponse:
+      title: updateLinkedAccountNotFoundResponse
+      type: object
+      properties:
+        type:
+          type: string
+          minLength: 1
+        title:
+          type: string
+          minLength: 1
+        detail:
+          type: string
+          minLength: 1
+      required:
+        - type
+        - title
+        - detail
+      example:
+        type: urn:dx:dmp:success
+        title: Bad Request
+        detail: Linked account could not be updated as, the id provided does not exist
+
+
+    fetchLinkedAccountWithGivenFields:
+      title: Linked account with DMP APD stated fields
+      type: object
+      properties:
+        type:
+          type: string
+          minLength: 1
+        title:
+          type: string
+          minLength: 1
+        results:
+          type: object
+          properties:
+            id:
+              type: string
+              minLength: 18
+              maxLength: 18
+            type:
+              type: string
+              enum: [ route ]
+            status:
+              type: string
+              enum: [ created ]
+            email:
+              type: string
+              pattern: '^([a-zA-Z0-9_\-\.]+)@([a-zA-Z0-9_\-\.]+)\.([a-zA-Z]{2,5})$'
+            profile:
+              type: object
+              properties:
+                category:
+                  type: string
+                  minLength: 1
+                subcategory:
+                  type: string
+                  minLength: 1
+                addresses:
+                  type: object
+                  properties:
+                    street1:
+                      type: string
+                      minLength: 1
+                      maxLength: 100
+                    street2:
+                      type: string
+                      minLength: 1
+                      maxLength: 100
+                    city:
+                      type: string
+                      minLength: 1
+                      maxLength: 100
+                    state:
+                      type: string
+                      minLength: 2
+                      maxLength: 32
+                    postalCode:
+                      type: string
+                      minLength: 6
+                      maxLength: 6
+                    country:
+                      type: string
+                      minLength: 2
+                      maxLength: 64
+                  required:
+                    - street1
+                    - street2
+                    - city
+                    - state
+                    - postalCode
+                    - country
+              required:
+                - category
+                - subcategory
+                - addresses
+            phone:
+              type: string
+              minLength: 8
+              maxLength: 15
+            contactName:
+              type: string
+              minLength: 4
+              maxLength: 255
+            referenceId:
+              type: string
+              minLength: 20
+              maxLength: 20
+            businessType:
+              type: string
+            legalBusinessName:
+              type: string
+              minLength: 4
+              maxLength: 200
+            customerFacingBusinessName:
+              type: string
+              minLength: 1
+              maxLength: 255
+            legalInfo:
+              type: object
+              properties:
+                pan:
+                  type: string
+                  minLength: 10
+                  maxLength: 10
+                  pattern: '/^[a-zA-z]{5}\d{4}[a-zA-Z]{1}$/'
+                gst:
+                  type: string
+                  minLength: 15
+                  maxLength: 15
+                  pattern: '/^[0123][0-9][a-z]{5}[0-9]{4}[a-z][0-9][a-z0-9][a-z0-9]$/gi'
+          required:
+            - id
+            - type
+            - status
+            - email
+            - profile
+            - phone
+            - referenceId
+            - businessType
+            - legalBusinessName
+            - customerFacingBusinessName
+      required:
+        - type
+        - title
+        - results
+      example:
+        type: urn:dx:dmp:success
+        title: Success
+        results:
+          {
+            "id": "acc_GRWKk7qQsLnDjX",
+            "type": "route",
+            "status": "created",
+            "email": "test.provider@gmail.com",
+            "profile": {
+              "category": "healthcare",
+              "subcategory": "doctors",
+              "addresses": {
+                "registered": {
+                  "street1": "Outer Ring road",
+                  "street2": "MG Road",
+                  "city": "Bengaluru",
+                  "state": "KARNATAKA",
+                  "postalCode": "560038",
+                  "country": "india"
+                }
+              }
+            },
+            "phone": "9100090000",
+            "contactName": "Test Name",
+            "referenceId": "9db3e89b9db3e89b85e1",
+            "businessType": "partnership",
+            "legalBusinessName": "Dummy Corp V1",
+            "customerFacingBusinessName": "Dummy Corp V1",
+            "legalInfo": {
+              "pan": "ABACL1234C",
+              "gst": "19AABCU9603R1ZM"
+            }
+          }
+
+
+
+    fetchLinkedAccountWithOtherFields:
+      title: Linked Account with other fields
+      type: object
+      properties:
+        type:
+          type: string
+          minLength: 1
+        title:
+          type: string
+          minLength: 1
+        results:
+          type: object
+          properties:
+            id:
+              type: string
+              minLength: 18
+              maxLength: 18
+            type:
+              type: string
+              enum: [ route ]
+            status:
+              type: string
+              enum: [ created ]
+            email:
+              type: string
+              pattern: '^([a-zA-Z0-9_\-\.]+)@([a-zA-Z0-9_\-\.]+)\.([a-zA-Z]{2,5})$'
+            profile:
+              type: object
+              properties:
+                category:
+                  type: string
+                  minLength: 1
+                subcategory:
+                  type: string
+                  minLength: 1
+                addresses:
+                  type: object
+                  properties:
+                    street1:
+                      type: string
+                      minLength: 1
+                      maxLength: 100
+                    street2:
+                      type: string
+                      minLength: 1
+                      maxLength: 100
+                    city:
+                      type: string
+                      minLength: 1
+                      maxLength: 100
+                    state:
+                      type: string
+                      minLength: 2
+                      maxLength: 32
+                    postalCode:
+                      type: string
+                      minLength: 6
+                      maxLength: 6
+                    country:
+                      type: string
+                      minLength: 2
+                      maxLength: 64
+                  required:
+                    - street1
+                    - street2
+                    - city
+                    - state
+                    - postalCode
+                    - country
+                operation:
+                  type: object
+                  properties:
+                    street1:
+                      type: string
+                      minLength: 1
+                      maxLength: 100
+                    street2:
+                      type: string
+                      minLength: 1
+                      maxLength: 100
+                    city:
+                      type: string
+                      minLength: 1
+                      maxLength: 100
+                    state:
+                      type: string
+                      minLength: 2
+                      maxLength: 32
+                    country:
+                      type: string
+                      minLength: 2
+                      maxLength: 64
+                businessModel:
+                  type: string
+                  nullable: true
+              required:
+                - category
+                - subcategory
+                - addresses
+            notes:
+              type: array
+              items:
+                type: string
+            phone:
+              type: string
+              minLength: 8
+              maxLength: 15
+            contactName:
+              type: string
+              minLength: 4
+              maxLength: 255
+            referenceId:
+              type: string
+              minLength: 20
+              maxLength: 20
+            businessType:
+              type: string
+            legalBusinessName:
+              type: string
+              minLength: 4
+              maxLength: 200
+            customerFacingBusinessName:
+              type: string
+              minLength: 1
+              maxLength: 255
+            legalInfo:
+              type: object
+              properties:
+                pan:
+                  type: string
+                  minLength: 10
+                  maxLength: 10
+                  pattern: '/^[a-zA-z]{5}\d{4}[a-zA-Z]{1}$/'
+                gst:
+                  type: string
+                  minLength: 15
+                  maxLength: 15
+                  pattern: '/^[0123][0-9][a-z]{5}[0-9]{4}[a-z][0-9][a-z0-9][a-z0-9]$/gi'
+              required:
+                - pan
+                - gst
+            apps:
+              type: object
+              properties:
+                websites:
+                  type: array
+                  items:
+                    type: string
+                android:
+                  type: array
+                  items:
+                    type: object
+                    properties:
+                      url:
+                        type: string
+                        nullable: true
+                      name:
+                        type: string
+                        nullable: true
+                ios:
+                  type: array
+                  items:
+                    type: object
+                    properties:
+                      url:
+                        type: string
+                        nullable: true
+                      name:
+                        type: string
+                        nullable: true
+            brand:
+              type: object
+              properties:
+                color:
+                  type: string
+                  nullable: true
+            contactInfo:
+              type: object
+              properties:
+                chargeback:
+                  type: object
+                  properties:
+                    email:
+                      type: string
+                      nullable: true
+                    phone:
+                      type: string
+                      nullable: true
+                    policyUrl:
+                      type: string
+                      nullable: true
+
+                refund:
+                  type: object
+                  properties:
+                    email:
+                      type: string
+                      nullable: true
+                    phone:
+                      type: string
+                      nullable: true
+                    policyUrl:
+                      type: string
+                      nullable: true
+                support:
+                  type: object
+                  properties:
+                    email:
+                      type: string
+                      nullable: true
+                    phone:
+                      type: string
+                      nullable: true
+                    policyUrl:
+                      type: string
+                      nullable: true
+          required:
+            - id
+            - type
+            - status
+            - email
+            - profile
+            - notes
+            - phone
+            - contactName
+            - referenceId
+            - businessType
+            - legalBusinessName
+            - customerFacingBusinessName
+            - legalInfo
+      required:
+        - type
+        - title
+        - results
+      example:
+        type: urn:dx:dmp:success
+        title: Success
+        results:
+          {
+            "id": "acc_NBK8KJeLl7fvpC",
+            "type": "route",
+            "status": "created",
+            "email": "test.provider@gmail.com",
+            "profile": {
+              "category": "healthcare",
+              "subcategory": "doctors",
+              "addresses": {
+                "registered": {
+                  "street1": "Outer Ring road",
+                  "street2": "MG Road",
+                  "city": "Bengaluru",
+                  "state": "KARNATAKA",
+                  "postalCode": "560038",
+                  "country": "india"
+                },
+                "operation": {
+                  "street1": "507, Koramangala 6th block",
+                  "street2": "Kormanagala",
+                  "city": "Bengaluru",
+                  "state": "KARNATAKA",
+                  "country": "IN",
+                }
+              },
+              "businessModel": null
+            },
+            "phone": "9100090000",
+            "contactName": "Test Name",
+            "referenceId": "12345678912345678912",
+            "businessType": "partnership",
+            "legalBusinessName": "Dummy Corp V2",
+            "customerFacingBusinessName": "Some Other Corp",
+            "legalInfo": {
+              "pan": "ABACL1234C",
+              "gst": "19AABCU9603R1ZM"
+            },
+            "apps": {
+              "websites": [
+
+              ],
+              "android": [
+                {
+                  "url": null,
+                  "name": null
+                }
+              ],
+              "ios": [
+                {
+                  "url": null,
+                  "name": null
+                }
+              ]
+            },
+            "brand": {
+              "color": null
+            },
+            "contactInfo": {
+              "chargeback": {
+                "email": null,
+                "phone": null,
+                "policyUrl": null
+              },
+              "refund": {
+                "email": null,
+                "phone": null,
+                "policyUrl": null
+              },
+              "support": {
+                "email": null,
+                "phone": null,
+                "policyUrl": null
+              }
+            }
+          }
+
+    fetchLinkedAccountNotFound:
+      title: fetchLinkedAccountNotFound
+      type: object
+      properties:
+        type:
+          type: string
+          minLength: 1
+        title:
+          type: string
+          minLength: 1
+        detail:
+          type: string
+          minLength: 1
+      required:
+        - type
+        - title
+        - detail
+      example:
+        type: urn:dx:dmp:resourceNotFound
+        title: Not Found
+        detail: Linked account cannot be fetched as, it is not found
+
+
+
+

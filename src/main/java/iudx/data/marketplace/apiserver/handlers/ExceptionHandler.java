@@ -22,6 +22,7 @@ public class ExceptionHandler implements Handler<RoutingContext> {
   public void handle(RoutingContext routingContext) {
 
     Throwable failure = routingContext.failure();
+    failure.printStackTrace();
 
     if (failure instanceof DxRuntimeException) {
       DxRuntimeException exception = (DxRuntimeException) failure;

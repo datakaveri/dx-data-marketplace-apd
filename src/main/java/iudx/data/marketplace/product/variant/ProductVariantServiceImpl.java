@@ -50,6 +50,19 @@ public class ProductVariantServiceImpl implements ProductVariantService {
         .onComplete(
             pdfHandler -> {
               if (pdfHandler.succeeded()) {
+                //                  check if the length is 0
+                //                  if it is return with forbidden response
+                boolean isResultEmpty = pdfHandler.result().getJsonArray(RESULTS).isEmpty();
+                if (isResultEmpty) {
+                   handler.handle(
+                      Future.failedFuture(
+                              new RespBuilder()
+                                      .withType(ResponseUrn.BAD_REQUEST_URN.getUrn())
+                                      .withTitle(ResponseUrn.BAD_REQUEST_URN.getMessage())
+                                      .withDetail("Product Variant is only created after product is created").getResponse()
+                          ));
+                   return;
+                }
                 JsonObject res = pdfHandler.result().getJsonArray(RESULTS).getJsonObject(0);
                 JsonArray resResources = res.getJsonArray(RESOURCES_ARRAY);
                 if (resources.size() != resResources.size()) {

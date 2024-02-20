@@ -20,7 +20,6 @@ import iudx.data.marketplace.postgres.PostgresServiceImpl;
 import java.util.Map;
 
 import static iudx.data.marketplace.common.Constants.*;
-import static iudx.data.marketplace.policies.util.Constants.DB_RECONNECT_ATTEMPTS;
 
 public class PolicyVerticle extends AbstractVerticle {
 
@@ -42,7 +41,7 @@ public class PolicyVerticle extends AbstractVerticle {
     api = Api.getInstance(config().getString("dxApiBasePath"));
     deletePolicy = new DeletePolicy(postgresServiceImpl, auditingService, api);
     getPolicy = new GetPolicy(postgresServiceImpl);
-    createPolicy = new CreatePolicy(postgresServiceImpl, catalogueService, auditingService, api);
+    createPolicy = new CreatePolicy(postgresServiceImpl, auditingService, api);
     verifyPolicy = new VerifyPolicy(postgresServiceImpl);
     policyService =
         new PolicyServiceImpl(deletePolicy, createPolicy, getPolicy, verifyPolicy, config());

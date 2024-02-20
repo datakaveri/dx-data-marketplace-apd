@@ -8,7 +8,9 @@ public enum RequestType {
   VERIFY("verify_policy"),
   PROVIDER("provider"),
   ORDER("order"),
-  VERIFY_PAYMENT("verify_payment");
+  VERIFY_PAYMENT("verify_payment"),
+  POST_ACCOUNT("post_account"),
+  PUT_ACCOUNT("put_account");
 
   private String filename;
 

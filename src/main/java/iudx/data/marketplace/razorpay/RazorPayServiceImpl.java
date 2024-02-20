@@ -1,8 +1,11 @@
 package iudx.data.marketplace.razorpay;
 
+import static iudx.data.marketplace.apiserver.provider.linkedAccount.util.Constants.ACCOUNT_TYPE;
+import static iudx.data.marketplace.apiserver.provider.linkedAccount.util.Constants.FAILURE_MESSAGE;
 import static iudx.data.marketplace.product.util.Constants.*;
 import static iudx.data.marketplace.razorpay.Constants.*;
 
+import com.razorpay.Account;
 import com.razorpay.Order;
 import com.razorpay.RazorpayClient;
 import com.razorpay.RazorpayException;
@@ -11,9 +14,11 @@ import io.vertx.core.Future;
 import io.vertx.core.Promise;
 import io.vertx.core.json.JsonObject;
 import iudx.data.marketplace.apiserver.exceptions.DxRuntimeException;
+import iudx.data.marketplace.common.HttpStatusCode;
 import iudx.data.marketplace.common.RespBuilder;
 import iudx.data.marketplace.common.ResponseUrn;
 import iudx.data.marketplace.postgres.PostgresService;
+import java.util.Map;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.json.JSONArray;
@@ -22,6 +27,7 @@ import org.json.JSONObject;
 
 public class RazorPayServiceImpl implements RazorPayService {
 
+  private static final Map<String, String> errorMap = initialiseMap();
   private static Logger LOGGER = LogManager.getLogger(RazorPayServiceImpl.class);
   private final PostgresService postgresService;
   private final String razorPaySecret;
@@ -34,6 +40,75 @@ public class RazorPayServiceImpl implements RazorPayService {
     this.postgresService = postgresService;
     this.razorPaySecret = config.getString(RAZORPAY_SECRET);
     this.paymentTable = config.getJsonArray(TABLES).getString(9);
+  }
+
+  static Map<String, String> initialiseMap() {
+    return Map.ofEntries(
+        Map.entry(
+            "Merchant email already exists for account".toLowerCase(),
+            FAILURE_MESSAGE + "merchant email already exists for account"),
+        Map.entry(
+            "The phone format is invalid".toLowerCase(),
+            FAILURE_MESSAGE + "phone format is invalid"),
+        Map.entry(
+            "The contact name may only contain alphabets and spaces".toLowerCase(),
+            FAILURE_MESSAGE + "name is invalid"),
+        Map.entry(
+            "Invalid business subcategory for business category".toLowerCase(),
+            FAILURE_MESSAGE + "subcategory or category is invalid"),
+        Map.entry(
+            "The street2 field is required".toLowerCase(),
+            FAILURE_MESSAGE + "street2 field is required"),
+        Map.entry(
+            "The street1 field is required".toLowerCase(),
+            FAILURE_MESSAGE + "street1 field is required"),
+        Map.entry(
+            "The city field is required".toLowerCase(), FAILURE_MESSAGE + "city field is required"),
+        Map.entry(
+            "The business registered city may only contain alphabets, digits and spaces"
+                .toLowerCase(),
+            FAILURE_MESSAGE + "city name is invalid"),
+        Map.entry(
+            "State name entered is incorrect. Please provide correct state name".toLowerCase(),
+            FAILURE_MESSAGE + "state name is invalid"),
+        Map.entry(
+            "The postal code must be an integer".toLowerCase(),
+            FAILURE_MESSAGE + "postal code is invalid"),
+        Map.entry(
+            "The business registered country may only contain alphabets and spaces".toLowerCase(),
+            FAILURE_MESSAGE + "country name is invalid"),
+        Map.entry(
+            "The pan field is invalid".toLowerCase(), FAILURE_MESSAGE + "pan field is invalid"),
+        Map.entry(
+            "The gst field is invalid".toLowerCase(), FAILURE_MESSAGE + "gst field is invalid"),
+        Map.entry(
+            "Route code Support feature not enabled to add account code".toLowerCase(),
+            FAILURE_MESSAGE + "route code support feature not enabled to add account code"),
+        Map.entry(
+            "The api key/secret provided is invalid".toLowerCase(),
+            FAILURE_MESSAGE + ResponseUrn.INTERNAL_SERVER_ERR_URN.getMessage()),
+        Map.entry(
+            "Merchant activation form has been locked for editing by admin.".toLowerCase(),
+            "Linked account updation failed as merchant activation form has been locked for editing by admin"));
+
+    //    errorMap.put("Invalid type: route", FAILURE_MESSAGE  +
+    // ResponseUrn.INTERNAL_SERVER_ERR_URN.getMessage());
+    //    errorMap.put("The code format is invalid", FAILURE_MESSAGE  +
+    // ResponseUrn.INTERNAL_SERVER_ERR_URN.getMessage());
+    //    errorMap.put("The code must be at least 3 characters",FAILURE_MESSAGE  +
+    // ResponseUrn.INTERNAL_SERVER_ERR_URN.getMessage());
+    //    errorMap.put("The selected tnc accepted is invalid.",FAILURE_MESSAGE  +
+    // ResponseUrn.INTERNAL_SERVER_ERR_URN.getMessage());
+    //    errorMap.put("The product requested is invalid",FAILURE_MESSAGE  +
+    // ResponseUrn.INTERNAL_SERVER_ERR_URN.getMessage());
+    //    errorMap.put("Linked account does not exist",FAILURE_MESSAGE  +
+    // ResponseUrn.INTERNAL_SERVER_ERR_URN.getMessage());
+    //      errorMap.put("no Route matched with those values", FAILURE_MESSAGE +
+    // ResponseUrn.INTERNAL_SERVER_ERR_URN.getUrn());
+    //      errorMap.put("id provided does not exist", FAILURE_MESSAGE +
+    // ResponseUrn.INTERNAL_SERVER_ERR_URN.getUrn());
+    //    Map.entry("The id provided does not exist".toLowerCase(), FAILURE_MESSAGE +
+    // ResponseUrn.INTERNAL_SERVER_ERR_URN.getUrn());
   }
 
   @Override
@@ -182,6 +257,92 @@ public class RazorPayServiceImpl implements RazorPayService {
     return promise.future();
   }
 
+  public Future<JsonObject> requestProductConfiguration(JsonObject info) {
+    Promise<JsonObject> promise = Promise.promise();
+    JSONObject request =
+        new JSONObject().put("product_name", ACCOUNT_TYPE).put("tnc_accepted", true);
+    //    TODO: what if we don't send the IP address of the system
+    String accountId = info.getString("accountId");
+    try {
+      Account productConfiguration =
+          razorpayClient.product.requestProductConfiguration(accountId, request);
+      JsonObject temp = new JsonObject(productConfiguration.toString());
+      String razorpayAccountProductId = temp.getString(ID);
+      LOGGER.info(
+          "Terms and conditions accepted for accountId with razorpayAccountProductId : {}, {}",
+          accountId,
+          razorpayAccountProductId);
+      promise.complete(new JsonObject().put("razorpayAccountProductId", razorpayAccountProductId));
+    } catch (RazorpayException e) {
+      e.printStackTrace();
+      LOGGER.error("Razorpay error message: {}", e.getMessage());
+      /*handle error messages from Razorpay*/
+      String razorpayError = e.getMessage().toLowerCase();
+      String failureMessage = errorHandler(razorpayError);
+      promise.fail(failureMessage);
+    }
+    return promise.future();
+  }
+
+  @Override
+  public Future<Boolean> fetchProductConfiguration(JsonObject request) {
+    Promise<Boolean> promise = Promise.promise();
+    String razorpayAccountId = request.getString("account_id");
+    String razorpayAccountProductId = request.getString("rzp_account_product_id");
+    try {
+      Account fetchProductConfiguration =
+          razorpayClient.product.fetch(razorpayAccountId, razorpayAccountProductId);
+      JsonObject temp = new JsonObject(fetchProductConfiguration.toString());
+      String activationStatus = temp.getString("activation_status");
+      boolean isAccountActivated = activationStatus.toLowerCase().matches("activated");
+
+      if (isAccountActivated) {
+        promise.complete(true);
+      } else {
+        LOGGER.error("Linked account not activated");
+        String detail =
+            "To activate linked account please complete the KYC, filling account information etc., in your Razorpay merchant dashboard";
+        String failureMessage =
+            new RespBuilder()
+                .withType(HttpStatusCode.FORBIDDEN.getValue())
+                .withTitle(ResponseUrn.FORBIDDEN_PRODUCT_CREATION.getUrn())
+                .withDetail(detail)
+                .getResponse();
+        promise.fail(failureMessage);
+      }
+    } catch (RazorpayException e) {
+      e.printStackTrace();
+      LOGGER.error("Razorpay error message: {}", e.getMessage());
+      /*handle error messages from Razorpay*/
+      String razorpayError = e.getMessage().toLowerCase();
+      String failureMessage = errorHandler(razorpayError);
+      promise.fail(failureMessage);
+    }
+    return promise.future();
+  }
+
+  @Override
+  public Future<JsonObject> createLinkedAccount(String request) {
+    Promise<JsonObject> promise = Promise.promise();
+    /*convert string to maven JSONObject */
+    JSONObject requestJson = new JSONObject(request);
+    try {
+      Account account = razorpayClient.account.create(requestJson);
+      JsonObject temp = new JsonObject(account.toString());
+      String accountId = temp.getString(ID);
+      LOGGER.info("Linked account created with accountId : {}", accountId);
+      promise.complete(new JsonObject().put("accountId", accountId));
+
+    } catch (RazorpayException e) {
+      LOGGER.error("Razorpay error message: {}", e.getMessage());
+      /*handle error messages from Razorpay*/
+      String razorpayError = e.getMessage().toLowerCase();
+      String failureMessage = errorHandler(razorpayError);
+      promise.fail(failureMessage);
+    }
+    return promise.future();
+  }
+
   private Future<JsonObject> recordPayment(JsonObject request) {
     Promise<JsonObject> promise = Promise.promise();
 
@@ -204,5 +365,69 @@ public class RazorPayServiceImpl implements RazorPayService {
           }
         });
     return promise.future();
+  }
+
+  @Override
+  public Future<JsonObject> fetchLinkedAccount(String accountId) {
+    Promise<JsonObject> promise = Promise.promise();
+    try {
+      Account account = razorpayClient.account.fetch(accountId);
+      JsonObject result = new JsonObject(account.toString());
+      LOGGER.info("Fetched linked account information with accountId : {}", accountId);
+      promise.complete(result);
+    } catch (RazorpayException e) {
+      LOGGER.error("Razorpay error message: {}", e.getMessage());
+      /*handle error messages from Razorpay*/
+      String razorpayError = e.getMessage().toLowerCase();
+      String failureMessage = errorHandler(razorpayError);
+      promise.fail(failureMessage);
+    }
+    return promise.future();
+  }
+
+  @Override
+  public Future<Boolean> updateLinkedAccount(String request, String accountId) {
+    Promise<Boolean> promise = Promise.promise();
+    JSONObject accountRequest = new JSONObject(request);
+    try {
+      Account account = razorpayClient.account.edit(accountId, accountRequest);
+      JsonObject temp = new JsonObject(account.toString());
+      String referenceId = temp.getString("reference_id");
+      LOGGER.info(
+          "Linked account with accountId : {}, referenceId : {} updated successfully",
+          accountId,
+          referenceId);
+      promise.complete(true);
+    } catch (RazorpayException e) {
+      LOGGER.error("Razorpay error message: {}", e.getMessage());
+      /*handle error messages from Razorpay*/
+      String razorpayError = e.getMessage().toLowerCase();
+      String message = errorHandler(razorpayError);
+      String failureMessage = message.replace(FAILURE_MESSAGE, "Linked account updation failed : ");
+      promise.fail(failureMessage);
+    }
+    return promise.future();
+  }
+
+  public String errorHandler(String rzpFailureMessage) {
+    String failureMessage =
+        new RespBuilder()
+            .withType(HttpStatusCode.INTERNAL_SERVER_ERROR.getValue())
+            .withTitle(ResponseUrn.INTERNAL_SERVER_ERR_URN.getUrn())
+            .withDetail(FAILURE_MESSAGE + ResponseUrn.INTERNAL_SERVER_ERR_URN.getMessage())
+            .getResponse();
+    ;
+    for (var error : errorMap.entrySet()) {
+      boolean isErrorPresent = rzpFailureMessage.contains(error.getKey());
+      if (isErrorPresent) {
+        failureMessage =
+            new RespBuilder()
+                .withType(HttpStatusCode.BAD_REQUEST.getValue())
+                .withTitle(ResponseUrn.BAD_REQUEST_URN.getUrn())
+                .withDetail(error.getValue())
+                .getResponse();
+      }
+    }
+    return failureMessage;
   }
 }

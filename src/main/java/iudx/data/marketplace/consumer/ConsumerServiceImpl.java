@@ -125,7 +125,7 @@ public class ConsumerServiceImpl implements ConsumerService {
     } else if (request.containsKey(PROVIDER_ID)) {
       String providerID = request.getString(PROVIDER_ID);
       params.put(STATUS, Status.ACTIVE.toString()).put(PROVIDER_ID, providerID);
-      query.append(" and pt.providerId=$2");
+      query.append(" and pt.provider_id=$2");
     } else {
       params.put(STATUS, Status.ACTIVE.toString());
     }
