@@ -353,7 +353,6 @@ public class ApiServerVerticle extends AbstractVerticle {
 
   }
 
-//  TODO: add auditing after success response
   private void handlePostLinkedAccount(RoutingContext routingContext) {
     JsonObject requestBody = routingContext.body().asJsonObject();
     User user = routingContext.get("user");

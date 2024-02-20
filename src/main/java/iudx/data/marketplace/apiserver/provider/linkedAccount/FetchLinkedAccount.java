@@ -37,9 +37,7 @@ public class FetchLinkedAccount {
   }
 
   public Future<JsonObject> initiateFetchingLinkedAccount(User provider) {
-    //    TODO: Replace this providerId with the providerId from token
-    String providerId = "f560aea3-2f9e-4245-b01d-df2db8937424";
-    //    String providerId = provider.getUserId();
+    String providerId = provider.getUserId();
     /*get accountId associated with the given provider ID*/
     Future<JsonObject> getAccountFuture = getAccountId(GET_ACCOUNT_ID_QUERY, providerId);
     Future<JsonObject> accountDetailsFromRzpFuture =

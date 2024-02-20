@@ -259,12 +259,9 @@ public class ProductServiceImpl implements ProductService {
       User user, Handler<AsyncResult<Boolean>> handler) {
     if (isAccountActivationCheckBeingDone) {
       /* ideal flow to simulate synchronisation */
-      //      TODO: Replace this with the providerId from the token
-      //        String providerId = user.getUserId();
-      //        TODO: Update the KYC to remove the hard-coding
-      String dummyProviderId = "8afb4269-bee4-4a88-9947-128315479eb6";
+      String providerId = user.getUserId();
       Future<JsonObject> providerDetailsFuture =
-          fetchRazorpayDetailsOfProvider(FETCH_MERCHANT_INFO_QUERY, dummyProviderId);
+          fetchRazorpayDetailsOfProvider(FETCH_MERCHANT_INFO_QUERY, providerId);
 
       /* check if account status is activated in database */
       Future<Boolean> accountStatusInDbFuture =
@@ -289,7 +286,7 @@ public class ProductServiceImpl implements ProductService {
                   linkedAccountActivationFuture.compose(
                       isLinkedAccountActivated -> {
                         return updateStatusOfLinkedAccount(
-                            UPDATE_LINKED_ACCOUNT_STATUS_QUERY, dummyProviderId);
+                            UPDATE_LINKED_ACCOUNT_STATUS_QUERY, providerId);
                       });
               updateStatusFuture.onComplete(
                   updateStatusHandler -> {
