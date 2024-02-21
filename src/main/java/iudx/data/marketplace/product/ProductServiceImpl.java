@@ -11,17 +11,15 @@ import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
 import iudx.data.marketplace.apiserver.exceptions.DxRuntimeException;
 import iudx.data.marketplace.common.CatalogueService;
-import iudx.data.marketplace.common.HttpStatusCode;
 import iudx.data.marketplace.common.RespBuilder;
 import iudx.data.marketplace.common.ResponseUrn;
 import iudx.data.marketplace.policies.User;
 import iudx.data.marketplace.postgres.PostgresService;
 import iudx.data.marketplace.product.util.QueryBuilder;
 import iudx.data.marketplace.product.util.Status;
+import iudx.data.marketplace.razorpay.RazorPayService;
 import java.util.ArrayList;
 import java.util.List;
-
-import iudx.data.marketplace.razorpay.RazorPayService;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -35,7 +33,11 @@ public class ProductServiceImpl implements ProductService {
   private boolean isAccountActivationCheckBeingDone;
 
   public ProductServiceImpl(
-          JsonObject config, PostgresService pgService, CatalogueService catService, RazorPayService razorPayService, boolean isAccountActivationCheckBeingDone) {
+      JsonObject config,
+      PostgresService pgService,
+      CatalogueService catService,
+      RazorPayService razorPayService,
+      boolean isAccountActivationCheckBeingDone) {
     this.pgService = pgService;
     this.catService = catService;
     this.queryBuilder = new QueryBuilder(config.getJsonArray(TABLES));
@@ -44,121 +46,127 @@ public class ProductServiceImpl implements ProductService {
     this.isAccountActivationCheckBeingDone = isAccountActivationCheckBeingDone;
   }
 
+  private static boolean isSameProviderForAll(JsonArray resourceDetails) {
+    LOGGER.debug(resourceDetails);
+    String providerOfFirstResource = resourceDetails.getJsonObject(0).getString(PROVIDER);
+    boolean sameProviderForAll = true;
+    for (int i = 1; i < resourceDetails.size() && sameProviderForAll; i++) {
+      sameProviderForAll =
+          resourceDetails
+              .getJsonObject(i)
+              .getString(PROVIDER)
+              .equalsIgnoreCase(providerOfFirstResource);
+    }
+    return sameProviderForAll;
+  }
+
   @Override
   public ProductService createProduct(
       User user, JsonObject request, Handler<AsyncResult<JsonObject>> handler) {
 
-    this.checkMerchantAccountStatus(
-        user,
-        accountStatusHandler -> {
-          if (accountStatusHandler.succeeded()) {
-            String providerID = user.getUserId();
-            String productID =
-                URN_PREFIX.concat(providerID).concat(":").concat(request.getString(PRODUCT_ID));
-            request.put(PROVIDER_ID, providerID).put(PRODUCT_ID, productID);
+    JsonArray resourceDetails = new JsonArray();
+    String providerID = user.getUserId();
+    String productID =
+        URN_PREFIX.concat(providerID).concat(":").concat(request.getString(PRODUCT_ID));
 
-            Future<Boolean> checkForExistence = checkIfProductExists(providerID, productID);
-            JsonArray resourceIds = request.getJsonArray(RESOURCE_IDS);
-            JsonArray resourceDetails = new JsonArray();
+    /* Check Merchant Account Existence on RazorPay */
+    checkMerchantAccountStatus(user)
+        .compose(
+            merchantAccountStatus -> {
+              List<Future> itemFutures =
+                  fetchItemDetailsFromCat(request, providerID, productID, resourceDetails);
 
-            List<Future> itemFutures = new ArrayList<>();
-            resourceIds.forEach(
-                resourceID -> {
-                  Future<JsonObject> getResourceDetails =
-                      catService.getItemDetails((String) resourceID);
-                  itemFutures.add(getResourceDetails);
-                });
+              return CompositeFuture.all(itemFutures);
+            })
+        /* Check if all resources belong to the same provider */
+        .compose(
+            ar -> {
+              boolean sameProviderForAll = isSameProviderForAll(resourceDetails);
+              if (!sameProviderForAll) {
+                return Future.failedFuture("The resources listed belong to different providers");
+              } else {
+                return checkIfProductExists(providerID, productID);
+              }
+            })
+        /* Check if product already exists */
+        .compose(
+            existenceHandler -> {
+              if (existenceHandler) {
+                return Future.failedFuture(ResponseUrn.RESOURCE_ALREADY_EXISTS_URN.getMessage());
+              } else {
+                String providerItemId = resourceDetails.getJsonObject(0).getString(PROVIDER);
+                return catService.getItemDetails(providerItemId);
+              }
+            })
+        /* Check if provider of resources matches the provider user */
+        .onComplete(
+            completeHandler -> {
+              if (completeHandler.succeeded()) {
+                if (!completeHandler
+                    .result()
+                    .getString("ownerUserId")
+                    .equalsIgnoreCase(providerID)) {
+                  handler.handle(
+                      Future.failedFuture(
+                          "The user with given token does not own the resource listed"));
+                } else {
+                  request
+                      .put(PROVIDER_NAME, completeHandler.result().getString(PROVIDER_NAME, ""))
+                      .put(RESOURCE_SERVER, user.getResourceServerUrl());
 
-            itemFutures.forEach(
-                fr -> {
-                  fr.onSuccess(
-                      h -> {
-                        JsonObject res = (JsonObject) h;
-                        resourceDetails.add(res);
+                  List<String> queries =
+                      queryBuilder.buildCreateProductQueries(request, resourceDetails);
+
+                  /* Finally Create the Product */
+                  pgService.executeTransaction(
+                      queries,
+                      pgHandler -> {
+                        if (pgHandler.succeeded()) {
+                          handler.handle(
+                              Future.succeededFuture(
+                                  pgHandler.result().put(PRODUCT_ID, productID)));
+                        } else {
+                          LOGGER.error(pgHandler.cause());
+                          handler.handle(Future.failedFuture(pgHandler.cause()));
+                        }
                       });
-                });
-
-            CompositeFuture.all(itemFutures)
-                .onComplete(
-                    ar -> {
-                      LOGGER.debug(resourceDetails);
-                      String providerOfFirstResource =
-                          resourceDetails.getJsonObject(0).getString(PROVIDER);
-                      boolean sameProviderForAll = true;
-                      for (int i = 1; i < resourceDetails.size() && sameProviderForAll; i++) {
-                        sameProviderForAll =
-                            resourceDetails
-                                .getJsonObject(i)
-                                .getString(PROVIDER)
-                                .equalsIgnoreCase(providerOfFirstResource);
-                      }
-                      if (!sameProviderForAll) {
-                        handler.handle(
-                            Future.failedFuture(
-                                "The resources listed belong to different providers"));
-                      } else {
-                        String providerItemId = providerOfFirstResource;
-                        Future<JsonObject> getProviderDetails =
-                            catService.getItemDetails(providerItemId);
-                        checkForExistence
-                            .compose(
-                                existenceHandler -> {
-                                  if (existenceHandler) {
-                                    return Future.failedFuture(
-                                        ResponseUrn.RESOURCE_ALREADY_EXISTS_URN.getUrn());
-                                  } else {
-                                    return getProviderDetails;
-                                  }
-                                })
-                            .onComplete(
-                                completeHandler -> {
-                                  if (completeHandler.succeeded()) {
-                                    if (!completeHandler
-                                        .result()
-                                        .getString("ownerUserId")
-                                        .equalsIgnoreCase(providerID)) {
-                                      handler.handle(
-                                          Future.failedFuture(
-                                              "The user with given token does not own the resource listed"));
-                                    } else {
-                                      request.put(
-                                          PROVIDER_NAME,
-                                          completeHandler.result().getString(PROVIDER_NAME, ""))
-                                              .put(RESOURCE_SERVER, user.getResourceServerUrl());
-
-                                      List<String> queries =
-                                          queryBuilder.buildCreateProductQueries(
-                                              request, resourceDetails);
-
-                                      pgService.executeTransaction(
-                                          queries,
-                                          pgHandler -> {
-                                            if (pgHandler.succeeded()) {
-                                              handler.handle(
-                                                  Future.succeededFuture(
-                                                      pgHandler
-                                                          .result()
-                                                          .put(PRODUCT_ID, productID)));
-                                            } else {
-                                              LOGGER.error(pgHandler.cause());
-                                              handler.handle(
-                                                  Future.failedFuture(pgHandler.cause()));
-                                            }
-                                          });
-                                    }
-                                  } else {
-                                    handler.handle(Future.failedFuture(completeHandler.cause()));
-                                  }
-                                });
-                      }
-                    });
-
-          } else {
-            handler.handle(Future.failedFuture(accountStatusHandler.cause().getMessage()));
-          }
-        });
+                }
+              } else {
+                handler.handle(
+                    Future.failedFuture(
+                        new RespBuilder()
+                            .withType(ResponseUrn.FORBIDDEN_PRODUCT_CREATION.getUrn())
+                            .withTitle(ResponseUrn.FORBIDDEN_PRODUCT_CREATION.getMessage())
+                            .withDetail(completeHandler.cause().getLocalizedMessage())
+                            .getResponse()));
+              }
+            });
 
     return this;
+  }
+
+  private List<Future> fetchItemDetailsFromCat(
+      JsonObject request, String providerID, String productID, JsonArray resourceDetails) {
+    request.put(PROVIDER_ID, providerID).put(PRODUCT_ID, productID);
+
+    JsonArray resourceIds = request.getJsonArray(RESOURCE_IDS);
+
+    List<Future> itemFutures = new ArrayList<>();
+    resourceIds.forEach(
+        resourceID -> {
+          Future<JsonObject> getResourceDetails = catService.getItemDetails((String) resourceID);
+          itemFutures.add(getResourceDetails);
+        });
+
+    itemFutures.forEach(
+        fr -> {
+          fr.onSuccess(
+              h -> {
+                JsonObject res = (JsonObject) h;
+                resourceDetails.add(res);
+              });
+        });
+    return itemFutures;
   }
 
   Future<Boolean> checkIfProductExists(String providerID, String productID) {
@@ -252,155 +260,133 @@ public class ProductServiceImpl implements ProductService {
    * their KYC before creating a product on Data Market place server
    *
    * @param user Provider user object
-   * @param handler request handler that contains failure or success response
    * @return ProductService object
    */
-  public ProductService checkMerchantAccountStatus(
-      User user, Handler<AsyncResult<Boolean>> handler) {
+  Future<Void> checkMerchantAccountStatus(User user) {
+    Promise<Void> promise = Promise.promise();
+
     if (isAccountActivationCheckBeingDone) {
       /* ideal flow to simulate synchronisation */
       String providerId = user.getUserId();
       Future<JsonObject> providerDetailsFuture =
           fetchRazorpayDetailsOfProvider(FETCH_MERCHANT_INFO_QUERY, providerId);
 
+      ResultContainer resultContainer = new ResultContainer();
+
       /* check if account status is activated in database */
-      Future<Boolean> accountStatusInDbFuture =
-          providerDetailsFuture.compose(
+      providerDetailsFuture
+          .compose(
               json -> {
+                resultContainer.resultJson = json;
                 boolean isStatusActivated = json.getString("status").equalsIgnoreCase("ACTIVATED");
-                if (isStatusActivated) {
-                  return Future.succeededFuture(true);
+                return Future.succeededFuture(isStatusActivated);
+              })
+          .compose(
+              isAccountStatusActive -> {
+                if (!isAccountStatusActive) {
+                  /* check if account is activated in Razorpay */
+                  razorPayService.fetchProductConfiguration(
+                      resultContainer.resultJson); /* update status in merchant_table */
                 }
-                return Future.succeededFuture(false);
+                /* account is activated */
+                return Future.succeededFuture(true);
+              })
+          .compose(
+              isLinkedAccountActivated ->
+                  updateStatusOfLinkedAccount(UPDATE_LINKED_ACCOUNT_STATUS_QUERY, providerId))
+          .onComplete(
+              updateStatusHandler -> {
+                if (updateStatusHandler.succeeded()) {
+                  promise.complete();
+                } else {
+                  promise.fail(updateStatusHandler.cause().getMessage());
+                }
               });
-      accountStatusInDbFuture.compose(
-          isAccountStatusActive -> {
-            if (!isAccountStatusActive) {
-              /* check if account is activated in Razorpay */
-              Future<Boolean> linkedAccountActivationFuture =
-                  providerDetailsFuture.compose(
-                      providerDetailsJson ->
-                          razorPayService.fetchProductConfiguration(providerDetailsJson));
-              /* update status in merchant_table */
-              Future<Boolean> updateStatusFuture =
-                  linkedAccountActivationFuture.compose(
-                      isLinkedAccountActivated -> {
-                        return updateStatusOfLinkedAccount(
-                            UPDATE_LINKED_ACCOUNT_STATUS_QUERY, providerId);
-                      });
-              updateStatusFuture.onComplete(
-                  updateStatusHandler -> {
-                    if (updateStatusHandler.succeeded()) {
-                      handler.handle(Future.succeededFuture(true));
-                    } else {
-                      handler.handle(Future.failedFuture(updateStatusFuture.cause().getMessage()));
-                    }
-                  });
-            }
-            /* account is activated */
-            return Future.succeededFuture(true);
-          });
+      ;
 
     } else {
-      handler.handle(Future.succeededFuture(true));
+      promise.complete();
     }
-    return this;
+    return promise.future();
   }
 
-    public Future<JsonObject> fetchRazorpayDetailsOfProvider(String query, String providerId) {
-        Promise<JsonObject> promise = Promise.promise();
+  public Future<JsonObject> fetchRazorpayDetailsOfProvider(String query, String providerId) {
+    Promise<JsonObject> promise = Promise.promise();
 
-        String finalQuery = query.replace("$1", providerId);
-        pgService.executeQuery(
-                finalQuery,
-                handler -> {
-                    if (handler.succeeded()) {
-                        /*  check if response is empty*/
-                        if (!handler.result().getJsonArray(RESULTS).isEmpty()) {
-                            JsonObject result = handler.result().getJsonArray(RESULTS).getJsonObject(0);
-                            String accountId = result.getString("account_id");
-                            String rzp_account_product_id = result.getString("rzp_account_product_id");
-                            String status = result.getString("status");
-                            LOGGER.info(
-                                    "Provider with _id : {} , with accountId {}, accountProductId {} has status : {}",
-                                    providerId,
-                                    accountId,
-                                    rzp_account_product_id,
-                                    status);
-                            promise.complete(result);
-                        } else {
-                            LOGGER.fatal(
-                                    "The provider information is not inserted in the table after a linked account is "
-                                            + "created given that "
-                                            + "linked account creation,accepting tnc, insertion of information in table and fetching that "
-                                            + "provider info"
-                                            + " before product creation is done serially");
-                            promise.fail(
-                                    new RespBuilder()
-                                            .withType(HttpStatusCode.FORBIDDEN.getValue())
-                                            .withTitle(ResponseUrn.FORBIDDEN_PRODUCT_CREATION.getUrn())
-                                            .withDetail(ResponseUrn.FORBIDDEN_PRODUCT_CREATION.getMessage() + " as, linked account is not created")
-                                            .getResponse());
-                        }
-                    } else {
-                        LOGGER.info(
-                                "Failed to fetch razorpay details of provider : " + handler.cause().getMessage());
-                        promise.fail(
-                                new RespBuilder()
-                                        .withType(HttpStatusCode.INTERNAL_SERVER_ERROR.getValue())
-                                        .withTitle(ResponseUrn.DB_ERROR_URN.getUrn())
-                                        .withDetail(FAILURE_MESSAGE + "Internal Server Error")
-                                        .getResponse());
-                    }
-                });
-        return promise.future();
-    }
+    String finalQuery = query.replace("$1", providerId);
+    pgService.executeQuery(
+        finalQuery,
+        handler -> {
+          if (handler.succeeded()) {
+            /*  check if response is empty*/
+            if (!handler.result().getJsonArray(RESULTS).isEmpty()) {
+              JsonObject result = handler.result().getJsonArray(RESULTS).getJsonObject(0);
+              String accountId = result.getString("account_id");
+              String rzp_account_product_id = result.getString("rzp_account_product_id");
+              String status = result.getString("status");
+              LOGGER.info(
+                  "Provider with _id : {} , with accountId {}, accountProductId {} has status : {}",
+                  providerId,
+                  accountId,
+                  rzp_account_product_id,
+                  status);
+              promise.complete(result);
+            } else {
+              LOGGER.fatal(
+                  "The provider information is not inserted in the table after a linked account is "
+                      + "created given that "
+                      + "linked account creation,accepting tnc, insertion of information in table and fetching that "
+                      + "provider info"
+                      + " before product creation is done serially");
+              promise.fail(
+                  ResponseUrn.FORBIDDEN_PRODUCT_CREATION.getMessage()
+                      + " as, linked account is not created");
+            }
+          } else {
+            LOGGER.info(
+                "Failed to fetch razorpay details of provider : " + handler.cause().getMessage());
+            promise.fail(FAILURE_MESSAGE + "Internal Server Error");
+          }
+        });
+    return promise.future();
+  }
 
-    public Future<Boolean> updateStatusOfLinkedAccount(String query, String providerId)
-    {
-        Promise<Boolean> promise = Promise.promise();
-        String finalQuery =
-                query.replace("$1", providerId);
-        pgService.executeQuery(
-                finalQuery,
-                handler -> {
-                    if (handler.succeeded()) {
-                        /*  check if response is empty*/
-                        if (!handler.result().getJsonArray(RESULTS).isEmpty()) {
-                            JsonObject result = handler.result().getJsonArray(RESULTS).getJsonObject(0);
-                            String referenceId = result.getString("reference_id");
-                            LOGGER.info(
-                                    "Provider with _id : {} , with referenceId {}, has status of the linked account : {}",
-                                    providerId,
-                                    referenceId,
-                                    "activated");
-                            promise.complete(true);
-                        } else {
-                            LOGGER.fatal(
-                                    "The provider linked account status is not updated in the table after a linked account is "
-                                            + "created given that "
-                                            + "linked account creation, accepting tnc, insertion of information in table and fetching that "
-                                            + "provider info"
-                                            + " before product creation is done serially");
-                            promise.fail(
-                                    new RespBuilder()
-                                            .withType(HttpStatusCode.INTERNAL_SERVER_ERROR.getValue())
-                                            .withTitle(ResponseUrn.DB_ERROR_URN.getUrn())
-                                            .withDetail(FAILURE_MESSAGE + "Internal Server Error")
-                                            .getResponse());
-                        }
-                    } else {
-                        LOGGER.info(
-                                "Failed to fetch razorpay details of provider : " + handler.cause().getMessage());
-                        promise.fail(
-                                new RespBuilder()
-                                        .withType(HttpStatusCode.INTERNAL_SERVER_ERROR.getValue())
-                                        .withTitle(ResponseUrn.DB_ERROR_URN.getUrn())
-                                        .withDetail(FAILURE_MESSAGE + "Internal Server Error")
-                                        .getResponse());
-                    }
-                });
-        return promise.future();
-    }
+  public Future<Boolean> updateStatusOfLinkedAccount(String query, String providerId) {
+    Promise<Boolean> promise = Promise.promise();
+    String finalQuery = query.replace("$1", providerId);
+    pgService.executeQuery(
+        finalQuery,
+        handler -> {
+          if (handler.succeeded()) {
+            /*  check if response is empty*/
+            if (!handler.result().getJsonArray(RESULTS).isEmpty()) {
+              JsonObject result = handler.result().getJsonArray(RESULTS).getJsonObject(0);
+              String referenceId = result.getString("reference_id");
+              LOGGER.info(
+                  "Provider with _id : {} , with referenceId {}, has status of the linked account : {}",
+                  providerId,
+                  referenceId,
+                  "activated");
+              promise.complete(true);
+            } else {
+              LOGGER.fatal(
+                  "The provider linked account status is not updated in the table after a linked account is "
+                      + "created given that "
+                      + "linked account creation, accepting tnc, insertion of information in table and fetching that "
+                      + "provider info"
+                      + " before product creation is done serially");
+              promise.fail(FAILURE_MESSAGE + "Internal Server Error");
+            }
+          } else {
+            LOGGER.info(
+                "Failed to fetch razorpay details of provider : " + handler.cause().getMessage());
+            promise.fail(FAILURE_MESSAGE + "Internal Server Error");
+          }
+        });
+    return promise.future();
+  }
 
+  private final class ResultContainer {
+    JsonObject resultJson;
+  }
 }

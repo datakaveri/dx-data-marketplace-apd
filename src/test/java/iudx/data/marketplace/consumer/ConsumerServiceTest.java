@@ -7,6 +7,7 @@ import io.vertx.core.json.JsonObject;
 import io.vertx.junit5.VertxExtension;
 import io.vertx.junit5.VertxTestContext;
 import iudx.data.marketplace.postgres.PostgresService;
+import iudx.data.marketplace.razorpay.RazorPayService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -30,6 +31,7 @@ public class ConsumerServiceTest {
   @Mock AsyncResult<JsonObject> asyncResult;
 
   private static PostgresService postgresService;
+  private static RazorPayService razorPayService;
   private static ConsumerServiceImpl consumerService;
   JsonObject request;
   JsonObject config;
@@ -38,10 +40,11 @@ public class ConsumerServiceTest {
   @BeforeEach
   public void setup(VertxTestContext testContext) {
     postgresService = mock(PostgresService.class);
+    razorPayService = mock(RazorPayService.class);
     request = new JsonObject();
     tableArray = new JsonArray().add("table name").add("table name");
     config = new JsonObject().put(TABLES, tableArray);
-    consumerService = new ConsumerServiceImpl(config, postgresService);
+    consumerService = new ConsumerServiceImpl(config, postgresService, razorPayService);
     testContext.completeNow();
   }
 
@@ -142,7 +145,7 @@ public class ConsumerServiceTest {
   public void testListProvidersFailed2(VertxTestContext testContext) {
 
     when(asyncResult.succeeded()).thenReturn(false);
-    consumerService = new ConsumerServiceImpl(config, postgresService);
+    consumerService = new ConsumerServiceImpl(config, postgresService, razorPayService);
     doAnswer(
             new Answer<AsyncResult<JsonObject>>() {
               @Override
@@ -238,7 +241,7 @@ public class ConsumerServiceTest {
     tableArray.add("table name");
     request.put(PROVIDER_ID, "pid");
     when(asyncResult.succeeded()).thenReturn(true);
-    consumerService = new ConsumerServiceImpl(config, postgresService);
+    consumerService = new ConsumerServiceImpl(config, postgresService, razorPayService);
     doAnswer(
             new Answer<AsyncResult<JsonObject>>() {
               @Override

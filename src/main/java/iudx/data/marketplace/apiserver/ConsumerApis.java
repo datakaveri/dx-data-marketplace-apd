@@ -19,6 +19,7 @@ import iudx.data.marketplace.common.Api;
 import iudx.data.marketplace.common.RespBuilder;
 import iudx.data.marketplace.common.ResponseUrn;
 import iudx.data.marketplace.consumer.ConsumerService;
+import iudx.data.marketplace.policies.User;
 import iudx.data.marketplace.postgres.PostgresService;
 import java.util.Map;
 import org.apache.logging.log4j.LogManager;
@@ -98,8 +99,9 @@ public class ConsumerApis {
     JsonObject requestBody = new JsonObject()
         .put(AUTH_INFO, routingContext.data().get(AUTH_INFO))
         .put(PRODUCT_VARIANT_NAME, variantId);
+    User user = routingContext.get("user");
 
-    consumerService.createOrder(requestBody, handler -> {
+    consumerService.createOrder(requestBody, user, handler -> {
       if(handler.succeeded()) {
         handleSuccessResponse(routingContext, 201, handler.result());
       } else {

@@ -1,4 +1,4 @@
-package iudx.data.marketplace.razorpay;
+package iudx.data.marketplace.razorpay.util;
 
 public class Constants {
 

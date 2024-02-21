@@ -3,7 +3,6 @@ package iudx.data.marketplace.razorpay;
 import com.razorpay.RazorpayClient;
 import com.razorpay.RazorpayException;
 import io.vertx.core.AbstractVerticle;
-import io.vertx.core.ServiceHelper;
 import io.vertx.core.eventbus.MessageConsumer;
 import io.vertx.core.json.JsonObject;
 import io.vertx.serviceproxy.ServiceBinder;
@@ -13,8 +12,8 @@ import org.apache.logging.log4j.Logger;
 
 import static iudx.data.marketplace.common.Constants.POSTGRES_SERVICE_ADDRESS;
 import static iudx.data.marketplace.common.Constants.RAZORPAY_SERVICE_ADDRESS;
-import static iudx.data.marketplace.razorpay.Constants.RAZORPAY_KEY;
-import static iudx.data.marketplace.razorpay.Constants.RAZORPAY_SECRET;
+import static iudx.data.marketplace.razorpay.util.Constants.RAZORPAY_KEY;
+import static iudx.data.marketplace.razorpay.util.Constants.RAZORPAY_SECRET;
 
 public class RazorPayVerticle extends AbstractVerticle {
   private static final Logger LOGGER = LogManager.getLogger(AbstractVerticle.class);

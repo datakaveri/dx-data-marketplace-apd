@@ -3,7 +3,7 @@ package iudx.data.marketplace.razorpay;
 import static iudx.data.marketplace.apiserver.provider.linkedAccount.util.Constants.ACCOUNT_TYPE;
 import static iudx.data.marketplace.apiserver.provider.linkedAccount.util.Constants.FAILURE_MESSAGE;
 import static iudx.data.marketplace.product.util.Constants.*;
-import static iudx.data.marketplace.razorpay.Constants.*;
+import static iudx.data.marketplace.razorpay.util.Constants.*;
 
 import com.razorpay.Account;
 import com.razorpay.Order;
@@ -18,6 +18,7 @@ import iudx.data.marketplace.common.HttpStatusCode;
 import iudx.data.marketplace.common.RespBuilder;
 import iudx.data.marketplace.common.ResponseUrn;
 import iudx.data.marketplace.postgres.PostgresService;
+import iudx.data.marketplace.razorpay.util.ErrorMessageBuilder;
 import java.util.Map;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -27,7 +28,7 @@ import org.json.JSONObject;
 
 public class RazorPayServiceImpl implements RazorPayService {
 
-  private static final Map<String, String> errorMap = initialiseMap();
+  private static final Map<String, String> errorMap = ErrorMessageBuilder.initialiseMap();
   private static Logger LOGGER = LogManager.getLogger(RazorPayServiceImpl.class);
   private final PostgresService postgresService;
   private final String razorPaySecret;
@@ -42,74 +43,6 @@ public class RazorPayServiceImpl implements RazorPayService {
     this.paymentTable = config.getJsonArray(TABLES).getString(9);
   }
 
-  static Map<String, String> initialiseMap() {
-    return Map.ofEntries(
-        Map.entry(
-            "Merchant email already exists for account".toLowerCase(),
-            FAILURE_MESSAGE + "merchant email already exists for account"),
-        Map.entry(
-            "The phone format is invalid".toLowerCase(),
-            FAILURE_MESSAGE + "phone format is invalid"),
-        Map.entry(
-            "The contact name may only contain alphabets and spaces".toLowerCase(),
-            FAILURE_MESSAGE + "name is invalid"),
-        Map.entry(
-            "Invalid business subcategory for business category".toLowerCase(),
-            FAILURE_MESSAGE + "subcategory or category is invalid"),
-        Map.entry(
-            "The street2 field is required".toLowerCase(),
-            FAILURE_MESSAGE + "street2 field is required"),
-        Map.entry(
-            "The street1 field is required".toLowerCase(),
-            FAILURE_MESSAGE + "street1 field is required"),
-        Map.entry(
-            "The city field is required".toLowerCase(), FAILURE_MESSAGE + "city field is required"),
-        Map.entry(
-            "The business registered city may only contain alphabets, digits and spaces"
-                .toLowerCase(),
-            FAILURE_MESSAGE + "city name is invalid"),
-        Map.entry(
-            "State name entered is incorrect. Please provide correct state name".toLowerCase(),
-            FAILURE_MESSAGE + "state name is invalid"),
-        Map.entry(
-            "The postal code must be an integer".toLowerCase(),
-            FAILURE_MESSAGE + "postal code is invalid"),
-        Map.entry(
-            "The business registered country may only contain alphabets and spaces".toLowerCase(),
-            FAILURE_MESSAGE + "country name is invalid"),
-        Map.entry(
-            "The pan field is invalid".toLowerCase(), FAILURE_MESSAGE + "pan field is invalid"),
-        Map.entry(
-            "The gst field is invalid".toLowerCase(), FAILURE_MESSAGE + "gst field is invalid"),
-        Map.entry(
-            "Route code Support feature not enabled to add account code".toLowerCase(),
-            FAILURE_MESSAGE + "route code support feature not enabled to add account code"),
-        Map.entry(
-            "The api key/secret provided is invalid".toLowerCase(),
-            FAILURE_MESSAGE + ResponseUrn.INTERNAL_SERVER_ERR_URN.getMessage()),
-        Map.entry(
-            "Merchant activation form has been locked for editing by admin.".toLowerCase(),
-            "Linked account updation failed as merchant activation form has been locked for editing by admin"));
-
-    //    errorMap.put("Invalid type: route", FAILURE_MESSAGE  +
-    // ResponseUrn.INTERNAL_SERVER_ERR_URN.getMessage());
-    //    errorMap.put("The code format is invalid", FAILURE_MESSAGE  +
-    // ResponseUrn.INTERNAL_SERVER_ERR_URN.getMessage());
-    //    errorMap.put("The code must be at least 3 characters",FAILURE_MESSAGE  +
-    // ResponseUrn.INTERNAL_SERVER_ERR_URN.getMessage());
-    //    errorMap.put("The selected tnc accepted is invalid.",FAILURE_MESSAGE  +
-    // ResponseUrn.INTERNAL_SERVER_ERR_URN.getMessage());
-    //    errorMap.put("The product requested is invalid",FAILURE_MESSAGE  +
-    // ResponseUrn.INTERNAL_SERVER_ERR_URN.getMessage());
-    //    errorMap.put("Linked account does not exist",FAILURE_MESSAGE  +
-    // ResponseUrn.INTERNAL_SERVER_ERR_URN.getMessage());
-    //      errorMap.put("no Route matched with those values", FAILURE_MESSAGE +
-    // ResponseUrn.INTERNAL_SERVER_ERR_URN.getUrn());
-    //      errorMap.put("id provided does not exist", FAILURE_MESSAGE +
-    // ResponseUrn.INTERNAL_SERVER_ERR_URN.getUrn());
-    //    Map.entry("The id provided does not exist".toLowerCase(), FAILURE_MESSAGE +
-    // ResponseUrn.INTERNAL_SERVER_ERR_URN.getUrn());
-  }
 
   @Override
   public Future<JsonObject> createOrder(JsonObject request) {

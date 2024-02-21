@@ -1,7 +1,6 @@
 package iudx.data.marketplace.consumer;
 
-import static iudx.data.marketplace.common.Constants.PROVIDER_ID;
-import static iudx.data.marketplace.common.Constants.RESOURCE_ID;
+import static iudx.data.marketplace.common.Constants.*;
 import static iudx.data.marketplace.consumer.util.Constants.*;
 import static iudx.data.marketplace.product.util.Constants.RESULTS;
 import static iudx.data.marketplace.product.util.Constants.STATUS;
@@ -11,11 +10,15 @@ import io.vertx.core.AsyncResult;
 import io.vertx.core.Future;
 import io.vertx.core.Handler;
 import io.vertx.core.Promise;
+import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
 import iudx.data.marketplace.consumer.util.PaymentStatus;
+import iudx.data.marketplace.policies.User;
 import iudx.data.marketplace.postgres.PostgresService;
 import iudx.data.marketplace.product.util.Status;
 import iudx.data.marketplace.razorpay.RazorPayService;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
@@ -149,14 +152,17 @@ public class ConsumerServiceImpl implements ConsumerService {
   }
 
   @Override
-  public ConsumerService createOrder(JsonObject request, Handler<AsyncResult<JsonObject>> handler) {
+  public ConsumerService createOrder(
+      JsonObject request, User user, Handler<AsyncResult<JsonObject>> handler) {
     String variantId = request.getString(VARIANT);
+    String consumerId = user.getUserId();
+    LOGGER.debug(consumerId);
 
     getOrderRelatedInfo(variantId)
         .compose(
             orderInfo ->
                 razorPayService.createOrder(orderInfo.getJsonArray(RESULTS).getJsonObject(0)))
-        .compose(this::generateOrderEntry)
+        .compose(x -> generateOrderEntry(x, variantId, consumerId))
         .onComplete(
             completeHandler -> {
               if (completeHandler.succeeded()) {
@@ -171,18 +177,46 @@ public class ConsumerServiceImpl implements ConsumerService {
     return this;
   }
 
-  private Future<JsonObject> generateOrderEntry(JsonObject orderInfo) {
+  private Future<JsonObject> generateOrderEntry(
+      JsonObject orderInfo, String variantId, String consumerId) {
     Promise<JsonObject> promise = Promise.promise();
+    QueryContainer queryContainer = getQueryContainer(orderInfo, variantId, consumerId);
+
+    pgService.executeTransaction(
+        queryContainer.queries,
+        pgHandler -> {
+          if (pgHandler.succeeded()) {
+            LOGGER.info("order created : {}", pgHandler.result());
+            promise.complete(
+                pgHandler
+                    .result()
+                    .put(
+                        "results",
+                        new JsonArray()
+                            .add(new JsonObject().put("order_id", queryContainer.orderId))));
+          } else {
+            LOGGER.error("Failed to create order : {}", pgHandler.cause().getMessage());
+            promise.fail(pgHandler.cause());
+          }
+        });
+
+    return promise.future();
+  }
+
+  private QueryContainer getQueryContainer(
+      JsonObject orderInfo, String variantId, String consumerId) {
     String orderTable = config.getJsonArray(TABLES).getString(7);
     String invoiceTable = config.getJsonArray(TABLES).getString(6);
+    String productVariantTable = config.getJsonArray(TABLES).getString(3);
     JsonObject transferInfo = orderInfo.getJsonArray(TRANSFERS).getJsonObject(0);
-    JsonObject tranferNotes = transferInfo.getJsonObject(NOTES);
+
+    String orderId = transferInfo.getString(SOURCE);
 
     StringBuilder orderQuery =
         new StringBuilder(
             INSERT_ORDER_QUERY
                 .replace("$0", orderTable)
-                .replace("$1", transferInfo.getString(SOURCE))
+                .replace("$1", orderId)
                 .replace("$2", transferInfo.getInteger(AMOUNT).toString())
                 .replace("$3", INR)
                 .replace("$4", transferInfo.getString(RECIPIENT))
@@ -194,32 +228,26 @@ public class ConsumerServiceImpl implements ConsumerService {
         new StringBuilder(
             INSERT_INVOICE_QUERY
                 .replace("$0", invoiceTable)
+                .replace("$p", productVariantTable)
                 .replace("$1", uuidSupplier.get())
-                .replace("$2", tranferNotes.getString(VARIANT))
-                .replace("$3", PaymentStatus.PENDING.getStatus())
-                .replace("$4", "")
-                .replace("$5", "")
-                .replace("$6", tranferNotes.toString()));
+                .replace("$2", consumerId)
+                .replace("$3", orderId)
+                .replace("$4", variantId)
+                .replace("$5", String.valueOf(PaymentStatus.PENDING))
+                .replace(
+                    "$6",
+                    ZonedDateTime.now()
+                        .withZoneSameInstant(ZoneId.of("UTC"))
+                        .toLocalDateTime()
+                        .toString()) // TODO: how to set payment time at time of order creation?
+            );
 
     LOGGER.debug("invoice info: {}", invoiceQuery);
 
     List<String> queries = new ArrayList<>();
     queries.add(orderQuery.toString());
     queries.add(invoiceQuery.toString());
-
-    pgService.executeTransaction(
-        queries,
-        pgHandler -> {
-          if (pgHandler.succeeded()) {
-            LOGGER.info("order created : {}", pgHandler.result());
-            promise.complete();
-          } else {
-            LOGGER.error("Failed to create order : {}", pgHandler.cause().getMessage());
-            promise.fail(pgHandler.cause());
-          }
-        });
-
-    return promise.future();
+    return new QueryContainer(orderId, queries);
   }
 
   Future<JsonObject> getOrderRelatedInfo(String variantId) {
@@ -251,5 +279,15 @@ public class ConsumerServiceImpl implements ConsumerService {
           }
         });
     return promise.future();
+  }
+
+  private static class QueryContainer {
+    public final String orderId;
+    public final List<String> queries;
+
+    public QueryContainer(String orderId, List<String> queries) {
+      this.orderId = orderId;
+      this.queries = queries;
+    }
   }
 }
