@@ -1,7 +1,7 @@
 package iudx.data.marketplace.apiserver.validation.types;
 
 import static iudx.data.marketplace.apiserver.util.Constants.*;
-import static iudx.data.marketplace.common.ResponseUrn.INVALID_PROVIDER_URN;
+import static iudx.data.marketplace.common.ResponseUrn.INVALID_ID_VALUE_URN;
 
 import iudx.data.marketplace.apiserver.exceptions.DxRuntimeException;
 import iudx.data.marketplace.common.HttpStatusCode;
@@ -29,23 +29,23 @@ public class UUIDTypeValidator implements Validator {
     LOGGER.debug("value : " + value + "");
     if (required && (value == null || value.isBlank())) {
       LOGGER.error("validation error: null or blank value for required mandatory field");
-      throw new DxRuntimeException(failureCode(), INVALID_PROVIDER_URN, failureMessage());
+      throw new DxRuntimeException(failureCode(), INVALID_ID_VALUE_URN, failureMessage());
     } else {
       if (value == null) {
         return true;
       }
       if (value.isBlank()) {
         LOGGER.error("Validation error: blank value passed");
-        throw new DxRuntimeException(failureCode(), INVALID_PROVIDER_URN, failureMessage(value));
+        throw new DxRuntimeException(failureCode(), INVALID_ID_VALUE_URN, failureMessage(value));
       }
     }
     if (value.length() != VALIDATION_ID_LENGTH) {
       LOGGER.error("Validation error : Value mismatch character limit.");
-      throw new DxRuntimeException(failureCode(), INVALID_PROVIDER_URN, failureMessage(value));
+      throw new DxRuntimeException(failureCode(), INVALID_ID_VALUE_URN, failureMessage(value));
     }
     if (!isValidID(value)) {
       LOGGER.error("Validation error : Invalid Provider ID");
-      throw new DxRuntimeException(failureCode(), INVALID_PROVIDER_URN, failureMessage(value));
+      throw new DxRuntimeException(failureCode(), INVALID_ID_VALUE_URN, failureMessage(value));
     }
     return true;
   }
@@ -57,6 +57,6 @@ public class UUIDTypeValidator implements Validator {
 
   @Override
   public String failureMessage() {
-    return INVALID_PROVIDER_URN.getMessage();
+    return INVALID_ID_VALUE_URN.getMessage();
   }
 }
