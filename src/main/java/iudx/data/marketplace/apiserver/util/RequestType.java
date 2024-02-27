@@ -10,6 +10,7 @@ public enum RequestType {
   ORDER("order"),
   PURCHASE("purchase"),
   VERIFY_PAYMENT("verify_payment"),
+  PURCHASE("purchase"),
   POST_ACCOUNT("post_account"),
   PUT_ACCOUNT("put_account");
 
