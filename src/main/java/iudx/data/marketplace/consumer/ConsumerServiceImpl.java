@@ -1,20 +1,30 @@
 package iudx.data.marketplace.consumer;
 
+import static iudx.data.marketplace.apiserver.util.Constants.RESULT;
+import static iudx.data.marketplace.apiserver.util.Constants.TITLE;
 import static iudx.data.marketplace.common.Constants.PROVIDER_ID;
 import static iudx.data.marketplace.common.Constants.RESOURCE_ID;
 import static iudx.data.marketplace.consumer.util.Constants.*;
-import static iudx.data.marketplace.product.util.Constants.RESULTS;
-import static iudx.data.marketplace.product.util.Constants.STATUS;
-import static iudx.data.marketplace.product.util.Constants.VARIANT;
+import static iudx.data.marketplace.consumer.util.Constants.TABLES;
+import static iudx.data.marketplace.product.util.Constants.*;
 
 import io.vertx.core.AsyncResult;
 import io.vertx.core.Future;
 import io.vertx.core.Handler;
 import io.vertx.core.Promise;
+import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
+import iudx.data.marketplace.common.HttpStatusCode;
+import iudx.data.marketplace.common.RespBuilder;
+import iudx.data.marketplace.common.ResponseUrn;
+import iudx.data.marketplace.policies.User;
 import iudx.data.marketplace.postgres.PostgresService;
+import iudx.data.marketplace.product.util.Constants;
+import iudx.data.marketplace.product.util.QueryBuilder;
 import iudx.data.marketplace.product.util.Status;
+import iudx.data.marketplace.product.variant.ProductVariantService;
 import iudx.data.marketplace.razorpay.RazorPayService;
+import org.apache.commons.lang.StringUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -23,11 +33,13 @@ public class ConsumerServiceImpl implements ConsumerService {
   private final PostgresService pgService;
   private final RazorPayService razorPayService;
   private final JsonObject config;
+  private final QueryBuilder queryBuilder;
 
   public ConsumerServiceImpl(JsonObject config, PostgresService postgresService, RazorPayService razorPayService) {
     this.config = config;
     this.pgService = postgresService;
     this.razorPayService = razorPayService;
+    this.queryBuilder = new QueryBuilder(config.getJsonArray(Constants.TABLES));
   }
 
   @Override
@@ -89,11 +101,6 @@ public class ConsumerServiceImpl implements ConsumerService {
     return this;
   }
 
-  @Override
-  public ConsumerService listPurchases(
-      JsonObject request, Handler<AsyncResult<JsonObject>> handler) {
-    return null;
-  }
 
   @Override
   public ConsumerService listProducts(
@@ -163,6 +170,114 @@ public class ConsumerServiceImpl implements ConsumerService {
     return this;
   }
 
+  /*
+ TODO: Add expiryTime stamp if there is any policy created (check if payment status is successful)
+  */
+  @Override
+  public ConsumerService listPurchase(User user, JsonObject request, Handler<AsyncResult<JsonObject>> handler) {
+
+    String resourceId = request.getString("resourceId");
+    String productId = request.getString("productId");
+    String query = queryBuilder.listPurchaseForConsumer(user.getUserId(), resourceId, productId);
+    pgService.executeQuery(query, queryHandler -> {
+      if(queryHandler.succeeded())
+      {
+        LOGGER.debug("Fetched invoice related information from postgres successfully");
+        JsonArray result = queryHandler.result().getJsonArray(RESULTS);
+        if(!result.isEmpty())
+        {
+          JsonArray userResponse = new JsonArray();
+          for(Object row : result)
+          {
+            JsonObject rowEntry = JsonObject.mapFrom(row);
+
+            rowEntry.mergeIn(getProviderInfo(rowEntry))
+                    .mergeIn(getConsumerInfo(user))
+                    .mergeIn(getProductInfo(rowEntry));
+            userResponse.add(rowEntry);
+
+          }
+          JsonObject response =
+                  new JsonObject()
+                          .put(TYPE, ResponseUrn.SUCCESS_URN.getUrn())
+                          .put(TITLE, ResponseUrn.SUCCESS_URN.getMessage())
+                          .put(RESULT, userResponse);
+
+          handler.handle(Future.succeededFuture(response));
+        }
+        else
+        {
+          LOGGER.debug("No invoice present for the given resource " +
+                          ": {} or product : {}, for the consumer : {}",
+                  resourceId, productId, user.getUserId());
+
+          boolean isAnyQueryParamSent = StringUtils.isNotBlank(resourceId)||StringUtils.isNotBlank(productId);
+
+          String failureMessage = new RespBuilder()
+                  .withType(HttpStatusCode.NO_CONTENT.getValue())
+                  .withTitle(HttpStatusCode.NO_CONTENT.getUrn()).getResponse();
+          if(isAnyQueryParamSent)
+          {
+            failureMessage = new RespBuilder()
+                    .withType(HttpStatusCode.NOT_FOUND.getValue())
+                    .withTitle(ResponseUrn.RESOURCE_NOT_FOUND_URN.getUrn())
+                    .withDetail("Purchase info not found")
+                    .getResponse();
+          }
+          handler.handle(Future.failedFuture(failureMessage));
+        }
+      }
+    });
+    return this;
+  }
+  private JsonObject getProviderInfo(JsonObject row) {
+    JsonObject providerJson = new JsonObject()
+            .put("provider", new JsonObject()
+                    .put("email", row.getString("providerEmailId"))
+                    .put("name", new JsonObject()
+                            .put("firstName", row.getString("providerFirstName"))
+                            .put("lastName", row.getString("providerLastName")))
+                    .put("id", row.getString("providerId"))
+            );
+    row.remove("providerEmailId");
+    row.remove("providerFirstName");
+    row.remove("providerLastName");
+    row.remove("providerId");
+    return providerJson;
+  }
+
+  public JsonObject getProductInfo(JsonObject row)
+  {
+    JsonObject productJson = new JsonObject()
+            .put("product",new JsonObject()
+                    .put("productId", row.getString("productId"))
+                    .put("productVariantId", row.getString("productVariantId"))
+                    .put("resourceName", row.getString("resourceName"))
+                    .put("price", row.getString("price"))
+                    .put("expiryInMonths", row.getString("expiryInMonths"))
+                    .put("resourcesAndCapabilities", row.getJsonObject("resourcesAndCapabilities")));
+
+    row.remove("productId");
+    row.remove("productVariantId");
+    row.remove("resourceName");
+    row.remove("price");
+    row.remove( "resourcesAndCapabilities");
+    row.remove("expiryInMonths");
+    return productJson;
+  }
+  public JsonObject getConsumerInfo(User user)
+  {
+    JsonObject consumerJson = new JsonObject()
+            .put("consumer", new JsonObject()
+                    .put("email", user.getEmailId())
+                    .put("name", new JsonObject()
+                            .put("firstName", user.getFirstName())
+                            .put("lastName", user.getLastName()))
+                    .put("id", user.getUserId())
+            );
+
+    return consumerJson;
+  }
   private Future<JsonObject> generateOrderEntry(JsonObject orderInfo) {
     Promise<JsonObject> promise = Promise.promise();
     String orderTable = config.getJsonArray(TABLES).getString(7);

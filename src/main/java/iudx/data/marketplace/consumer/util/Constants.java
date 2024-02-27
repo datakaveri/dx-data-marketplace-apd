@@ -22,6 +22,56 @@ public class Constants {
 
   public static final String INSERT_ORDER_QUERY =
       "insert into $0 (order_id, amount, currency, account_id, notes) values ($1, $2, $3, $4, $5)";
+  public static final String LIST_ALL_PURCHASE_4_CONSUMER =
+      "SELECT I._id AS \"invoiceId\", P.provider_id AS \"providerId\",\n"
+          + "U.email_id AS \"providerEmailId\", U.first_name AS \"providerFirstName\",\n"
+          + "U.last_name AS \"providerLastName\", \n"
+          + "I.order_id AS \"orderId\", I.product_variant_id AS \"productVariantId\",\n"
+          + "P.product_id AS \"productId\", P.resource_name AS \"resourceName\",\n"
+          + "P.price, P.resource_ids_and_capabilities AS \"resourcesAndCapabilities\",\n"
+          + "I.payment_status AS \"paymentStatus\", I.payment_time AS \"paymentTime\",\n"
+          + "I.expiry AS \"expiryInMonths\"\n"
+          + "FROM invoice I\n"
+          + "INNER JOIN product_variant P\n"
+          + "ON I.product_variant_id = P._id\n"
+          + "INNER JOIN user_table U\n"
+          + "ON U._id = P.provider_id\n"
+          + "WHERE I.consumer_id = '$1'";
+  public static final String LIST_PURCHASE_4_CONSUMER_WITH_GIVEN_PRODUCT =
+      "SELECT I._id AS \"invoiceId\", P.provider_id AS \"providerId\",\n"
+          + "U.email_id AS \"providerEmailId\", U.first_name AS \"providerFirstName\",\n"
+          + "U.last_name AS \"providerLastName\", \n"
+          + "I.order_id AS \"orderId\", I.product_variant_id AS \"productVariantId\",\n"
+          + "P.product_id AS \"productId\", P.resource_name AS \"resourceName\",\n"
+          + "P.price, P.resource_ids_and_capabilities AS \"resourcesAndCapabilities\",\n"
+          + "I.payment_status AS \"paymentStatus\", I.payment_time AS \"paymentTime\",\n"
+          + "I.expiry AS \"expiryInMonths\"\n"
+          + "FROM invoice I\n"
+          + "INNER JOIN product_variant P\n"
+          + "ON I.product_variant_id = P._id\n"
+          + "INNER JOIN user_table U\n"
+          + "ON U._id = P.provider_id\n"
+          + "WHERE\n"
+          + "P.product_id = '$1'\n"
+          + "AND I.consumer_id = '$2'";
+  public static final String LIST_PURCHASE_4_CONSUMER_WITH_GIVEN_RESOURCE =
+      "SELECT I._id AS \"invoiceId\", P.provider_id AS \"providerId\",\n"
+          + "U.email_id AS \"providerEmailId\", U.first_name AS \"providerFirstName\",\n"
+          + "U.last_name AS \"providerLastName\", \n"
+          + "I.order_id AS \"orderId\", I.product_variant_id AS \"productVariantId\",\n"
+          + "P.product_id AS \"productId\", P.resource_name AS \"resourceName\",\n"
+          + "P.price, P.resource_ids_and_capabilities AS \"resourcesAndCapabilities\",\n"
+          + "I.payment_status AS \"paymentStatus\", I.payment_time AS \"paymentTime\",\n"
+          + "I.expiry AS \"expiryInMonths\"\n"
+          + "FROM invoice I\n"
+          + "INNER JOIN product_variant P\n"
+          + "ON I.product_variant_id = P._id\n"
+          + "INNER JOIN user_table U\n"
+          + "ON U._id = P.provider_id\n"
+          + "WHERE\n"
+          + "P.product_id IN (SELECT product_id FROM product_resource_relation WHERE resource_id = '$1'\n"
+          + ")\n"
+          + "AND I.consumer_id = '$2'";
 
   public static final String TRANSFER_ID = "id";
   public static final String SOURCE = "source";
