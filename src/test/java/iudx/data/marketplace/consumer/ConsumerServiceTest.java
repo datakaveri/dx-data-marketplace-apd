@@ -46,7 +46,7 @@ public class ConsumerServiceTest {
     request = new JsonObject();
     tableArray = new JsonArray().add("table name").add("table name");
     config = new JsonObject().put(TABLES, tableArray);
-    consumerService = new ConsumerServiceImpl(config, postgresService, razorPayService);
+    consumerService = new ConsumerServiceImpl(config, postgresService,razorPayService);
     testContext.completeNow();
   }
 
