@@ -1,6 +1,9 @@
-package iudx.data.marketplace.razorpay;
+package iudx.data.marketplace.razorpay.util;
 
 public class Constants {
+
+  public static final String RAZORPAY_KEY = "razorPayKey";
+  public static final String RAZORPAY_SECRET = "razorPaySecret";
   public static final String AMOUNT = "amount";
   public static final String CURRENCY = "currency";
   public static final String INR = "INR";
@@ -14,4 +17,9 @@ public class Constants {
   public static final String ERROR = "error";
   public static final String REASON = "reason";
   public static final Integer ZERO = 0;
+  public static final String RAZORPAY_ORDER_ID = "razorpay_order_id";
+  public static final String RAZORPAY_PAYMENT_ID = "razorpay_payment_id";
+  public static final String RAZORPAY_SIGNATURE = "razorpay_signature";
+
+  public static final String RECORD_PAYMENT = "insert into $0 (order_id, payment_id, payment_signature) values ($1,$2,$3) on conflict do nothing";
 }

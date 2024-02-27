@@ -444,7 +444,7 @@ paths:
                   value:
                     type: 'urn:dx:dmp:Success'
                     title: Success
-                    results: []
+                    results: [ ]
     get:
       tags:
         - provider
@@ -680,7 +680,7 @@ paths:
                   description: Linked account billing label
                 businessType:
                   type: string
-                  enum: [llp, ngo, other, individual, partnership, proprietorship, public_limited, private_limited, trust, society, not_yet_registered, educational_institutes]
+                  enum: [ llp, ngo, other, individual, partnership, proprietorship, public_limited, private_limited, trust, society, not_yet_registered, educational_institutes ]
                   description: Provider's business type. Here are the list of values - [link](https://razorpay.com/docs/payments/route/integration-guide/#business-type)
                 contactName:
                   type: string
@@ -693,7 +693,7 @@ paths:
                   properties:
                     category:
                       type: string
-                      enum: [financial_services, education, healthcare, utilities, government, logistics, tours_and_travel ,transport ,ecommerce ,food ,it_and_software ,gaming ,media_and_entertainment ,services ,housing ,not_for_profit ,social ,others]
+                      enum: [ financial_services, education, healthcare, utilities, government, logistics, tours_and_travel ,transport ,ecommerce ,food ,it_and_software ,gaming ,media_and_entertainment ,services ,housing ,not_for_profit ,social ,others ]
                       description: business category of the account holder. Please refer the given link to look at updated list of suitable values for category field - [link](https://razorpay.com/docs/payments/route/integration-guide/#business-category)
                       minLength: 1
                       required: true
@@ -1086,9 +1086,9 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/fetchLinkedAccountWithGivenFields'
-#                oneOf:
-#                  - $ref: '#/components/schemas/fetchLinkedAccountWithGivenFields'
-#                  - $ref: '#/components/schemas/fetchLinkedAccountWithOtherFields'
+          #                oneOf:
+          #                  - $ref: '#/components/schemas/fetchLinkedAccountWithGivenFields'
+          #                  - $ref: '#/components/schemas/fetchLinkedAccountWithOtherFields'
 
           headers:
             Content-Type:
@@ -1541,46 +1541,86 @@ paths:
                     type: 'urn:dx:cat:InvalidAuthorizationToken'
                     title: Token is invalid
                     detail: failed
-  /consumer/create-purchase:
+  '/consumer/order/{variantId}':
     post:
+      summary: Create Order on a Product Variant
       tags:
         - consumer
-      operationId: post-consumer-create-purchase
-      parameters:
-        - name: token
-          in: header
-          description: DX Auth consumer token to process the request
-          schema:
-            type: string
-      requestBody:
-        content:
-          application/json:
-            schema:
-              type: object
-              properties:
-                variantId:
-                  type: string
-                  description: Product Variant ID
-                stateId:
-                  type: string
-                  description: |
-                    Generated at UI to maintain state of a purchase
       responses:
-        '202':
-          description: Accepted
+        '201':
+          description: Created
           content:
             application/json:
               schema:
                 type: object
+                x-examples:
+                  Example 1:
+                    type: 'urn:dx:dmp:success'
+                    title: Success
+                    results:
+                      - order_id: order_NdbE6J6pv732qa
+                required:
+                  - type
+                  - title
                 properties:
-                  purchaseID:
+                  type:
                     type: string
-                  variantID:
+                  title:
                     type: string
-                  purchasedAt:
+                  results:
+                    type: array
+                    items:
+                      type: object
+                      required:
+                        - order_id
+                      properties:
+                        order_id:
+                          type: string
+              examples:
+                Example of Order Created:
+                  value:
+                    type: 'urn:dx:dmp:success'
+                    title: Success
+                    results:
+                      - order_id: order_NdbE6J6pv732qa
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                type: object
+                x-examples:
+                  Example 1:
+                    type: 'urn:dx:dmp:invalidIdValue'
+                    title: Bad Request
+                    detail: 'Invalid id [ 060cc0ed-14fb-4f07-be1d-f0b66585eab ] '
+                required:
+                  - type
+                  - title
+                  - detail
+                properties:
+                  type:
                     type: string
-                  status:
+                  title:
                     type: string
+                  detail:
+                    type: string
+              examples:
+                Invalid Product Variant ID:
+                  value:
+                    type: 'urn:dx:dmp:invalidIdValue'
+                    title: Bad Request
+                    detail: 'Invalid id [ 060cc0ed-14fb-4f07-be1d-f0b66585eab ] '
+      operationId: post-consumer-order
+      parameters:
+        - schema:
+            type: string
+          in: header
+          name: token
+          description: DX Auth token to process the request
+          required: true
+      requestBody:
+        content: { }
   /verify:
     post:
       tags:
@@ -1652,7 +1692,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/verifyPolicyForbiddenResponse'
       security:
-        - authorization: []
+        - authorization: [ ]
       x-internal: false
   /policy:
     get:
@@ -1715,7 +1755,7 @@ paths:
                 type: string
               description: application/json
       security:
-        - authorization: []
+        - authorization: [ ]
     delete:
       tags:
         - Policies
@@ -1809,6 +1849,7 @@ paths:
                 type: string
               description: application/json
       security:
+
         - authorization: []
 
 tags:

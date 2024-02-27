@@ -8,6 +8,7 @@ import io.vertx.core.AsyncResult;
 import io.vertx.core.Handler;
 import io.vertx.core.Vertx;
 import io.vertx.core.json.JsonObject;
+import iudx.data.marketplace.policies.User;
 
 @VertxGen @ProxyGen
 public interface ConsumerService {
@@ -59,7 +60,7 @@ public interface ConsumerService {
    * @return
    */
   @Fluent
-  ConsumerService createOrder(JsonObject request, Handler<AsyncResult<JsonObject>> handler);
+  ConsumerService createOrder(JsonObject request, User user, Handler<AsyncResult<JsonObject>> handler);
 
   /**
    * The createProxy helps the code generation blocks to generate proxy code.

@@ -16,12 +16,16 @@ public class Constants {
           + "where  pt.status=$1";
 
   public static final String GET_PRODUCT_VARIANT_INFO =
-      "select pv._id, pv.product_variant_name, pv.product_id, pv.provider_id, pv.price, m.account_id " +
-          "from $0 as pv inner join $9 as m on pv.provider_id = m.provider_id " +
-          "where pv._id='22f7907d-d602-4455-9181-96e75b3df9b7' and pv.status='ACTIVE'";
+      "select pv._id, pv.product_variant_name, pv.product_id, pv.provider_id, pv.price, m.account_id "
+          + "from $0 as pv inner join $9 as m on pv.provider_id = m.provider_id "
+          + "where pv._id=$1 and pv.status=$2";
 
   public static final String INSERT_ORDER_QUERY =
-      "insert into $0 (order_id, amount, currency, account_id, notes) values ($1, $2, $3, $4, $5)";
+      "insert into $0 (order_id, amount, currency, account_id, notes) values ('$1', $2, '$3', '$4', '$5')";
+
+  public static final String INSERT_INVOICE_QUERY =
+      "insert into $0 (_id, consumer_id, order_id, product_variant_id, payment_status, payment_time, expiry) "
+          + "values ('$1', '$2', '$3', '$4', '$5', '$6', (select validity from $p where _id = '$4'))";
 
   public static final String TRANSFER_ID = "id";
   public static final String SOURCE = "source";

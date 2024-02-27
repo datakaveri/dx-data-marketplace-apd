@@ -38,7 +38,6 @@ public enum ResponseUrn {
   DB_ERROR_URN("urn:dx:dmp:DatabaseError", "Database error"),
   QUEUE_ERROR_URN("urn:dx:dmp:QueueError", "Queue error"),
   INVALID_RESOURCE_URN("urn:dx:dmp:InvalidResourceID", "Resource ID is invalid"),
-  INVALID_PROVIDER_URN("urn:dx:dmp:InvalidProviderID", "Provider ID is invalid"),
   ROLE_NOT_FOUND("urn:dx:dmp:invalidRole", "Role does not exist"),
   BACKING_SERVICE_FORMAT_URN(
       "urn:dx:dmp:backend", "format error from backing service [cat,auth etc.]"),
@@ -51,7 +50,8 @@ public enum ResponseUrn {
   FORBIDDEN_PRODUCT_CREATION("urn:dx:dmp:forbidden", "Product creation is forbidden"),
   //RazorPay related URNs
   ORDER_NOT_CREATED("urn:dx:dmp:RazorPay:OrderNotCreatedError", "Order Not Created"),
-  ORDER_CREATION_FAILED("urn:dx:dmp:RazorPay:OrderCreationFailedError", "Order creation returned with error");
+  ORDER_CREATION_FAILED("urn:dx:dmp:RazorPay:OrderCreationFailedError", "Order creation returned with error"),
+  INVALID_PAYMENT("urn:dx:dmp:RazorPay:InvalidPayment", "Payment Signature verification failed");
 
   private final String urn;
   private final String message;
