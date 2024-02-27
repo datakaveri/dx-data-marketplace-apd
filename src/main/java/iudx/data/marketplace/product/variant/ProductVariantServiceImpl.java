@@ -133,6 +133,7 @@ public class ProductVariantServiceImpl implements ProductVariantService {
     Promise<JsonObject> promise = Promise.promise();
 
     String query = queryBuilder.buildProductDetailsQuery(productID);
+    LOGGER.debug(query);
     pgService.executeQuery(
         query,
         pgHandler -> {

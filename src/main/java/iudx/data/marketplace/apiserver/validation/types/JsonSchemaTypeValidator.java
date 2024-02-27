@@ -3,6 +3,8 @@ package iudx.data.marketplace.apiserver.validation.types;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.github.fge.jackson.JsonLoader;
 import com.github.fge.jsonschema.core.exceptions.ProcessingException;
+import com.github.fge.jsonschema.core.report.ProcessingMessage;
+import com.github.fge.jsonschema.core.report.ProcessingReport;
 import com.github.fge.jsonschema.main.JsonSchema;
 import com.github.fge.jsonschema.main.JsonSchemaFactory;
 import io.vertx.core.json.JsonObject;
@@ -46,7 +48,7 @@ public class JsonSchemaTypeValidator implements Validator {
     }
   }
 
-  private boolean validateJson(JsonObject body, RequestType requestType) throws IOException, ProcessingException {
+  private boolean validateJson(JsonObject body, RequestType requestType) throws IOException, ProcessingException, DxRuntimeException {
     boolean isValid;
     String schemaPath = PACKAGE_NAME + "/".concat(requestType.getFilename()).concat("_schema.json");
 
@@ -64,7 +66,15 @@ public class JsonSchemaTypeValidator implements Validator {
 
     try {
       JsonNode jsonobj = loadString(body.toString());
-      isValid = schema.validInstance(jsonobj);
+//      isValid = schema.validInstance(jsonobj);
+      ProcessingReport report = schema.validate(jsonobj);
+      report.forEach( x -> {
+        if(x.getLogLevel().toString().equalsIgnoreCase("error")) {
+          LOGGER.error(x.getMessage());
+          throw new DxRuntimeException(failureCode(), INVALID_PAYLOAD_FORMAT_URN, x.getMessage());
+        }
+      });
+      isValid = report.isSuccess();
     } catch (IOException | ProcessingException e) {
       isValid = false;
     }

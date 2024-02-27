@@ -4,6 +4,7 @@ import static iudx.data.marketplace.apiserver.util.Constants.RESULT;
 import static iudx.data.marketplace.apiserver.util.Constants.TITLE;
 import static iudx.data.marketplace.common.Constants.PROVIDER_ID;
 import static iudx.data.marketplace.common.Constants.RESOURCE_ID;
+import static iudx.data.marketplace.common.Constants.*;
 import static iudx.data.marketplace.consumer.util.Constants.*;
 import static iudx.data.marketplace.consumer.util.Constants.TABLES;
 import static iudx.data.marketplace.product.util.Constants.*;
@@ -17,6 +18,7 @@ import io.vertx.core.json.JsonObject;
 import iudx.data.marketplace.common.HttpStatusCode;
 import iudx.data.marketplace.common.RespBuilder;
 import iudx.data.marketplace.common.ResponseUrn;
+import iudx.data.marketplace.consumer.util.PaymentStatus;
 import iudx.data.marketplace.policies.User;
 import iudx.data.marketplace.postgres.PostgresService;
 import iudx.data.marketplace.product.util.Constants;
@@ -25,6 +27,12 @@ import iudx.data.marketplace.product.util.Status;
 import iudx.data.marketplace.product.variant.ProductVariantService;
 import iudx.data.marketplace.razorpay.RazorPayService;
 import org.apache.commons.lang.StringUtils;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.UUID;
+import java.util.function.Supplier;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -35,7 +43,10 @@ public class ConsumerServiceImpl implements ConsumerService {
   private final JsonObject config;
   private final QueryBuilder queryBuilder;
 
-  public ConsumerServiceImpl(JsonObject config, PostgresService postgresService, RazorPayService razorPayService) {
+  Supplier<String> uuidSupplier = () -> UUID.randomUUID().toString();
+
+  public ConsumerServiceImpl(
+      JsonObject config, PostgresService postgresService, RazorPayService razorPayService) {
     this.config = config;
     this.pgService = postgresService;
     this.razorPayService = razorPayService;
@@ -148,24 +159,27 @@ public class ConsumerServiceImpl implements ConsumerService {
   }
 
   @Override
-  public ConsumerService createOrder(JsonObject request, Handler<AsyncResult<JsonObject>> handler) {
+  public ConsumerService createOrder(
+      JsonObject request, User user, Handler<AsyncResult<JsonObject>> handler) {
     String variantId = request.getString(VARIANT);
+    String consumerId = user.getUserId();
+    LOGGER.debug(consumerId);
 
     getOrderRelatedInfo(variantId)
-        .compose(orderInfo -> {
-          return razorPayService.createOrder(orderInfo.getJsonArray(RESULTS).getJsonObject(0));
-        }).compose(orderInfo -> {
-          return generateOrderEntry(orderInfo);
-        })
-        .onComplete(completeHandler -> {
-          if(completeHandler.succeeded()) {
-            LOGGER.info("order created");
-            handler.handle(Future.succeededFuture(completeHandler.result()));
-          } else {
-            LOGGER.info("order creation failed");
-            handler.handle(Future.failedFuture(completeHandler.cause()));
-          }
-        });
+        .compose(
+            orderInfo ->
+                razorPayService.createOrder(orderInfo.getJsonArray(RESULTS).getJsonObject(0)))
+        .compose(x -> generateOrderEntry(x, variantId, consumerId))
+        .onComplete(
+            completeHandler -> {
+              if (completeHandler.succeeded()) {
+                LOGGER.info("order created");
+                handler.handle(Future.succeededFuture(completeHandler.result()));
+              } else {
+                LOGGER.info("order creation failed");
+                handler.handle(Future.failedFuture(completeHandler.cause()));
+              }
+            });
 
     return this;
   }
@@ -280,35 +294,74 @@ public class ConsumerServiceImpl implements ConsumerService {
   }
   private Future<JsonObject> generateOrderEntry(JsonObject orderInfo) {
     Promise<JsonObject> promise = Promise.promise();
-    String orderTable = config.getJsonArray(TABLES).getString(7);
+    QueryContainer queryContainer = getQueryContainer(orderInfo, variantId, consumerId);
 
-    StringBuilder query = new StringBuilder(
-      INSERT_ORDER_QUERY.replace("$0", orderTable)
-    );
-
-    LOGGER.debug("orderInfo : {}", orderInfo);
-
-    JsonObject params = new JsonObject()
-        .put("order_id", orderInfo.getJsonArray(TRANSFERS).getJsonObject(0).getString(SOURCE))
-        .put(AMOUNT, orderInfo.getJsonArray(TRANSFERS).getJsonObject(0).getInteger(AMOUNT))
-        .put(CURRENCY, INR)
-        .put(ACCOUNT_ID, orderInfo.getJsonArray(TRANSFERS).getJsonObject(0).getString(RECIPIENT))
-        .put(NOTES, orderInfo.getJsonArray(TRANSFERS).getJsonObject(0).getJsonObject(NOTES));
-
-    LOGGER.debug("query params : {}", params);
-
-    pgService.executePreparedQuery(query.toString(), params, pgHandler -> {
-      if(pgHandler.succeeded()) {
-        LOGGER.info("order created : {}", pgHandler.result());
-        promise.complete(params);
-      } else {
-        LOGGER.error("Failed to create order : {}", pgHandler.cause().getMessage());
-        promise.fail(pgHandler.cause());
-      }
-    });
+    pgService.executeTransaction(
+        queryContainer.queries,
+        pgHandler -> {
+          if (pgHandler.succeeded()) {
+            LOGGER.info("order created : {}", pgHandler.result());
+            promise.complete(
+                pgHandler
+                    .result()
+                    .put(
+                        "results",
+                        new JsonArray()
+                            .add(new JsonObject().put("order_id", queryContainer.orderId))));
+          } else {
+            LOGGER.error("Failed to create order : {}", pgHandler.cause().getMessage());
+            promise.fail(pgHandler.cause());
+          }
+        });
 
     return promise.future();
+  }
 
+  private QueryContainer getQueryContainer(
+      JsonObject orderInfo, String variantId, String consumerId) {
+    String orderTable = config.getJsonArray(TABLES).getString(7);
+    String invoiceTable = config.getJsonArray(TABLES).getString(6);
+    String productVariantTable = config.getJsonArray(TABLES).getString(3);
+    JsonObject transferInfo = orderInfo.getJsonArray(TRANSFERS).getJsonObject(0);
+
+    String orderId = transferInfo.getString(SOURCE);
+
+    StringBuilder orderQuery =
+        new StringBuilder(
+            INSERT_ORDER_QUERY
+                .replace("$0", orderTable)
+                .replace("$1", orderId)
+                .replace("$2", transferInfo.getInteger(AMOUNT).toString())
+                .replace("$3", INR)
+                .replace("$4", transferInfo.getString(RECIPIENT))
+                .replace("$5", transferInfo.getJsonObject(NOTES).toString()));
+
+    LOGGER.debug("order query : {}", orderQuery);
+
+    StringBuilder invoiceQuery =
+        new StringBuilder(
+            INSERT_INVOICE_QUERY
+                .replace("$0", invoiceTable)
+                .replace("$p", productVariantTable)
+                .replace("$1", uuidSupplier.get())
+                .replace("$2", consumerId)
+                .replace("$3", orderId)
+                .replace("$4", variantId)
+                .replace("$5", String.valueOf(PaymentStatus.PENDING))
+                .replace(
+                    "$6",
+                    ZonedDateTime.now()
+                        .withZoneSameInstant(ZoneId.of("UTC"))
+                        .toLocalDateTime()
+                        .toString()) // TODO: how to set payment time at time of order creation?
+            );
+
+    LOGGER.debug("invoice info: {}", invoiceQuery);
+
+    List<String> queries = new ArrayList<>();
+    queries.add(orderQuery.toString());
+    queries.add(invoiceQuery.toString());
+    return new QueryContainer(orderId, queries);
   }
 
   Future<JsonObject> getOrderRelatedInfo(String variantId) {
@@ -316,27 +369,39 @@ public class ConsumerServiceImpl implements ConsumerService {
     String productVariantTable = config.getJsonArray(TABLES).getString(3);
     String merchantTable = config.getJsonArray(TABLES).getString(8);
 
-    StringBuilder query = new StringBuilder(
-        GET_PRODUCT_VARIANT_INFO.replace("$0", productVariantTable)
-            .replace("$9", merchantTable)
-    );
+    StringBuilder query =
+        new StringBuilder(
+            GET_PRODUCT_VARIANT_INFO
+                .replace("$0", productVariantTable)
+                .replace("$9", merchantTable));
 
-    JsonObject params = new JsonObject()
-        .put(VARIANT, variantId)
-            .put(STATUS, Status.ACTIVE.toString());
+    JsonObject params =
+        new JsonObject().put(VARIANT, variantId).put(STATUS, Status.ACTIVE.toString());
 
     LOGGER.debug("select variant query : {}", query);
 
-    pgService.executeQuery(query.toString(), pgHandler -> {
-      if(pgHandler.succeeded()) {
-        LOGGER.info("variant for order : {}", pgHandler.result());
-        promise.complete(pgHandler.result());
-      } else {
-        LOGGER.error("Couldn't fetch variant for order");
-        promise.fail(pgHandler.cause());
-      }
-    });
+    pgService.executePreparedQuery(
+        query.toString(),
+        params,
+        pgHandler -> {
+          if (pgHandler.succeeded()) {
+            LOGGER.info("variant for order : {}", pgHandler.result());
+            promise.complete(pgHandler.result());
+          } else {
+            LOGGER.error("Couldn't fetch variant for order");
+            promise.fail(pgHandler.cause());
+          }
+        });
     return promise.future();
   }
 
+  private static class QueryContainer {
+    public final String orderId;
+    public final List<String> queries;
+
+    public QueryContainer(String orderId, List<String> queries) {
+      this.orderId = orderId;
+      this.queries = queries;
+    }
+  }
 }

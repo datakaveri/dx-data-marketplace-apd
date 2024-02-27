@@ -29,7 +29,6 @@ import iudx.data.marketplace.common.RespBuilder;
 import iudx.data.marketplace.common.ResponseUrn;
 import iudx.data.marketplace.policies.User;
 import iudx.data.marketplace.postgres.PostgresService;
-import iudx.data.marketplace.postgres.PostgresServiceImpl;
 import iudx.data.marketplace.product.ProductService;
 import iudx.data.marketplace.product.variant.ProductVariantService;
 import java.util.Map;
@@ -151,12 +150,15 @@ public class ProviderApis {
             handleSuccessResponse(routingContext, 201, handler.result());
           } else {
             String errorMessage = handler.cause().getMessage();
-            if (errorMessage.equalsIgnoreCase(ResponseUrn.RESOURCE_ALREADY_EXISTS_URN.getUrn())) {
+            if (errorMessage.contains(ResponseUrn.RESOURCE_ALREADY_EXISTS_URN.getUrn())) {
               routingContext.fail(
                   new DxRuntimeException(
                       409,
                       ResponseUrn.RESOURCE_ALREADY_EXISTS_URN,
                       ResponseUrn.RESOURCE_ALREADY_EXISTS_URN.getMessage()));
+            } else if (errorMessage.contains(ResponseUrn.INTERNAL_SERVER_ERR_URN.getMessage())) {
+              routingContext.fail(
+                  new DxRuntimeException(500, ResponseUrn.INTERNAL_SERVER_ERR_URN, errorMessage));
             } else {
               handleFailureResponse(routingContext, handler.cause());
             }
@@ -335,6 +337,7 @@ public class ProviderApis {
         .setStatusCode(400)
         .end(cause.getMessage());
   }
+
   private void handleFailure(RoutingContext routingContext, String failureMessage) {
     HttpServerResponse response = routingContext.response();
     LOGGER.debug("Failure Message : {} ", failureMessage);
@@ -358,14 +361,14 @@ public class ProviderApis {
       if (jsonObject.getString(DETAIL) != null) {
         detail = jsonObject.getString(DETAIL);
         response
-                .putHeader(CONTENT_TYPE, APPLICATION_JSON)
-                .setStatusCode(type)
-                .end(generateResponse(status, urn, detail).toString());
+            .putHeader(CONTENT_TYPE, APPLICATION_JSON)
+            .setStatusCode(type)
+            .end(generateResponse(status, urn, detail).toString());
       } else {
         response
-                .putHeader(CONTENT_TYPE, APPLICATION_JSON)
-                .setStatusCode(type)
-                .end(generateResponse(status, urn).toString());
+            .putHeader(CONTENT_TYPE, APPLICATION_JSON)
+            .setStatusCode(type)
+            .end(generateResponse(status, urn).toString());
       }
 
     } catch (DecodeException exception) {
@@ -373,21 +376,23 @@ public class ProviderApis {
       handleResponse(response, BAD_REQUEST, ResponseUrn.BACKING_SERVICE_FORMAT_URN);
     }
   }
+
   private void handleResponse(
-          HttpServerResponse response, HttpStatusCode statusCode, ResponseUrn urn) {
+      HttpServerResponse response, HttpStatusCode statusCode, ResponseUrn urn) {
     handleResponse(response, statusCode, urn, statusCode.getDescription());
   }
 
   private void handleResponse(
-          HttpServerResponse response,
-          HttpStatusCode statusCode,
-          ResponseUrn urn,
-          String failureMessage) {
+      HttpServerResponse response,
+      HttpStatusCode statusCode,
+      ResponseUrn urn,
+      String failureMessage) {
     response
-            .putHeader(CONTENT_TYPE, APPLICATION_JSON)
-            .setStatusCode(statusCode.getValue())
-            .end(generateResponse(statusCode, urn, failureMessage).toString());
+        .putHeader(CONTENT_TYPE, APPLICATION_JSON)
+        .setStatusCode(statusCode.getValue())
+        .end(generateResponse(statusCode, urn, failureMessage).toString());
   }
+
   private void handleSuccessResponse(
       RoutingContext routingContext, int statusCode, JsonObject result) {
 

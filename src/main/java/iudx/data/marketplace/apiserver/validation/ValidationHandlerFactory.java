@@ -43,6 +43,9 @@ public class ValidationHandlerFactory {
       case ORDER:
         validator = getOrderValidator(parameters);
         break;
+      case VERIFY_PAYMENT:
+        validator = getVerfiyPaymentValidator(parameters, body);
+        break;
       case POST_ACCOUNT:
         validator = getPostLinkedAccountValidator(body, requestType);
         break;
@@ -59,6 +62,11 @@ public class ValidationHandlerFactory {
 
     validators.add(new UUIDTypeValidator(parameters.get("resourceId"),false));
     validators.add(new ProductIDTypeValidator(parameters.get("productId"), false));
+    return validators;
+  }
+  private List<Validator> getVerfiyPaymentValidator(MultiMap parameters, JsonObject body) {
+    List<Validator> validators = new ArrayList<>();
+    validators.add(new JsonSchemaTypeValidator(body, RequestType.VERIFY_PAYMENT));
     return validators;
   }
 

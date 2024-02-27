@@ -28,7 +28,6 @@ public class Constants {
   public static final String HEADER_REFERER = "Referer";
   public static final String HEADER_ALLOW_ORIGIN = "Access-Control-Allow-Origin";
 
-
   // request/response params
   public static final String CONTENT_TYPE = "content-type";
   public static final String APPLICATION_JSON = "application/json";
@@ -51,7 +50,6 @@ public class Constants {
   public static final String POLICY_ID = "id";
   public static final String ACCOUNT_ID = "account_id";
 
-
   // paths
   public static final String ROUTE_STATIC_SPEC = "/apis/spec";
   public static final String ROUTE_DOC = "/apis";
@@ -70,6 +68,7 @@ public class Constants {
   public static final String USERMAPS_PATH = "/product/usermaps";
   public static final String VERIFY_PATH = "/verify";
   public static final String POLICIES_API = "/policies";
+  public static final String VERIFY_PAYMENTS_PATH = "/verify-payment";
   public static final String ACCOUNTS_API = "/account";
 
   // query parameters | request body
@@ -80,24 +79,21 @@ public class Constants {
 
   public static final String PROVIDER_ID = "providerID";
 
-  //validations
+  // validations
   public static final int VALIDATION_URN_DELIMITER_COUNT = 3;
   public static final String STRING_URN = "urn";
   public static final String DOMAIN = "datakaveri.org";
   public static final int VALIDATION_PRODUCT_ID_MAXLEN = 150;
   public static final Pattern VALIDATION_PRODUCT_ID_REGEX = Pattern.compile("^[a-zA-Z0-9]{3,150}$");
   public static final int VALIDATION_VARIANT_NAME_MAX_LEN = 100;
-  public static final Pattern VALIDATION_VARIANT_NAME_REGEX = Pattern.compile("^[a-zA-Z0-9-]{3,100}$");
+  public static final Pattern VALIDATION_VARIANT_NAME_REGEX =
+      Pattern.compile("^[a-zA-Z0-9-]{3,100}$");
   public static final int VALIDATION_ID_LENGTH = 36;
   public static final Pattern VALIDATION_IUDX_ID_REGEX =
       Pattern.compile("^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$");
-  public static final int VALIDATION_DATASET_ID_MAXLEN = 512;
-  public static final Pattern VALIDATION_DATASET_ID_REGEX = Pattern.compile("^[a-zA-Z0-9.]{4,100}/[a-zA-Z0-9.]{4,100}/[a-zA-Z.]{4,100}/[a-zA-Z-_.]{4,100}$");
-  public static final Pattern POLICY_ID_PATTERN = Pattern.compile("[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-4[a-fA-F0-9]{3}-[89abAB][a-fA-F0-9]{3}-[a-fA-F0-9]{12}");
-
-
-  public static final int VALIDATION_PROVIDER_ID_MAXLEN = 200;
-  public static final Pattern VALIDATION_PROVIDER_ID_REGEX = Pattern.compile("^[a-zA-Z0-9.]{4,100}/[a-zA-Z0-9.]{4,100}$");
+  public static final Pattern POLICY_ID_PATTERN =
+      Pattern.compile(
+          "[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-4[a-fA-F0-9]{3}-[89abAB][a-fA-F0-9]{3}-[a-fA-F0-9]{12}");
 
   // response keys
   public static final String TYPE = "type";
@@ -105,5 +101,4 @@ public class Constants {
   public static final String DETAIL = "detail";
   public static final String RESULT = "results";
   public static final String STATUS_CODE = "statusCode";
-
 }

@@ -31,6 +31,7 @@ public class ConsumerServiceTest {
   @Mock AsyncResult<JsonObject> asyncResult;
 
   private static PostgresService postgresService;
+  private static RazorPayService razorPayService;
   private static ConsumerServiceImpl consumerService;
   JsonObject request;
   JsonObject config;
@@ -41,10 +42,11 @@ public class ConsumerServiceTest {
   @BeforeEach
   public void setup(VertxTestContext testContext) {
     postgresService = mock(PostgresService.class);
+    razorPayService = mock(RazorPayService.class);
     request = new JsonObject();
     tableArray = new JsonArray().add("table name").add("table name");
     config = new JsonObject().put(TABLES, tableArray);
-    consumerService = new ConsumerServiceImpl(config, postgresService,razorPayService);
+    consumerService = new ConsumerServiceImpl(config, postgresService, razorPayService);
     testContext.completeNow();
   }
 

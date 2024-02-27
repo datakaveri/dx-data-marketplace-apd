@@ -3,7 +3,6 @@ package iudx.data.marketplace.razorpay;
 import com.razorpay.RazorpayClient;
 import com.razorpay.RazorpayException;
 import io.vertx.core.AbstractVerticle;
-import io.vertx.core.ServiceHelper;
 import io.vertx.core.eventbus.MessageConsumer;
 import io.vertx.core.json.JsonObject;
 import io.vertx.serviceproxy.ServiceBinder;
@@ -13,6 +12,8 @@ import org.apache.logging.log4j.Logger;
 
 import static iudx.data.marketplace.common.Constants.POSTGRES_SERVICE_ADDRESS;
 import static iudx.data.marketplace.common.Constants.RAZORPAY_SERVICE_ADDRESS;
+import static iudx.data.marketplace.razorpay.util.Constants.RAZORPAY_KEY;
+import static iudx.data.marketplace.razorpay.util.Constants.RAZORPAY_SECRET;
 
 public class RazorPayVerticle extends AbstractVerticle {
   private static final Logger LOGGER = LogManager.getLogger(AbstractVerticle.class);
@@ -27,8 +28,8 @@ public class RazorPayVerticle extends AbstractVerticle {
   public void start() throws RazorpayException {
     postgresService = PostgresService.createProxy(vertx, POSTGRES_SERVICE_ADDRESS);
 
-    String razorPayKey = config().getString("razorPayKey");
-    String razorPaySecret = config().getString("razorPaySecret");
+    String razorPayKey = config().getString(RAZORPAY_KEY);
+    String razorPaySecret = config().getString(RAZORPAY_SECRET);
 
     Boolean enableLogging = config().getBoolean("enableLogging", false);
     if (enableLogging) {
@@ -38,7 +39,7 @@ public class RazorPayVerticle extends AbstractVerticle {
       razorpayClient = new RazorpayClient(razorPayKey, razorPaySecret);
     }
 
-    razorPayService = new RazorPayServiceImpl(razorpayClient, postgresService);
+    razorPayService = new RazorPayServiceImpl(razorpayClient, postgresService, config());
 
     binder = new ServiceBinder(vertx);
     consumer =

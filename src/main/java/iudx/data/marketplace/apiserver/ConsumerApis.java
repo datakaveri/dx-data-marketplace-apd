@@ -109,12 +109,12 @@ public class ConsumerApis {
     JsonObject requestBody = new JsonObject()
         .put(AUTH_INFO, routingContext.data().get(AUTH_INFO))
         .put(PRODUCT_VARIANT_NAME, variantId);
+    User user = routingContext.get("user");
 
-    consumerService.createOrder(requestBody, handler -> {
+    consumerService.createOrder(requestBody, user, handler -> {
       if(handler.succeeded()) {
         handleSuccessResponse(routingContext, 201, handler.result());
       } else {
-        LOGGER.error("here");
         handleFailureResponse(routingContext, handler.cause());
       }
     });

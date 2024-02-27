@@ -26,10 +26,17 @@ public interface RazorPayService {
    *  This method also creates a transfer from the order to the respective merchant account
    *
    * @param request which is a JsonObject
-   * @param User which is a User object
    * @retun Future<JsonObject> which is a vertx Future
    */
   Future<JsonObject> createOrder(JsonObject request);
+
+  /**
+   * The verifyPayment method verifies the payment signature for every payment that is made using RazorPay
+   *  This method also creates a payment record in the marketplace database
+   * @param request which is a JsonObject
+   * @retun Future<JsonObject> which is a vertx Future
+   */
+  Future<JsonObject> verifyPayment(JsonObject request);
 
   /**
    * Accepts the terms and conditions of behalf of the merchant after a linked account is created

@@ -7,7 +7,6 @@ public class Constants {
   public static final String resourceNames = "resource_name";
   public static final String RESOURCES_ARRAY = "resources";
   public static final String RESOURCE_IDS = "resourceIds";
-  public static final String RESOURCE_CAPABILITIES = "resource_capabilities";
   public static final String STATUS = "status";
   public static final String RESULTS = "results";
   public static final String PRICE = "price";
