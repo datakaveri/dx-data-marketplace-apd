@@ -3,25 +3,25 @@ package iudx.data.marketplace.consumer.util;
 public class Constants {
 
   public static final String LIST_RESOURCES_QUERY =
-      "select _id, resource_name, accessPolicy, provider_name from $0";
+          "select _id, resource_name, accessPolicy, provider_name from $0";
   public static final String LIST_PROVIDERS_QUERY =
-      "select distinct provider_id, provider_name, resource_server from $0";
+          "select distinct provider_id, provider_name, resource_server from $0";
 
   public static final String LIST_PRODUCTS =
-      "select pt.product_id as productId, pt.provider_name, "
-          + "array_agg(json_build_object('id', rt._id, 'name', rt.resource_name)) as resources "
-          + "from $0 as pt "
-          + "inner join $9 as dpt on pt.product_id = dpt.product_id "
-          + "inner join $8 as rt on dpt.resource_id = rt._id "
-          + "where  pt.status=$1";
+          "select pt.product_id as productId, pt.provider_name, "
+                  + "array_agg(json_build_object('id', rt._id, 'name', rt.resource_name)) as resources "
+                  + "from $0 as pt "
+                  + "inner join $9 as dpt on pt.product_id = dpt.product_id "
+                  + "inner join $8 as rt on dpt.resource_id = rt._id "
+                  + "where  pt.status=$1";
 
   public static final String GET_PRODUCT_VARIANT_INFO =
-      "select pv._id, pv.product_variant_name, pv.product_id, pv.provider_id, pv.price, m.account_id "
-          + "from $0 as pv inner join $9 as m on pv.provider_id = m.provider_id "
-          + "where pv._id=$1 and pv.status=$2";
+          "select pv._id, pv.product_variant_name, pv.product_id, pv.provider_id, pv.price, m.account_id "
+                  + "from $0 as pv inner join $9 as m on pv.provider_id = m.provider_id "
+                  + "where pv._id=$1 and pv.status=$2";
 
   public static final String INSERT_ORDER_QUERY =
-      "insert into $0 (order_id, amount, currency, account_id, notes) values ($1, $2, $3, $4, $5)";
+          "insert into $0 (order_id, amount, currency, account_id, notes) values ($1, $2, $3, $4, $5)";
   public static final String LIST_PURCHASE = "SELECT I._id AS \"invoiceId\", P.provider_id AS \"providerId\",\n"
           + "U.email_id AS \"providerEmailId\", U.first_name AS \"providerFirstName\",\n"
           + "U.last_name AS \"providerLastName\", \n"
@@ -36,72 +36,22 @@ public class Constants {
           + "INNER JOIN user_table U\n"
           + "ON U._id = P.provider_id\n";
   public static final String LIST_ALL_PURCHASE_4_CONSUMER =
-     LIST_PURCHASE + "WHERE I.consumer_id = '$1'";
+          LIST_PURCHASE + "WHERE I.consumer_id = '$1'";
   public static final String LIST_PURCHASE_4_CONSUMER_WITH_GIVEN_PRODUCT =
-      LIST_PURCHASE
-          + "WHERE\n"
-          + "P.product_id = '$1'\n"
-          + "AND I.consumer_id = '$2'";
+          LIST_PURCHASE
+                  + "WHERE\n"
+                  + "P.product_id = '$1'\n"
+                  + "AND I.consumer_id = '$2'";
   public static final String LIST_PURCHASE_4_CONSUMER_WITH_GIVEN_RESOURCE =
-     LIST_PURCHASE
-          + "WHERE\n"
-          + "P.product_id IN (SELECT product_id FROM product_resource_relation WHERE resource_id = '$1'\n"
-          + ")\n"
-          + "AND I.consumer_id = '$2'";
+          LIST_PURCHASE
+                  + "WHERE\n"
+                  + "P.product_id IN (SELECT product_id FROM product_resource_relation WHERE resource_id = '$1'\n"
+                  + ")\n"
+                  + "AND I.consumer_id = '$2'";
 
   public static final String INSERT_INVOICE_QUERY =
-      "insert into $0 (_id, consumer_id, order_id, product_variant_id, payment_status, payment_time, expiry) "
-          + "values ('$1', '$2', '$3', '$4', '$5', '$6', (select validity from $p where _id = '$4'))";
-  public static final String LIST_ALL_PURCHASE_4_CONSUMER =
-      "SELECT I._id AS \"invoiceId\", P.provider_id AS \"providerId\",\n"
-          + "U.email_id AS \"providerEmailId\", U.first_name AS \"providerFirstName\",\n"
-          + "U.last_name AS \"providerLastName\", \n"
-          + "I.order_id AS \"orderId\", I.product_variant_id AS \"productVariantId\",\n"
-          + "P.product_id AS \"productId\", P.resource_name AS \"resourceName\",\n"
-          + "P.price, P.resource_ids_and_capabilities AS \"resourcesAndCapabilities\",\n"
-          + "I.payment_status AS \"paymentStatus\", I.payment_time AS \"paymentTime\",\n"
-          + "I.expiry AS \"expiryInMonths\"\n"
-          + "FROM invoice I\n"
-          + "INNER JOIN product_variant P\n"
-          + "ON I.product_variant_id = P._id\n"
-          + "INNER JOIN user_table U\n"
-          + "ON U._id = P.provider_id\n"
-          + "WHERE I.consumer_id = '$1'";
-  public static final String LIST_PURCHASE_4_CONSUMER_WITH_GIVEN_PRODUCT =
-      "SELECT I._id AS \"invoiceId\", P.provider_id AS \"providerId\",\n"
-          + "U.email_id AS \"providerEmailId\", U.first_name AS \"providerFirstName\",\n"
-          + "U.last_name AS \"providerLastName\", \n"
-          + "I.order_id AS \"orderId\", I.product_variant_id AS \"productVariantId\",\n"
-          + "P.product_id AS \"productId\", P.resource_name AS \"resourceName\",\n"
-          + "P.price, P.resource_ids_and_capabilities AS \"resourcesAndCapabilities\",\n"
-          + "I.payment_status AS \"paymentStatus\", I.payment_time AS \"paymentTime\",\n"
-          + "I.expiry AS \"expiryInMonths\"\n"
-          + "FROM invoice I\n"
-          + "INNER JOIN product_variant P\n"
-          + "ON I.product_variant_id = P._id\n"
-          + "INNER JOIN user_table U\n"
-          + "ON U._id = P.provider_id\n"
-          + "WHERE\n"
-          + "P.product_id = '$1'\n"
-          + "AND I.consumer_id = '$2'";
-  public static final String LIST_PURCHASE_4_CONSUMER_WITH_GIVEN_RESOURCE =
-      "SELECT I._id AS \"invoiceId\", P.provider_id AS \"providerId\",\n"
-          + "U.email_id AS \"providerEmailId\", U.first_name AS \"providerFirstName\",\n"
-          + "U.last_name AS \"providerLastName\", \n"
-          + "I.order_id AS \"orderId\", I.product_variant_id AS \"productVariantId\",\n"
-          + "P.product_id AS \"productId\", P.resource_name AS \"resourceName\",\n"
-          + "P.price, P.resource_ids_and_capabilities AS \"resourcesAndCapabilities\",\n"
-          + "I.payment_status AS \"paymentStatus\", I.payment_time AS \"paymentTime\",\n"
-          + "I.expiry AS \"expiryInMonths\"\n"
-          + "FROM invoice I\n"
-          + "INNER JOIN product_variant P\n"
-          + "ON I.product_variant_id = P._id\n"
-          + "INNER JOIN user_table U\n"
-          + "ON U._id = P.provider_id\n"
-          + "WHERE\n"
-          + "P.product_id IN (SELECT product_id FROM product_resource_relation WHERE resource_id = '$1'\n"
-          + ")\n"
-          + "AND I.consumer_id = '$2'";
+          "insert into $0 (_id, consumer_id, order_id, product_variant_id, payment_status, payment_time, expiry) "
+                  + "values ('$1', '$2', '$3', '$4', '$5', '$6', (select validity from $p where _id = '$4'))";
 
   public static final String TRANSFER_ID = "id";
   public static final String SOURCE = "source";
