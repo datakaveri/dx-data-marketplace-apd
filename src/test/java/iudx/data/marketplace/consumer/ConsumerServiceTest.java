@@ -31,7 +31,6 @@ public class ConsumerServiceTest {
   @Mock AsyncResult<JsonObject> asyncResult;
 
   private static PostgresService postgresService;
-  private static RazorPayService razorPayService;
   private static ConsumerServiceImpl consumerService;
   JsonObject request;
   JsonObject config;
