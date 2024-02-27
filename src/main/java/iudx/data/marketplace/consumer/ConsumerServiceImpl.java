@@ -12,6 +12,9 @@ import io.vertx.core.Handler;
 import io.vertx.core.Promise;
 import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
+import iudx.data.marketplace.common.HttpStatusCode;
+import iudx.data.marketplace.common.RespBuilder;
+import iudx.data.marketplace.common.ResponseUrn;
 import iudx.data.marketplace.consumer.util.PaymentStatus;
 import iudx.data.marketplace.policies.User;
 import iudx.data.marketplace.postgres.PostgresService;
@@ -174,6 +177,45 @@ public class ConsumerServiceImpl implements ConsumerService {
               }
             });
 
+    return this;
+  }
+
+  @Override
+  public ConsumerService listProductVariants(
+      User user, JsonObject request, Handler<AsyncResult<JsonObject>> handler) {
+    String productId = request.getString("productId");
+    String query = FETCH_ACTIVE_PRODUCT_VARIANTS.replace("$1", productId);
+    pgService.executeQuery(
+        query,
+        pgHandler -> {
+          if (pgHandler.succeeded()) {
+            boolean isResponseEmpty = pgHandler.result().getJsonArray(RESULTS).isEmpty();
+            if (!isResponseEmpty) {
+              LOGGER.info("Product variants fetched successfully");
+              handler.handle(Future.succeededFuture(pgHandler.result()));
+            } else {
+              LOGGER.info("Response from DB is empty while fetching " + "product variant");
+              String failureMessage =
+                  new RespBuilder()
+                      .withType(ResponseUrn.RESOURCE_NOT_FOUND_URN.getUrn())
+                      .withTitle(ResponseUrn.RESOURCE_NOT_FOUND_URN.getMessage())
+                      .withDetail("Product variants not found")
+                      .getResponse();
+              handler.handle(Future.failedFuture(failureMessage));
+            }
+          } else {
+            LOGGER.error(
+                "Failure while fetching product variant : {}", pgHandler.cause().getMessage());
+            String failureMessage =
+                new RespBuilder()
+                    .withType(ResponseUrn.DB_ERROR_URN.getUrn())
+                    .withTitle(ResponseUrn.INTERNAL_SERVER_ERR_URN.getMessage())
+                    .withDetail(
+                        "Product variants could not be fetched as there was internal server error")
+                    .getResponse();
+            handler.handle(Future.failedFuture(failureMessage));
+          }
+        });
     return this;
   }
 

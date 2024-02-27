@@ -63,6 +63,15 @@ public interface ConsumerService {
   ConsumerService createOrder(JsonObject request, User user, Handler<AsyncResult<JsonObject>> handler);
 
   /**
+   * The listProductVariants method fetches all the <b>ACTIVE</b> product variants of a given product
+   * @param request containing the productId of a given product
+   * @param handler AsyncResult JsonObject request handler
+   * @return ConsumerService object
+   */
+  @Fluent
+  ConsumerService listProductVariants(User user,JsonObject request, Handler<AsyncResult<JsonObject>> handler);
+
+  /**
    * The createProxy helps the code generation blocks to generate proxy code.
    *
    * @param vertx which is the vertx instance

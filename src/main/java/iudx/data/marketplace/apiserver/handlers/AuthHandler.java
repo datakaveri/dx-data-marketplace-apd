@@ -247,6 +247,12 @@ public class AuthHandler implements Handler<RoutingContext> {
       return api.getConsumerOrderApi();
     } else if(url.matches(api.getLinkedAccountService())){
       return api.getLinkedAccountService();
+    } else if(url.matches(api.getConsumerListResourcePath()))
+    {
+      return api.getConsumerListResourcePath();
+    }else if(url.matches(api.getConsumerProductVariantPath()))
+    {
+      return api.getConsumerProductVariantPath();
     }
     return null;
   }
