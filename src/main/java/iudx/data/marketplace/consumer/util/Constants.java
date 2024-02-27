@@ -37,4 +37,12 @@ public class Constants {
   public static final String NOTES = "notes";
   public static final String TRANSFERS = "transfers";
   public static final String TABLES = "tables";
+  public static final String FETCH_ACTIVE_PRODUCT_VARIANTS  = "SELECT _id AS \"productVariantId\"," +
+          " product_variant_name AS \"productVariantName\", \"product_id\" AS \"productId\",\n" +
+          "provider_id AS \"providerId\", resource_name AS \"resourceName\", \n" +
+          "resource_ids_and_capabilities AS \"resourceIdsAndCapabilities\",\n" +
+          "price AS \"price\", validity AS \"expiryInMonths\"\n" +
+          "FROM product_variant\n" +
+          "WHERE product_id = '$1'\n" +
+          "AND status = 'ACTIVE';";
 }
