@@ -193,66 +193,76 @@ public class ConsumerServiceImpl implements ConsumerService {
     String resourceId = request.getString("resourceId");
     String productId = request.getString("productId");
     String query = queryBuilder.listPurchaseForConsumer(user.getUserId(), resourceId, productId);
-    pgService.executeQuery(query, queryHandler -> {
-      if(queryHandler.succeeded())
-      {
-        LOGGER.debug("Fetched invoice related information from postgres successfully");
-        JsonArray result = queryHandler.result().getJsonArray(RESULTS);
-        if(!result.isEmpty())
-        {
-          JsonArray userResponse = new JsonArray();
-          for(Object row : result)
-          {
-            JsonObject rowEntry = JsonObject.mapFrom(row);
+    pgService.executeQuery(
+        query,
+        queryHandler -> {
+          if (queryHandler.succeeded()) {
+            LOGGER.debug("Fetched invoice related information from postgres successfully");
+            JsonArray result = queryHandler.result().getJsonArray(RESULTS);
+            if (!result.isEmpty()) {
+              JsonArray userResponse = new JsonArray();
+              for (Object row : result) {
+                JsonObject rowEntry = JsonObject.mapFrom(row);
 
-            rowEntry.mergeIn(getProviderInfo(rowEntry))
+                rowEntry
+                    .mergeIn(getProviderInfo(rowEntry))
                     .mergeIn(getConsumerInfo(user))
                     .mergeIn(getProductInfo(rowEntry));
-            userResponse.add(rowEntry);
+                userResponse.add(rowEntry);
+              }
 
+              JsonObject response =
+                  new RespBuilder()
+                      .withType(ResponseUrn.SUCCESS_URN.getUrn())
+                      .withTitle(ResponseUrn.SUCCESS_URN.getMessage())
+                      .withResult(new JsonArray().add(userResponse))
+                      .getJsonResponse();
+
+              handler.handle(Future.succeededFuture(response));
+            } else {
+              LOGGER.debug(
+                  "No invoice present for the given resource "
+                      + ": {} or product : {}, for the consumer : {}",
+                  resourceId,
+                  productId,
+                  user.getUserId());
+
+              boolean isAnyQueryParamSent =
+                  StringUtils.isNotBlank(resourceId) || StringUtils.isNotBlank(productId);
+
+              String failureMessage =
+                  new RespBuilder()
+                      .withType(HttpStatusCode.NO_CONTENT.getValue())
+                      .withTitle(HttpStatusCode.NO_CONTENT.getUrn())
+                      .getResponse();
+              if (isAnyQueryParamSent) {
+                failureMessage =
+                    new RespBuilder()
+                        .withType(HttpStatusCode.NOT_FOUND.getValue())
+                        .withTitle(ResponseUrn.RESOURCE_NOT_FOUND_URN.getUrn())
+                        .withDetail("Purchase info not found")
+                        .getResponse();
+              }
+              handler.handle(Future.failedFuture(failureMessage));
+            }
           }
-          JsonObject response =
-                  new JsonObject()
-                          .put(TYPE, ResponseUrn.SUCCESS_URN.getUrn())
-                          .put(TITLE, ResponseUrn.SUCCESS_URN.getMessage())
-                          .put(RESULT, userResponse);
-
-          handler.handle(Future.succeededFuture(response));
-        }
-        else
-        {
-          LOGGER.debug("No invoice present for the given resource " +
-                          ": {} or product : {}, for the consumer : {}",
-                  resourceId, productId, user.getUserId());
-
-          boolean isAnyQueryParamSent = StringUtils.isNotBlank(resourceId)||StringUtils.isNotBlank(productId);
-
-          String failureMessage = new RespBuilder()
-                  .withType(HttpStatusCode.NO_CONTENT.getValue())
-                  .withTitle(HttpStatusCode.NO_CONTENT.getUrn()).getResponse();
-          if(isAnyQueryParamSent)
-          {
-            failureMessage = new RespBuilder()
-                    .withType(HttpStatusCode.NOT_FOUND.getValue())
-                    .withTitle(ResponseUrn.RESOURCE_NOT_FOUND_URN.getUrn())
-                    .withDetail("Purchase info not found")
-                    .getResponse();
-          }
-          handler.handle(Future.failedFuture(failureMessage));
-        }
-      }
-    });
+        });
     return this;
   }
+
   private JsonObject getProviderInfo(JsonObject row) {
-    JsonObject providerJson = new JsonObject()
-            .put("provider", new JsonObject()
+    JsonObject providerJson =
+        new JsonObject()
+            .put(
+                "provider",
+                new JsonObject()
                     .put("email", row.getString("providerEmailId"))
-                    .put("name", new JsonObject()
+                    .put(
+                        "name",
+                        new JsonObject()
                             .put("firstName", row.getString("providerFirstName"))
                             .put("lastName", row.getString("providerLastName")))
-                    .put("id", row.getString("providerId"))
-            );
+                    .put("id", row.getString("providerId")));
     row.remove("providerEmailId");
     row.remove("providerFirstName");
     row.remove("providerLastName");
@@ -260,39 +270,48 @@ public class ConsumerServiceImpl implements ConsumerService {
     return providerJson;
   }
 
-  public JsonObject getProductInfo(JsonObject row)
-  {
-    JsonObject productJson = new JsonObject()
-            .put("product",new JsonObject()
+  public JsonObject getProductInfo(JsonObject row) {
+    JsonObject productJson =
+        new JsonObject()
+            .put(
+                "product",
+                new JsonObject()
                     .put("productId", row.getString("productId"))
                     .put("productVariantId", row.getString("productVariantId"))
                     .put("resourceName", row.getString("resourceName"))
                     .put("price", row.getString("price"))
                     .put("expiryInMonths", row.getString("expiryInMonths"))
-                    .put("resourcesAndCapabilities", row.getJsonObject("resourcesAndCapabilities")));
+                    .put(
+                        "resourcesAndCapabilities", row.getJsonObject("resourcesAndCapabilities")));
 
     row.remove("productId");
     row.remove("productVariantId");
     row.remove("resourceName");
     row.remove("price");
-    row.remove( "resourcesAndCapabilities");
+    row.remove("resourcesAndCapabilities");
     row.remove("expiryInMonths");
     return productJson;
   }
-  public JsonObject getConsumerInfo(User user)
-  {
-    JsonObject consumerJson = new JsonObject()
-            .put("consumer", new JsonObject()
+
+  public JsonObject getConsumerInfo(User user) {
+    JsonObject consumerJson =
+        new JsonObject()
+            .put(
+                "consumer",
+                new JsonObject()
                     .put("email", user.getEmailId())
-                    .put("name", new JsonObject()
+                    .put(
+                        "name",
+                        new JsonObject()
                             .put("firstName", user.getFirstName())
                             .put("lastName", user.getLastName()))
-                    .put("id", user.getUserId())
-            );
+                    .put("id", user.getUserId()));
 
     return consumerJson;
   }
-  private Future<JsonObject> generateOrderEntry(JsonObject orderInfo) {
+
+  private Future<JsonObject> generateOrderEntry(
+          JsonObject orderInfo, String variantId, String consumerId) {
     Promise<JsonObject> promise = Promise.promise();
     QueryContainer queryContainer = getQueryContainer(orderInfo, variantId, consumerId);
 

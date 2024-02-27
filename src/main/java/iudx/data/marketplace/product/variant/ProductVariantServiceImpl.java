@@ -272,10 +272,11 @@ public class ProductVariantServiceImpl implements ProductVariantService {
 
                     }
                     JsonObject response =
-                            new JsonObject()
-                                    .put(TYPE, ResponseUrn.SUCCESS_URN.getUrn())
-                                    .put(TITLE, ResponseUrn.SUCCESS_URN.getMessage())
-                                    .put(RESULT, userResponse);
+                            new RespBuilder()
+                                    .withType(ResponseUrn.SUCCESS_URN.getUrn())
+                                    .withTitle(ResponseUrn.SUCCESS_URN.getMessage())
+                                    .withResult(new JsonArray().add(userResponse))
+                                    .getJsonResponse();
 
                     handler.handle(Future.succeededFuture(response));
                 }

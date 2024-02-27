@@ -10,6 +10,7 @@ import io.vertx.core.json.JsonObject;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
+import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
 import org.apache.commons.lang.StringUtils;
@@ -20,12 +21,15 @@ public class QueryBuilder {
 
   public static final Logger LOGGER = LogManager.getLogger(QueryBuilder.class);
   private String productTable, resourceTable, productResourceRelationTable, productVariantTable;
+  private Supplier<String> supplier;
 
   public QueryBuilder(JsonArray tables) {
     this.productTable = tables.getString(0);
     this.resourceTable = tables.getString(1);
     this.productResourceRelationTable = tables.getString(2);
     this.productVariantTable = tables.getString(3);
+    this.supplier = () -> UUID.randomUUID().toString();
+
   }
 
   public QueryBuilder() {}
@@ -124,7 +128,7 @@ public class QueryBuilder {
             .collect(Collectors.joining("','", "'", "'"));
 
     // UUID for each product variant.
-    String pvID = generateUuid();
+    String pvID = supplier.get();
 
     LOGGER.debug("resourceId and capabilities : {} ", resourceIdsAndCapabilities.encode());
     LOGGER.debug("request is : " + request.encodePrettily());
@@ -183,7 +187,7 @@ public class QueryBuilder {
   }
 
   public JsonObject buildMessageForRmq(JsonObject request) {
-    String primaryKey = generateUuid().replace("-", "");
+    String primaryKey = supplier.get().replace("-", "");
     request.put(PRIMARY_KEY, primaryKey);
     request.put(ORIGIN, ORIGIN_SERVER);
 
@@ -240,10 +244,6 @@ public class QueryBuilder {
     return query.toString();
   }
 
-public String generateUuid()
-{
-  return UUID.randomUUID().toString();
-}
 
 
 }
