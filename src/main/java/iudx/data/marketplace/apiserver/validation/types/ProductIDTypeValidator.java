@@ -22,8 +22,22 @@ public class ProductIDTypeValidator implements Validator {
   }
 
   public boolean isValidID(final String value) {
-    int count = StringUtils.countMatches(value, ":");
-    return VALIDATION_PRODUCT_ID_REGEX.matcher(value).matches() && (count == VALIDATION_URN_DELIMITER_COUNT);
+    String[] variable = value.split(":");
+    try {
+      boolean isValidUrn =
+          StringUtils.isNotBlank(variable[0]) && variable[0].equals(STRING_URN);
+      boolean isValidDomain =
+              StringUtils.isNotBlank(variable[1]) && variable[1].equals(DOMAIN);
+      boolean isValidProvider =
+          StringUtils.isNotBlank(variable[2]) && new UUIDTypeValidator(variable[2], true).isValid();
+      boolean isValidProductName =
+          StringUtils.isNotBlank(variable[3])
+              && VALIDATION_PRODUCT_ID_REGEX.matcher(variable[3]).matches();
+      return isValidProductName && isValidProvider && isValidUrn && isValidDomain;
+
+    } catch (ArrayIndexOutOfBoundsException e) {
+      throw new DxRuntimeException(failureCode(), INVALID_ID_VALUE_URN, failureMessage(value));
+    }
   }
 
   @Override

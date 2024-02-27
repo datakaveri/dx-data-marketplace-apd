@@ -7,6 +7,7 @@ public enum RequestType {
   POLICY("policy"),
   VERIFY("verify_policy"),
   ORDER("order"),
+  PURCHASE("purchase"),
   POST_ACCOUNT("post_account"),
   PUT_ACCOUNT("put_account"),
   PROVIDER("provider");

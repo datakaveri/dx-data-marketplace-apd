@@ -1,5 +1,7 @@
 package iudx.data.marketplace.product.variant;
 
+import static iudx.data.marketplace.apiserver.util.Constants.RESULT;
+import static iudx.data.marketplace.apiserver.util.Constants.TITLE;
 import static iudx.data.marketplace.product.util.Constants.*;
 
 import io.vertx.core.AsyncResult;
@@ -9,12 +11,14 @@ import io.vertx.core.Promise;
 import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
 import iudx.data.marketplace.apiserver.exceptions.DxRuntimeException;
+import iudx.data.marketplace.common.HttpStatusCode;
 import iudx.data.marketplace.common.RespBuilder;
 import iudx.data.marketplace.common.ResponseUrn;
 import iudx.data.marketplace.policies.User;
 import iudx.data.marketplace.postgres.PostgresService;
 import iudx.data.marketplace.product.util.QueryBuilder;
 import iudx.data.marketplace.product.util.Status;
+import org.apache.commons.lang.StringUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -238,4 +242,113 @@ public class ProductVariantServiceImpl implements ProductVariantService {
 
     return this;
   }
+
+  /*
+  TODO: Add expiryTime stamp if there is any policy created (check if payment status is successful)
+   */
+    @Override
+    public ProductVariantService listPurchase(User user, JsonObject request, Handler<AsyncResult<JsonObject>> handler) {
+
+        String resourceId = request.getString("resourceId");
+        String productId = request.getString("productId");
+        String query = queryBuilder.listPurchase(user.getUserId(), resourceId, productId);
+        pgService.executeQuery(query, queryHandler -> {
+            if(queryHandler.succeeded())
+            {
+                LOGGER.debug("Fetched invoice related information from postgres successfully");
+                JsonArray result = queryHandler.result().getJsonArray(RESULTS);
+                if(!result.isEmpty())
+                {
+                    JsonArray userResponse = new JsonArray();
+                    for(Object row : result)
+                    {
+                        JsonObject rowEntry = JsonObject.mapFrom(row);
+
+                             rowEntry.mergeIn(getProviderInfo(user))
+                                .mergeIn(getConsumerInfo(rowEntry))
+                                .mergeIn(getProductInfo(rowEntry));
+                        userResponse.add(rowEntry);
+
+                    }
+                    JsonObject response =
+                            new JsonObject()
+                                    .put(TYPE, ResponseUrn.SUCCESS_URN.getUrn())
+                                    .put(TITLE, ResponseUrn.SUCCESS_URN.getMessage())
+                                    .put(RESULT, userResponse);
+
+                    handler.handle(Future.succeededFuture(response));
+                }
+                else
+                {
+                    LOGGER.debug("No invoice present for the given resource " +
+                                    ": {} or product : {}, for the provider : {}",
+                            resourceId, productId, user.getUserId());
+
+                    boolean isAnyQueryParamSent = StringUtils.isNotBlank(resourceId)||StringUtils.isNotBlank(productId);
+
+                    String failureMessage = new RespBuilder()
+                            .withType(HttpStatusCode.NO_CONTENT.getValue())
+                            .withTitle(HttpStatusCode.NO_CONTENT.getUrn()).getResponse();
+                    if(isAnyQueryParamSent)
+                    {
+                        failureMessage = new RespBuilder()
+                                .withType(HttpStatusCode.NOT_FOUND.getValue())
+                                .withTitle(ResponseUrn.RESOURCE_NOT_FOUND_URN.getUrn())
+                                .withDetail("Purchase info not found")
+                                .getResponse();
+                    }
+                    handler.handle(Future.failedFuture(failureMessage));
+                }
+            }
+        });
+        return this;
+    }
+
+    private JsonObject getProviderInfo(User user) {
+        JsonObject providerJson = new JsonObject()
+                .put("provider", new JsonObject()
+                        .put("email", user.getEmailId())
+                        .put("name", new JsonObject()
+                                .put("firstName", user.getFirstName())
+                                .put("lastName", user.getLastName()))
+                        .put("id", user.getUserId())
+                );
+        return providerJson;
+    }
+
+    public JsonObject getProductInfo(JsonObject row)
+    {
+        JsonObject productJson = new JsonObject()
+                .put("product",new JsonObject()
+                        .put("productId", row.getString("productId"))
+                        .put("productVariantId", row.getString("productVariantId"))
+                        .put("resourceName", row.getString("resourceName"))
+                        .put("price", row.getString("price"))
+                        .put("expiryInMonths", row.getString("expiryInMonths"))
+                        .put("resourcesAndCapabilities", row.getJsonObject("resourcesAndCapabilities")));
+
+        row.remove("productId");
+        row.remove("productVariantId");
+        row.remove("resourceName");
+        row.remove("price");
+        row.remove( "resourcesAndCapabilities");
+        row.remove("expiryInMonths");
+        return productJson;
+    }
+    public JsonObject getConsumerInfo(JsonObject row)
+    {
+        JsonObject consumerJson = new JsonObject()
+                .put("consumer", new JsonObject()
+                        .put("email", row.getString("consumerEmailId"))
+                        .put("name", new JsonObject()
+                                .put("firstName", row.getString("consumerFirstName"))
+                                .put("lastName", row.getString("consumerLastName")))
+                        .put("id", row.getString("consumerId"))
+                );
+        row.remove("consumerEmailId");
+        row.remove("consumerFirstName");
+        row.remove("consumerLastName");
+        row.remove("consumerId");
+        return consumerJson;
+    }
 }

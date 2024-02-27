@@ -2,6 +2,7 @@ package iudx.data.marketplace.product.util;
 
 import static iudx.data.marketplace.auditing.util.Constants.*;
 import static iudx.data.marketplace.common.Constants.*;
+import static iudx.data.marketplace.consumer.util.Constants.*;
 import static iudx.data.marketplace.product.util.Constants.*;
 
 import io.vertx.core.json.JsonArray;
@@ -10,6 +11,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
+
+import org.apache.commons.lang.StringUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -121,7 +124,7 @@ public class QueryBuilder {
             .collect(Collectors.joining("','", "'", "'"));
 
     // UUID for each product variant.
-    String pvID = UUID.randomUUID().toString();
+    String pvID = generateUuid();
 
     LOGGER.debug("resourceId and capabilities : {} ", resourceIdsAndCapabilities.encode());
     LOGGER.debug("request is : " + request.encodePrettily());
@@ -180,11 +183,67 @@ public class QueryBuilder {
   }
 
   public JsonObject buildMessageForRmq(JsonObject request) {
-    String primaryKey = UUID.randomUUID().toString().replace("-", "");
+    String primaryKey = generateUuid().replace("-", "");
     request.put(PRIMARY_KEY, primaryKey);
     request.put(ORIGIN, ORIGIN_SERVER);
 
     LOGGER.debug("Info: Request " + request);
     return request;
   }
+
+  public String listPurchase(String providerId, String resourceId, String productId)
+  {
+    boolean isProductIdPresent = StringUtils.isNotBlank(productId);
+    boolean isResourceIdPresent = StringUtils.isNotBlank(resourceId);
+
+    StringBuilder query =
+            new StringBuilder(LIST_ALL_PURCHASE_4_PROVIDER.replace("$1", providerId));
+
+    if(isProductIdPresent && !isResourceIdPresent)
+    {
+      query = new StringBuilder(LIST_PURCHASE_4_PROVIDER_WITH_GIVEN_PRODUCT
+              .replace("$1", productId)
+              .replace("$2", providerId));
+    }
+
+    if(isResourceIdPresent && !isProductIdPresent)
+    {
+      query = new StringBuilder(LIST_PURCHASE_4_PROVIDER_WITH_GIVEN_RESOURCE
+              .replace("$1", resourceId)
+              .replace("$2", providerId));
+    }
+    return query.toString();
+  }
+
+  public String listPurchaseForConsumer(String consumerId, String resourceId, String productId)
+  {
+    boolean isProductIdPresent = StringUtils.isNotBlank(productId);
+    boolean isResourceIdPresent = StringUtils.isNotBlank(resourceId);
+
+    StringBuilder query =
+            new StringBuilder(LIST_ALL_PURCHASE_4_CONSUMER.replace("$1", consumerId));
+
+    if(isProductIdPresent && !isResourceIdPresent)
+    {
+      query = new StringBuilder(LIST_PURCHASE_4_CONSUMER_WITH_GIVEN_PRODUCT
+              .replace("$1", productId)
+              .replace("$2", consumerId));
+    }
+
+    if(isResourceIdPresent && !isProductIdPresent)
+    {
+      query = new StringBuilder(LIST_PURCHASE_4_CONSUMER_WITH_GIVEN_RESOURCE
+              .replace("$1", resourceId)
+              .replace("$2", consumerId));
+    }
+
+    return query.toString();
+  }
+
+public String generateUuid()
+{
+  return UUID.randomUUID().toString();
+}
+
+
 }

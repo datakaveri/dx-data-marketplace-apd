@@ -39,6 +39,8 @@ public enum ResponseUrn {
   QUEUE_ERROR_URN("urn:dx:dmp:QueueError", "Queue error"),
   INVALID_RESOURCE_URN("urn:dx:dmp:InvalidResourceID", "Resource ID is invalid"),
   INVALID_PROVIDER_URN("urn:dx:dmp:InvalidProviderID", "Provider ID is invalid"),
+  INVALID_ID_URN("urn:dx:dmp:invalidId", "Given ID is invalid"),
+
   ROLE_NOT_FOUND("urn:dx:dmp:invalidRole", "Role does not exist"),
   BACKING_SERVICE_FORMAT_URN(
       "urn:dx:dmp:backend", "format error from backing service [cat,auth etc.]"),

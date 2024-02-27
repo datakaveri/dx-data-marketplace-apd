@@ -58,4 +58,57 @@ public class Constants {
   public static final String SELECT_PV_QUERY = "select count(*) from $0 where product_id='$1' and product_variant_name='$2' and status='$3'";
 
   public static final String LIST_PVS_QUERY = "select product_variant_name, product_id, resource_name from $0 where product_id=$1 and status=$2";
+  public static final String LIST_ALL_PURCHASE_4_PROVIDER =
+      "\n"
+          + "SELECT I._id AS \"invoiceId\", I.consumer_id AS \"consumerId\",\n"
+          + "U.email_id AS \"consumerEmailId\", U.first_name AS \"consumerFirstName\",\n"
+          + "U.last_name AS \"consumerLastName\", \n"
+          + "I.order_id AS \"orderId\", I.product_variant_id AS \"productVariantId\",\n"
+          + "P.product_id AS \"productId\", P.resource_name AS \"resourceName\",\n"
+          + "P.price, P.resource_ids_and_capabilities AS \"resourcesAndCapabilities\",\n"
+          + "I.payment_status AS \"paymentStatus\", I.payment_time AS \"paymentTime\",\n"
+          + "I.expiry AS \"expiryInMonths\"\n"
+          + "FROM invoice I\n"
+          + "INNER JOIN product_variant P\n"
+          + "ON I.product_variant_id = P._id\n"
+          + "INNER JOIN user_table U\n"
+          + "ON U._id = I.consumer_id\n"
+          + "WHERE P.provider_id = '$1'";
+  public static final String LIST_PURCHASE_4_PROVIDER_WITH_GIVEN_PRODUCT =
+      "\n"
+          + "SELECT I._id AS \"invoiceId\", I.consumer_id AS \"consumerId\",\n"
+          + "U.email_id AS \"consumerEmailId\", U.first_name AS \"consumerFirstName\",\n"
+          + "U.last_name AS \"consumerLastName\", \n"
+          + "I.order_id AS \"orderId\", I.product_variant_id AS \"productVariantId\",\n"
+          + "P.product_id AS \"productId\", P.resource_name AS \"resourceName\",\n"
+          + "P.price, P.resource_ids_and_capabilities AS \"resourcesAndCapabilities\",\n"
+          + "I.payment_status AS \"paymentStatus\", I.payment_time AS \"paymentTime\",\n"
+          + "I.expiry AS \"expiryInMonths\"\n"
+          + "FROM invoice I\n"
+          + "INNER JOIN product_variant P\n"
+          + "ON I.product_variant_id = P._id\n"
+          + "INNER JOIN user_table U\n"
+          + "ON U._id = I.consumer_id\n"
+          + "WHERE\n"
+          + "P.product_id = '$1'\n"
+          + "AND P.provider_id = '$2'";
+  public static final String LIST_PURCHASE_4_PROVIDER_WITH_GIVEN_RESOURCE =
+          "SELECT I._id AS \"invoiceId\", I.consumer_id AS \"consumerId\",\n"
+          + "U.email_id AS \"consumerEmailId\", U.first_name AS \"consumerFirstName\",\n"
+          + "U.last_name AS \"consumerLastName\", \n"
+          + "I.order_id AS \"orderId\", I.product_variant_id AS \"productVariantId\",\n"
+          + "P.product_id AS \"productId\", P.resource_name AS \"resourceName\",\n"
+          + "P.price, P.resource_ids_and_capabilities AS \"resourcesAndCapabilities\",\n"
+          + "I.payment_status AS \"paymentStatus\", I.payment_time AS \"paymentTime\",\n"
+          + "I.expiry AS \"expiryInMonths\"\n"
+          + "FROM invoice I\n"
+          + "INNER JOIN product_variant P\n"
+          + "ON I.product_variant_id = P._id\n"
+          + "INNER JOIN user_table U\n"
+          + "ON U._id = I.consumer_id\n"
+          + "WHERE\n"
+          + "P.product_id IN (SELECT product_id FROM product_resource_relation WHERE resource_id = '$1'\n"
+          + ")\n"
+          + "\n"
+          + "AND P.provider_id = '$2';";
 }

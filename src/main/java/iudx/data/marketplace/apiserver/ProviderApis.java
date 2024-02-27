@@ -7,10 +7,12 @@ import static iudx.data.marketplace.common.Constants.PRODUCT_SERVICE_ADDRESS;
 import static iudx.data.marketplace.common.Constants.PRODUCT_VARIANT_SERVICE_ADDRESS;
 import static iudx.data.marketplace.common.HttpStatusCode.BAD_REQUEST;
 
+import io.vertx.core.MultiMap;
 import io.vertx.core.Vertx;
 import io.vertx.core.http.HttpServerRequest;
 import io.vertx.core.http.HttpServerResponse;
 import io.vertx.core.json.DecodeException;
+import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
 import io.vertx.ext.web.Router;
 import io.vertx.ext.web.RoutingContext;
@@ -69,6 +71,8 @@ public class ProviderApis {
         new ValidationHandler(vertx, RequestType.PRODUCT_VARIANT);
     ValidationHandler resourceValidationHandler =
         new ValidationHandler(vertx, RequestType.RESOURCE);
+    ValidationHandler purchaseValidationHandler =
+        new ValidationHandler(vertx, RequestType.PURCHASE);
     ExceptionHandler exceptionHandler = new ExceptionHandler();
 
     productService = ProductService.createProxy(vertx, PRODUCT_SERVICE_ADDRESS);
@@ -98,6 +102,7 @@ public class ProviderApis {
 
     router
         .get(PROVIDER_PATH + LIST_PURCHASES_PATH)
+        .handler(purchaseValidationHandler)
         .handler(AuthHandler.create(authenticationService, vertx, api, postgresService, authClient))
         .handler(this::listPurchases)
         .failureHandler(exceptionHandler);
@@ -213,15 +218,23 @@ public class ProviderApis {
   }
 
   private void listPurchases(RoutingContext routingContext) {
-    routingContext
-        .response()
-        .putHeader(CONTENT_TYPE, APPLICATION_JSON)
-        .setStatusCode(404)
-        .end(
-            new RespBuilder()
-                .withType(ResponseUrn.YET_NOT_IMPLEMENTED_URN.getUrn())
-                .withTitle(ResponseUrn.YET_NOT_IMPLEMENTED_URN.getMessage())
-                .getResponse());
+    User provider = routingContext.get("user");
+    MultiMap requestParams = routingContext.request().params();
+    String resourceId = requestParams.get("resourceId");
+    String productId = requestParams.get("productId");
+    JsonObject requestJson =
+        new JsonObject().put("resourceId", resourceId).put("productId", productId);
+    variantService
+            .listPurchase(provider, requestJson, handler -> {
+              if(handler.succeeded())
+              {
+                handleSuccessResponse(routingContext, HttpStatusCode.SUCCESS.getValue(), handler.result());
+              }
+              else
+              {
+                handleFailure(routingContext, handler.cause().getMessage());
+              }
+            });
   }
 
   private void handleCreateProductVariant(RoutingContext routingContext) {

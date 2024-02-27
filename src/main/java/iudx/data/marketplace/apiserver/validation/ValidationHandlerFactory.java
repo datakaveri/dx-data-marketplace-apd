@@ -48,8 +48,18 @@ public class ValidationHandlerFactory {
         break;
       case PUT_ACCOUNT:
         validator = getPutLinkedAccountValidator(body, requestType);
+      case PURCHASE:
+        validator = getPurchaseValidator(parameters);
     }
     return validator;
+  }
+
+  private List<Validator> getPurchaseValidator(MultiMap parameters) {
+    List<Validator> validators = new ArrayList<>();
+
+    validators.add(new UUIDTypeValidator(parameters.get("resourceId"),false));
+    validators.add(new ProductIDTypeValidator(parameters.get("productId"), false));
+    return validators;
   }
 
   private List<Validator> getPostLinkedAccountValidator(JsonObject body, RequestType requestType) {
