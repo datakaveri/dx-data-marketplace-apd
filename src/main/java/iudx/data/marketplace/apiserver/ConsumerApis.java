@@ -61,35 +61,41 @@ public class ConsumerApis {
     ValidationHandler purchaseValidationHandler =
             new ValidationHandler(vertx, RequestType.PURCHASE);
     ExceptionHandler exceptionHandler = new ExceptionHandler();
+    ValidationHandler productVariantHandler = new ValidationHandler(vertx, RequestType.PRODUCT);
 
     consumerService = ConsumerService.createProxy(vertx, CONSUMER_SERVICE_ADDRESS);
 
     router
-        .get(CONSUMER_PATH + LIST_PROVIDERS_PATH)
+        .get(api.getConsumerListProviders())
         .handler(providerValidationHandler)
         .handler(AuthHandler.create(authenticationService, vertx, api, postgresService, authClient))
         .handler(this::listProviders)
         .failureHandler(exceptionHandler);
 
     router
-        .get(CONSUMER_PATH + LIST_RESOURCES_PATH)
+        .get(api.getConsumerListResourcePath())
         .handler(resourceValidationHandler)
         .handler(AuthHandler.create(authenticationService, vertx, api, postgresService, authClient))
         .handler(this::listResources)
         .failureHandler(exceptionHandler);
 
     router
-        .get(CONSUMER_PATH + LIST_PRODUCTS_PATH)
+        .get(api.getConsumerListProducts())
         .handler(resourceValidationHandler)
         .handler(AuthHandler.create(authenticationService, vertx, api, postgresService, authClient))
         .handler(this::listProducts)
         .failureHandler(exceptionHandler);
 
     router
-        .get(CONSUMER_PATH + LIST_PURCHASES_PATH)
+        .get(api.getConsumerListPurchases())
         .handler(purchaseValidationHandler)
         .handler(AuthHandler.create(authenticationService, vertx, api, postgresService, authClient))
-        .handler(this::listPurchases)
+    
+ router
+      .get(api.getConsumerProductVariantPath())
+      //  .handler(productVariantHandler)
+        .handler(AuthHandler.create(authenticationService, vertx, api, postgresService, authClient))
+        .handler(this::listProductVariants)
         .failureHandler(exceptionHandler);
 
     router
@@ -170,6 +176,27 @@ public class ConsumerApis {
         });
   }
 
+  private void listProductVariants(RoutingContext routingContext) {
+
+    User consumer = routingContext.get("user");
+    MultiMap requestParams = routingContext.request().params();
+    String productId = requestParams.get("productId");
+    JsonObject requestJson =
+            new JsonObject().put("productId", productId);
+
+    consumerService.listProductVariants(
+        consumer,
+        requestJson,
+        handler -> {
+          if (handler.succeeded()) {
+            handleSuccessResponse(
+                routingContext, HttpStatusCode.SUCCESS.getValue(), handler.result());
+          } else {
+            handleFailureResponse(routingContext, handler.cause());
+          }
+        });
+  }
+
   private void listProducts(RoutingContext routingContext) {
     HttpServerRequest request = routingContext.request();
     JsonObject requestBody = new JsonObject();
@@ -190,7 +217,7 @@ public class ConsumerApis {
               handleSuccessResponse(routingContext, 200, handler.result());
             }
           } else {
-            handleFailureResponse(routingContext, handler.cause());
+            handleFailureResponse(routingContext, handler.cause().getMessage());
           }
         });
   }
@@ -305,6 +332,5 @@ public class ConsumerApis {
             .setStatusCode(statusCode.getValue())
             .end(generateResponse(statusCode, urn, failureMessage).toString());
   }
-
 
 }

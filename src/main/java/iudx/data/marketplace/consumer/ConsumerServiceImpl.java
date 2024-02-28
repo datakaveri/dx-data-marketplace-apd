@@ -310,6 +310,45 @@ public class ConsumerServiceImpl implements ConsumerService {
         return consumerJson;
     }
 
+    @Override
+    public ConsumerService listProductVariants(
+            User user, JsonObject request, Handler<AsyncResult<JsonObject>> handler) {
+        String productId = request.getString("productId");
+        String query = FETCH_ACTIVE_PRODUCT_VARIANTS.replace("$1", productId);
+        pgService.executeQuery(
+                query,
+                pgHandler -> {
+                    if (pgHandler.succeeded()) {
+                        boolean isResponseEmpty = pgHandler.result().getJsonArray(RESULTS).isEmpty();
+                        if (!isResponseEmpty) {
+                            LOGGER.info("Product variants fetched successfully");
+                            handler.handle(Future.succeededFuture(pgHandler.result()));
+                        } else {
+                            LOGGER.info("Response from DB is empty while fetching " + "product variant");
+                            String failureMessage =
+                                    new RespBuilder()
+                                            .withType(ResponseUrn.RESOURCE_NOT_FOUND_URN.getUrn())
+                                            .withTitle(ResponseUrn.RESOURCE_NOT_FOUND_URN.getMessage())
+                                            .withDetail("Product variants not found")
+                                            .getResponse();
+                            handler.handle(Future.failedFuture(failureMessage));
+                        }
+                    } else {
+                        LOGGER.error(
+                                "Failure while fetching product variant : {}", pgHandler.cause().getMessage());
+                        String failureMessage =
+                                new RespBuilder()
+                                        .withType(ResponseUrn.DB_ERROR_URN.getUrn())
+                                        .withTitle(ResponseUrn.INTERNAL_SERVER_ERR_URN.getMessage())
+                                        .withDetail(
+                                                "Product variants could not be fetched as there was internal server error")
+                                        .getResponse();
+                        handler.handle(Future.failedFuture(failureMessage));
+                    }
+                });
+        return this;
+    }
+    
     private Future<JsonObject> generateOrderEntry(
             JsonObject orderInfo, String variantId, String consumerId) {
         Promise<JsonObject> promise = Promise.promise();
