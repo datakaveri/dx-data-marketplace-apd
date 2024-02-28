@@ -15,9 +15,11 @@ import io.vertx.core.Handler;
 import io.vertx.core.Promise;
 import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
+import iudx.data.marketplace.apiserver.util.Role;
 import iudx.data.marketplace.common.HttpStatusCode;
 import iudx.data.marketplace.common.RespBuilder;
 import iudx.data.marketplace.common.ResponseUrn;
+import iudx.data.marketplace.common.Util;
 import iudx.data.marketplace.consumer.util.PaymentStatus;
 import iudx.data.marketplace.policies.User;
 import iudx.data.marketplace.postgres.PostgresService;
@@ -42,15 +44,17 @@ public class ConsumerServiceImpl implements ConsumerService {
     private final RazorPayService razorPayService;
     private final JsonObject config;
     private final QueryBuilder queryBuilder;
+    private final Util util;
 
     Supplier<String> uuidSupplier = () -> UUID.randomUUID().toString();
 
     public ConsumerServiceImpl(
-            JsonObject config, PostgresService postgresService, RazorPayService razorPayService) {
+            JsonObject config, PostgresService postgresService, RazorPayService razorPayService, Util util) {
         this.config = config;
         this.pgService = postgresService;
         this.razorPayService = razorPayService;
         this.queryBuilder = new QueryBuilder(config.getJsonArray(Constants.TABLES));
+        this.util = util;
     }
 
     @Override
@@ -204,10 +208,11 @@ public class ConsumerServiceImpl implements ConsumerService {
                             for (Object row : result) {
                                 JsonObject rowEntry = JsonObject.mapFrom(row);
 
+                                // gets provider info, consumer info, product info
                                 rowEntry
-                                        .mergeIn(getProviderInfo(rowEntry))
-                                        .mergeIn(getConsumerInfo(user))
-                                        .mergeIn(getProductInfo(rowEntry));
+                                        .mergeIn(util.getUserJsonFromRowEntry(rowEntry, Role.PROVIDER))
+                                        .mergeIn(util.generateUserJson(user, Role.CONSUMER))
+                                        .mergeIn(util.getProductInfo(rowEntry));
                                 userResponse.add(rowEntry);
                             }
 
@@ -250,25 +255,6 @@ public class ConsumerServiceImpl implements ConsumerService {
         return this;
     }
 
-    private JsonObject getProviderInfo(JsonObject row) {
-        JsonObject providerJson =
-                new JsonObject()
-                        .put(
-                                "provider",
-                                new JsonObject()
-                                        .put("email", row.getString("providerEmailId"))
-                                        .put(
-                                                "name",
-                                                new JsonObject()
-                                                        .put("firstName", row.getString("providerFirstName"))
-                                                        .put("lastName", row.getString("providerLastName")))
-                                        .put("id", row.getString("providerId")));
-        row.remove("providerEmailId");
-        row.remove("providerFirstName");
-        row.remove("providerLastName");
-        row.remove("providerId");
-        return providerJson;
-    }
 
     public JsonObject getProductInfo(JsonObject row) {
         JsonObject productJson =
@@ -293,22 +279,6 @@ public class ConsumerServiceImpl implements ConsumerService {
         return productJson;
     }
 
-    public JsonObject getConsumerInfo(User user) {
-        JsonObject consumerJson =
-                new JsonObject()
-                        .put(
-                                "consumer",
-                                new JsonObject()
-                                        .put("email", user.getEmailId())
-                                        .put(
-                                                "name",
-                                                new JsonObject()
-                                                        .put("firstName", user.getFirstName())
-                                                        .put("lastName", user.getLastName()))
-                                        .put("id", user.getUserId()));
-
-        return consumerJson;
-    }
 
     @Override
     public ConsumerService listProductVariants(

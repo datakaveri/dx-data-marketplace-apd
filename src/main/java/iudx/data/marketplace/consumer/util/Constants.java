@@ -36,7 +36,7 @@ public class Constants {
           + "INNER JOIN user_table U\n"
           + "ON U._id = P.provider_id\n";
   public static final String LIST_ALL_PURCHASE_4_CONSUMER =
-          LIST_PURCHASE + "WHERE I.consumer_id = '$1'";
+          LIST_PURCHASE + "WHERE I.consumer_id = '$1'  ";
   public static final String LIST_PURCHASE_4_CONSUMER_WITH_GIVEN_PRODUCT =
           LIST_PURCHASE
                   + "WHERE\n"

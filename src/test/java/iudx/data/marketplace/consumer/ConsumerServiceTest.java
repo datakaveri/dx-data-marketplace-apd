@@ -6,6 +6,7 @@ import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
 import io.vertx.junit5.VertxExtension;
 import io.vertx.junit5.VertxTestContext;
+import iudx.data.marketplace.common.Util;
 import iudx.data.marketplace.postgres.PostgresService;
 import iudx.data.marketplace.razorpay.RazorPayService;
 import org.junit.jupiter.api.BeforeEach;
@@ -37,6 +38,8 @@ public class ConsumerServiceTest {
   JsonArray tableArray;
   @Mock
     RazorPayService razorPayService;
+  @Mock
+    Util util;
 
   @BeforeEach
   public void setup(VertxTestContext testContext) {
@@ -45,7 +48,7 @@ public class ConsumerServiceTest {
     request = new JsonObject();
     tableArray = new JsonArray().add("table name").add("table name");
     config = new JsonObject().put(TABLES, tableArray);
-    consumerService = new ConsumerServiceImpl(config, postgresService,razorPayService);
+    consumerService = new ConsumerServiceImpl(config, postgresService,razorPayService, util);
     testContext.completeNow();
   }
 
@@ -146,7 +149,7 @@ public class ConsumerServiceTest {
   public void testListProvidersFailed2(VertxTestContext testContext) {
 
     when(asyncResult.succeeded()).thenReturn(false);
-    consumerService = new ConsumerServiceImpl(config, postgresService, razorPayService);
+    consumerService = new ConsumerServiceImpl(config, postgresService, razorPayService, util);
     doAnswer(
             new Answer<AsyncResult<JsonObject>>() {
               @Override
@@ -242,7 +245,7 @@ public class ConsumerServiceTest {
     tableArray.add("table name");
     request.put(PROVIDER_ID, "pid");
     when(asyncResult.succeeded()).thenReturn(true);
-    consumerService = new ConsumerServiceImpl(config, postgresService, razorPayService);
+    consumerService = new ConsumerServiceImpl(config, postgresService, razorPayService, util);
     doAnswer(
             new Answer<AsyncResult<JsonObject>>() {
               @Override

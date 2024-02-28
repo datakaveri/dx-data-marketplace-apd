@@ -90,8 +90,10 @@ public class ConsumerApis {
         .get(api.getConsumerListPurchases())
         .handler(purchaseValidationHandler)
         .handler(AuthHandler.create(authenticationService, vertx, api, postgresService, authClient))
-    
- router
+        .handler(this::listPurchases)
+        .failureHandler(exceptionHandler);
+
+      router
       .get(api.getConsumerProductVariantPath())
       //  .handler(productVariantHandler)
         .handler(AuthHandler.create(authenticationService, vertx, api, postgresService, authClient))

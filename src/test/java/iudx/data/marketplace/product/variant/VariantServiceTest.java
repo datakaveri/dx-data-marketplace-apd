@@ -8,6 +8,7 @@ import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
 import io.vertx.junit5.VertxExtension;
 import io.vertx.junit5.VertxTestContext;
+import iudx.data.marketplace.common.Util;
 import iudx.data.marketplace.configuration.Configuration;
 import iudx.data.marketplace.policies.User;
 import iudx.data.marketplace.postgres.PostgresService;
@@ -39,6 +40,8 @@ public class VariantServiceTest {
   AsyncResult<JsonObject> asyncResult;
   @Mock
   User user;
+  @Mock
+  Util util;
 
   @BeforeEach
   @DisplayName("setup")
@@ -46,7 +49,7 @@ public class VariantServiceTest {
     configuration = new Configuration();
     JsonObject config = configuration.configLoader(4, vertx);
     postgresService = mock(PostgresService.class);
-    variantServiceImpl = new ProductVariantServiceImpl(config, postgresService);
+    variantServiceImpl = new ProductVariantServiceImpl(config, postgresService, util);
     lenient().when(jsonObjectMock.getString(PRODUCT_ID)).thenReturn("urn:datakaeri.org:provider-id:abcde");
     lenient().when(jsonObjectMock.getString(VARIANT)).thenReturn("var-name");
     variantServiceSpy = spy(variantServiceImpl);

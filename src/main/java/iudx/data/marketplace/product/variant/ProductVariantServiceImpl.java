@@ -11,9 +11,11 @@ import io.vertx.core.Promise;
 import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
 import iudx.data.marketplace.apiserver.exceptions.DxRuntimeException;
+import iudx.data.marketplace.apiserver.util.Role;
 import iudx.data.marketplace.common.HttpStatusCode;
 import iudx.data.marketplace.common.RespBuilder;
 import iudx.data.marketplace.common.ResponseUrn;
+import iudx.data.marketplace.common.Util;
 import iudx.data.marketplace.policies.User;
 import iudx.data.marketplace.postgres.PostgresService;
 import iudx.data.marketplace.product.util.QueryBuilder;
@@ -27,10 +29,12 @@ public class ProductVariantServiceImpl implements ProductVariantService {
     public static final Logger LOGGER = LogManager.getLogger(ProductVariantServiceImpl.class);
     private final PostgresService pgService;
     private QueryBuilder queryBuilder;
+    private final Util util;
 
-    public ProductVariantServiceImpl(JsonObject config, PostgresService postgresService) {
+    public ProductVariantServiceImpl(JsonObject config, PostgresService postgresService, Util util) {
         this.pgService = postgresService;
         this.queryBuilder = new QueryBuilder(config.getJsonArray(TABLES));
+        this.util = util;
     }
 
     @Override
@@ -265,10 +269,12 @@ public class ProductVariantServiceImpl implements ProductVariantService {
                     {
                         JsonObject rowEntry = JsonObject.mapFrom(row);
 
-                        rowEntry.mergeIn(getProviderInfo(user))
-                                .mergeIn(getConsumerInfo(rowEntry))
-                                .mergeIn(getProductInfo(rowEntry));
+//                        gets providerInfo, consumerInfo, productInfo from util to be merged in a json Object
+                        rowEntry.mergeIn(util.generateUserJson(user, Role.PROVIDER))
+                                .mergeIn(util.getUserJsonFromRowEntry(rowEntry, Role.CONSUMER))
+                                .mergeIn(util.getProductInfo(rowEntry));
                         userResponse.add(rowEntry);
+
 
                     }
                     JsonObject response =
@@ -306,51 +312,4 @@ public class ProductVariantServiceImpl implements ProductVariantService {
         return this;
     }
 
-    private JsonObject getProviderInfo(User user) {
-        JsonObject providerJson = new JsonObject()
-                .put("provider", new JsonObject()
-                        .put("email", user.getEmailId())
-                        .put("name", new JsonObject()
-                                .put("firstName", user.getFirstName())
-                                .put("lastName", user.getLastName()))
-                        .put("id", user.getUserId())
-                );
-        return providerJson;
-    }
-
-    public JsonObject getProductInfo(JsonObject row)
-    {
-        JsonObject productJson = new JsonObject()
-                .put("product",new JsonObject()
-                        .put("productId", row.getString("productId"))
-                        .put("productVariantId", row.getString("productVariantId"))
-                        .put("resourceName", row.getString("resourceName"))
-                        .put("price", row.getString("price"))
-                        .put("expiryInMonths", row.getString("expiryInMonths"))
-                        .put("resourcesAndCapabilities", row.getJsonObject("resourcesAndCapabilities")));
-
-        row.remove("productId");
-        row.remove("productVariantId");
-        row.remove("resourceName");
-        row.remove("price");
-        row.remove( "resourcesAndCapabilities");
-        row.remove("expiryInMonths");
-        return productJson;
-    }
-    public JsonObject getConsumerInfo(JsonObject row)
-    {
-        JsonObject consumerJson = new JsonObject()
-                .put("consumer", new JsonObject()
-                        .put("email", row.getString("consumerEmailId"))
-                        .put("name", new JsonObject()
-                                .put("firstName", row.getString("consumerFirstName"))
-                                .put("lastName", row.getString("consumerLastName")))
-                        .put("id", row.getString("consumerId"))
-                );
-        row.remove("consumerEmailId");
-        row.remove("consumerFirstName");
-        row.remove("consumerLastName");
-        row.remove("consumerId");
-        return consumerJson;
-    }
 }
