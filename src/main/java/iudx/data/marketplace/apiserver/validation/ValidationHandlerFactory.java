@@ -54,6 +54,8 @@ public class ValidationHandlerFactory {
         break;
       case ORDER_PAID_WEBHOOK:
         validator = getPaymentWebhookValidator(body);
+      case PURCHASE:
+        validator = getPurchaseValidator(parameters);
     }
     return validator;
   }
@@ -61,6 +63,14 @@ public class ValidationHandlerFactory {
   private List<Validator> getPaymentWebhookValidator(JsonObject body) {
     List<Validator> validators = new ArrayList<>();
     validators.add(new JsonSchemaTypeValidator(body, RequestType.ORDER_PAID_WEBHOOK));
+    return validators;
+  }
+
+  private List<Validator> getPurchaseValidator(MultiMap parameters) {
+    List<Validator> validators = new ArrayList<>();
+
+    validators.add(new UUIDTypeValidator(parameters.get("resourceId"),false));
+    validators.add(new ProductIDTypeValidator(parameters.get("productId"), false));
     return validators;
   }
 

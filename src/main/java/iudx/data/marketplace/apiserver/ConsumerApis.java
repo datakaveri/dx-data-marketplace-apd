@@ -1,11 +1,16 @@
 package iudx.data.marketplace.apiserver;
 
+import static iudx.data.marketplace.apiserver.response.ResponseUtil.generateResponse;
 import static iudx.data.marketplace.apiserver.util.Constants.*;
 import static iudx.data.marketplace.common.Constants.AUTH_INFO;
 import static iudx.data.marketplace.common.Constants.CONSUMER_SERVICE_ADDRESS;
+import static iudx.data.marketplace.common.HttpStatusCode.BAD_REQUEST;
 
+import io.vertx.core.MultiMap;
 import io.vertx.core.Vertx;
 import io.vertx.core.http.HttpServerRequest;
+import io.vertx.core.http.HttpServerResponse;
+import io.vertx.core.json.DecodeException;
 import io.vertx.core.json.JsonObject;
 import io.vertx.ext.web.Router;
 import io.vertx.ext.web.RoutingContext;
@@ -16,6 +21,7 @@ import iudx.data.marketplace.apiserver.util.RequestType;
 import iudx.data.marketplace.authenticator.AuthClient;
 import iudx.data.marketplace.authenticator.AuthenticationService;
 import iudx.data.marketplace.common.Api;
+import iudx.data.marketplace.common.HttpStatusCode;
 import iudx.data.marketplace.common.RespBuilder;
 import iudx.data.marketplace.common.ResponseUrn;
 import iudx.data.marketplace.consumer.ConsumerService;
@@ -52,34 +58,46 @@ public class ConsumerApis {
     ValidationHandler providerValidationHandler =
         new ValidationHandler(vertx, RequestType.PROVIDER);
     ValidationHandler orderValidationHandler = new ValidationHandler(vertx, RequestType.ORDER);
+    ValidationHandler purchaseValidationHandler =
+            new ValidationHandler(vertx, RequestType.PURCHASE);
     ExceptionHandler exceptionHandler = new ExceptionHandler();
+    ValidationHandler productVariantHandler = new ValidationHandler(vertx, RequestType.PRODUCT);
 
     consumerService = ConsumerService.createProxy(vertx, CONSUMER_SERVICE_ADDRESS);
 
     router
-        .get(CONSUMER_PATH + LIST_PROVIDERS_PATH)
+        .get(api.getConsumerListProviders())
         .handler(providerValidationHandler)
         .handler(AuthHandler.create(authenticationService, vertx, api, postgresService, authClient))
         .handler(this::listProviders)
         .failureHandler(exceptionHandler);
 
     router
-        .get(CONSUMER_PATH + LIST_RESOURCES_PATH)
+        .get(api.getConsumerListResourcePath())
         .handler(resourceValidationHandler)
         .handler(AuthHandler.create(authenticationService, vertx, api, postgresService, authClient))
         .handler(this::listResources)
         .failureHandler(exceptionHandler);
 
     router
-        .get(CONSUMER_PATH + LIST_PRODUCTS_PATH)
+        .get(api.getConsumerListProducts())
         .handler(resourceValidationHandler)
         .handler(AuthHandler.create(authenticationService, vertx, api, postgresService, authClient))
         .handler(this::listProducts)
         .failureHandler(exceptionHandler);
 
     router
-        .get(CONSUMER_PATH + LIST_PURCHASES_PATH)
+        .get(api.getConsumerListPurchases())
+        .handler(purchaseValidationHandler)
+        .handler(AuthHandler.create(authenticationService, vertx, api, postgresService, authClient))
         .handler(this::listPurchases)
+        .failureHandler(exceptionHandler);
+
+      router
+      .get(api.getConsumerProductVariantPath())
+      //  .handler(productVariantHandler)
+        .handler(AuthHandler.create(authenticationService, vertx, api, postgresService, authClient))
+        .handler(this::listProductVariants)
         .failureHandler(exceptionHandler);
 
     router
@@ -160,6 +178,27 @@ public class ConsumerApis {
         });
   }
 
+  private void listProductVariants(RoutingContext routingContext) {
+
+    User consumer = routingContext.get("user");
+    MultiMap requestParams = routingContext.request().params();
+    String productId = requestParams.get("productId");
+    JsonObject requestJson =
+            new JsonObject().put("productId", productId);
+
+    consumerService.listProductVariants(
+        consumer,
+        requestJson,
+        handler -> {
+          if (handler.succeeded()) {
+            handleSuccessResponse(
+                routingContext, HttpStatusCode.SUCCESS.getValue(), handler.result());
+          } else {
+            handleFailureResponse(routingContext, handler.cause());
+          }
+        });
+  }
+
   private void listProducts(RoutingContext routingContext) {
     HttpServerRequest request = routingContext.request();
     JsonObject requestBody = new JsonObject();
@@ -180,21 +219,29 @@ public class ConsumerApis {
               handleSuccessResponse(routingContext, 200, handler.result());
             }
           } else {
-            handleFailureResponse(routingContext, handler.cause());
+            handleFailureResponse(routingContext, handler.cause().getMessage());
           }
         });
   }
 
   private void listPurchases(RoutingContext routingContext) {
-    routingContext
-        .response()
-        .putHeader(CONTENT_TYPE, APPLICATION_JSON)
-        .setStatusCode(404)
-        .end(
-            new RespBuilder()
-                .withType(ResponseUrn.YET_NOT_IMPLEMENTED_URN.getUrn())
-                .withTitle(ResponseUrn.YET_NOT_IMPLEMENTED_URN.getMessage())
-                .getResponse());
+    User consumer = routingContext.get("user");
+    MultiMap requestParams = routingContext.request().params();
+    String resourceId = requestParams.get("resourceId");
+    String productId = requestParams.get("productId");
+    JsonObject requestJson =
+            new JsonObject().put("resourceId", resourceId).put("productId", productId);
+
+    consumerService.listPurchase(consumer,requestJson, handler -> {
+      if(handler.succeeded())
+      {
+        handleSuccessResponse(routingContext, HttpStatusCode.SUCCESS.getValue(), handler.result());
+      }
+      else
+      {
+        handleFailureResponse(routingContext, handler.cause().getMessage());
+      }
+    });
   }
 
   private void handleFailureResponse(RoutingContext routingContext, Throwable cause) {
@@ -226,4 +273,66 @@ public class ConsumerApis {
         break;
     }
   }
+
+  /**
+   * Handles Failed HTTP Response
+   *
+   * @param routingContext Routing context object
+   * @param failureMessage Failure message for response
+   */
+  private void handleFailureResponse(RoutingContext routingContext, String failureMessage) {
+    HttpServerResponse response = routingContext.response();
+    LOGGER.debug("Failure Message : {} ", failureMessage);
+
+    try {
+      JsonObject jsonObject = new JsonObject(failureMessage);
+      int type = jsonObject.getInteger(TYPE);
+      String title = jsonObject.getString(TITLE);
+
+      HttpStatusCode status = HttpStatusCode.getByValue(type);
+
+      ResponseUrn urn;
+
+      // get the urn by either type or title
+      if (title != null) {
+        urn = ResponseUrn.fromCode(title);
+      } else {
+
+        urn = ResponseUrn.fromCode(String.valueOf(type));
+      }
+      if (jsonObject.getString(DETAIL) != null) {
+       String detail = jsonObject.getString(DETAIL);
+        response
+                .putHeader(CONTENT_TYPE, APPLICATION_JSON)
+                .setStatusCode(type)
+                .end(generateResponse(status, urn, detail).toString());
+      } else {
+        response
+                .putHeader(CONTENT_TYPE, APPLICATION_JSON)
+                .setStatusCode(type)
+                .end(generateResponse(status, urn).toString());
+      }
+
+    } catch (DecodeException exception) {
+      LOGGER.error("Error : Expecting JSON from backend service [ jsonFormattingException ] ");
+      handleResponse(response, BAD_REQUEST, ResponseUrn.BACKING_SERVICE_FORMAT_URN);
+    }
+  }
+
+  private void handleResponse(
+          HttpServerResponse response, HttpStatusCode statusCode, ResponseUrn urn) {
+    handleResponse(response, statusCode, urn, statusCode.getDescription());
+  }
+
+  private void handleResponse(
+          HttpServerResponse response,
+          HttpStatusCode statusCode,
+          ResponseUrn urn,
+          String failureMessage) {
+    response
+            .putHeader(CONTENT_TYPE, APPLICATION_JSON)
+            .setStatusCode(statusCode.getValue())
+            .end(generateResponse(statusCode, urn, failureMessage).toString());
+  }
+
 }

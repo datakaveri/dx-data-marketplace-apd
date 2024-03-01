@@ -64,4 +64,18 @@ public interface ProductVariantService {
    */
   @Fluent
   ProductVariantService listProductVariants(User user, JsonObject request, Handler<AsyncResult<JsonObject>> handler);
+
+
+  /**
+   * List purchase will fetch invoice related info, provider, consumer and product variant related information
+   * After the purchase is made. Both successful and failed payments are displayed
+   * List purchase will list all the purchases if no query parameters are given
+   * It can also list purchases based on the productId, resourceId if it is given in the query parameter
+   * @param user Provider user
+   * @param request query param if any
+   * @param handler Asynchronous JsonObject handler that contains the list of purchases
+   * @return
+   */
+  @Fluent
+  ProductVariantService listPurchase(User user, JsonObject request, Handler<AsyncResult<JsonObject>> handler);
 }

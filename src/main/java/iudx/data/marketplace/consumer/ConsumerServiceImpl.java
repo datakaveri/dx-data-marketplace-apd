@@ -1,10 +1,11 @@
 package iudx.data.marketplace.consumer;
 
 import static iudx.data.marketplace.common.Constants.*;
+import static iudx.data.marketplace.common.Constants.PROVIDER_ID;
+import static iudx.data.marketplace.common.Constants.RESOURCE_ID;
 import static iudx.data.marketplace.consumer.util.Constants.*;
-import static iudx.data.marketplace.product.util.Constants.RESULTS;
-import static iudx.data.marketplace.product.util.Constants.STATUS;
-import static iudx.data.marketplace.product.util.Constants.VARIANT;
+import static iudx.data.marketplace.consumer.util.Constants.TABLES;
+import static iudx.data.marketplace.product.util.Constants.*;
 
 import io.vertx.core.AsyncResult;
 import io.vertx.core.Future;
@@ -12,9 +13,16 @@ import io.vertx.core.Handler;
 import io.vertx.core.Promise;
 import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
+import iudx.data.marketplace.apiserver.util.Role;
+import iudx.data.marketplace.common.HttpStatusCode;
+import iudx.data.marketplace.common.RespBuilder;
+import iudx.data.marketplace.common.ResponseUrn;
+import iudx.data.marketplace.common.Util;
 import iudx.data.marketplace.consumer.util.PaymentStatus;
 import iudx.data.marketplace.policies.User;
 import iudx.data.marketplace.postgres.PostgresService;
+import iudx.data.marketplace.product.util.Constants;
+import iudx.data.marketplace.product.util.QueryBuilder;
 import iudx.data.marketplace.product.util.Status;
 import iudx.data.marketplace.razorpay.RazorPayService;
 import java.time.ZoneId;
@@ -23,6 +31,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 import java.util.function.Supplier;
+import org.apache.commons.lang.StringUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -31,14 +40,21 @@ public class ConsumerServiceImpl implements ConsumerService {
   private final PostgresService pgService;
   private final RazorPayService razorPayService;
   private final JsonObject config;
+  private final QueryBuilder queryBuilder;
+  private final Util util;
 
   Supplier<String> uuidSupplier = () -> UUID.randomUUID().toString();
 
   public ConsumerServiceImpl(
-      JsonObject config, PostgresService postgresService, RazorPayService razorPayService) {
+      JsonObject config,
+      PostgresService postgresService,
+      RazorPayService razorPayService,
+      Util util) {
     this.config = config;
     this.pgService = postgresService;
     this.razorPayService = razorPayService;
+    this.queryBuilder = new QueryBuilder(config.getJsonArray(Constants.TABLES));
+    this.util = util;
   }
 
   @Override
@@ -98,12 +114,6 @@ public class ConsumerServiceImpl implements ConsumerService {
           }
         });
     return this;
-  }
-
-  @Override
-  public ConsumerService listPurchases(
-      JsonObject request, Handler<AsyncResult<JsonObject>> handler) {
-    return null;
   }
 
   @Override
@@ -177,6 +187,150 @@ public class ConsumerServiceImpl implements ConsumerService {
     return this;
   }
 
+  /*
+  TODO: Add expiryTime stamp if there is any policy created (check if payment status is successful)
+   */
+  @Override
+  public ConsumerService listPurchase(
+      User user, JsonObject request, Handler<AsyncResult<JsonObject>> handler) {
+
+    String resourceId = request.getString("resourceId");
+    String productId = request.getString("productId");
+    String query = queryBuilder.listPurchaseForConsumer(user.getUserId(), resourceId, productId);
+    pgService.executeQuery(
+        query,
+        queryHandler -> {
+          if (queryHandler.succeeded()) {
+            LOGGER.debug("Fetched invoice related information from postgres successfully");
+            JsonArray result = queryHandler.result().getJsonArray(RESULTS);
+            if (!result.isEmpty()) {
+              JsonArray userResponse = new JsonArray();
+              for (Object row : result) {
+                JsonObject rowEntry = JsonObject.mapFrom(row);
+
+                // gets provider info, consumer info, product info
+                rowEntry
+                    .mergeIn(util.getUserJsonFromRowEntry(rowEntry, Role.PROVIDER))
+                    .mergeIn(util.generateUserJson(user))
+                    .mergeIn(util.getProductInfo(rowEntry));
+                userResponse.add(rowEntry);
+              }
+
+              JsonObject response =
+                  new RespBuilder()
+                      .withType(ResponseUrn.SUCCESS_URN.getUrn())
+                      .withTitle(ResponseUrn.SUCCESS_URN.getMessage())
+                      .withResult(new JsonArray().add(userResponse))
+                      .getJsonResponse();
+
+              handler.handle(Future.succeededFuture(response));
+            } else {
+              LOGGER.debug(
+                  "No invoice present for the given resource "
+                      + ": {} or product : {}, for the consumer : {}",
+                  resourceId,
+                  productId,
+                  user.getUserId());
+
+              boolean isAnyQueryParamSent =
+                  StringUtils.isNotBlank(resourceId) || StringUtils.isNotBlank(productId);
+
+              String failureMessage =
+                  new RespBuilder()
+                      .withType(HttpStatusCode.NO_CONTENT.getValue())
+                      .withTitle(HttpStatusCode.NO_CONTENT.getUrn())
+                      .getResponse();
+              if (isAnyQueryParamSent) {
+                failureMessage =
+                    new RespBuilder()
+                        .withType(HttpStatusCode.NOT_FOUND.getValue())
+                        .withTitle(ResponseUrn.RESOURCE_NOT_FOUND_URN.getUrn())
+                        .withDetail("Purchase info not found")
+                        .getResponse();
+              }
+              handler.handle(Future.failedFuture(failureMessage));
+            }
+          }
+        });
+    return this;
+  }
+
+  ExpiryAtContainer getExpiryAtFuture(JsonObject rowEntry, User user, boolean isPaymentSuccessFul) {
+    ExpiryAtContainer expiryAtContainer = null;
+    if (isPaymentSuccessFul) {
+      /* query the policy table to see the expiryAt */
+      String fetchExpiryAtQuery = queryBuilder.fetchExpiryAtQuery(rowEntry, user);
+      pgService.executeQuery(
+          fetchExpiryAtQuery,
+          pgHandler -> {
+            if (pgHandler.succeeded()) {
+              JsonArray resultFromPolicyTable = pgHandler.result().getJsonArray(RESULTS);
+              /* if the response is not empty, the expiry time stamp is added in the final
+               * response */
+              if (!resultFromPolicyTable.isEmpty()) {
+                // TODO: What to do when multiple policies are present
+                String expiryAt = resultFromPolicyTable.getJsonObject(0).getString("expiryAt");
+              }
+
+              // TODO: What to do when the policy is not present and the payment is successful?
+              // Do we throw an exception or internal server error or ignore it
+
+            } else {
+              LOGGER.error("Failure while fetching expiryAt : {}", pgHandler.cause().getMessage());
+              String failureMessage =
+                  new RespBuilder()
+                      .withType(HttpStatusCode.INTERNAL_SERVER_ERROR.getValue())
+                      .withTitle(ResponseUrn.DB_ERROR_URN.getUrn())
+                      .withDetail(ResponseUrn.INTERNAL_SERVER_ERR_URN.getMessage())
+                      .getResponse();
+
+              //              throw new DxRuntimeException(500, ResponseUrn.DB_ERROR_URN);
+            }
+          });
+    }
+
+    return expiryAtContainer;
+  }
+
+  @Override
+  public ConsumerService listProductVariants(
+      User user, JsonObject request, Handler<AsyncResult<JsonObject>> handler) {
+    String productId = request.getString("productId");
+    String query = FETCH_ACTIVE_PRODUCT_VARIANTS.replace("$1", productId);
+    pgService.executeQuery(
+        query,
+        pgHandler -> {
+          if (pgHandler.succeeded()) {
+            boolean isResponseEmpty = pgHandler.result().getJsonArray(RESULTS).isEmpty();
+            if (!isResponseEmpty) {
+              LOGGER.info("Product variants fetched successfully");
+              handler.handle(Future.succeededFuture(pgHandler.result()));
+            } else {
+              LOGGER.info("Response from DB is empty while fetching " + "product variant");
+              String failureMessage =
+                  new RespBuilder()
+                      .withType(ResponseUrn.RESOURCE_NOT_FOUND_URN.getUrn())
+                      .withTitle(ResponseUrn.RESOURCE_NOT_FOUND_URN.getMessage())
+                      .withDetail("Product variants not found")
+                      .getResponse();
+              handler.handle(Future.failedFuture(failureMessage));
+            }
+          } else {
+            LOGGER.error(
+                "Failure while fetching product variant : {}", pgHandler.cause().getMessage());
+            String failureMessage =
+                new RespBuilder()
+                    .withType(ResponseUrn.DB_ERROR_URN.getUrn())
+                    .withTitle(ResponseUrn.INTERNAL_SERVER_ERR_URN.getMessage())
+                    .withDetail(
+                        "Product variants could not be fetched as there was internal server error")
+                    .getResponse();
+            handler.handle(Future.failedFuture(failureMessage));
+          }
+        });
+    return this;
+  }
+
   private Future<JsonObject> generateOrderEntry(
       JsonObject orderInfo, String variantId, String consumerId) {
     Promise<JsonObject> promise = Promise.promise();
@@ -193,7 +347,7 @@ public class ConsumerServiceImpl implements ConsumerService {
                     .put(
                         "results",
                         new JsonArray()
-                            .add(orderInfo)));
+                            .add(new JsonObject().put("order_id", queryContainer.orderId))));
           } else {
             LOGGER.error("Failed to create order : {}", pgHandler.cause().getMessage());
             promise.fail(pgHandler.cause());
@@ -233,7 +387,7 @@ public class ConsumerServiceImpl implements ConsumerService {
                 .replace("$2", consumerId)
                 .replace("$3", orderId)
                 .replace("$4", variantId)
-                .replace("$5", String.valueOf(PaymentStatus.PENDING))
+                .replace("$5", PaymentStatus.PENDING.getPaymentStatus())
                 .replace(
                     "$6",
                     ZonedDateTime.now()
@@ -288,6 +442,14 @@ public class ConsumerServiceImpl implements ConsumerService {
     public QueryContainer(String orderId, List<String> queries) {
       this.orderId = orderId;
       this.queries = queries;
+    }
+  }
+
+  private static class ExpiryAtContainer {
+    public final String expiryAt;
+
+    public ExpiryAtContainer(String expiryAt) {
+      this.expiryAt = expiryAt;
     }
   }
 }

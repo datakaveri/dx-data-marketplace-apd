@@ -14,8 +14,8 @@ public class Constants {
 
   public static final String GET_POLICY_4_PROVIDER_QUERY =
       "SELECT P._id AS \"policyId\", P.resource_id AS \"resourceId\",\n"
-          + "RE.resource_server_url AS \"resourceServerUrl\",\n"
-          + "P.purchase_id AS \"purchaseId\",\n"
+          + "RE.resource_server AS \"resourceServerUrl\",\n"
+          + "P.invoice_id AS \"purchaseId\",\n"
           + "RE.resource_name AS \"resourceName\",\n"
           + "P.product_variant_id AS \"productVariantId\",\n"
           + "RE.accesspolicy AS \"accessPolicy\",\n"
@@ -29,11 +29,11 @@ public class Constants {
           + "INNER JOIN resource_entity AS RE\n"
           + "ON RE._id = P.resource_id\n"
           + "AND P.provider_id = $1::uuid \n"
-          + "AND RE.resource_server_url = $2;";
+          + "AND RE.resource_server = $2;";
   public static final String GET_POLICY_4_CONSUMER_QUERY =
       "SELECT P._id AS \"policyId\", P.resource_id AS \"resourceId\",\n"
-          + "RE.resource_server_url AS \"resourceServerUrl\",\n"
-          + "P.purchase_id AS \"purchaseId\",\n"
+          + "RE.resource_server AS \"resourceServerUrl\",\n"
+          + "P.invoice_id AS \"purchaseId\",\n"
           + "RE.resource_name AS \"resourceName\",\n"
           + "P.product_variant_id AS \"productVariantId\",\n"
           + "RE.accesspolicy AS \"accessPolicy\",\n"
@@ -47,12 +47,12 @@ public class Constants {
           + "INNER JOIN resource_entity AS RE\n"
           + "ON RE._id = P.resource_id\n"
           + "AND P.consumer_email_id = $1  \n"
-          + "AND RE.resource_server_url = $2;";
+          + "AND RE.resource_server = $2;";
     public static final String DELETE_POLICY_QUERY =
             "UPDATE policy SET status='DELETED' "
                     + "WHERE _id = $1::uuid AND expiry_at > NOW() RETURNING _id";
     public static final String CHECK_IF_POLICY_PRESENT_QUERY =
-            "SELECT p.provider_id, p.status, r.resource_server_url"
+            "SELECT p.provider_id, p.status, r.resource_server"
                     + " FROM policy p"
                     + " INNER JOIN resource_entity r ON p.resource_id = r._id"
                     + " WHERE p._id = $1;";
