@@ -248,68 +248,108 @@ public class ProductVariantServiceImpl implements ProductVariantService {
         return this;
     }
 
-    /*
-    TODO: Add expiryTime stamp if there is any policy created (check if payment status is successful)
-     */
-    @Override
-    public ProductVariantService listPurchase(User user, JsonObject request, Handler<AsyncResult<JsonObject>> handler) {
+  @Override
+  public ProductVariantService listPurchase(
+      User user, JsonObject request, Handler<AsyncResult<JsonObject>> handler) {
 
-        String resourceId = request.getString("resourceId");
-        String productId = request.getString("productId");
-        String query = queryBuilder.listPurchase(user.getUserId(), resourceId, productId);
-        pgService.executeQuery(query, queryHandler -> {
-            if(queryHandler.succeeded())
-            {
-                LOGGER.debug("Fetched invoice related information from postgres successfully");
-                JsonArray result = queryHandler.result().getJsonArray(RESULTS);
-                if(!result.isEmpty())
-                {
-                    JsonArray userResponse = new JsonArray();
-                    for(Object row : result)
-                    {
-                        JsonObject rowEntry = JsonObject.mapFrom(row);
+      String resourceId = request.getString("resourceId");
+      String productId = request.getString("productId");
+      JsonArray userResponse = new JsonArray();
 
-//                        gets providerInfo, consumerInfo, productInfo from util to be merged in a json Object
-                        rowEntry.mergeIn(util.generateUserJson(user))
-                                .mergeIn(util.getUserJsonFromRowEntry(rowEntry, Role.CONSUMER))
-                                .mergeIn(util.getProductInfo(rowEntry));
-                        userResponse.add(rowEntry);
+      String fetchInvoiceDuringSuccessfulPayment =
+              queryBuilder.listSuccessfulPurchaseForProvider(
+                      user.getUserId(), resourceId, productId);
+      String fetchInvoiceForOtherPaymentStatus =
+              queryBuilder.listPurchaseForProvider(user.getUserId(), resourceId, productId);
 
+      Future<JsonArray> successfulPaymentFuture =
+              executePurchaseQuery(fetchInvoiceDuringSuccessfulPayment, resourceId, productId, user);
+      Future<JsonArray> pendingOrFailedPaymentFuture =
+              successfulPaymentFuture.compose(
+                      jsonArray -> {
+                          userResponse.add(jsonArray);
+                          return executePurchaseQuery(fetchInvoiceForOtherPaymentStatus, resourceId, productId, user);
+                      });
+      Future<JsonArray> userResponseFuture =
+              pendingOrFailedPaymentFuture.onComplete(
+                      pgHandler -> {
+                          if (pgHandler.succeeded()) {
+                              userResponse.add(pgHandler.result());
+                              JsonObject response =
+                                      new RespBuilder()
+                                              .withType(ResponseUrn.SUCCESS_URN.getUrn())
+                                              .withTitle(ResponseUrn.SUCCESS_URN.getMessage())
+                                              .withResult(userResponse)
+                                              .getJsonResponse();
+                              handler.handle(Future.succeededFuture(response));
 
+                          } else {
+                              handler.handle(Future.failedFuture(pgHandler.cause().getMessage()));
+                          }
+                      });
+
+      return this;
+  }
+
+    public Future<JsonArray> executePurchaseQuery(
+            String query, String resourceId, String productId, User user) {
+        Promise<JsonArray> promise = Promise.promise();
+        pgService.executeQuery(
+                query,
+                queryHandler -> {
+                    if (queryHandler.succeeded()) {
+                        LOGGER.debug("Fetched invoice related information from postgres successfully");
+                        JsonArray result = queryHandler.result().getJsonArray(RESULTS);
+                        if (!result.isEmpty()) {
+                            JsonArray userResponse = new JsonArray();
+                            for (Object row : result) {
+                                JsonObject rowEntry = JsonObject.mapFrom(row);
+
+                                // gets provider info, consumer info, product info
+                                rowEntry
+                                        .mergeIn(util.getUserJsonFromRowEntry(rowEntry, Role.CONSUMER))
+                                        .mergeIn(util.generateUserJson(user))
+                                        .mergeIn(util.getProductInfo(rowEntry));
+                                userResponse.add(rowEntry);
+                            }
+                            promise.complete(userResponse);
+                        } else {
+                            LOGGER.debug(
+                                    "No invoice present for the given resource "
+                                            + ": {} or product : {}, for the provider : {}",
+                                    resourceId,
+                                    productId,
+                                    user.getUserId());
+
+                            boolean isAnyQueryParamSent =
+                                    StringUtils.isNotBlank(resourceId) || StringUtils.isNotBlank(productId);
+
+                            String failureMessage =
+                                    new RespBuilder()
+                                            .withType(HttpStatusCode.NO_CONTENT.getValue())
+                                            .withTitle(HttpStatusCode.NO_CONTENT.getUrn())
+                                            .getResponse();
+                            if (isAnyQueryParamSent) {
+                                failureMessage =
+                                        new RespBuilder()
+                                                .withType(HttpStatusCode.NOT_FOUND.getValue())
+                                                .withTitle(ResponseUrn.RESOURCE_NOT_FOUND_URN.getUrn())
+                                                .withDetail("Purchase info not found")
+                                                .getResponse();
+                            }
+                            promise.fail(failureMessage);
+                        }
+                    } else {
+                        String failureMessage =
+                                new RespBuilder()
+                                        .withType(HttpStatusCode.INTERNAL_SERVER_ERROR.getValue())
+                                        .withTitle(ResponseUrn.DB_ERROR_URN.getUrn())
+                                        .withDetail(ResponseUrn.INTERNAL_SERVER_ERR_URN.getMessage())
+                                        .getResponse();
+                        promise.fail(failureMessage);
                     }
-                    JsonObject response =
-                            new RespBuilder()
-                                    .withType(ResponseUrn.SUCCESS_URN.getUrn())
-                                    .withTitle(ResponseUrn.SUCCESS_URN.getMessage())
-                                    .withResult(new JsonArray().add(userResponse))
-                                    .getJsonResponse();
-
-                    handler.handle(Future.succeededFuture(response));
-                }
-                else
-                {
-                    LOGGER.debug("No invoice present for the given resource " +
-                                    ": {} or product : {}, for the provider : {}",
-                            resourceId, productId, user.getUserId());
-
-                    boolean isAnyQueryParamSent = StringUtils.isNotBlank(resourceId)||StringUtils.isNotBlank(productId);
-
-                    String failureMessage = new RespBuilder()
-                            .withType(HttpStatusCode.NO_CONTENT.getValue())
-                            .withTitle(HttpStatusCode.NO_CONTENT.getUrn()).getResponse();
-                    if(isAnyQueryParamSent)
-                    {
-                        failureMessage = new RespBuilder()
-                                .withType(HttpStatusCode.NOT_FOUND.getValue())
-                                .withTitle(ResponseUrn.RESOURCE_NOT_FOUND_URN.getUrn())
-                                .withDetail("Purchase info not found")
-                                .getResponse();
-                    }
-                    handler.handle(Future.failedFuture(failureMessage));
-                }
-            }
-        });
-        return this;
+                });
+        return promise.future();
     }
 
 }

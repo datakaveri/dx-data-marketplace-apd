@@ -197,75 +197,101 @@ public class QueryBuilder {
     return request;
   }
 
-  public String listPurchase(String providerId, String resourceId, String productId)
+  public String listPurchaseForProvider(String providerId, String resourceId, String productId)
   {
     boolean isProductIdPresent = StringUtils.isNotBlank(productId);
     boolean isResourceIdPresent = StringUtils.isNotBlank(resourceId);
 
     StringBuilder query =
-            new StringBuilder(LIST_ALL_PURCHASE_4_PROVIDER.replace("$1", providerId));
+            new StringBuilder(LIST_FAILED_OR_PENDING_PAYMENTS_4_PROVIDER.replace("$1", providerId));
 
     if(isProductIdPresent && !isResourceIdPresent)
     {
-      query = new StringBuilder(LIST_PURCHASE_4_PROVIDER_WITH_GIVEN_PRODUCT
+      query = new StringBuilder(LIST_FAILED_OR_PENDING_PAYMENTS_4_PROVIDER_WITH_GIVEN_PRODUCT
               .replace("$1", productId)
               .replace("$2", providerId));
     }
 
     if(isResourceIdPresent && !isProductIdPresent)
     {
-      query = new StringBuilder(LIST_PURCHASE_4_PROVIDER_WITH_GIVEN_RESOURCE
+      query = new StringBuilder(LIST_FAILED_OR_PENDING_PAYMENTS_WITH_GIVEN_RESOURCE
+              .replace("$1", resourceId)
+              .replace("$2", providerId));
+    }
+
+    return query.toString();
+  }
+
+  public String listSuccessfulPurchaseForProvider(String providerId, String resourceId, String productId)
+  {
+    boolean isProductIdPresent = StringUtils.isNotBlank(productId);
+    boolean isResourceIdPresent = StringUtils.isNotBlank(resourceId);
+
+    StringBuilder query =
+            new StringBuilder(LIST_SUCCESSFUL_PAYMENTS_4_PROVIDER.replace("$1", providerId));
+
+    if(isProductIdPresent && !isResourceIdPresent)
+    {
+      query = new StringBuilder(LIST_SUCCESSFUL_PAYMENTS_4_PROVIDER_WITH_GIVEN_PRODUCT
+              .replace("$1", productId)
+              .replace("$2", providerId));
+    }
+
+    if(isResourceIdPresent && !isProductIdPresent)
+    {
+      query = new StringBuilder(LIST_SUCCESSFUL_PAYMENTS_4_PROVIDER_WITH_GIVEN_RESOURCE
               .replace("$1", resourceId)
               .replace("$2", providerId));
     }
     return query.toString();
   }
-
   public String listPurchaseForConsumer(String consumerId, String resourceId, String productId)
   {
     boolean isProductIdPresent = StringUtils.isNotBlank(productId);
     boolean isResourceIdPresent = StringUtils.isNotBlank(resourceId);
 
     StringBuilder query =
-            new StringBuilder(LIST_ALL_PURCHASE_4_CONSUMER.replace("$1", consumerId));
+            new StringBuilder(LIST_FAILED_OR_PENDING_PAYMENTS_4_CONSUMER.replace("$1", consumerId));
 
     if(isProductIdPresent && !isResourceIdPresent)
     {
-      query = new StringBuilder(LIST_PURCHASE_4_CONSUMER_WITH_GIVEN_PRODUCT
+      query = new StringBuilder(LIST_FAILED_OR_PENDING_PAYMENTS_4_CONSUMER_WITH_GIVEN_PRODUCT
               .replace("$1", productId)
               .replace("$2", consumerId));
     }
 
     if(isResourceIdPresent && !isProductIdPresent)
     {
-      query = new StringBuilder(LIST_PURCHASE_4_CONSUMER_WITH_GIVEN_RESOURCE
+      query = new StringBuilder(LIST_FAILED_OR_PENDING_PAYMENTS_4_CONSUMER_WITH_GIVEN_RESOURCE
+              .replace("$1", resourceId)
+              .replace("$2", consumerId));
+    }
+    return query.toString();
+  }
+
+  public String listPurchaseForConsumerDuringSuccessfulPayment(String consumerId, String resourceId, String productId)
+  {
+    boolean isProductIdPresent = StringUtils.isNotBlank(productId);
+    boolean isResourceIdPresent = StringUtils.isNotBlank(resourceId);
+
+    StringBuilder query =
+            new StringBuilder(LIST_SUCCESSFUL_PAYMENTS_PAYMENTS_4_CONSUMER.replace("$1", consumerId));
+
+    if(isProductIdPresent && !isResourceIdPresent)
+    {
+      query = new StringBuilder(LIST_SUCCESSFUL_PAYMENTS_4_CONSUMER_WITH_GIVEN_PRODUCT
+              .replace("$1", productId)
+              .replace("$2", consumerId));
+    }
+
+    if(isResourceIdPresent && !isProductIdPresent)
+    {
+      query = new StringBuilder(LIST_SUCCESSFUL_PAYMENTS_4_CONSUMER_WITH_GIVEN_RESOURCE
               .replace("$1", resourceId)
               .replace("$2", consumerId));
     }
 
-    LOGGER.debug("query : " + query);
     return query.toString();
-  }
-
-  public String fetchExpiryAtQuery(JsonObject rowEntry, User user)
-  {
-    if(user.getUserRole().equals(Role.CONSUMER))
-    {
-      /* query the policy table to see the expiryAt */
-      String invoiceId = rowEntry.getString("invoiceId");
-      String providerId = rowEntry.getString("providerId");
-      String productVariantId = rowEntry.getString("productVariantId");
-      String consumerEmailId = user.getEmailId();
-      String fetchExpiryAtQuery =
-              FETCH_EXPIRY_AT_FROM_POLICY
-                      .replace("$1", productVariantId)
-                      .replace("$2", consumerEmailId)
-                      .replace("$3", providerId)
-                      .replace("$4", invoiceId);
-      return fetchExpiryAtQuery;
-    }
-    return null;
-
   }
 
 

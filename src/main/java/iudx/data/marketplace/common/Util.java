@@ -83,6 +83,7 @@ public class Util {
                     .put("productId", row.getString("productId"))
                     .put("productVariantId", row.getString("productVariantId"))
                     .put("resourceName", row.getString("resourceName"))
+                    .put("productVariantName", row.getString("productVariantName"))
                     .put("price", row.getString("price"))
                     .put("expiryInMonths", row.getString("expiryInMonths"))
                     .put("resourcesAndCapabilities", row.getJsonObject("resourcesAndCapabilities")));
@@ -93,6 +94,7 @@ public class Util {
     row.remove("price");
     row.remove( "resourcesAndCapabilities");
     row.remove("expiryInMonths");
+    row.remove("productVariantName");
     return productJson;
   }
 
