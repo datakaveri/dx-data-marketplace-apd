@@ -58,6 +58,8 @@ public class ConsumerApis {
     ValidationHandler providerValidationHandler =
         new ValidationHandler(vertx, RequestType.PROVIDER);
     ValidationHandler orderValidationHandler = new ValidationHandler(vertx, RequestType.ORDER);
+    ValidationHandler purchaseValidationHandler =
+            new ValidationHandler(vertx, RequestType.PURCHASE);
     ExceptionHandler exceptionHandler = new ExceptionHandler();
     ValidationHandler productVariantHandler = new ValidationHandler(vertx, RequestType.PRODUCT);
 
@@ -85,15 +87,17 @@ public class ConsumerApis {
         .failureHandler(exceptionHandler);
 
     router
-        .get(api.getConsumerProductVariantPath())
+        .get(api.getConsumerListPurchases())
+        .handler(purchaseValidationHandler)
+        .handler(AuthHandler.create(authenticationService, vertx, api, postgresService, authClient))
+        .handler(this::listPurchases)
+        .failureHandler(exceptionHandler);
+
+      router
+      .get(api.getConsumerProductVariantPath())
       //  .handler(productVariantHandler)
         .handler(AuthHandler.create(authenticationService, vertx, api, postgresService, authClient))
         .handler(this::listProductVariants)
-        .failureHandler(exceptionHandler);
-
-    router
-        .get(api.getConsumerListPurchases())
-        .handler(this::listPurchases)
         .failureHandler(exceptionHandler);
 
     router
@@ -221,15 +225,23 @@ public class ConsumerApis {
   }
 
   private void listPurchases(RoutingContext routingContext) {
-    routingContext
-        .response()
-        .putHeader(CONTENT_TYPE, APPLICATION_JSON)
-        .setStatusCode(404)
-        .end(
-            new RespBuilder()
-                .withType(ResponseUrn.YET_NOT_IMPLEMENTED_URN.getUrn())
-                .withTitle(ResponseUrn.YET_NOT_IMPLEMENTED_URN.getMessage())
-                .getResponse());
+    User consumer = routingContext.get("user");
+    MultiMap requestParams = routingContext.request().params();
+    String resourceId = requestParams.get("resourceId");
+    String productId = requestParams.get("productId");
+    JsonObject requestJson =
+            new JsonObject().put("resourceId", resourceId).put("productId", productId);
+
+    consumerService.listPurchase(consumer,requestJson, handler -> {
+      if(handler.succeeded())
+      {
+        handleSuccessResponse(routingContext, HttpStatusCode.SUCCESS.getValue(), handler.result());
+      }
+      else
+      {
+        handleFailureResponse(routingContext, handler.cause().getMessage());
+      }
+    });
   }
 
   private void handleFailureResponse(RoutingContext routingContext, Throwable cause) {
@@ -289,7 +301,7 @@ public class ConsumerApis {
         urn = ResponseUrn.fromCode(String.valueOf(type));
       }
       if (jsonObject.getString(DETAIL) != null) {
-        String detail = jsonObject.getString(DETAIL);
+       String detail = jsonObject.getString(DETAIL);
         response
                 .putHeader(CONTENT_TYPE, APPLICATION_JSON)
                 .setStatusCode(type)
@@ -322,4 +334,5 @@ public class ConsumerApis {
             .setStatusCode(statusCode.getValue())
             .end(generateResponse(statusCode, urn, failureMessage).toString());
   }
+
 }

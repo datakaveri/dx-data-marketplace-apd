@@ -306,7 +306,6 @@ public class RazorPayServiceImpl implements RazorPayService {
     try {
       Account account = razorpayClient.account.fetch(accountId);
       JsonObject result = new JsonObject(account.toString());
-      LOGGER.info("Fetched linked account information with accountId : {}", accountId);
       promise.complete(result);
     } catch (RazorpayException e) {
       LOGGER.error("Razorpay error message: {}", e.getMessage());
