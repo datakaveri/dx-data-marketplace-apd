@@ -56,6 +56,7 @@ public class Constants {
   public static final String UPDATE_PV_STATUS_QUERY = "update $0 set status='$4' where product_id='$1' and product_variant_name='$2' and status='$3'";
   public static final String SELECT_PV_QUERY = "select count(*) from $0 where product_id='$1' and product_variant_name='$2' and status='$3'";
 
+  //TODO: Should we only fetch all the active product variants only? Are the users allowed to input active or inactive as query parameter?
   public static final String LIST_PVS_QUERY = "select product_variant_name, product_id, resource_name from $0 where product_id=$1 and status=$2";
   public static final String LIST_FAILED_OR_PENDING_PAYMENTS =  "SELECT DISTINCT I._id AS \"invoiceId\", I.consumer_id AS \"consumerId\",\n"
           + "U.email_id AS \"consumerEmailId\", U.first_name AS \"consumerFirstName\",\n"

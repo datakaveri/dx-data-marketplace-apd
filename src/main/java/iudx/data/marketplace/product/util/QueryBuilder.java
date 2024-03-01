@@ -179,9 +179,9 @@ public class QueryBuilder {
   public String listProductVariants(JsonObject request) {
 
     StringBuilder query = new StringBuilder(
-            LIST_PVS_QUERY.replace("$0", productVariantTable));
+            FETCH_ACTIVE_PRODUCT_VARIANTS.replace("'$1'","$1"));
     if(request.containsKey(VARIANT)) {
-      query.append(" and product_variant_name=$3");
+      query.append(" AND product_variant_name=$2");
     }
 
     LOGGER.debug(query);

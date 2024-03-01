@@ -229,8 +229,7 @@ public class ProductVariantServiceImpl implements ProductVariantService {
         String query = queryBuilder.listProductVariants(request);
 
         JsonObject params = new JsonObject()
-                .put(PRODUCT_ID, request.getString(PRODUCT_ID))
-                .put(STATUS, Status.ACTIVE.toString());
+                .put(PRODUCT_ID, request.getString(PRODUCT_ID));
 
         if(request.containsKey(VARIANT)) {
             params.put(VARIANT, request.getString(VARIANT));

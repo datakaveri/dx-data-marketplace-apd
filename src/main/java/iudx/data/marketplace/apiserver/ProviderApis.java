@@ -78,7 +78,7 @@ public class ProviderApis {
     variantService = ProductVariantService.createProxy(vertx, PRODUCT_VARIANT_SERVICE_ADDRESS);
 
     router
-        .post(PROVIDER_PATH + PRODUCT_PATH)
+        .post(api.getProviderProductPath())
         .consumes(APPLICATION_JSON)
         .handler(productValidationHandler)
         .handler(AuthHandler.create(authenticationService, vertx, api, postgresService, authClient))
@@ -86,49 +86,49 @@ public class ProviderApis {
         .failureHandler(exceptionHandler);
 
     router
-        .delete(PROVIDER_PATH + PRODUCT_PATH)
+        .delete(api.getProviderProductPath())
         .handler(productValidationHandler)
         .handler(AuthHandler.create(authenticationService, vertx, api, postgresService, authClient))
         .handler(this::handleDeleteProduct)
         .failureHandler(exceptionHandler);
 
     router
-        .get(PROVIDER_PATH + LIST_PRODUCTS_PATH)
+        .get(api.getProviderListProductsPath())
         .handler(resourceValidationHandler)
         .handler(AuthHandler.create(authenticationService, vertx, api, postgresService, authClient))
         .handler(this::listProducts)
         .failureHandler(exceptionHandler);
 
     router
-        .get(PROVIDER_PATH + LIST_PURCHASES_PATH)
+        .get(api.getProviderListPurchasesPath())
         .handler(purchaseValidationHandler)
         .handler(AuthHandler.create(authenticationService, vertx, api, postgresService, authClient))
         .handler(this::listPurchases)
         .failureHandler(exceptionHandler);
 
     router
-        .post(PROVIDER_PATH + PRODUCT_VARIANT_PATH)
+        .post(api.getProviderProductVariantPath())
         .handler(variantValidationHandler)
         .handler(AuthHandler.create(authenticationService, vertx, api, postgresService, authClient))
         .handler(this::handleCreateProductVariant)
         .failureHandler(exceptionHandler);
 
     router
-        .put(PROVIDER_PATH + PRODUCT_VARIANT_PATH)
+        .put(api.getProviderProductVariantPath())
         .handler(variantValidationHandler)
         .handler(AuthHandler.create(authenticationService, vertx, api, postgresService, authClient))
         .handler(this::handleUpdateProductVariant)
         .failureHandler(exceptionHandler);
 
     router
-        .get(PROVIDER_PATH + PRODUCT_VARIANT_PATH)
+        .get(api.getProviderProductVariantPath())
         .handler(variantValidationHandler)
         .handler(AuthHandler.create(authenticationService, vertx, api, postgresService, authClient))
         .handler(this::handleGetProductVariants)
         .failureHandler(exceptionHandler);
 
     router
-        .delete(PROVIDER_PATH + PRODUCT_VARIANT_PATH)
+        .delete(api.getProviderProductVariantPath())
         .handler(variantValidationHandler)
         .handler(AuthHandler.create(authenticationService, vertx, api, postgresService, authClient))
         .handler(this::handleDeleteProductVariant)
