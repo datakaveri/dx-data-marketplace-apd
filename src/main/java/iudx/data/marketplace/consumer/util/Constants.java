@@ -72,4 +72,10 @@ public class Constants {
           "FROM product_variant\n" +
           "WHERE product_id = '$1'\n" +
           "AND status = 'ACTIVE';";
+
+  public static final String FETCH_EXPIRY_AT_FROM_POLICY = "SELECT expiry_at AS \"expiryAt\" FROM policy WHERE\n" +
+          "product_variant_id = '$1' AND\n" +
+          "consumer_email_id = '$2' AND\n" +
+          "provider_id = '$3' AND\n" +
+          "invoice_id = '$4'";
 }

@@ -211,7 +211,7 @@ public class ConsumerServiceImpl implements ConsumerService {
                                 // gets provider info, consumer info, product info
                                 rowEntry
                                         .mergeIn(util.getUserJsonFromRowEntry(rowEntry, Role.PROVIDER))
-                                        .mergeIn(util.generateUserJson(user, Role.CONSUMER))
+                                        .mergeIn(util.generateUserJson(user))
                                         .mergeIn(util.getProductInfo(rowEntry));
                                 userResponse.add(rowEntry);
                             }
@@ -255,30 +255,42 @@ public class ConsumerServiceImpl implements ConsumerService {
         return this;
     }
 
+  ExpiryAtContainer getExpiryAtFuture(
+      JsonObject rowEntry, User user, boolean isPaymentSuccessFul) {
+      ExpiryAtContainer expiryAtContainer = null;
+      if (isPaymentSuccessFul) {
+      /* query the policy table to see the expiryAt */
+      String fetchExpiryAtQuery = queryBuilder.fetchExpiryAtQuery(rowEntry, user);
+      pgService.executeQuery(
+          fetchExpiryAtQuery,
+          pgHandler -> {
+            if (pgHandler.succeeded()) {
+              JsonArray resultFromPolicyTable = pgHandler.result().getJsonArray(RESULTS);
+              /* if the response is not empty, the expiry time stamp is added in the final
+               * response */
+              if (!resultFromPolicyTable.isEmpty()) {
+                // TODO: What to do when multiple policies are present
+                String expiryAt = resultFromPolicyTable.getJsonObject(0).getString("expiryAt");
+              }
 
-    public JsonObject getProductInfo(JsonObject row) {
-        JsonObject productJson =
-                new JsonObject()
-                        .put(
-                                "product",
-                                new JsonObject()
-                                        .put("productId", row.getString("productId"))
-                                        .put("productVariantId", row.getString("productVariantId"))
-                                        .put("resourceName", row.getString("resourceName"))
-                                        .put("price", row.getString("price"))
-                                        .put("expiryInMonths", row.getString("expiryInMonths"))
-                                        .put(
-                                                "resourcesAndCapabilities", row.getJsonObject("resourcesAndCapabilities")));
+              // TODO: What to do when the policy is not present and the payment is successful?
+              // Do we throw an exception or internal server error or ignore it
 
-        row.remove("productId");
-        row.remove("productVariantId");
-        row.remove("resourceName");
-        row.remove("price");
-        row.remove("resourcesAndCapabilities");
-        row.remove("expiryInMonths");
-        return productJson;
+            } else {
+              LOGGER.error("Failure while fetching expiryAt : {}", pgHandler.cause().getMessage());
+              String failureMessage = new RespBuilder()
+                      .withType(HttpStatusCode.INTERNAL_SERVER_ERROR.getValue())
+                      .withTitle(ResponseUrn.DB_ERROR_URN.getUrn())
+                      .withDetail(ResponseUrn.INTERNAL_SERVER_ERR_URN.getMessage())
+                      .getResponse();
+
+//              throw new DxRuntimeException(500, ResponseUrn.DB_ERROR_URN);
+            }
+          });
     }
 
+      return expiryAtContainer;
+  }
 
     @Override
     public ConsumerService listProductVariants(
@@ -430,6 +442,13 @@ public class ConsumerServiceImpl implements ConsumerService {
         public QueryContainer(String orderId, List<String> queries) {
             this.orderId = orderId;
             this.queries = queries;
+        }
+    }
+    private static class ExpiryAtContainer {
+        public final String expiryAt;
+
+        public ExpiryAtContainer(String expiryAt) {
+            this.expiryAt = expiryAt;
         }
     }
 }

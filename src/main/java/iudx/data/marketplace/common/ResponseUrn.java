@@ -42,6 +42,8 @@ public enum ResponseUrn {
   INVALID_ID_URN("urn:dx:dmp:invalidId", "Given ID is invalid"),
 
   ROLE_NOT_FOUND("urn:dx:dmp:invalidRole", "Role does not exist"),
+  PAYMENT_STATUS_NOT_FOUND("urn:dx:dmp:invalidPaymentStatus", "Payment status does not exist"),
+
   BACKING_SERVICE_FORMAT_URN(
           "urn:dx:dmp:backend", "format error from backing service [cat,auth etc.]"),
   SCHEMA_READ_ERROR_URN("urn:dx:dmp:readError", "Fail to read file"),

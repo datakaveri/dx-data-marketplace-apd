@@ -13,6 +13,8 @@ import java.util.UUID;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
+import iudx.data.marketplace.apiserver.util.Role;
+import iudx.data.marketplace.policies.User;
 import org.apache.commons.lang.StringUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -241,7 +243,29 @@ public class QueryBuilder {
               .replace("$2", consumerId));
     }
 
+    LOGGER.debug("query : " + query);
     return query.toString();
+  }
+
+  public String fetchExpiryAtQuery(JsonObject rowEntry, User user)
+  {
+    if(user.getUserRole().equals(Role.CONSUMER))
+    {
+      /* query the policy table to see the expiryAt */
+      String invoiceId = rowEntry.getString("invoiceId");
+      String providerId = rowEntry.getString("providerId");
+      String productVariantId = rowEntry.getString("productVariantId");
+      String consumerEmailId = user.getEmailId();
+      String fetchExpiryAtQuery =
+              FETCH_EXPIRY_AT_FROM_POLICY
+                      .replace("$1", productVariantId)
+                      .replace("$2", consumerEmailId)
+                      .replace("$3", providerId)
+                      .replace("$4", invoiceId);
+      return fetchExpiryAtQuery;
+    }
+    return null;
+
   }
 
 

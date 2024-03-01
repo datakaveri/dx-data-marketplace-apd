@@ -27,14 +27,13 @@ public class Util {
   /**
    * Generates consumer or provider json object that can be used to display in the consumer response
    * @param user Provider or consumer object
-   * @param role Provider or consumer
    * @return JsonObject with user related information like firstName, lastName, emailId, ID
    */
-  public JsonObject generateUserJson(User user, Role role) {
+  public JsonObject generateUserJson(User user) {
     JsonObject userJson =
         new JsonObject()
             .put(
-                role.getRole(),
+                user.getUserRole().getRole(),
                 new JsonObject()
                     .put("email", user.getEmailId())
                     .put(

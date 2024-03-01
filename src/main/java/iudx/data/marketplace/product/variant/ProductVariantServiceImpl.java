@@ -270,7 +270,7 @@ public class ProductVariantServiceImpl implements ProductVariantService {
                         JsonObject rowEntry = JsonObject.mapFrom(row);
 
 //                        gets providerInfo, consumerInfo, productInfo from util to be merged in a json Object
-                        rowEntry.mergeIn(util.generateUserJson(user, Role.PROVIDER))
+                        rowEntry.mergeIn(util.generateUserJson(user))
                                 .mergeIn(util.getUserJsonFromRowEntry(rowEntry, Role.CONSUMER))
                                 .mergeIn(util.getProductInfo(rowEntry));
                         userResponse.add(rowEntry);
