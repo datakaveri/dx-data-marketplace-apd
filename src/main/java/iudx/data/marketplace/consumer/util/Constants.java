@@ -5,7 +5,20 @@ public class Constants {
   public static final String LIST_RESOURCES_QUERY =
           "select _id, resource_name, accessPolicy, provider_name from $0";
   public static final String LIST_PROVIDERS_QUERY =
-          "select distinct provider_id, provider_name, resource_server from $0";
+      "SELECT DISTINCT  provider_id AS \"providerId\", COUNT(_id) AS \"numberOfResources\","
+          +" provider_name AS \"providerName\", "
+          + "resource_server AS \"resourceServerUrl\"  "
+          + "FROM $0  "
+          + "GROUP BY provider_id, provider_name, resource_server "
+          + "ORDER BY provider_id ASC";
+  public static final String LIST_PROVIDER_WITH_GIVEN_PROVIDER_ID =
+  "SELECT distinct  provider_id AS \"providerId\", COUNT(_id) AS \"numberOfResources\"," +
+          " provider_name AS \"providerName\", " +
+          "resource_server AS \"resourceServerUrl\" " +
+          "FROM $0 " +
+          "WHERE provider_id = $1 " +
+          "GROUP BY provider_id, provider_name, resource_server " +
+          "ORDER BY provider_id ASC";
 
   public static final String LIST_PRODUCTS =
           "select pt.product_id as productId, pt.provider_name, "
