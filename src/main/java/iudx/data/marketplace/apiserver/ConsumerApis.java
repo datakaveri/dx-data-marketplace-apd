@@ -61,7 +61,7 @@ public class ConsumerApis {
     ValidationHandler purchaseValidationHandler =
             new ValidationHandler(vertx, RequestType.PURCHASE);
     ExceptionHandler exceptionHandler = new ExceptionHandler();
-    ValidationHandler productVariantHandler = new ValidationHandler(vertx, RequestType.PRODUCT);
+    ValidationHandler productVariantHandler = new ValidationHandler(vertx, RequestType.CONSUMER_PRODUCT_VARIANT);
 
     consumerService = ConsumerService.createProxy(vertx, CONSUMER_SERVICE_ADDRESS);
 
@@ -95,7 +95,7 @@ public class ConsumerApis {
 
       router
       .get(api.getConsumerProductVariantPath())
-      //  .handler(productVariantHandler)
+        .handler(productVariantHandler)
         .handler(AuthHandler.create(authenticationService, vertx, api, postgresService, authClient))
         .handler(this::listProductVariants)
         .failureHandler(exceptionHandler);

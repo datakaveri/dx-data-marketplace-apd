@@ -51,12 +51,23 @@ public class ValidationHandlerFactory {
         break;
       case PUT_ACCOUNT:
         validator = getPutLinkedAccountValidator(body, requestType);
+        break;
       case PURCHASE:
         validator = getPurchaseValidator(parameters);
+        break;
+      case CONSUMER_PRODUCT_VARIANT:
+        validator = getConsumerProductVariantValidator(parameters);
+        break;
     }
     return validator;
   }
 
+  private List<Validator> getConsumerProductVariantValidator(MultiMap parameters) {
+    List<Validator> validators = new ArrayList<>();
+
+    validators.add(new ProductIDTypeValidator(parameters.get("productId"), true));
+    return validators;
+  }
   private List<Validator> getPurchaseValidator(MultiMap parameters) {
     List<Validator> validators = new ArrayList<>();
 

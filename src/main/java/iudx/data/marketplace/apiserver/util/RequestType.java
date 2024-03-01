@@ -11,6 +11,7 @@ public enum RequestType {
   PURCHASE("purchase"),
   VERIFY_PAYMENT("verify_payment"),
   POST_ACCOUNT("post_account"),
+  CONSUMER_PRODUCT_VARIANT("consumer_list_product_variant"),
   PUT_ACCOUNT("put_account");
 
   private String filename;
