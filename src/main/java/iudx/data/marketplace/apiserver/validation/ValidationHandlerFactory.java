@@ -51,8 +51,17 @@ public class ValidationHandlerFactory {
         break;
       case PUT_ACCOUNT:
         validator = getPutLinkedAccountValidator(body, requestType);
+        break;
+      case ORDER_PAID_WEBHOOK:
+        validator = getPaymentWebhookValidator(body);
     }
     return validator;
+  }
+
+  private List<Validator> getPaymentWebhookValidator(JsonObject body) {
+    List<Validator> validators = new ArrayList<>();
+    validators.add(new JsonSchemaTypeValidator(body, RequestType.ORDER_PAID_WEBHOOK));
+    return validators;
   }
 
   private List<Validator> getVerfiyPaymentValidator(MultiMap parameters, JsonObject body) {

@@ -3,17 +3,12 @@ package iudx.data.marketplace.postgres;
 import io.vertx.core.*;
 import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
-import io.vertx.pgclient.PgConnectOptions;
 import io.vertx.pgclient.PgPool;
-import io.vertx.sqlclient.PoolOptions;
 import io.vertx.sqlclient.Row;
 import io.vertx.sqlclient.SqlConnection;
 import io.vertx.sqlclient.Tuple;
-import iudx.data.marketplace.apiserver.util.Role;
-import iudx.data.marketplace.common.HttpStatusCode;
 import iudx.data.marketplace.common.RespBuilder;
 import iudx.data.marketplace.common.ResponseUrn;
-import iudx.data.marketplace.policies.GetPolicy;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -23,21 +18,11 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.stream.Collector;
 import java.util.stream.Collectors;
 
-import static iudx.data.marketplace.apiserver.util.Constants.*;
-import static iudx.data.marketplace.policies.GetPolicy.FAILURE_MESSAGE;
 
 public class PostgresServiceImpl implements PostgresService {
   private static final Logger LOGGER = LogManager.getLogger(PostgresServiceImpl.class);
 
   private final PgPool client;
-    private PgConnectOptions connectOptions;
-    private PoolOptions poolOptions;
-    private String databaseIP;
-    private int databasePort;
-    private String databaseName;
-    private String databaseUserName;
-    private String databasePassword;
-    private int poolSize;
   public PostgresServiceImpl(final PgPool pgclient) {
     this.client = pgclient;
   }
@@ -113,7 +98,6 @@ public class PostgresServiceImpl implements PostgresService {
       }
       Promise<Void> promise = Promise.promise();
 
-      LOGGER.debug(statement);
       Collector<Row, ?, List<JsonObject>> rowCollector =
           Collectors.mapping(row -> row.toJson(), Collectors.toList());
       conn.query(statement)

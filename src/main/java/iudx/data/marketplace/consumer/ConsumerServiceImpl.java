@@ -193,7 +193,7 @@ public class ConsumerServiceImpl implements ConsumerService {
                     .put(
                         "results",
                         new JsonArray()
-                            .add(new JsonObject().put("order_id", queryContainer.orderId))));
+                            .add(orderInfo)));
           } else {
             LOGGER.error("Failed to create order : {}", pgHandler.cause().getMessage());
             promise.fail(pgHandler.cause());

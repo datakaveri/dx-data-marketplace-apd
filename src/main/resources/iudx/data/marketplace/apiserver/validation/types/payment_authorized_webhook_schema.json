@@ -1,0 +1,332 @@
+{
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "$id": "http://example.com/payment-authorized-event-schema.json",
+    "title": "Payment Authorized Event Schema",
+    "description": "Schema for describing an payment authorized event with payload containing payment details.",
+    "type": "object",
+    "properties": {
+        "entity": {
+            "$id": "#/properties/entity",
+            "title": "Entity",
+            "description": "Type of the entity, should be 'event'.",
+            "type": "string",
+            "enum": [
+                "event"
+            ]
+        },
+        "account_id": {
+            "$id": "#/properties/account_id",
+            "title": "Account ID",
+            "description": "Unique identifier of the account associated with the event. It always starts with 'acc_'.",
+            "type": "string",
+            "pattern": "^acc_.*$"
+        },
+        "event": {
+            "$id": "#/properties/event",
+            "title": "Event",
+            "description": "Type of event occurred, e.g., 'payment.authorized'.",
+            "type": "string"
+        },
+        "contains": {
+            "$id": "#/properties/contains",
+            "title": "Contains",
+            "description": "List of entities contained in the payload.",
+            "type": "array",
+            "items": {
+                "$id": "#/properties/contains/items",
+                "type": "string"
+            }
+        },
+        "payload": {
+            "$id": "#/properties/payload",
+            "title": "Payload",
+            "description": "Details regarding the payment associated with the event.",
+            "type": "object",
+            "properties": {
+                "payment": {
+                    "$id": "#/properties/payload/properties/payment",
+                    "title": "Payment",
+                    "description": "Details of the payment entity.",
+                    "type": "object",
+                    "properties": {
+                        "entity": {
+                            "$id": "#/properties/payload/properties/payment/properties/entity",
+                            "title": "Payment Entity",
+                            "description": "Details of the payment.",
+                            "type": "object",
+                            "properties": {
+                                "id": {
+                                    "$id": "#/properties/payload/properties/payment/properties/entity/properties/id",
+                                    "type": "string",
+                                    "pattern": "^pay_.*$"
+                                },
+                                "entity": {
+                                    "$id": "#/properties/payload/properties/payment/properties/entity/properties/entity",
+                                    "type": "string"
+                                },
+                                "amount": {
+                                    "$id": "#/properties/payload/properties/payment/properties/entity/properties/amount",
+                                    "type": "integer"
+                                },
+                                "currency": {
+                                    "$id": "#/properties/payload/properties/payment/properties/entity/properties/currency",
+                                    "type": "string",
+                                    "pattern": "^INR$"
+                                },
+                                "status": {
+                                    "$id": "#/properties/payload/properties/payment/properties/entity/properties/status",
+                                    "type": "string"
+                                },
+                                "order_id": {
+                                    "$id": "#/properties/payload/properties/payment/properties/entity/properties/order_id",
+                                    "type": "string",
+                                    "pattern": "^order_.*$"
+                                },
+                                "invoice_id": {
+                                    "$id": "#/properties/payload/properties/payment/properties/entity/properties/invoice_id",
+                                    "type": [
+                                        "string",
+                                        "null"
+                                    ]
+                                },
+                                "international": {
+                                    "$id": "#/properties/payload/properties/payment/properties/entity/properties/international",
+                                    "type": "boolean"
+                                },
+                                "method": {
+                                    "$id": "#/properties/payload/properties/payment/properties/entity/properties/method",
+                                    "type": "string"
+                                },
+                                "amount_refunded": {
+                                    "$id": "#/properties/payload/properties/payment/properties/entity/properties/amount_refunded",
+                                    "type": "integer"
+                                },
+                                "refund_status": {
+                                    "$id": "#/properties/payload/properties/payment/properties/entity/properties/refund_status",
+                                    "type": [
+                                        "string",
+                                        "null"
+                                    ]
+                                },
+                                "captured": {
+                                    "$id": "#/properties/payload/properties/payment/properties/entity/properties/captured",
+                                    "type": "boolean"
+                                },
+                                "description": {
+                                    "$id": "#/properties/payload/properties/payment/properties/entity/properties/description",
+                                    "type": "string"
+                                },
+                                "card_id": {
+                                    "$id": "#/properties/payload/properties/payment/properties/entity/properties/card_id",
+                                    "type": [
+                                        "string",
+                                        "null"
+                                    ]
+                                },
+                                "card": {
+                                    "$id": "#/properties/payload/properties/payment/properties/entity/properties/card",
+                                    "type": "object",
+                                    "properties": {
+                                        "id": {
+                                            "$id": "#/properties/payload/properties/payment/properties/entity/properties/card/properties/id",
+                                            "type": "string"
+                                        },
+                                        "entity": {
+                                            "$id": "#/properties/payload/properties/payment/properties/entity/properties/card/properties/entity",
+                                            "type": "string"
+                                        },
+                                        "name": {
+                                            "$id": "#/properties/payload/properties/payment/properties/entity/properties/card/properties/name",
+                                            "type": "string"
+                                        },
+                                        "last4": {
+                                            "$id": "#/properties/payload/properties/payment/properties/entity/properties/card/properties/last4",
+                                            "type": "string"
+                                        },
+                                        "network": {
+                                            "$id": "#/properties/payload/properties/payment/properties/entity/properties/card/properties/network",
+                                            "type": "string"
+                                        },
+                                        "type": {
+                                            "$id": "#/properties/payload/properties/payment/properties/entity/properties/card/properties/type",
+                                            "type": "string"
+                                        },
+                                        "issuer": {
+                                            "$id": "#/properties/payload/properties/payment/properties/entity/properties/card/properties/issuer",
+                                            "type": [
+                                                "string",
+                                                "null"
+                                            ]
+                                        },
+                                        "international": {
+                                            "$id": "#/properties/payload/properties/payment/properties/entity/properties/card/properties/international",
+                                            "type": "boolean"
+                                        },
+                                        "emi": {
+                                            "$id": "#/properties/payload/properties/payment/properties/entity/properties/card/properties/emi",
+                                            "type": "boolean"
+                                        },
+                                        "sub_type": {
+                                            "$id": "#/properties/payload/properties/payment/properties/entity/properties/card/properties/sub_type",
+                                            "type": "string"
+                                        },
+                                        "token_iin": {
+                                            "$id": "#/properties/payload/properties/payment/properties/entity/properties/card/properties/token_iin",
+                                            "type": [
+                                                "string",
+                                                "null"
+                                            ]
+                                        }
+                                    },
+                                    "required": [
+                                        "id",
+                                        "entity",
+                                        "name",
+                                        "last4",
+                                        "network",
+                                        "type",
+                                        "international",
+                                        "emi",
+                                        "sub_type"
+                                    ]
+                                },
+                                "bank": {
+                                    "$id": "#/properties/payload/properties/payment/properties/entity/properties/bank",
+                                    "type": [
+                                        "string",
+                                        "null"
+                                    ]
+                                },
+                                "wallet": {
+                                    "$id": "#/properties/payload/properties/payment/properties/entity/properties/wallet",
+                                    "type": [
+                                        "string",
+                                        "null"
+                                    ]
+                                },
+                                "vpa": {
+                                    "$id": "#/properties/payload/properties/payment/properties/entity/properties/vpa",
+                                    "type": [
+                                        "string",
+                                        "null"
+                                    ]
+                                },
+                                "email": {
+                                    "$id": "#/properties/payload/properties/payment/properties/entity/properties/email",
+                                    "type": "string",
+                                    "format": "email"
+                                },
+                                "contact": {
+                                    "$id": "#/properties/payload/properties/payment/properties/entity/properties/contact",
+                                    "type": "string",
+                                    "pattern": "^\\+91\\d{10}$"
+                                },
+                                "notes": {
+                                    "$id": "#/properties/payload/properties/payment/properties/entity/properties/notes",
+                                    "type": "object",
+                                    "additionalProperties": {
+                                        "type": "string"
+                                    }
+                                },
+                                "fee": {
+                                    "$id": "#/properties/payload/properties/payment/properties/entity/properties/fee",
+                                    "type": [
+                                        "integer",
+                                        "null"
+                                    ]
+                                },
+                                "tax": {
+                                    "$id": "#/properties/payload/properties/payment/properties/entity/properties/tax",
+                                    "type": [
+                                        "integer",
+                                        "null"
+                                    ]
+                                },
+                                "error_code": {
+                                    "$id": "#/properties/payload/properties/payment/properties/entity/properties/error_code",
+                                    "type": [
+                                        "string",
+                                        "null"
+                                    ]
+                                },
+                                "error_description": {
+                                    "$id": "#/properties/payload/properties/payment/properties/entity/properties/error_description",
+                                    "type": [
+                                        "string",
+                                        "null"
+                                    ]
+                                },
+                                "error_source": {
+                                    "$id": "#/properties/payload/properties/payment/properties/entity/properties/error_source",
+                                    "type": [
+                                        "string",
+                                        "null"
+                                    ]
+                                },
+                                "error_step": {
+                                    "$id": "#/properties/payload/properties/payment/properties/entity/properties/error_step",
+                                    "type": [
+                                        "string",
+                                        "null"
+                                    ]
+                                },
+                                "error_reason": {
+                                    "$id": "#/properties/payload/properties/payment/properties/entity/properties/error_reason",
+                                    "type": [
+                                        "string",
+                                        "null"
+                                    ]
+                                },
+                                "created_at": {
+                                    "$id": "#/properties/payload/properties/payment/properties/entity/properties/created_at",
+                                    "type": "integer"
+                                },
+                                "reward": {
+                                    "$id": "#/properties/payload/properties/payment/properties/entity/properties/reward",
+                                    "type": [
+                                        "string",
+                                        "null"
+                                    ]
+                                }
+                            },
+                            "required": [
+                                "id",
+                                "entity",
+                                "amount",
+                                "currency",
+                                "status",
+                                "order_id",
+                                "method",
+                                "captured",
+                                "email",
+                                "contact",
+                                "notes",
+                                "created_at"
+                            ]
+                        }
+                    },
+                    "required": [
+                        "entity"
+                    ]
+                }
+            },
+            "required": [
+                "payment"
+            ]
+        },
+        "created_at": {
+            "$id": "#/properties/created_at",
+            "title": "Created At",
+            "description": "Timestamp when the event occurred, in Unix format.",
+            "type": "integer"
+        }
+    },
+    "required": [
+        "entity",
+        "account_id",
+        "event",
+        "contains",
+        "payload",
+        "created_at"
+    ]
+}

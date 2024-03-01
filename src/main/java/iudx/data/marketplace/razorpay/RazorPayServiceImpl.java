@@ -3,13 +3,9 @@ package iudx.data.marketplace.razorpay;
 import static iudx.data.marketplace.apiserver.provider.linkedAccount.util.Constants.ACCOUNT_TYPE;
 import static iudx.data.marketplace.apiserver.provider.linkedAccount.util.Constants.FAILURE_MESSAGE;
 import static iudx.data.marketplace.product.util.Constants.*;
-import static iudx.data.marketplace.razorpay.util.Constants.*;
+import static iudx.data.marketplace.razorpay.Constants.*;
 
-import com.razorpay.Account;
-import com.razorpay.Order;
-import com.razorpay.RazorpayClient;
-import com.razorpay.RazorpayException;
-import com.razorpay.Utils;
+import com.razorpay.*;
 import io.vertx.core.Future;
 import io.vertx.core.Promise;
 import io.vertx.core.json.JsonObject;
@@ -18,7 +14,7 @@ import iudx.data.marketplace.common.HttpStatusCode;
 import iudx.data.marketplace.common.RespBuilder;
 import iudx.data.marketplace.common.ResponseUrn;
 import iudx.data.marketplace.postgres.PostgresService;
-import iudx.data.marketplace.razorpay.util.ErrorMessageBuilder;
+import iudx.data.marketplace.razorpay.util.*;
 import java.util.Map;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -33,6 +29,8 @@ public class RazorPayServiceImpl implements RazorPayService {
   private final PostgresService postgresService;
   private final String razorPaySecret;
   private final String paymentTable;
+
+  private final String webhookSecret;
   RazorpayClient razorpayClient;
 
   RazorPayServiceImpl(
@@ -41,8 +39,8 @@ public class RazorPayServiceImpl implements RazorPayService {
     this.postgresService = postgresService;
     this.razorPaySecret = config.getString(RAZORPAY_SECRET);
     this.paymentTable = config.getJsonArray(TABLES).getString(9);
+    this.webhookSecret = config.getString(WEBHOOK_SECRET);
   }
-
 
   @Override
   public Future<JsonObject> createOrder(JsonObject request) {
@@ -180,6 +178,38 @@ public class RazorPayServiceImpl implements RazorPayService {
           400, ResponseUrn.INVALID_PAYMENT, ResponseUrn.INVALID_PAYMENT.getMessage());
     } catch (DxRuntimeException e) {
       LOGGER.error("payment not verified on razorpay, : {}", e.getMessage());
+      RespBuilder respBuilder =
+          new RespBuilder()
+              .withType(e.getUrn().getUrn())
+              .withTitle("RazorPay Error")
+              .withDetail(e.getUrn().getMessage());
+      promise.fail(respBuilder.getResponse());
+    }
+    return promise.future();
+  }
+
+  @Override
+  public Future<JsonObject> webhookSignatureValidator(JsonObject request, String signatureHeader) {
+    Promise<JsonObject> promise = Promise.promise();
+
+    try {
+      boolean isValidRequest =
+          Utils.verifyWebhookSignature(request.toString(), signatureHeader, webhookSecret);
+      if (isValidRequest) {
+        promise.complete();
+      } else {
+        throw new DxRuntimeException(
+            400,
+            ResponseUrn.INVALID_WEBHOOK_REQUEST,
+            ResponseUrn.INVALID_WEBHOOK_REQUEST.getMessage());
+      }
+    } catch (RazorpayException e) {
+      throw new DxRuntimeException(
+          400,
+          ResponseUrn.INVALID_WEBHOOK_REQUEST,
+          ResponseUrn.INVALID_WEBHOOK_REQUEST.getMessage());
+    } catch (DxRuntimeException e) {
+      LOGGER.error("Webhook signature verification failed on razorpay, : {}", e.getMessage());
       RespBuilder respBuilder =
           new RespBuilder()
               .withType(e.getUrn().getUrn())

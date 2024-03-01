@@ -1,5 +1,8 @@
 package iudx.data.marketplace.policies;
 
+import static iudx.data.marketplace.apiserver.util.Constants.*;
+import static iudx.data.marketplace.policies.util.Constants.*;
+
 import io.vertx.core.CompositeFuture;
 import io.vertx.core.Future;
 import io.vertx.core.Promise;
@@ -10,15 +13,11 @@ import iudx.data.marketplace.apiserver.util.Role;
 import iudx.data.marketplace.auditing.AuditingService;
 import iudx.data.marketplace.common.Api;
 import iudx.data.marketplace.postgres.PostgresService;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
-
 import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
-
-import static iudx.data.marketplace.apiserver.util.Constants.*;
-import static iudx.data.marketplace.policies.util.Constants.*;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 public class CreatePolicy {
   private static final Logger LOGGER = LogManager.getLogger(CreatePolicy.class);
@@ -81,13 +80,8 @@ public class CreatePolicy {
               providerId = jsonObject.getString("providerId");
 
               JsonObject providerUser =
-                  new JsonObject()
-                      .put(USERID, providerId)
-                      .put(USER_ROLE, Role.PROVIDER.getRole())
-                      .put(EMAIL_ID, jsonObject.getString(EMAIL_ID))
-                      .put(FIRST_NAME, jsonObject.getString(FIRST_NAME))
-                      .put(LAST_NAME, jsonObject.getString(LAST_NAME))
-                      .put(RS_SERVER_URL, jsonObject.getString(RS_SERVER_URL));
+                  new JsonObject().put(USERID, providerId).put(USER_ROLE, Role.PROVIDER.getRole());
+              providerUser.mergeIn(jsonObject);
               User provider = new User(providerUser);
 
               consumerEmailId = jsonObject.getString("consumerEmailId");
@@ -124,24 +118,18 @@ public class CreatePolicy {
                         .replace("$2", resourceItem)
                         .replace("$4", constraint + "");
                 listOfQueries.add(createPolicyFinalQuery);
-                Future<Boolean> policyCreationFuture = executeTransaction(listOfQueries, policyId);
-                futureList.add(policyCreationFuture);
-
-                /* send data for auditing after policy is created*/
-                policyCreationFuture.compose(
-                    policyCreatedSuccessFully -> {
-                      return initiateAuditing(
-                          provider, orderId, policyId, resourceItem, constraint);
-                    });
+                futureList.add(
+                    initiateAuditing(provider, orderId, policyId, resourceItem, constraint));
               }
-              Future<Boolean> policyInsertionFuture =
-                  CompositeFuture.all(futureList)
-                      .compose(
-                          map -> {
-                            return Future.succeededFuture(true);
-                          });
+              Future<Boolean> policyCreationFuture = executeTransaction(listOfQueries, orderId);
 
-              return policyInsertionFuture;
+              /* send data for auditing after policy is created*/
+              CompositeFuture.all(futureList)
+                  .onComplete(
+                      map -> {
+                        LOGGER.info("audit completed");
+                      });
+              return policyCreationFuture;
             });
 
     return future;
@@ -184,7 +172,7 @@ public class CreatePolicy {
               /* OR multiple policies are created at the same time and not one after the other */
               LOGGER.error("Failure while fetching the results : {} ", detail);
               LOGGER.error("Error : {}", pgHandler.result().getJsonArray(RESULTS));
-              promise.fail("Error : {}" + pgHandler.cause().getMessage());
+              promise.fail("Error : No payment found for the given order");
             }
 
           } else {
@@ -196,20 +184,20 @@ public class CreatePolicy {
     return promise.future();
   }
 
-    public Future<Boolean> executeTransaction(List<String> queries, String policyId) {
-        Promise<Boolean> promise = Promise.promise();
-        postgresService.executeTransaction(
-                queries,
-                pgHandler -> {
-                    if (pgHandler.succeeded()) {
-                        LOGGER.info("Policy with ID {} inserted successfully", policyId);
-                        promise.complete(true);
-                    } else {
-                        LOGGER.error("Failure while inserting policy with ID : {}", policyId);
-                        LOGGER.error("Error : {}", pgHandler.cause().getMessage());
-                        promise.fail("Error : {}" + pgHandler.cause().getMessage());
-                    }
-                });
-        return promise.future();
-    }
+  public Future<Boolean> executeTransaction(List<String> queries, String orderId) {
+    Promise<Boolean> promise = Promise.promise();
+    postgresService.executeTransaction(
+        queries,
+        pgHandler -> {
+          if (pgHandler.succeeded()) {
+            LOGGER.info("Policies inserted successfully for order : {}", orderId);
+            promise.complete(true);
+          } else {
+            LOGGER.error("Failure while inserting policy for order : {}", orderId);
+            LOGGER.error("Error : {}", pgHandler.cause().getMessage());
+            promise.fail("Error : {}" + pgHandler.cause().getMessage());
+          }
+        });
+    return promise.future();
+  }
 }

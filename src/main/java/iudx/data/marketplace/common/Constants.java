@@ -32,5 +32,6 @@ public class Constants {
   public static final String AUDITING_SERVICE_ADDRESS = "iudx.data.marketplace.server.auditing";
 
   public static final String LINKED_ACCOUNT_ADDRESS = "iudx.data.marketplace.apiserver.provider.linked.account.service";
+  public static final String WEBHOOK_SERVICE_ADDRESS = "iudx.data.marketplace.webhook.service";
 
 }

@@ -89,4 +89,11 @@ public interface RazorPayService {
    * @return Future of type boolean after updating successfully or failure if any
    */
   Future<Boolean> updateLinkedAccount(String request, String accountId);
+
+  /**
+   * Captures webhook event from RazorPay related to payment and order,
+   * it also triggers the flow of policy creation
+   * @return Future of type JsonObject as success response, failure if any
+   */
+  Future<JsonObject> webhookSignatureValidator(JsonObject request, String signatureHeader);
 }

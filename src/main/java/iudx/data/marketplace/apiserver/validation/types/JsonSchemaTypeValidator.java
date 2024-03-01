@@ -66,7 +66,6 @@ public class JsonSchemaTypeValidator implements Validator {
 
     try {
       JsonNode jsonobj = loadString(body.toString());
-//      isValid = schema.validInstance(jsonobj);
       ProcessingReport report = schema.validate(jsonobj);
       report.forEach( x -> {
         if(x.getLogLevel().toString().equalsIgnoreCase("error")) {
