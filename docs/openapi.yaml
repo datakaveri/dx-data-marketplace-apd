@@ -1784,7 +1784,7 @@ paths:
                     type: 'urn:dx:cat:InvalidAuthorizationToken'
                     title: Token is invalid
                     detail: failed
-  /consumer/list/product-variants:
+  /consumer/product-variants:
     get:
       tags:
         - Consumer-List-APIs
