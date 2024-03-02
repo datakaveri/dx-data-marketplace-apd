@@ -15,7 +15,7 @@ public static   String UPDATE_LINKED_ACCOUNT_STATUS_QUERY =
 
   public static final String ACCOUNT_TYPE = "route";
   public static final String FAILURE_MESSAGE = "User registration incomplete : ";
-  public static final String GET_ACCOUNT_ID_QUERY = "SELECT account_id FROM merchant_table WHERE provider_id = '$1'";
+  public static final String GET_ACCOUNT_ID_QUERY = "SELECT account_id, rzp_account_product_id FROM merchant_table WHERE provider_id = '$1'";
   public static final String GET_MERCHANT_INFO_QUERY = "SELECT account_id, reference_id FROM merchant_table WHERE provider_id = '$1'" +
           " AND email = '$2'";
 

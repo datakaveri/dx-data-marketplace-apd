@@ -31,7 +31,14 @@ paths:
       summary: ''
       description: |-
         Create a product where the body contains the name and the array of resources that will be part of the product. 
-        The name cannot be updated once the product is created as it is a unique identifier for a product of a provider. The name is stored as a URN(for eg: a product named flood-sensors hosted by the provider with id 4efde16f-96cd-4b86-b6ee-ca5102413ff6 is represented as urn:datakaveri.org:4efde16f-96cd-4b86-b6ee-ca5102413ff6:flood-sensors)
+        The name cannot be updated once the product is created as it is a unique identifier for a product of a provider. 
+        The name is stored as a URN(for eg: a product named flood-sensors hosted by the provider with id 4efde16f-96cd-4b86-b6ee-ca5102413ff6 is represented as urn:datakaveri.org:4efde16f-96cd-4b86-b6ee-ca5102413ff6:flood-sensors)
+              </br>
+        
+        `Note`: If Linked account is not activated after completing the KYC and filling account details in the 
+        dashboard, please use this API : [link](https://razorpay.com/docs/api/payments/route/linked-account-onboarding/update-product-config).
+        ID like accountId, account product Id required for the API could be fetched from GET linked account API : [link](http://localhost:8443/apis#tag/Linked-Account/operation/get-linked-account-v1)
+
       operationId: Create Product
       parameters:
         - name: token
@@ -3084,7 +3091,7 @@ components:
         results:
           type: object
           properties:
-            id:
+            accountId:
               type: string
               minLength: 18
               maxLength: 18
@@ -3097,6 +3104,9 @@ components:
             email:
               type: string
               pattern: '^([a-zA-Z0-9_\-\.]+)@([a-zA-Z0-9_\-\.]+)\.([a-zA-Z]{2,5})$'
+            accountProductId:
+              type: string
+              minLength: 1
             profile:
               type: object
               properties:
@@ -3180,7 +3190,7 @@ components:
                   maxLength: 15
                   pattern: '/^[0123][0-9][a-z]{5}[0-9]{4}[a-z][0-9][a-z0-9][a-z0-9]$/gi'
           required:
-            - id
+            - accountId
             - type
             - status
             - email
@@ -3190,6 +3200,7 @@ components:
             - businessType
             - legalBusinessName
             - customerFacingBusinessName
+            - accountProductId
       required:
         - type
         - title
@@ -3199,10 +3210,11 @@ components:
         title: Success
         results:
           {
-            "id": "acc_GRWKk7qQsLnDjX",
+            "accountId": "acc_GRWKk7qQsLnDjX",
             "type": "route",
             "status": "created",
             "email": "test.provider@gmail.com",
+            "accountProductId": "acc_prd_NhauXCr6VoHFYq",
             "profile": {
               "category": "healthcare",
               "subcategory": "doctors",

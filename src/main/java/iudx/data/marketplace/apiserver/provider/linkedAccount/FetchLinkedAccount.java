@@ -24,6 +24,7 @@ public class FetchLinkedAccount {
   Api api;
   RazorPayService razorPayService;
   AuditingService auditingService;
+  String razorpayAccountProductId;
 
   public FetchLinkedAccount(
       PostgresService postgresService,
@@ -111,10 +112,11 @@ public class FetchLinkedAccount {
 
     JsonObject details =
         new JsonObject()
-            .put("id", accountId)
+            .put("accountId", accountId)
             .put("type", type)
             .put("status", status)
             .put("email", emailId)
+            .put("accountProductId", getRazorpayAccountProductId())
             .put("profile", profileJson)
             .put("phone", phoneNumber);
     if (StringUtils.isNotBlank(contactName)) {
@@ -148,6 +150,8 @@ public class FetchLinkedAccount {
             if (!handler.result().getJsonArray(RESULTS).isEmpty()) {
               JsonObject result = handler.result().getJsonArray(RESULTS).getJsonObject(0);
               String accountId = result.getString("account_id");
+              String accountProductId = result.getString("rzp_account_product_id");
+              setRazorpayAccountProductId(accountProductId);
               promise.complete(new JsonObject().put("accountId", accountId));
             } else {
               promise.fail(
@@ -169,5 +173,14 @@ public class FetchLinkedAccount {
           }
         });
     return promise.future();
+  }
+
+
+  public String getRazorpayAccountProductId() {
+    return razorpayAccountProductId;
+  }
+
+  public void setRazorpayAccountProductId(String razorpayAccountProductId) {
+    this.razorpayAccountProductId = razorpayAccountProductId;
   }
 }
