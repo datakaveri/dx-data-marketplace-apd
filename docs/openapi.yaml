@@ -1,16 +1,33 @@
 openapi: 3.0.2
+contact:
+  email: support@iudx.org.in
+  name: For support contact IUDX team at
+schemes:
+  - "http"
+  - "https"
+
+produces:
+  - "application/json"
+  - "text/plain"
+
+consumes:
+  - "application/json"
+  - "text/plain"
 info:
-  version: 4.5.0
+  version: 5.5.0
   title: DX Data Marketplace APIs
-  description: 'The data marketplace is Data Exchange (DX) platform that enables data Providers to host their datasets as a product. Likewise, data consumers can buy the products listed by various providers '
+  description: |-
+    # Introduction
+    The data marketplace is Data Exchange (DX) platform that enables data Providers to host their datasets as a product. Likewise, data consumers can buy the products listed by various providers
   contact:
+    name: For support contact IUDX Team at
     email: support@iudx.org.in
-    name: For support contact IUDX team at
+    url: https://iudx.org.in/
 paths:
   /provider/product:
     post:
       tags:
-        - provider
+        - Product
       summary: ''
       description: |-
         Create a product where the body contains the name and the array of resources that will be part of the product. 
@@ -98,7 +115,7 @@ paths:
                     detail: To activate linked account please complete the KYC, filling account information etc., in your Razorpay merchant dashboard
     delete:
       tags:
-        - provider
+        - Product
       summary: ''
       operationId: Delete Product
       parameters:
@@ -162,7 +179,7 @@ paths:
   /provider/list/products:
     get:
       tags:
-        - provider
+        - Product
       operationId: List Products
       parameters:
         - name: token
@@ -286,8 +303,16 @@ paths:
   /provider/list/purchases:
     get:
       tags:
-        - provider
+        - Purchase
       operationId: List Purchases
+      description: |-
+        Lists consumer information [id, email, name], provider information [id, email, name],
+        product information [product and variant id, name, resources with constraints, expiry and price],
+        along with purchase related information [orderId, invoiceId, payment status and time].
+        Expiry at field would be displayed when the payment status is `SUCCEEDED`.
+        </br>
+        The response could be also be filtered based on productId or resourceId.
+
       parameters:
         - name: token
           in: header
@@ -297,21 +322,20 @@ paths:
             type: string
             pattern: '^[a-zA-Z0-9\/\@\.]*$'
             maxLength: 512
-        - name: productID
+        - name: productId
           in: query
-          description: urn name of the product
+          description: purchases based on productId. Specifying this is optional
+          type: UUID
+          minLength: 36
+          maxLength: 36
           required: false
-          schema:
-            type: string
-            pattern: '^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$'
-            minLength: 36
-            maxLength: 36
-        - name: resourceID
+        - name: resourceId
           in: query
-          description: 'If resourceID is provided for listing, then purchases are filtered to show purchases against that resource'
+          description: purchases based on resourceId. Specifying this is optional
+          type: UUID
+          minLength: 36
+          maxLength: 36
           required: false
-          schema:
-            type: string
       responses:
         '200':
           description: success
@@ -321,43 +345,37 @@ paths:
                 $ref: '#/components/schemas/exampleResponseListPurchases'
         '204':
           description: no content
-        '400':
-          description: invalid document
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/errorResponseWithObjects'
-              examples:
-                Doesn't Exist:
-                  value:
-                    type: 'urn:dx:dmp:DocDoesNotExist'
-                    results:
-                      - productID: 'urn:datakaveri.org:iisc.ac.in/123qwerty:zxcvb'
-                        method: list
-                        title: failed
-                        detail: 'Fail: Doc does not exist'
-                    title: Product does not exist
-                Invalid name:
-                  value:
-                    type: 'urn:dx:dmp:InvalidNameValue'
-                    title: Bad request
-                    detail: 'Invalid name [ abc&23? ]'
         '401':
           description: Unauthorized access
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/errorResponseWithObjects'
-              examples:
-                Unauthorized:
-                  value:
-                    type: 'urn:dx:cat:InvalidAuthorizationToken'
-                    title: Token is invalid
-                    detail: failed
+                $ref: '#/components/schemas/Unauthorized'
+        '400':
+          description: Invalid product or resource ID
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/errorResponse'
+              example:
+                value:
+                  {
+                    "type": "urn:dx:dmp:invalidIdValue",
+                    "title": "Bad Request",
+                    "detail": "Invalid id [  abcd ] "
+                  }
+        '404':
+          description: |-
+            Not Found</br>
+            When given purchase information related to given resource or product ID is not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/notFoundExampleResponseListPurchases'
   /provider/product-variant:
     post:
       tags:
-        - provider
+        - Product-Variant
       summary: ''
       description: 'Create a product variant where the body contains details about the variant such as price, duration, resources and their capabilities. Along with the name of the variant and the product it belongs to.'
       operationId: Create Product Variant
@@ -447,27 +465,41 @@ paths:
                     results: [ ]
     get:
       tags:
-        - provider
+        - Product-Variant
       summary: ''
+      description: |-
+        Lists all the active product variants of a given product. 
+        Product variant descriptors like it's ID, name, price, duration of product variant or expiry, 
+        and other information like provider ID, resource ID and constraints of that resource, product ID and name are displayed.
       operationId: Get Product Variant
       parameters:
         - name: token
           in: header
           description: DX Auth token to process the request
-          schema:
-            type: string
-        - name: id
-          in: query
           required: true
           schema:
             type: string
+            pattern: '^[a-zA-Z0-9\/\@\.]*$'
+            maxLength: 512
+        - name: productId
+          description: ID of the product for which product variant is to be listed
+          in: query
+          required: true
+          schema:
+            type: UUID
+            minLength: 36
+            maxLength: 36
         - name: variant
+          description: |-
+            Name of the product variant based on which product variant information is to be listed.
+            This is an optional parameter.
           in: query
           schema:
             type: string
+            minLength: 1
       responses:
         '200':
-          description: OK
+          description: success
           content:
             application/json:
               schema:
@@ -482,14 +514,41 @@ paths:
                     items:
                       type: object
                       properties:
-                        product_variant_name:
+                        productVariantId:
+                          type: UUID
+                          minLength: 36
+                          maxLength: 36
+                        productVariantName:
                           type: string
-                        product_id:
-                          type: string
-                        resource_name:
+                          minLength: 1
+                        productId:
+                          type: UUID
+                          minLength: 36
+                          maxLength: 36
+                        resourceName:
                           type: array
                           items:
                             type: string
+                        resourceIdsAndCapabilities:
+                          type: object
+                        price:
+                          type: number
+                          minimum: 0
+                        expiryInMonths:
+                          type: integer
+                          minimum: 1
+                      required:
+                        - productVariantId
+                        - productVariantName
+                        - productId
+                        - resourceName
+                        - resourceIdsAndCapabilities
+                        - price
+                        - expiryInMonths
+                required:
+                  - type
+                  - title
+                  - results
                 x-examples:
                   Example 1:
                     type: 'urn:dx:dmp:success'
@@ -503,42 +562,146 @@ paths:
               examples:
                 Get a Product Variant:
                   value:
-                    type: 'urn:dx:dmp:success'
-                    title: Success
-                    results:
-                      - product_variant_name: variant1
-                        product_id: 'urn:datakaveri.org:b2c27f3f-2524-4a84-816e-91f9ab23f837:testProduct1'
-                        resource_name:
-                          - Chandigarh Paid Parking Locations
-                          - TEST ITEM FOR APD /verify TESTS
+                    {
+                      "type": "urn:dx:dmp:success",
+                      "title": "Success",
+                      "results": [
+                        {
+                          "productVariantId": "74d87fcb-a17d-4ca6-8017-7cfcd4391282",
+                          "productVariantName": "someVariantName",
+                          "productId": "urn:datakaveri.org:ef67e601-05f0-4d13-96ce-9cafaaf801db:testProduct",
+                          "providerId": "ef67e601-05f0-4d13-96ce-9cafaaf801db",
+                          "resourceName": [
+                            "Resource Name 1",
+                            "Resource Name 2"
+                          ],
+                          "resourceIdsAndCapabilities": {
+                            "1c411817-abcf-42f3-980b-fd0d62a651f1": [
+                              "sub",
+                              "file"
+                            ],
+                            "7355eed3-a337-4924-9f80-3afdd538e958": [
+                              "api",
+                              "async"
+                            ]
+                          },
+                          "price": 150.0,
+                          "expiryInMonths": 12
+                        }
+                      ]
+                    }
                 List all variants of the product:
                   value:
-                    type: 'urn:dx:dmp:success'
-                    title: Success
-                    results:
-                      - product_variant_name: variant2
-                        product_id: 'urn:datakaveri.org:b2c27f3f-2524-4a84-816e-91f9ab23f837:testProduct1'
-                        resource_name:
-                          - Chandigarh Paid Parking Locations
-                          - TEST ITEM FOR APD /verify TESTS
-                      - product_variant_name: variant3
-                        product_id: 'urn:datakaveri.org:b2c27f3f-2524-4a84-816e-91f9ab23f837:testProduct1'
-                        resource_name:
-                          - Chandigarh Paid Parking Locations
-                          - TEST ITEM FOR APD /verify TESTS
-                      - product_variant_name: variant2X
-                        product_id: 'urn:datakaveri.org:b2c27f3f-2524-4a84-816e-91f9ab23f837:testProduct1'
-                        resource_name:
-                          - Chandigarh Paid Parking Locations
-                          - TEST ITEM FOR APD /verify TESTS
-                      - product_variant_name: variant1
-                        product_id: 'urn:datakaveri.org:b2c27f3f-2524-4a84-816e-91f9ab23f837:testProduct1'
-                        resource_name:
-                          - Chandigarh Paid Parking Locations
-                          - TEST ITEM FOR APD /verify TESTS
+                    {
+                      "type": "urn:dx:dmp:success",
+                      "title": "Success",
+                      "results": [
+                        {
+                          "productVariantId": "74d87fcb-a17d-4ca6-8017-7cfcd4391282",
+                          "productVariantName": "someVariantName",
+                          "productId": "urn:datakaveri.org:ef67e601-05f0-4d13-96ce-9cafaaf801db:testProduct1",
+                          "providerId": "ef67e601-05f0-4d13-96ce-9cafaaf801db",
+                          "resourceName": [
+                            "Resource Name 1",
+                            "Resource Name 2"
+                          ],
+                          "resourceIdsAndCapabilities": {
+                            "1c411817-abcf-42f3-980b-fd0d62a651f1": [
+                              "sub",
+                              "file"
+                            ],
+                            "7355eed3-a337-4924-9f80-3afdd538e958": [
+                              "api",
+                              "async"
+                            ]
+                          },
+                          "price": 150.0,
+                          "expiryInMonths": 12
+                        },
+                        {
+                          "productVariantId": "be85f112-51e6-4248-a254-38c3e13151fa",
+                          "productVariantName": "someTestVariantName",
+                          "productId": "urn:datakaveri.org:ef67e601-05f0-4d13-96ce-9cafaaf801db:testProduct2",
+                          "providerId": "ef67e601-05f0-4d13-96ce-9cafaaf801db",
+                          "resourceName": [
+                            "Resource Name 3",
+                            "Resource Name 4"
+                          ],
+                          "resourceIdsAndCapabilities": {
+                            "c3903ed7-e524-44c1-9b2e-96d50cc4234f": [
+                              "sub",
+                              "file"
+                            ],
+                            "a2cdaba0-b77e-4e2f-bb01-e2ab9c143b16": [
+                              "api",
+                              "async"
+                            ]
+                          },
+                          "price": 200,
+                          "expiryInMonths": 4
+                        },
+                        {
+                          "productVariantId": "3780dedb-e0a6-4eff-a05c-8b2aa555a598",
+                          "productVariantName": "someOtherVariantName",
+                          "productId": "urn:datakaveri.org:ef67e601-05f0-4d13-96ce-9cafaaf801db:testProduct3",
+                          "providerId": "ef67e601-05f0-4d13-96ce-9cafaaf801db",
+                          "resourceName": [
+                            "Resource Name 5",
+                            "Resource Name 6"
+                          ],
+                          "resourceIdsAndCapabilities": {
+                            "e8237392-221d-48b9-b3af-a62f165a315b": [
+                              "sub",
+                              "file"
+                            ],
+                            "8fceca8a-86c9-4521-9cf4-f66bab2025a7": [
+                              "api",
+                              "async"
+                            ]
+                          },
+                          "price": 145.0,
+                          "expiryInMonths": 2
+                        }
+                      ]
+                    }
+        '204':
+          description: no content
+        '400':
+          description: Invalid Product ID
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/errorResponse'
+              example:
+                value:
+                  {
+                    "type": "urn:dx:dmp:invalidIdValue",
+                    "title": "Bad Request",
+                    "detail": "Invalid id [  abcd ] "
+                  }
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/errorResponse'
+              example:
+                value:
+                  {
+                    "type": "urn:dx:dmp:resourceNotFound",
+                    "title": "Document of given id does not exist",
+                    "detail": "Product variants not found"
+                  }
+        '401':
+          description: Unauthorized access
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Unauthorized'
+
     put:
       tags:
-        - provider
+        - Product-Variant
       summary: ''
       operationId: Update Product Variant
       parameters:
@@ -605,7 +768,7 @@ paths:
                 $ref: '#/components/schemas/successResponseWithObjects'
     delete:
       tags:
-        - provider
+        - Product-Variant
       summary: ''
       operationId: Delete Product Variant
       parameters:
@@ -634,7 +797,7 @@ paths:
   /account:
     post:
       tags:
-        - provider
+        - Linked-Account
       summary: Create Linked account
       description: |-
         A provider could create a linked account to start the process of receiving payments via Payment Gateway. A provider or provider 
@@ -844,7 +1007,7 @@ paths:
         - authorization: [ ]
     put:
       tags:
-        - provider
+        - Linked-Account
       summary: Update Linked account
       description: |-
         A provider could update details related to their linked account. After creating a linked account through DMP, 
@@ -1060,7 +1223,7 @@ paths:
         - authorization: [ ]
     get:
       tags:
-        - provider
+        - Linked-Account
       summary: Fetch Linked account
       description: |-
         A provider could fetch the information related to their linked account provided while creating the 
@@ -1129,7 +1292,8 @@ paths:
   /consumer/list/resources:
     get:
       tags:
-        - consumer
+        - Consumer-List-APIs
+      summary: List resources
       parameters:
         - name: token
           in: header
@@ -1283,7 +1447,12 @@ paths:
   /consumer/list/providers:
     get:
       tags:
-        - consumer
+        - Consumer-List-APIs
+      summary: List providers
+      description: |-
+        Lists provider specific information for the consumer to buy products based on the resources of a give
+        provider. Number of resources of the provider is added in the response along with provider details like
+        ID, provider name and resource server URL to which the provider belongs
       parameters:
         - name: token
           in: header
@@ -1293,12 +1462,14 @@ paths:
             type: string
             pattern: '^[a-zA-Z0-9\/\@\.]*$'
             maxLength: 512
-        - name: providerID
+        - name: providerId
           in: query
-          description: Id of the provider for its details
+          description: ID of the provider for its details. This is an optional parameter
           required: false
           schema:
-            type: string
+            type: UUID
+            minLength: 36
+            maxLength: 36
       responses:
         '200':
           description: success
@@ -1316,12 +1487,29 @@ paths:
                     items:
                       type: object
                       properties:
-                        provider_id:
+                        providerId:
+                          type: UUID
+                          minLength: 36
+                          maxLength: 36
+                        providerName:
                           type: string
-                        providername:
+                          minLength: 1
+                        numberOfResources:
+                          type: integer
+                          minimum: 1
+                        resourceServer:
                           type: string
-                        resource_server:
-                          type: string
+                          minLength: 1
+                      required:
+                        - providerId
+                        - providerName
+                        - numberOfResources
+                        - resourceServer
+                required:
+                  - type
+                  - title
+                  - results
+
                 x-examples:
                   Example 1:
                     type: 'urn:dx:dmp:success'
@@ -1333,23 +1521,38 @@ paths:
               examples:
                 List All Providers:
                   value:
-                    type: 'urn:dx:dmp:success'
-                    title: Success
-                    results:
-                      - provider_id: b2c27f3f-2524-4a84-816e-91f9ab23f837
-                        providername: Administrator of the IUDX platform
-                        resource_server: 49cf5c76-09de-11ee-be56-0242ac120002
-                      - provider_id: c3a2af3f-2524-4a84-816e-91f9ab23d375
-                        providername: Administrator of platform
-                        resource_server: 49cf5c76-09de-11ee-be56-0242ac120002
+                    {
+                      "type": "urn:dx:dmp:success",
+                      "title": "Success",
+                      "results": [
+                        {
+                          "providerId": "b2c27f3f-2524-4a84-816e-91f9ab23f837",
+                          "numberOfResources": 8,
+                          "providerName": "Administrator of the IUDX platform",
+                          "resourceServerUrl": "rs.iudx.io"
+                        },
+                        {
+                          "providerId": "c3a2af3f-2524-4a84-816e-91f9ab23d375",
+                          "numberOfResources": 5,
+                          "providerName": "Administrator of the platform",
+                          "resourceServerUrl": "rs.iudx.io"
+                        }
+                      ]
+                    }
                 List Provider by ID:
                   value:
-                    type: 'urn:dx:dmp:success'
-                    title: Success
-                    results:
-                      - provider_id: b2c27f3f-2524-4a84-816e-91f9ab23f837
-                        providername: Administrator of the IUDX platform
-                        resource_server: 49cf5c76-09de-11ee-be56-0242ac120002
+                    {
+                      "type": "urn:dx:dmp:success",
+                      "title": "Success",
+                      "results": [
+                        {
+                          "providerId": "b2c27f3f-2524-4a84-816e-91f9ab23f837",
+                          "numberOfResources": 8,
+                          "providerName": "Administrator of the IUDX platform",
+                          "resourceServerUrl": "rs.iudx.io"
+                        }
+                      ]
+                    }
         '204':
           description: no content
         '401':
@@ -1367,7 +1570,16 @@ paths:
   /consumer/list/purchases:
     get:
       tags:
-        - consumer
+        - Consumer-List-APIs
+      summary: List purchases
+      description: |-
+        Lists consumer information [id, email, name], provider information [id, email, name],
+        product information [product and variant id, name, resources with constraints, expiry and price],
+        along with purchase related information [orderId, invoiceId, payment status and time].
+        Expiry at field would be displayed when the payment status is `SUCCEEDED`.
+        </br>
+        The response could be also be filtered based on productId or resourceId.
+
       parameters:
         - name: token
           in: header
@@ -1377,6 +1589,20 @@ paths:
             type: string
             pattern: '^[a-zA-Z0-9\/\@\.]*$'
             maxLength: 512
+        - name: productId
+          in: query
+          description: purchases based on productId. Specifying this is optional
+          type: UUID
+          minLength: 36
+          maxLength: 36
+          required: false
+        - name: resourceId
+          in: query
+          description: purchases based on resourceId. Specifying this is optional
+          type: UUID
+          minLength: 36
+          maxLength: 36
+          required: false
       responses:
         '200':
           description: success
@@ -1391,17 +1617,34 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/errorResponseWithObjects'
-              examples:
-                Unauthorized:
-                  value:
-                    type: 'urn:dx:cat:InvalidAuthorizationToken'
-                    title: Token is invalid
-                    detail: failed
+                $ref: '#/components/schemas/Unauthorized'
+        '400':
+          description: Invalid product or resource ID
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/errorResponse'
+              example:
+                value:
+                  {
+                    "type": "urn:dx:dmp:invalidIdValue",
+                    "title": "Bad Request",
+                    "detail": "Invalid id [  abcd ] "
+                  }
+        '404':
+          description: |-
+            Not Found</br>
+            When given purchase information related to given resource or product ID is not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/notFoundExampleResponseListPurchases'
+
   /consumer/list/products:
     get:
       tags:
-        - consumer
+        - Consumer-List-APIs
+      summary: List products
       parameters:
         - name: token
           in: header
@@ -1541,11 +1784,156 @@ paths:
                     type: 'urn:dx:cat:InvalidAuthorizationToken'
                     title: Token is invalid
                     detail: failed
+  /consumer/list/product-variants:
+    get:
+      tags:
+        - Consumer-List-APIs
+      summary: List Product Variants
+      description: |
+        Lists all the `active` product variants of a given product. Product variant descriptors like it's ID, name, price,
+        duration of product variant or expiry, and other information like provider ID, resource ID and constraints of that
+        resource, product ID and name are displayed.
+      parameters:
+        - name: token
+          in: header
+          description: DX Auth token to process the request
+          required: true
+          schema:
+            type: string
+            pattern: '^[a-zA-Z0-9\/\@\.]*$'
+            maxLength: 512
+        - name: productId
+          in: query
+          description: product ID for which variants need to be fetched
+          required: true
+          schema:
+            type: UUID
+            minLength: 36
+            maxLength: 36
+
+      responses:
+        '200':
+          description: success
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  type:
+                    type: string
+                  title:
+                    type: string
+                  results:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        productVariantId:
+                          type: UUID
+                          minLength: 36
+                          maxLength: 36
+                        productVariantName:
+                          type: string
+                          minLength: 1
+                        productId:
+                          type: UUID
+                          minLength: 36
+                          maxLength: 36
+                        resourceName:
+                          type: array
+                          items:
+                            type: string
+                        resourceIdsAndCapabilities:
+                          type: object
+                        price:
+                          type: number
+                          minimum: 0
+                        expiryInMonths:
+                          type: integer
+                          minimum: 1
+                      required:
+                        - productVariantId
+                        - productVariantName
+                        - productId
+                        - resourceName
+                        - resourceIdsAndCapabilities
+                        - price
+                        - expiryInMonths
+                required:
+                  - type
+                  - title
+                  - results
+              examples:
+                List All Resources:
+                  value:
+                    {
+                      "type": "urn:dx:dmp:success",
+                      "title": "Success",
+                      "results": [
+                        {
+                          "productVariantId": "74d87fcb-a17d-4ca6-8017-7cfcd4391282",
+                          "productVariantName": "someVariantName",
+                          "productId": "urn:datakaveri.org:ef67e601-05f0-4d13-96ce-9cafaaf801db:testProduct",
+                          "providerId": "ef67e601-05f0-4d13-96ce-9cafaaf801db",
+                          "resourceName": [
+                            "Resource Name 1",
+                            "Resource Name 2"
+                          ],
+                          "resourceIdsAndCapabilities": {
+                            "1c411817-abcf-42f3-980b-fd0d62a651f1": [
+                              "sub",
+                              "file"
+                            ],
+                            "7355eed3-a337-4924-9f80-3afdd538e958": [
+                              "api",
+                              "async"
+                            ]
+                          },
+                          "price": 150.0,
+                          "expiryInMonths": 12
+                        }
+                      ]
+                    }
+
+        '204':
+          description: no content
+        '400':
+          description: Invalid Product ID
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/errorResponse'
+              example:
+                  value:
+                    {
+                      "type": "urn:dx:dmp:invalidIdValue",
+                      "title": "Bad Request",
+                      "detail": "Invalid id [  abcd ] "
+                    }
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/errorResponse'
+              example:
+                value:
+                  {
+                    "type": "urn:dx:dmp:resourceNotFound",
+                    "title": "Document of given id does not exist",
+                    "detail": "Product variants not found"
+                  }
+        '401':
+          description: Unauthorized access
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Unauthorized'
   '/consumer/order/{variantId}':
     post:
-      summary: Create Order on a Product Variant
+      summary: Order
       tags:
-        - consumer
+        - Order
       responses:
         '201':
           description: Created
@@ -1853,14 +2241,55 @@ paths:
         - authorization: []
 
 tags:
-  - name: provider
+  - name: Product
     description: |
-      Datamarketplace specific data provider APIs.
-    x-displayName: Provider
-  - name: consumer
+      Product CRUD APIs for the user
+    x-displayName: Product
+  - name: Purchase
+    description: |
+      List purchase or list invoice API
+    x-displayName: Purchase
+  - name: Product-Variant
+    description: |
+      Product variant APIs for the user
+    x-displayName: Product Variant
+  - name: Linked-Account
+    description: |
+      Linked Account APIs for the provider
+    x-displayName: Linked Account
+  - name: Order
+    description: |
+      Create order API on behalf of consumer
+    x-displayName: Order
+  - name: Policies
+    description: |
+      Consumer policy APIs
+    x-displayName: Policies
+  - name: Consumer-List-APIs
+    description: |
+      List resources, providers, purchases, products, product variants
+    x-displayName: Consumer list API
+
+x-tagGroups:
+  - name: Consumer
     description: |
       Catalogue consumer specific apis.
-    x-displayName: Consumer
+    tags:
+      - Order
+      - Consumer-List-APIs
+  - name: Provider
+    description: |
+      Data marketplace specific data provider APIs.
+    tags:
+      - Product
+      - Purchase
+      - Product-Variant
+      - Linked-Account
+  - name: Policies
+    description: |
+      Policy APIs
+    tags:
+      - Policies
 components:
   securitySchemes:
     authorization:
@@ -1941,6 +2370,23 @@ components:
           description: A human readable title to the message response.
       required:
         - type
+    errorResponse:
+      type: object
+      title: Root Type for standardResponse
+      description: example Response for get products request
+      properties:
+        type:
+          type: string
+          description: URN type of the response indicating if the query was successful or if any errors have been triggered.
+        title:
+          description: A human readable title to the message response.
+        detail:
+          type: string
+          description: Detailed description of the type or response
+      required:
+        - type
+        - title
+        - detail
     successResponseForDeleteProduct:
       type: object
       title: Root Tupe for standard DELETE response
@@ -1973,26 +2419,129 @@ components:
           description: URN type of the response indicating if the query was successful or if any errors have been triggered.
         title:
           description: A human readable title to the message response.
-        totalHits:
-          type: integer
-          description: Total number of documents which matched the query.
-          format: int32
         results:
           type: array
           description: Results which matched the query. This is an array of objects.
           items:
             type: object
+      required:
+        - type
+        - title
+        - results
       example:
-        type: 'urn:dx:dmp:Success'
-        title: Success
-        totalHits: 1
-        results:
-          - productID: 'urn:datakaveri.org:iisc.ac.in/123qwerty:zxcvb'
-            consumerID: 89a36273d77dac4cf38114fca1bbe64392547f86
-            paymentStatus: payment.succeeded
-            paymentTime: '2022-11-23T09:00:00Z'
-            expiry: '2023-11-22T09:00:00Z'
-            status: active/expired
+        {
+          "type": "urn:dx:dmp:success",
+          "title": "Success",
+          "results":
+            [ {
+              "invoiceId": "0248bea1-23ca-4868-ab97-73d3da22c5ba",
+              "orderId": "order_NdPauGpjkmXEhz",
+              "paymentStatus": "SUCCEEDED",
+              "paymentTime": "2024-02-21T05:19:51.516817",
+              "expiryAt": "2024-06-15T13:21:01.484760",
+              "provider": {
+                "email": "bryanrobert@iisc.ac.in",
+                "name": {
+                  "firstName": "B",
+                  "lastName": "Robert A B C D"
+                },
+                "id": "b2c27f3f-2524-4a84-816e-91f9ab23f837"
+              },
+              "consumer": {
+                "email": "vasanth.rajaraman@datakaveri.org",
+                "name": {
+                  "firstName": "Vasanth",
+                  "lastName": "Rajaraman"
+                },
+                "id": "fd47486b-3497-4248-ac1e-082e4d37a66c"
+              },
+              "product": {
+                "productId": "urn:datakaveri.org:b2c27f3f-2524-4a84-816e-91f9ab23f837:testProduct1",
+                "productVariantId": "060cc0ed-14fb-4f07-be1d-f0b66585eab6",
+                "resourceName": "[Chandigarh Paid Parking Locations, TEST ITEM FOR APD /verify TESTS]",
+                "productVariantName": "variant1",
+                "price": "100.0",
+                "expiryInMonths": "12",
+                "resourcesAndCapabilities": {
+                  "2d043bdb-fc62-4650-8426-dc72492cd621": [
+                    "sub",
+                    "file"
+                  ],
+                  "a347c5b6-5281-4749-9eab-89784d8f8f9a": [
+                    "api",
+                    "sub"
+                  ]
+                }
+              }
+            },
+              {
+                "invoiceId": "69bee716-36f7-48d7-a3ea-b7c68a46f7f0",
+                "orderId": "order_NghEAGk7YvDKkz",
+                "paymentStatus": "PENDING",
+                "paymentTime": "2024-02-29T12:31:49.192984",
+                "provider": {
+                  "email": "bryanrobert@iisc.ac.in",
+                  "name": {
+                    "firstName": "B",
+                    "lastName": "Robert A B C D"
+                  },
+                  "id": "b2c27f3f-2524-4a84-816e-91f9ab23f837"
+                },
+                "consumer": {
+                  "email": "vasanth.rajaraman@datakaveri.org",
+                  "name": {
+                    "firstName": "Vasanth",
+                    "lastName": "Rajaraman"
+                  },
+                  "id": "fd47486b-3497-4248-ac1e-082e4d37a66c"
+                },
+                "product": {
+                  "productId": "urn:datakaveri.org:b2c27f3f-2524-4a84-816e-91f9ab23f837:testProduct1",
+                  "productVariantId": "060cc0ed-14fb-4f07-be1d-f0b66585eab6",
+                  "resourceName": "[Chandigarh Paid Parking Locations, TEST ITEM FOR APD /verify TESTS]",
+                  "productVariantName": "variant1",
+                  "price": "100.0",
+                  "expiryInMonths": "12",
+                  "resourcesAndCapabilities": {
+                    "2d043bdb-fc62-4650-8426-dc72492cd621": [
+                      "sub",
+                      "file"
+                    ],
+                    "a347c5b6-5281-4749-9eab-89784d8f8f9a": [
+                      "api",
+                      "sub"
+                    ]
+                  }
+                }
+              } ]
+        }
+    notFoundExampleResponseListPurchases:
+      type: object
+      title: Root type for purchases API response
+      description: example response for list products
+      properties:
+        type:
+          type: string
+          description: URN type of the response indicating if the query was successful or if any errors have been triggered.
+        title:
+          description: A human readable title to the message response.
+        detail:
+          type: string
+          description: Error description
+
+      required:
+        - type
+        - title
+        - detail
+      example:
+        {
+          "type": "urn:dx:dmp:resourceNotFound",
+          "title": "Not Found",
+          "detail": "Purchase info not found"
+        }
+
+
+
     exampleVerifyRequestBody:
       type: object
       title: Root type for verify API body
