@@ -143,8 +143,7 @@ public class ValidationHandlerFactory {
     List<Validator> validators = new ArrayList<>();
 
     if (body == null || body.isEmpty()) {
-      validators.add(new ProductIDTypeValidator(parameters.get(PRODUCT_ID), true));
-      validators.add(new VariantNameTypeValidator(parameters.get(PRODUCT_VARIANT_ID), false));
+      validators.add(new UUIDTypeValidator(parameters.get(PRODUCT_VARIANT_ID), false));
     } else {
       validators.add(new JsonSchemaTypeValidator(body, requestType));
     }

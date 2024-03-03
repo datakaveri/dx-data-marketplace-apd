@@ -152,12 +152,24 @@ public class QueryBuilder {
   public String updateProductVariantStatusQuery(String productID, String variant) {
     StringBuilder query =
             new StringBuilder(
-                    UPDATE_PV_STATUS_QUERY
+                    UPDATE_PV_STATUS
                             .replace("$0", productVariantTable)
                             .replace("$1", productID)
                             .replace("$2", variant)
                             .replace("$3", Status.ACTIVE.toString())
                             .replace("$4", Status.INACTIVE.toString()));
+
+    return query.toString();
+  }
+
+  public String updateProductVariantStatusQuery(String productVariantId) {
+    StringBuilder query =
+        new StringBuilder(
+            UPDATE_PV_STATUS_QUERY
+                .replace("$0", productVariantTable)
+                .replace("$1", productVariantId)
+                .replace("$3", Status.ACTIVE.toString())
+                .replace("$4", Status.INACTIVE.toString()));
 
     return query.toString();
   }

@@ -178,7 +178,7 @@ public class VariantServiceTest {
       }
     }).when(postgresService).executeQuery(anyString(),any());
 
-    variantServiceSpy.updateProductVariantStatus(anyString(),anyString()).onComplete(handler -> {
+    variantServiceSpy.updateProductVariantStatus(anyString()).onComplete(handler -> {
       if(handler.succeeded()) {
         verify(postgresService, times(1)).executeQuery(anyString(),any());
         testContext.completeNow();

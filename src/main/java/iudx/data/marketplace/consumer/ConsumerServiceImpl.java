@@ -166,7 +166,7 @@ public class ConsumerServiceImpl implements ConsumerService {
       JsonObject request, User user, Handler<AsyncResult<JsonObject>> handler) {
     String variantId = request.getString(PRODUCT_VARIANT_ID);
     String consumerId = user.getUserId();
-    LOGGER.debug(consumerId);
+    LOGGER.debug(variantId);
 
     getOrderRelatedInfo(variantId)
         .compose(
@@ -424,8 +424,10 @@ public class ConsumerServiceImpl implements ConsumerService {
 
     JsonObject params =
         new JsonObject()
-            .put(Constants.PRODUCT_VARIANT_NAME, variantId)
+            .put("variant", variantId)
             .put(STATUS, Status.ACTIVE.toString());
+
+    LOGGER.debug(params);
 
     LOGGER.debug("select variant query : {}", query);
 
@@ -433,9 +435,16 @@ public class ConsumerServiceImpl implements ConsumerService {
         query.toString(),
         params,
         pgHandler -> {
-          if (pgHandler.succeeded()) {
+          if (pgHandler.succeeded() && !pgHandler.result().getJsonArray(RESULTS).isEmpty()) {
             LOGGER.info("variant for order : {}", pgHandler.result());
             promise.complete(pgHandler.result());
+          } else if (pgHandler.succeeded() && pgHandler.result().getJsonArray(RESULTS).isEmpty()) {
+            RespBuilder respBuilder =
+                new RespBuilder()
+                    .withType(ResponseUrn.RESOURCE_NOT_FOUND_URN.getUrn())
+                    .withTitle(ResponseUrn.RESOURCE_NOT_FOUND_URN.getMessage())
+                    .withDetail("Product Variant Not Found");
+            promise.fail(respBuilder.getResponse());
           } else {
             LOGGER.error("Couldn't fetch variant for order");
             promise.fail(pgHandler.cause());

@@ -1,7 +1,7 @@
 {
 	"info": {
-		"_postman_id": "034e643c-8fa6-43ca-a558-90ccbeb57ba8",
-		"name": "IUDX-Data-Marketplace-APIs-V5.5",
+		"_postman_id": "2459680d-a7b7-4d80-afa0-9844fcd5bcc2",
+		"name": "IUDX-Data-Marketplace-APIs-V5.5 Copy",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
 		"_exporter_id": "17194681"
 	},
@@ -33,7 +33,7 @@
 										"header": [],
 										"body": {
 											"mode": "raw",
-											"raw": "{\n    \"id\": \"testProduct1\",\n    \"resourceIds\": [\n        \"2d043bdb-fc62-4650-8426-dc72492cd621\",\n        \"a347c5b6-5281-4749-9eab-89784d8f8f9a\"\n    ]\n}",
+											"raw": "{\n    \"productId\": \"testProduct1\",\n    \"resourceIds\": [\n        \"2d043bdb-fc62-4650-8426-dc72492cd621\",\n        \"a347c5b6-5281-4749-9eab-89784d8f8f9a\"\n    ]\n}",
 											"options": {
 												"raw": {
 													"language": "json"
@@ -71,7 +71,7 @@
 										"header": [],
 										"body": {
 											"mode": "raw",
-											"raw": "{\n    \"id\": \"abcedede\",\n    \"resources\": [\n        \"datakaveri.org/b8bd3e3f39615c8ec96722131ae95056b5938f2f/rs.iudx.io////agra-swachhata-app\",\n        \"datakaveri.org/b8bd3e3f39615c8ec96722131ae95056b5938f2f/rs.iudx.io/agra-point-of-interests\"\n    ]\n}",
+											"raw": "{\n    \"productId\": \"abcedede\",\n    \"resources\": [\n        \"datakaveri.org/b8bd3e3f39615c8ec96722131ae95056b5938f2f/rs.iudx.io////agra-swachhata-app\",\n        \"datakaveri.org/b8bd3e3f39615c8ec96722131ae95056b5938f2f/rs.iudx.io/agra-point-of-interests\"\n    ]\n}",
 											"options": {
 												"raw": {
 													"language": "json"
@@ -112,7 +112,7 @@
 										"header": [],
 										"body": {
 											"mode": "raw",
-											"raw": "{\n    \"id\": \"testProduct1\",\n    \"resourceIds\": [\n        \"2d043bdb-fc62-4650-8426-dc72492cd621\",\n        \"a347c5b6-5281-4749-9eab-89784d8f8f9a\"\n    ]\n}",
+											"raw": "{\n    \"productId\": \"testProduct1\",\n    \"resourceIds\": [\n        \"2d043bdb-fc62-4650-8426-dc72492cd621\",\n        \"a347c5b6-5281-4749-9eab-89784d8f8f9a\"\n    ]\n}",
 											"options": {
 												"raw": {
 													"language": "json"
@@ -150,7 +150,7 @@
 										"header": [],
 										"body": {
 											"mode": "raw",
-											"raw": "{\n    \"id\": \"testProduct1\",\n    \"resourceIds\": [\n        \"2d043bdb-fc62-4650-8426-dc72492cd621\",\n        \"a347c5b6-5281-4749-9eab-89784d8f8f9a\"\n    ]\n}",
+											"raw": "{\n    \"productId\": \"testProduct1\",\n    \"resourceIds\": [\n        \"2d043bdb-fc62-4650-8426-dc72492cd621\",\n        \"a347c5b6-5281-4749-9eab-89784d8f8f9a\"\n    ]\n}",
 											"options": {
 												"raw": {
 													"language": "json"
@@ -201,7 +201,7 @@
 										"method": "DELETE",
 										"header": [],
 										"url": {
-											"raw": "{{localhost}}/provider/product?id=urn:datakaveri.org:b2c27f3f-2524-4a84-816e-91f9ab23f837:testProduct1",
+											"raw": "{{localhost}}/provider/product?productId=urn:datakaveri.org:b2c27f3f-2524-4a84-816e-91f9ab23f837:testProduct1",
 											"host": [
 												"{{localhost}}"
 											],
@@ -211,7 +211,7 @@
 											],
 											"query": [
 												{
-													"key": "id",
+													"key": "productId",
 													"value": "urn:datakaveri.org:b2c27f3f-2524-4a84-816e-91f9ab23f837:testProduct1"
 												}
 											]
@@ -228,20 +228,18 @@
 										"method": "DELETE",
 										"header": [],
 										"url": {
-											"raw": "https://localhost:8445/provider/product?id=urn:datakaveri.org:datakaveri.org/b8bd3e3f39615c8ec96722131ae95056b5938f2f:abcedede",
-											"protocol": "https",
+											"raw": "{{localhost}}/provider/product?productId=urn:datakaveri.org/b8bd3e3f39615c8ec96722131ae95056b5938f2f:abcede",
 											"host": [
-												"localhost"
+												"{{localhost}}"
 											],
-											"port": "8445",
 											"path": [
 												"provider",
 												"product"
 											],
 											"query": [
 												{
-													"key": "id",
-													"value": "urn:datakaveri.org:datakaveri.org/b8bd3e3f39615c8ec96722131ae95056b5938f2f:abcedede"
+													"key": "productId",
+													"value": "urn:datakaveri.org/b8bd3e3f39615c8ec96722131ae95056b5938f2f:abcede"
 												}
 											]
 										}
@@ -254,19 +252,17 @@
 										"method": "DELETE",
 										"header": [],
 										"url": {
-											"raw": "https://localhost:8445/provider/product?id=urn:datakaveri.org:datakaveri.org/b8bd3e3f39615c8ec96722131ae95056b5938f2f:xyz123***",
-											"protocol": "https",
+											"raw": "{{localhost}}/provider/product?productId=urn:datakaveri.org:datakaveri.org/b8bd3e3f39615c8ec96722131ae95056b5938f2f:xyz123***",
 											"host": [
-												"localhost"
+												"{{localhost}}"
 											],
-											"port": "8445",
 											"path": [
 												"provider",
 												"product"
 											],
 											"query": [
 												{
-													"key": "id",
+													"key": "productId",
 													"value": "urn:datakaveri.org:datakaveri.org/b8bd3e3f39615c8ec96722131ae95056b5938f2f:xyz123***"
 												}
 											]
@@ -280,19 +276,17 @@
 										"method": "DELETE",
 										"header": [],
 										"url": {
-											"raw": "https://localhost:8445/provider/product?id=urn:datakaveri.org:datakaveri.org/b8bd3e3f39615c8ec96722131ae95056b5938f2f:xyz123",
-											"protocol": "https",
+											"raw": "{{localhost}}/provider/product?productId=urn:datakaveri.org:datakaveri.org/b8bd3e3f39615c8ec96722131ae95056b5938f2f:xyz123",
 											"host": [
-												"localhost"
+												"{{localhost}}"
 											],
-											"port": "8445",
 											"path": [
 												"provider",
 												"product"
 											],
 											"query": [
 												{
-													"key": "id",
+													"key": "productId",
 													"value": "urn:datakaveri.org:datakaveri.org/b8bd3e3f39615c8ec96722131ae95056b5938f2f:xyz123"
 												}
 											]
@@ -354,7 +348,7 @@
 										],
 										"body": {
 											"mode": "raw",
-											"raw": "{\n    \"id\": \"urn:datakaveri.org:b2c27f3f-2524-4a84-816e-91f9ab23f837:testProduct1\",\n    \"variant\": \"variant1\",\n    \"resources\": [\n        {\n          \"id\": \"a347c5b6-5281-4749-9eab-89784d8f8f9a\",\n          \"capabilities\": [\n            \"api\", \"sub\"\n          ]\n        },\n        {\n          \"id\": \"2d043bdb-fc62-4650-8426-dc72492cd621\",\n          \"capabilities\": [\n            \"sub\", \"file\"\n          ]\n        }\n      ],\n      \"price\": 100.0,\n      \"duration\": 12\n}",
+											"raw": "{\n    \"productId\": \"urn:datakaveri.org:b2c27f3f-2524-4a84-816e-91f9ab23f837:testProduct1\",\n    \"productVariantName\": \"variant1\",\n    \"resources\": [\n        {\n          \"id\": \"a347c5b6-5281-4749-9eab-89784d8f8f9a\",\n          \"capabilities\": [\n            \"api\", \"sub\"\n          ]\n        },\n        {\n          \"id\": \"2d043bdb-fc62-4650-8426-dc72492cd621\",\n          \"capabilities\": [\n            \"sub\", \"file\"\n          ]\n        }\n      ],\n      \"price\": 100.0,\n      \"duration\": 12\n}",
 											"options": {
 												"raw": {
 													"language": "json"
@@ -433,7 +427,7 @@
 										"header": [],
 										"body": {
 											"mode": "raw",
-											"raw": "{\n    \"id\": \"urn:datakaveri.org:b2c27f3f-2524-4a84-816e-91f9ab23f837:testProduct1\",\n    \"variant\": \"variant1\",\n    \"resources\": [\n        {\n          \"id\": \"a347c5b6-5281-4749-9eab-89784d8f8f9a\",\n          \"capabilities\": [\n            \"api\", \"sub\"\n          ]\n        },\n        {\n          \"id\": \"2d043bdb-fc62-4650-8426-dc72492cd621\",\n          \"capabilities\": [\n            \"sub\", \"file\"\n          ]\n        }\n      ],\n      \"price\": 100.0,\n      \"duration\": 12\n}",
+											"raw": "{\n    \"productId\": \"urn:datakaveri.org:b2c27f3f-2524-4a84-816e-91f9ab23f837:testProduct1\",\n    \"productVariantName\": \"variant1\",\n    \"resources\": [\n        {\n          \"id\": \"a347c5b6-5281-4749-9eab-89784d8f8f9a\",\n          \"capabilities\": [\n            \"api\", \"sub\"\n          ]\n        },\n        {\n          \"id\": \"2d043bdb-fc62-4650-8426-dc72492cd621\",\n          \"capabilities\": [\n            \"sub\", \"file\"\n          ]\n        }\n      ],\n      \"price\": 100.0,\n      \"duration\": 12\n}",
 											"options": {
 												"raw": {
 													"language": "json"
@@ -471,7 +465,7 @@
 										"header": [],
 										"body": {
 											"mode": "raw",
-											"raw": "{\n    \"id\": \"urn:datakaveri.org:b2c27f3f-2524-4a84-816e-91f9ab23f837:testProduct1\",\n    \"variant\": \"variant1\",\n    \"resources\": [\n        {\n          \"id\": \"a347c5b6-5281-4749-9eab-89784d8f8f9a\",\n          \"capabilities\": [\n            \"api\", \"sub\"\n          ]\n        },\n        {\n          \"id\": \"2d043bdb-fc62-4650-8426-dc72492cd621\",\n          \"capabilities\": [\n            \"sub\", \"file\"\n          ]\n        }\n      ],\n      \"price\": 100.0,\n      \"duration\": 12\n}",
+											"raw": "{\n    \"productId\": \"urn:datakaveri.org:b2c27f3f-2524-4a84-816e-91f9ab23f837:testProduct1\",\n    \"productVariantName\": \"variant1\",\n    \"resources\": [\n        {\n          \"id\": \"a347c5b6-5281-4749-9eab-89784d8f8f9a\",\n          \"capabilities\": [\n            \"api\", \"sub\"\n          ]\n        },\n        {\n          \"id\": \"2d043bdb-fc62-4650-8426-dc72492cd621\",\n          \"capabilities\": [\n            \"sub\", \"file\"\n          ]\n        }\n      ],\n      \"price\": 100.0,\n      \"duration\": 12\n}",
 											"options": {
 												"raw": {
 													"language": "json"
@@ -514,7 +508,7 @@
 										"header": [],
 										"body": {
 											"mode": "raw",
-											"raw": "{\n    \"id\": \"urn:datakaveri.org:b2c27f3f-2524-4a84-816e-91f9ab23f837:testProduct1\",\n    \"variant\": \"variant1\",\n    \"resources\": [\n        {\n          \"id\": \"a347c5b6-5281-4749-9eab-89784d8f8f9a\",\n          \"capabilities\": [\n            \"api\", \"sub\"\n          ]\n        },\n        {\n          \"id\": \"2d043bdb-fc62-4650-8426-dc72492cd621\",\n          \"capabilities\": [\n            \"sub\", \"file\"\n          ]\n        }\n      ],\n      \"price\": 100.0,\n      \"duration\": 12\n}",
+											"raw": "{\n    \"productId\": \"urn:datakaveri.org:b2c27f3f-2524-4a84-816e-91f9ab23f837:testProduct1\",\n    \"productVariantName\": \"variant1\",\n    \"resources\": [\n        {\n          \"id\": \"a347c5b6-5281-4749-9eab-89784d8f8f9a\",\n          \"capabilities\": [\n            \"api\", \"sub\"\n          ]\n        },\n        {\n          \"id\": \"2d043bdb-fc62-4650-8426-dc72492cd621\",\n          \"capabilities\": [\n            \"sub\", \"file\"\n          ]\n        }\n      ],\n      \"price\": 100.0,\n      \"duration\": 12\n}",
 											"options": {
 												"raw": {
 													"language": "json"
@@ -593,7 +587,7 @@
 										"header": [],
 										"body": {
 											"mode": "raw",
-											"raw": "{\n    \"id\": \"urn:datakaveri.org:b2c27f3f-2524-4a84-816e-91f9ab23f837:testProduct1\",\n    \"variant\": \"variant1\",\n    \"resources\": [\n        {\n          \"id\": \"a347c5b6-5281-4749-9eab-89784d8f8f9a\",\n          \"capabilities\": [\n            \"api\", \"sub\"\n          ]\n        },\n        {\n          \"id\": \"2d043bdb-fc62-4650-8426-dc72492cd621\",\n          \"capabilities\": [\n            \"sub\", \"file\"\n          ]\n        }\n      ],\n      \"price\": 100.0,\n      \"duration\": 12\n}",
+											"raw": "{\n    \"peoductId\": \"urn:datakaveri.org:b2c27f3f-2524-4a84-816e-91f9ab23f837:testProduct1\",\n    \"productVariantName\": \"variant1\",\n    \"resources\": [\n        {\n          \"id\": \"a347c5b6-5281-4749-9eab-89784d8f8f9a\",\n          \"capabilities\": [\n            \"api\", \"sub\"\n          ]\n        },\n        {\n          \"id\": \"2d043bdb-fc62-4650-8426-dc72492cd621\",\n          \"capabilities\": [\n            \"sub\", \"file\"\n          ]\n        }\n      ],\n      \"price\": 100.0,\n      \"duration\": 12\n}",
 											"options": {
 												"raw": {
 													"language": "json"
@@ -624,7 +618,7 @@
 										"method": "DELETE",
 										"header": [],
 										"url": {
-											"raw": "{{localhost}}/provider/product-variant?id=urn:datakaveri.org:b2c27f3f-2524-4a84-816e-91f9ab23f837:testProduct1&variant=variant1",
+											"raw": "{{localhost}}/provider/product-variant?productVariantId=4540ac60-27ad-43bb-ba68-e704de25be29",
 											"host": [
 												"{{localhost}}"
 											],
@@ -634,12 +628,8 @@
 											],
 											"query": [
 												{
-													"key": "id",
-													"value": "urn:datakaveri.org:b2c27f3f-2524-4a84-816e-91f9ab23f837:testProduct1"
-												},
-												{
-													"key": "variant",
-													"value": "variant1"
+													"key": "productVariantId",
+													"value": "4540ac60-27ad-43bb-ba68-e704de25be29"
 												}
 											]
 										}
@@ -647,91 +637,23 @@
 									"response": []
 								},
 								{
-									"name": "400 - Invalid Name",
+									"name": "400 - Invalid PV Id",
 									"request": {
 										"method": "DELETE",
 										"header": [],
 										"url": {
-											"raw": "https://localhost:8445/provider/product-variant?id=urn:datakaveri.org:datakaveri.org/b8bd3e3f39615c8ec96722131ae95056b5938f2f:abced&variant=variant1!!",
-											"protocol": "https",
+											"raw": "{{localhost}}/provider/product-variant?productVariantId={{productVariantId}}",
 											"host": [
-												"localhost"
+												"{{localhost}}"
 											],
-											"port": "8445",
 											"path": [
 												"provider",
 												"product-variant"
 											],
 											"query": [
 												{
-													"key": "id",
-													"value": "urn:datakaveri.org:datakaveri.org/b8bd3e3f39615c8ec96722131ae95056b5938f2f:abced"
-												},
-												{
-													"key": "variant",
-													"value": "variant1!!"
-												}
-											]
-										}
-									},
-									"response": []
-								},
-								{
-									"name": "400 - Invalid Name Copy",
-									"request": {
-										"method": "DELETE",
-										"header": [],
-										"url": {
-											"raw": "https://localhost:8445/provider/product-variant?id=urn:datakaveri.org:datakaveri.org/b8bd3e3f39615c8ec96722131ae95056b5938f2f:abced&variant=variant1",
-											"protocol": "https",
-											"host": [
-												"localhost"
-											],
-											"port": "8445",
-											"path": [
-												"provider",
-												"product-variant"
-											],
-											"query": [
-												{
-													"key": "id",
-													"value": "urn:datakaveri.org:datakaveri.org/b8bd3e3f39615c8ec96722131ae95056b5938f2f:abced"
-												},
-												{
-													"key": "variant",
-													"value": "variant1"
-												}
-											]
-										}
-									},
-									"response": []
-								}
-							]
-						},
-						{
-							"name": "List P.V.",
-							"item": [
-								{
-									"name": "200 - List All Product Variants",
-									"request": {
-										"method": "GET",
-										"header": [],
-										"url": {
-											"raw": "{{localhost}}provider/product-variant?id=urn:datakaveri.org:b2c27f3f-2524-4a84-816e-91f9ab23f837:testProduct1&variant=variant1",
-											"host": [
-												"{{localhost}}provider"
-											],
-											"path": [
-												"product-variant"
-											],
-											"query": [
-												{
-													"key": "id",
-													"value": "urn:datakaveri.org:b2c27f3f-2524-4a84-816e-91f9ab23f837:testProduct1"
-												},
-												{
-													"key": "variant",
-													"value": "variant1"
+													"key": "productVariantId",
+													"value": "{{productVariantId}}"
 												}
 											]
 										}
@@ -903,6 +825,39 @@
 												"provider",
 												"list",
 												"purchases"
+											]
+										}
+									},
+									"response": []
+								}
+							]
+						},
+						{
+							"name": "List P.V.",
+							"item": [
+								{
+									"name": "200 - List All Product Variants",
+									"request": {
+										"method": "GET",
+										"header": [],
+										"url": {
+											"raw": "{{localhost}}provider/product-variant?productId=urn:datakaveri.org:b2c27f3f-2524-4a84-816e-91f9ab23f837:testProduct1",
+											"host": [
+												"{{localhost}}provider"
+											],
+											"path": [
+												"product-variant"
+											],
+											"query": [
+												{
+													"key": "productId",
+													"value": "urn:datakaveri.org:b2c27f3f-2524-4a84-816e-91f9ab23f837:testProduct1"
+												},
+												{
+													"key": "productVariantName",
+													"value": "variant1",
+													"disabled": true
+												}
 											]
 										}
 									},
@@ -1519,22 +1474,27 @@
 				},
 				{
 					"name": "Create Order",
-					"request": {
-						"method": "POST",
-						"header": [],
-						"url": {
-							"raw": "{{localhost}}/consumer/order/22f7907d-d602-4455-9181-96e75b3df9b7",
-							"host": [
-								"{{localhost}}"
-							],
-							"path": [
-								"consumer",
-								"order",
-								"22f7907d-d602-4455-9181-96e75b3df9b7"
-							]
+					"item": [
+						{
+							"name": "Create Order",
+							"request": {
+								"method": "POST",
+								"header": [],
+								"url": {
+									"raw": "{{localhost}}/consumer/order/060cc0ed-14fb-4f07-be1d-f0b66585eab6",
+									"host": [
+										"{{localhost}}"
+									],
+									"path": [
+										"consumer",
+										"order",
+										"060cc0ed-14fb-4f07-be1d-f0b66585eab6"
+									]
+								}
+							},
+							"response": []
 						}
-					},
-					"response": []
+					]
 				}
 			],
 			"auth": {
