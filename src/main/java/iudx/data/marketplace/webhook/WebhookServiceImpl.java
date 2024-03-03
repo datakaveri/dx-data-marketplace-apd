@@ -29,7 +29,7 @@ public class WebhookServiceImpl implements WebhookService {
   public Future<JsonObject> recordOrderPaid(String orderId) {
     Promise<JsonObject> promise = Promise.promise();
 
-    updatePaymentStatusForInvoice(orderId, PaymentStatus.SUCCEEDED)
+    updatePaymentStatusForInvoice(orderId, PaymentStatus.SUCCESSFUL)
         .compose(ar -> policyService.createPolicy(orderId))
         .onComplete(
             completeHandler -> {
@@ -58,7 +58,7 @@ public class WebhookServiceImpl implements WebhookService {
         new StringBuilder(UPDATE_PAYMENT_STATUS_QUERY.replace("$0", invoiceTable));
 
     JsonObject params =
-        new JsonObject().put(PAYMENT_STATUS, paymentStatus.toString()).put(ORDER_ID, orderId);
+        new JsonObject().put(PAYMENT_STATUS, paymentStatus.getPaymentStatus()).put(ORDER_ID, orderId);
 
     postgresService.executePreparedQuery(
         query.toString(),

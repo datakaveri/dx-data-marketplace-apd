@@ -15,14 +15,16 @@ import java.time.temporal.ChronoUnit;
 
 import static iudx.data.marketplace.auditing.util.Constants.*;
 import static iudx.data.marketplace.auditing.util.Constants.ISO_TIME;
+import static iudx.data.marketplace.product.util.Constants.TABLES;
 
 public class AuditingServiceImpl implements AuditingService {
   private static final Logger LOGGER = LogManager.getLogger(AuditingServiceImpl.class);
   private DataBrokerService dataBrokerService;
-  private QueryBuilder queryBuilder = new QueryBuilder();
+  private QueryBuilder queryBuilder;
 
-  public AuditingServiceImpl(DataBrokerService dataBrokerService) {
+  public AuditingServiceImpl(DataBrokerService dataBrokerService, JsonObject config) {
     this.dataBrokerService = dataBrokerService;
+    this.queryBuilder = new QueryBuilder(config.getJsonArray(TABLES));
   }
 
   @Override

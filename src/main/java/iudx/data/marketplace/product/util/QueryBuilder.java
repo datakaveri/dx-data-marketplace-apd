@@ -31,10 +31,7 @@ public class QueryBuilder {
     this.productResourceRelationTable = tables.getString(2);
     this.productVariantTable = tables.getString(3);
     this.supplier = () -> UUID.randomUUID().toString();
-
   }
-
-  public QueryBuilder() {}
 
   public List<String> buildCreateProductQueries(JsonObject request, JsonArray resourceDetails) {
     String productID = request.getString(PRODUCT_ID);

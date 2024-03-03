@@ -336,6 +336,7 @@ public class ConsumerServiceImpl implements ConsumerService {
     Promise<JsonObject> promise = Promise.promise();
     QueryContainer queryContainer = getQueryContainer(orderInfo, variantId, consumerId);
 
+    LOGGER.debug(orderInfo);
     pgService.executeTransaction(
         queryContainer.queries,
         pgHandler -> {
@@ -347,7 +348,13 @@ public class ConsumerServiceImpl implements ConsumerService {
                     .put(
                         "results",
                         new JsonArray()
-                            .add(new JsonObject().put("order_id", queryContainer.orderId))));
+                            .add(
+                                new JsonObject()
+                                    .put(VARIANT, variantId)
+                                    .put("order_id", queryContainer.orderId)
+                                    .put(AMOUNT, orderInfo.getInteger(AMOUNT))
+                                    .put(CURRENCY, INR)
+                                    .put(STATUS, "Created"))));
           } else {
             LOGGER.error("Failed to create order : {}", pgHandler.cause().getMessage());
             promise.fail(pgHandler.cause());
