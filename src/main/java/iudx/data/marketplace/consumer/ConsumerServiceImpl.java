@@ -1,6 +1,6 @@
 package iudx.data.marketplace.consumer;
 
-import static iudx.data.marketplace.common.Constants.*;
+import static iudx.data.marketplace.apiserver.util.Constants.PRODUCT_VARIANT_ID;
 import static iudx.data.marketplace.common.Constants.PROVIDER_ID;
 import static iudx.data.marketplace.common.Constants.RESOURCE_ID;
 import static iudx.data.marketplace.consumer.util.Constants.*;
@@ -164,7 +164,7 @@ public class ConsumerServiceImpl implements ConsumerService {
   @Override
   public ConsumerService createOrder(
       JsonObject request, User user, Handler<AsyncResult<JsonObject>> handler) {
-    String variantId = request.getString(VARIANT);
+    String variantId = request.getString(PRODUCT_VARIANT_ID);
     String consumerId = user.getUserId();
     LOGGER.debug(consumerId);
 
@@ -350,7 +350,7 @@ public class ConsumerServiceImpl implements ConsumerService {
                         new JsonArray()
                             .add(
                                 new JsonObject()
-                                    .put(VARIANT, variantId)
+                                    .put(PRODUCT_VARIANT_NAME, variantId)
                                     .put("order_id", queryContainer.orderId)
                                     .put(AMOUNT, orderInfo.getInteger(AMOUNT))
                                     .put(CURRENCY, INR)
@@ -423,7 +423,9 @@ public class ConsumerServiceImpl implements ConsumerService {
                 .replace("$9", merchantTable));
 
     JsonObject params =
-        new JsonObject().put(VARIANT, variantId).put(STATUS, Status.ACTIVE.toString());
+        new JsonObject()
+            .put(Constants.PRODUCT_VARIANT_NAME, variantId)
+            .put(STATUS, Status.ACTIVE.toString());
 
     LOGGER.debug("select variant query : {}", query);
 

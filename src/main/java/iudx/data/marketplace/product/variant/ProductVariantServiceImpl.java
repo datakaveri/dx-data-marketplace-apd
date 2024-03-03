@@ -1,7 +1,5 @@
 package iudx.data.marketplace.product.variant;
 
-import static iudx.data.marketplace.apiserver.util.Constants.RESULT;
-import static iudx.data.marketplace.apiserver.util.Constants.TITLE;
 import static iudx.data.marketplace.product.util.Constants.*;
 
 import io.vertx.core.AsyncResult;
@@ -28,8 +26,8 @@ public class ProductVariantServiceImpl implements ProductVariantService {
 
     public static final Logger LOGGER = LogManager.getLogger(ProductVariantServiceImpl.class);
     private final PostgresService pgService;
-    private QueryBuilder queryBuilder;
     private final Util util;
+    private final QueryBuilder queryBuilder;
 
     public ProductVariantServiceImpl(JsonObject config, PostgresService postgresService, Util util) {
         this.pgService = postgresService;
@@ -41,7 +39,7 @@ public class ProductVariantServiceImpl implements ProductVariantService {
     public ProductVariantService createProductVariant(User user,
                                                       JsonObject request, Handler<AsyncResult<JsonObject>> handler) {
         String productID = request.getString(PRODUCT_ID);
-        String variantName = request.getString(VARIANT);
+        String variantName = request.getString(PRODUCT_VARIANT_NAME);
         Future<Boolean> checkForExistence = checkIfProductVariantExists(productID, variantName);
         Future<JsonObject> productDetailsFuture = getProductDetails(productID);
         JsonArray resources = request.getJsonArray(RESOURCES_ARRAY);
@@ -104,7 +102,7 @@ public class ProductVariantServiceImpl implements ProductVariantService {
                                                                                 .add(
                                                                                         new JsonObject()
                                                                                                 .put(PRODUCT_ID, productID)
-                                                                                                .put(VARIANT, variantName)));
+                                                                                                .put(PRODUCT_VARIANT_NAME, variantName)));
                                                 handler.handle(Future.succeededFuture(respBuilder.getJsonResponse()));
                                             } else {
                                                 handler.handle(Future.failedFuture(pgHandler.cause()));
@@ -155,7 +153,7 @@ public class ProductVariantServiceImpl implements ProductVariantService {
                                                       JsonObject request, Handler<AsyncResult<JsonObject>> handler) {
 
         String productID = request.getString(PRODUCT_ID);
-        String variant = request.getString(VARIANT);
+        String variant = request.getString(PRODUCT_VARIANT_NAME);
 
         Future<Boolean> updateProductVariantFuture = updateProductVariantStatus(productID, variant);
         updateProductVariantFuture.onComplete(
@@ -202,7 +200,7 @@ public class ProductVariantServiceImpl implements ProductVariantService {
     public ProductVariantService deleteProductVariant(User user,
                                                       JsonObject request, Handler<AsyncResult<JsonObject>> handler) {
         String productID = request.getString(PRODUCT_ID);
-        String variant = request.getString(VARIANT);
+        String variant = request.getString(PRODUCT_VARIANT_NAME);
 
         Future<Boolean> updateProductVariantFuture = updateProductVariantStatus(productID, variant);
         updateProductVariantFuture.onComplete(
@@ -232,8 +230,8 @@ public class ProductVariantServiceImpl implements ProductVariantService {
                 .put(PRODUCT_ID, request.getString(PRODUCT_ID))
                 .put(STATUS, Status.ACTIVE.toString());
 
-        if(request.containsKey(VARIANT)) {
-            params.put(VARIANT, request.getString(VARIANT));
+        if(request.containsKey(PRODUCT_VARIANT_NAME)) {
+            params.put(PRODUCT_VARIANT_NAME, request.getString(PRODUCT_VARIANT_NAME));
         }
 
         pgService.executePreparedQuery(query, params, pgHandler -> {

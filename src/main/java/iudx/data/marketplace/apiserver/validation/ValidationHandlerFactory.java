@@ -94,7 +94,7 @@ public class ValidationHandlerFactory {
   }
   private List<Validator> getOrderValidator(MultiMap parameters) {
     List<Validator> validators = new ArrayList<>();
-    validators.add(new UUIDTypeValidator(parameters.get(PRODUCT_VARIANT_NAME), true));
+    validators.add(new UUIDTypeValidator(parameters.get(PRODUCT_VARIANT_ID), true));
     return validators;
   }
 
@@ -144,7 +144,7 @@ public class ValidationHandlerFactory {
 
     if (body == null || body.isEmpty()) {
       validators.add(new ProductIDTypeValidator(parameters.get(PRODUCT_ID), true));
-      validators.add(new VariantNameTypeValidator(parameters.get(PRODUCT_VARIANT_NAME), false));
+      validators.add(new VariantNameTypeValidator(parameters.get(PRODUCT_VARIANT_ID), false));
     } else {
       validators.add(new JsonSchemaTypeValidator(body, requestType));
     }

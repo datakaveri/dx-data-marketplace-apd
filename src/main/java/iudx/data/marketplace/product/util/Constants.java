@@ -1,7 +1,7 @@
 package iudx.data.marketplace.product.util;
 
 public class Constants {
-  public static final String PRODUCT_ID = "id";
+  public static final String PRODUCT_ID = "productId";
   public static final String IID = "iid";
   public static final String URN_PREFIX = "urn:datakaveri.org:";
   public static final String resourceNames = "resource_name";
@@ -12,13 +12,11 @@ public class Constants {
   public static final String PRICE = "price";
   public static final String DURATION = "duration";
   public static final String ID = "id";
-  public static final String VARIANT = "variant";
+  public static final String PRODUCT_VARIANT_NAME = "productVariantName";
   public static final String NAME = "name";
   public static final String CAPABILITIES = "capabilities";
   public static final String TYPE = "type";
 
-  // database related constants
-  public static final String PRODUCT_TABLE_NAME = "productTableName";
   public static final String TABLES = "tables";
   public static final String SELECT_PRODUCT_QUERY =
           "select count(*) from $0 where provider_id='$1' and product_id='$2'";

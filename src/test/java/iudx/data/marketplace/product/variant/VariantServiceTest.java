@@ -51,7 +51,7 @@ public class VariantServiceTest {
     postgresService = mock(PostgresService.class);
     variantServiceImpl = new ProductVariantServiceImpl(config, postgresService, util);
     lenient().when(jsonObjectMock.getString(PRODUCT_ID)).thenReturn("urn:datakaeri.org:provider-id:abcde");
-    lenient().when(jsonObjectMock.getString(VARIANT)).thenReturn("var-name");
+    lenient().when(jsonObjectMock.getString(PRODUCT_VARIANT_NAME)).thenReturn("var-name");
     variantServiceSpy = spy(variantServiceImpl);
     testContext.completeNow();
   }

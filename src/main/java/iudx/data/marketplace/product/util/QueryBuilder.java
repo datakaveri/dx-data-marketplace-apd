@@ -137,8 +137,8 @@ public class QueryBuilder {
                             .replace("$0", productVariantTable)
                             .replace("$1", pvID)
                             .replace("$2", request.getString("provider_id"))
-                            .replace("$3", request.getString(ID))
-                            .replace("$4", request.getString(VARIANT))
+                            .replace("$3", request.getString(PRODUCT_ID))
+                            .replace("$4", request.getString(Constants.PRODUCT_VARIANT_NAME))
                             .replace("$5", resourceNames)
                             .replace("$6", resourceIdsAndCapabilities.encode())
                             .replace("$7", request.getDouble(PRICE).toString())
@@ -177,7 +177,7 @@ public class QueryBuilder {
 
     StringBuilder query = new StringBuilder(
             LIST_PVS_QUERY.replace("$0", productVariantTable));
-    if(request.containsKey(VARIANT)) {
+    if(request.containsKey(Constants.PRODUCT_VARIANT_NAME)) {
       query.append(" and product_variant_name=$3");
     }
 

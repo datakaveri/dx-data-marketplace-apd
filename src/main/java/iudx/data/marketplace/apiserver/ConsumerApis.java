@@ -101,7 +101,7 @@ public class ConsumerApis {
         .failureHandler(exceptionHandler);
 
     router
-        .post(CONSUMER_PATH + ORDERS_PATH + "/:variant")
+        .post(CONSUMER_PATH + ORDERS_PATH + "/:productVariantId")
         .handler(orderValidationHandler)
         .handler(AuthHandler.create(authenticationService, vertx, api, postgresService, authClient))
         .handler(this::createOrder)
@@ -112,11 +112,13 @@ public class ConsumerApis {
   private void createOrder(RoutingContext routingContext) {
     LOGGER.info("hre");
     Map<String, String> pathParams = routingContext.pathParams();
-    String variantId = pathParams.get(PRODUCT_VARIANT_NAME);
+    String variantId = pathParams.get(PRODUCT_VARIANT_ID);
+
+    LOGGER.debug(variantId);
 
     JsonObject requestBody = new JsonObject()
         .put(AUTH_INFO, routingContext.data().get(AUTH_INFO))
-        .put(PRODUCT_VARIANT_NAME, variantId);
+        .put(PRODUCT_VARIANT_ID, variantId);
     User user = routingContext.get("user");
 
     consumerService.createOrder(requestBody, user, handler -> {

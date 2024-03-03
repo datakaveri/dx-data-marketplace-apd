@@ -6,7 +6,7 @@
   "description": "The root schema comprises the entire JSON document.",
   "examples": [
     {
-      "id": "flood-sensors",
+      "productId": "flood-sensors",
       "resourceIds": [
         "83a3bec5-247c-47a2-9810-273123564b0a",
         "0880ec14-f078-4059-bfde-4c9f022526a9"
@@ -14,11 +14,11 @@
     }
   ],
   "required": [
-    "id",
+    "productId",
     "resourceIds"
   ],
   "properties": {
-    "id": {
+    "productId": {
       "$id": "#/properties/id",
       "type": "string",
       "title": "Product name schema",

@@ -314,8 +314,7 @@ public class ProviderApis {
     JsonObject requestBody =
         new JsonObject()
             .put(AUTH_INFO, authInfo)
-            .put(PRODUCT_ID, request.getParam(PRODUCT_ID))
-            .put(PRODUCT_VARIANT_NAME, request.getParam(PRODUCT_VARIANT_NAME));
+            .put(PRODUCT_VARIANT_ID, request.getParam(PRODUCT_VARIANT_ID));
     User user = routingContext.get("user");
 
     variantService.deleteProductVariant(
