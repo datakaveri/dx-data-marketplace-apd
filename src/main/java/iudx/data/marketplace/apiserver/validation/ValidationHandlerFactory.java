@@ -114,7 +114,7 @@ public class ValidationHandlerFactory {
   private List<Validator> getResourceIDValidators(final MultiMap parameters) {
     List<Validator> validators = new ArrayList<>();
 
-    validators.add(new UUIDTypeValidator(parameters.get(RESOURCE_ID), false));
+    validators.add(new UUIDTypeValidator(parameters.get("resourceId"), false));
     validators.add(new UUIDTypeValidator(parameters.get(PROVIDER_ID), false));
     return validators;
   }
@@ -122,7 +122,7 @@ public class ValidationHandlerFactory {
   private List<Validator> getProviderIDValidators(final MultiMap parameters) {
     List<Validator> validators = new ArrayList<>();
 
-    validators.add(new UUIDTypeValidator(parameters.get(PROVIDER_ID), false));
+    validators.add(new UUIDTypeValidator(parameters.get("providerId"), false));
     return validators;
   }
 
@@ -144,7 +144,7 @@ public class ValidationHandlerFactory {
     List<Validator> validators = new ArrayList<>();
 
     if (body == null || body.isEmpty()) {
-      validators.add(new ProductIDTypeValidator(parameters.get(PRODUCT_ID), true));
+      validators.add(new ProductIDTypeValidator(parameters.get("productId"), true));
       validators.add(new VariantNameTypeValidator(parameters.get(PRODUCT_VARIANT_NAME), false));
     } else {
       validators.add(new JsonSchemaTypeValidator(body, requestType));

@@ -23,13 +23,16 @@ public class Constants {
           + "U.first_name AS \"consumerFirstName\",\n"
           + "U.last_name AS \"consumerLastName\", U._id AS \"consumerId\",\n"
           + "P.status AS \"status\", P.expiry_at AS \"expiryAt\",\n"
-          + "P.constraints AS \"constraints\" FROM policy AS P \n"
+          + "P.constraints AS \"constraints\" "
+          + " ,P.modified_at AS \"updatedAt\" "
+          + " FROM policy AS P \n"
           + "LEFT JOIN user_table AS U\n"
           + "ON P.consumer_email_id = U.email_id \n"
           + "INNER JOIN resource_entity AS RE\n"
           + "ON RE._id = P.resource_id\n"
           + "AND P.provider_id = $1::uuid \n"
-          + "AND RE.resource_server = $2;";
+          + "AND RE.resource_server = $2 "
+          + " ORDER BY P.modified_at DESC";
   public static final String GET_POLICY_4_CONSUMER_QUERY =
       "SELECT P._id AS \"policyId\", P.resource_id AS \"resourceId\",\n"
           + "RE.resource_server AS \"resourceServerUrl\",\n"
@@ -40,14 +43,16 @@ public class Constants {
           + "P.provider_id AS \"providerId\", U.first_name AS \"providerFirstName\",\n"
           + "U.last_name AS \"providerLastName\", U.email_id AS \"providerEmailId\",\n"
           + "P.status as \"status\", P.expiry_at AS \"expiryAt\",\n"
-          + "P.constraints AS \"constraints\" \n"
+          + "P.constraints AS \"constraints\"  \n"
+          + " ,P.modified_at AS \"updatedAt\" "
           + "FROM policy AS P \n"
           + "INNER JOIN user_table AS U\n"
           + "ON P.provider_id = U._id \n"
           + "INNER JOIN resource_entity AS RE\n"
           + "ON RE._id = P.resource_id\n"
           + "AND P.consumer_email_id = $1  \n"
-          + "AND RE.resource_server = $2;";
+          + "AND RE.resource_server = $2 "
+          + " ORDER BY P.modified_at DESC";
     public static final String DELETE_POLICY_QUERY =
             "UPDATE policy SET status='DELETED' "
                     + "WHERE _id = $1::uuid AND expiry_at > NOW() RETURNING _id";

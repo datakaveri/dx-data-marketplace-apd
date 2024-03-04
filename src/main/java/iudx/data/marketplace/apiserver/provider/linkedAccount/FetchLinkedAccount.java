@@ -25,6 +25,7 @@ public class FetchLinkedAccount {
   RazorPayService razorPayService;
   AuditingService auditingService;
   String razorpayAccountProductId;
+  String updatedAt;
 
   public FetchLinkedAccount(
       PostgresService postgresService,
@@ -129,6 +130,7 @@ public class FetchLinkedAccount {
       details.put("customerFacingBusinessName", customerFacingBusinessName);
     }
     details.put("legalInfo", legalInfoJson);
+    details.put("updatedAt", getUpdatedAt());
     JsonObject response =
         new RespBuilder()
             .withType(ResponseUrn.SUCCESS_URN.getUrn())
@@ -151,7 +153,9 @@ public class FetchLinkedAccount {
               JsonObject result = handler.result().getJsonArray(RESULTS).getJsonObject(0);
               String accountId = result.getString("account_id");
               String accountProductId = result.getString("rzp_account_product_id");
+              String updatedAt = result.getString("updatedAt");
               setRazorpayAccountProductId(accountProductId);
+              setUpdatedAt(updatedAt);
               promise.complete(new JsonObject().put("accountId", accountId));
             } else {
               promise.fail(
@@ -182,5 +186,12 @@ public class FetchLinkedAccount {
 
   public void setRazorpayAccountProductId(String razorpayAccountProductId) {
     this.razorpayAccountProductId = razorpayAccountProductId;
+  }
+  public String getUpdatedAt() {
+    return updatedAt;
+  }
+
+  public void setUpdatedAt(String updatedAt) {
+    this.updatedAt = updatedAt;
   }
 }

@@ -53,8 +53,8 @@ paths:
             examples:
               Create product body:
                 value:
-                  name: flood-sensors
-                  resources:
+                  id: flood-sensors
+                  resourceIds:
                     - e3e940d9-5743-4229-bd9b-d7c2c80264bf
                     - 9c2df357-4d3b-46fd-9d24-3248867eb77e
       responses:
@@ -130,7 +130,7 @@ paths:
             type: string
             pattern: '^[a-zA-Z0-9\/\@\.]*$'
             maxLength: 512
-        - name: productID
+        - name: productId
           in: query
           description: urn name of the product
           required: true
@@ -193,13 +193,13 @@ paths:
             type: string
             pattern: '^[a-zA-Z0-9\/\@\.]*$'
             maxLength: 512
-        - name: resourceID
+        - name: resourceId
           in: query
           description: 'If resourceID is provided for listing, then products are filtered to show products only for that resource'
           required: false
           schema:
             type: string
-            pattern: '[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}'
+            pattern: uuid
             minLength: 36
             maxLength: 36
       responses:
@@ -219,10 +219,13 @@ paths:
                     items:
                       type: object
                       properties:
-                        productid:
+                        productId:
                           type: string
-                        providername:
+                        providerName:
                           type: string
+                          updatedAt:
+                            type: string
+                            minLength: 1
                         resources:
                           type: array
                           items:
@@ -237,15 +240,17 @@ paths:
                     type: 'urn:dx:dmp:success'
                     title: Success
                     results:
-                      - productid: 'urn:datakaveri.org:b2c27f3f-2524-4a84-816e-91f9ab23f837:testProduct1'
-                        providername: Administrator of the IUDX platform
+                      - productId: 'urn:datakaveri.org:b2c27f3f-2524-4a84-816e-91f9ab23f837:testProduct1'
+                        providerName: Administrator of the IUDX platform
+                        updatedAt: '2024-02-16T04:51:15.239497'
                         resources:
                           - id: 2d043bdb-fc62-4650-8426-dc72492cd621
                             name: TEST ITEM FOR APD /verify TESTS
                           - id: a347c5b6-5281-4749-9eab-89784d8f8f9a
                             name: Chandigarh Paid Parking Locations
-                      - productid: 'urn:datakaveri.org:b2c27f3f-2524-4a84-816e-91f9ab23f837:testProduct5ui'
-                        providername: Administrator of the IUDX platform
+                      - productId: 'urn:datakaveri.org:b2c27f3f-2524-4a84-816e-91f9ab23f837:testProduct5ui'
+                        providerName: Administrator of the IUDX platform
+                        updatedAt: '2024-01-16T04:51:15.239497'
                         resources:
                           - id: b58da193-23d9-43eb-b98a-a103d4b6103c
                             name: FW055 Environment-UUID
@@ -255,15 +260,17 @@ paths:
                     type: 'urn:dx:dmp:success'
                     title: Success
                     results:
-                      - productid: 'urn:datakaveri.org:b2c27f3f-2524-4a84-816e-91f9ab23f837:testProduct1'
-                        providername: Administrator of the IUDX platform
+                      - productId: 'urn:datakaveri.org:b2c27f3f-2524-4a84-816e-91f9ab23f837:testProduct1'
+                        providerName: Administrator of the IUDX platform
+                        updatedAt: '2024-02-16T04:51:15.239497'
                         resources:
                           - id: 2d043bdb-fc62-4650-8426-dc72492cd621
                             name: TEST ITEM FOR APD /verify TESTS
                           - id: a347c5b6-5281-4749-9eab-89784d8f8f9a
                             name: Chandigarh Paid Parking Locations
-                      - productid: 'urn:datakaveri.org:b2c27f3f-2524-4a84-816e-91f9ab23f837:testProduct5ui'
-                        providername: Administrator of the IUDX platform
+                      - productId: 'urn:datakaveri.org:b2c27f3f-2524-4a84-816e-91f9ab23f837:testProduct5ui'
+                        providerName: Administrator of the IUDX platform
+                        updatedAt: '2023-12-16T04:51:15.239497'
                         resources:
                           - id: b58da193-23d9-43eb-b98a-a103d4b6103c
                             name: FW055 Environment-UUID
@@ -272,8 +279,9 @@ paths:
                     type: 'urn:dx:dmp:success'
                     title: Success
                     results:
-                      - productid: 'urn:datakaveri.org:b2c27f3f-2524-4a84-816e-91f9ab23f837:testProduct1'
-                        providername: Administrator of the IUDX platform
+                      - productId: 'urn:datakaveri.org:b2c27f3f-2524-4a84-816e-91f9ab23f837:testProduct1'
+                        providerName: Administrator of the IUDX platform
+                        updatedAt: '2022-02-16T04:51:15.239497'
                         resources:
                           - id: a347c5b6-5281-4749-9eab-89784d8f8f9a
                             name: Chandigarh Paid Parking Locations
@@ -328,14 +336,16 @@ paths:
         - name: productId
           in: query
           description: purchases based on productId. Specifying this is optional
-          type: UUID
+          type: string
+          pattern: uuid
           minLength: 36
           maxLength: 36
           required: false
         - name: resourceId
           in: query
           description: purchases based on resourceId. Specifying this is optional
-          type: UUID
+          type: string
+          pattern: uuid
           minLength: 36
           maxLength: 36
           required: false
@@ -394,8 +404,9 @@ paths:
             schema:
               type: object
               properties:
-                id:
+                productId:
                   type: string
+                  minLength: 1
                 variant:
                   type: string
                 resources:
@@ -417,14 +428,14 @@ paths:
                 validity:
                   type: integer
               required:
-                - id
+                - productId
                 - variant
                 - resources
                 - price
                 - validity
               x-examples:
                 Example 1:
-                  id: 'urn:datakaveri.org:iisc.ac.in/123qwerty:flood-sensors'
+                  productId: 'urn:datakaveri.org:iisc.ac.in/123qwerty:flood-sensors'
                   variant: sensors-1
                   resources:
                     - id: pune-flood
@@ -440,7 +451,7 @@ paths:
             examples:
               Example 1:
                 value:
-                  id: 'urn:datakaveri.org:iisc.ac.in/123qwerty:flood-sensors'
+                  productId: 'urn:datakaveri.org:iisc.ac.in/123qwerty:flood-sensors'
                   variant: sensors-1
                   resources:
                     - id: pune-flood
@@ -489,7 +500,8 @@ paths:
           in: query
           required: true
           schema:
-            type: UUID
+            type: string
+            pattern: uuid
             minLength: 36
             maxLength: 36
         - name: variant
@@ -518,14 +530,16 @@ paths:
                       type: object
                       properties:
                         productVariantId:
-                          type: UUID
+                          type: string
+                          pattern: uuid
                           minLength: 36
                           maxLength: 36
                         productVariantName:
                           type: string
                           minLength: 1
                         productId:
-                          type: UUID
+                          type: string
+                          pattern: uuid
                           minLength: 36
                           maxLength: 36
                         resourceName:
@@ -540,6 +554,9 @@ paths:
                         expiryInMonths:
                           type: integer
                           minimum: 1
+                        updatedAt:
+                          type: string
+                          minLength: 1
                       required:
                         - productVariantId
                         - productVariantName
@@ -548,6 +565,7 @@ paths:
                         - resourceIdsAndCapabilities
                         - price
                         - expiryInMonths
+                        - updatedAt
                 required:
                   - type
                   - title
@@ -589,7 +607,8 @@ paths:
                             ]
                           },
                           "price": 150.0,
-                          "expiryInMonths": 12
+                          "expiryInMonths": 12,
+                          "updatedAt": "2024-02-28T12:48:26.375195"
                         }
                       ]
                     }
@@ -619,7 +638,8 @@ paths:
                             ]
                           },
                           "price": 150.0,
-                          "expiryInMonths": 12
+                          "expiryInMonths": 12,
+                          "updatedAt": "2023-02-28T12:48:26.375195"
                         },
                         {
                           "productVariantId": "be85f112-51e6-4248-a254-38c3e13151fa",
@@ -641,7 +661,8 @@ paths:
                             ]
                           },
                           "price": 200,
-                          "expiryInMonths": 4
+                          "expiryInMonths": 4,
+                          "updatedAt": "2022-02-28T12:48:26.375195"
                         },
                         {
                           "productVariantId": "3780dedb-e0a6-4eff-a05c-8b2aa555a598",
@@ -663,7 +684,8 @@ paths:
                             ]
                           },
                           "price": 145.0,
-                          "expiryInMonths": 2
+                          "expiryInMonths": 2,
+                          "updatedAt": "2021-02-28T12:48:26.375195"
                         }
                       ]
                     }
@@ -719,8 +741,9 @@ paths:
             schema:
               type: object
               properties:
-                id:
+                productId:
                   type: string
+                  minLength: 1
                 variant:
                   type: string
                 resources:
@@ -742,7 +765,7 @@ paths:
                 validity:
                   type: integer
               required:
-                - id
+                - productId
                 - variant
                 - resources
                 - price
@@ -762,6 +785,22 @@ paths:
                         - file
                   price: 100
                   validity: 12
+            examples:
+              Example 1:
+                value:
+                  productId: 'urn:datakaveri.org:iisc.ac.in/123qwerty:flood-sensors'
+                  variant: sensors-1
+                  resources:
+                    - id: pune-flood
+                      capabilities:
+                        - api
+                        - sub
+                    - id: stqc-flood
+                      capabilities:
+                        - sub
+                        - async
+                  price: 100
+                  validity: 11
       responses:
         '200':
           description: OK
@@ -780,10 +819,11 @@ paths:
           description: IUDX Auth token to process the request
           schema:
             type: string
-        - name: id
+        - name: productId
           in: query
           schema:
             type: string
+            minLength: 1
         - name: variant
           in: query
           schema:
@@ -1306,18 +1346,24 @@ paths:
             type: string
             pattern: '^[a-zA-Z0-9\/\@\.]*$'
             maxLength: 512
-        - name: providerID
+        - name: providerId
           in: query
           description: Id of the provider for listing their resources
           required: false
           schema:
             type: string
-        - name: resourceID
+            pattern: uuid
+            minLength: 36
+            maxLength: 36
+        - name: resourceId
           in: query
           description: Id of the resource for its details
           required: false
           schema:
             type: string
+            pattern: uuid
+            minLength: 36
+            maxLength: 36
       responses:
         '200':
           description: success
@@ -1335,87 +1381,107 @@ paths:
                     items:
                       type: object
                       properties:
-                        _id:
+                        resourceId:
                           type: string
-                        resource_name:
+                          pattern: uuid
+                          minLength: 36
+                          maxLength: 36
+                        resourceName:
                           type: string
-                        accesspolicy:
+                          minLength: 1
+                        accessPolicy:
+                          enum: ["SECURE", "OPEN"]
+                        updatedAt:
                           type: string
-                        providername:
+                          minLength: 1
+                        providerName:
                           type: string
                 x-examples:
                   Example 1:
                     type: 'urn:dx:dmp:success'
                     title: Success
                     results:
-                      - _id: a347c5b6-5281-4749-9eab-89784d8f8f9a
-                        resource_name: Chandigarh Paid Parking Locations
-                        accesspolicy: OPEN
-                        providername: Administrator of the IUDX platform
-                      - _id: 2d043bdb-fc62-4650-8426-dc72492cd621
-                        resource_name: TEST ITEM FOR APD /verify TESTS
-                        accesspolicy: SECURE
-                        providername: Administrator of the IUDX platform
-                      - _id: b58da193-23d9-43eb-b98a-a103d4b6103c
-                        resource_name: FW055 Environment-UUID
-                        accesspolicy: OPEN
-                        providername: Administrator of the IUDX platform
-                      - _id: ae2b8b01-f642-411a-babb-cbd1b75fa2a1
-                        resource_name: Flood level data from FWR055
-                        accesspolicy: SECURE
-                        providername: Administrator of the IUDX platform
+                      - resourceId: a347c5b6-5281-4749-9eab-89784d8f8f9a
+                        resourceName: Chandigarh Paid Parking Locations
+                        accessPolicy: OPEN
+                        updatedAt: '2024-12-01T19:26:13.005418'
+                        providerName: Administrator of the IUDX platform
+                      - resourceId: 2d043bdb-fc62-4650-8426-dc72492cd621
+                        resourceName: TEST ITEM FOR APD /verify TESTS
+                        accessPolicy: SECURE
+                        updatedAt: '2024-11-01T19:26:13.005418'
+                        providerName: Administrator of the IUDX platform
+                      - resourceId: b58da193-23d9-43eb-b98a-a103d4b6103c
+                        resourceName: FW055 Environment-UUID
+                        accessPolicy: OPEN
+                        updatedAt: '2024-10-01T19:26:13.005418'
+                        providerName: Administrator of the IUDX platform
+                      - resourceId: ae2b8b01-f642-411a-babb-cbd1b75fa2a1
+                        resourceName: Flood level data from FWR055
+                        accessPolicy: SECURE
+                        updatedAt: '2024-09-01T19:26:13.005418'
+                        providerName: Administrator of the IUDX platform
               examples:
                 List All Resources:
                   value:
                     type: 'urn:dx:dmp:success'
                     title: Success
                     results:
-                      - _id: a347c5b6-5281-4749-9eab-89784d8f8f9a
-                        resource_name: Chandigarh Paid Parking Locations
-                        accesspolicy: OPEN
-                        providername: Administrator of the IUDX platform
-                      - _id: 2d043bdb-fc62-4650-8426-dc72492cd621
-                        resource_name: TEST ITEM FOR APD /verify TESTS
-                        accesspolicy: SECURE
-                        providername: Administrator of the IUDX platform
-                      - _id: b58da193-23d9-43eb-b98a-a103d4b6103c
-                        resource_name: FW055 Environment-UUID
-                        accesspolicy: OPEN
-                        providername: Administrator of the IUDX platform
-                      - _id: ae2b8b01-f642-411a-babb-cbd1b75fa2a1
-                        resource_name: Flood level data from FWR055
-                        accesspolicy: SECURE
-                        providername: Administrator of the IUDX platform
+                      - resourceId: a347c5b6-5281-4749-9eab-89784d8f8f9a
+                        resourceName: Chandigarh Paid Parking Locations
+                        accessPolicy: OPEN
+                        updatedAt: '2024-12-01T19:26:13.005418'
+                        providerName: Administrator of the IUDX platform
+                      - resourceId: 2d043bdb-fc62-4650-8426-dc72492cd621
+                        resourceName: TEST ITEM FOR APD /verify TESTS
+                        accessPolicy: SECURE
+                        updatedAt: '2024-11-01T19:26:13.005418'
+                        providerName: Administrator of the IUDX platform
+                      - resourceId: b58da193-23d9-43eb-b98a-a103d4b6103c
+                        resourceName: FW055 Environment-UUID
+                        accessPolicy: OPEN
+                        updatedAt: '2024-10-01T19:26:13.005418'
+                        providerName: Administrator of the IUDX platform
+                      - resourceId: ae2b8b01-f642-411a-babb-cbd1b75fa2a1
+                        resourceName: Flood level data from FWR055
+                        accessPolicy: SECURE
+                        updatedAt: '2024-09-01T19:26:13.005418'
+                        providerName: Administrator of the IUDX platform
                 List Resource of Provider:
                   value:
                     type: 'urn:dx:dmp:success'
                     title: Success
                     results:
-                      - _id: a347c5b6-5281-4749-9eab-89784d8f8f9a
-                        resource_name: Chandigarh Paid Parking Locations
-                        accesspolicy: OPEN
-                        providername: Administrator of the IUDX platform
-                      - _id: 2d043bdb-fc62-4650-8426-dc72492cd621
-                        resource_name: TEST ITEM FOR APD /verify TESTS
-                        accesspolicy: SECURE
-                        providername: Administrator of the IUDX platform
-                      - _id: b58da193-23d9-43eb-b98a-a103d4b6103c
-                        resource_name: FW055 Environment-UUID
-                        accesspolicy: OPEN
-                        providername: Administrator of the IUDX platform
-                      - _id: ae2b8b01-f642-411a-babb-cbd1b75fa2a1
-                        resource_name: Flood level data from FWR055
-                        accesspolicy: SECURE
-                        providername: Administrator of the IUDX platform
+                      - resourceId: a347c5b6-5281-4749-9eab-89784d8f8f9a
+                        resourceName: Chandigarh Paid Parking Locations
+                        accessPolicy: OPEN
+                        updatedAt: '2024-12-01T19:26:13.005418'
+                        providerName: Administrator of the IUDX platform
+                      - resourceId: 2d043bdb-fc62-4650-8426-dc72492cd621
+                        resourceName: TEST ITEM FOR APD /verify TESTS
+                        accessPolicy: SECURE
+                        updatedAt: '2024-11-01T19:26:13.005418'
+                        providerName: Administrator of the IUDX platform
+                      - resourceId: b58da193-23d9-43eb-b98a-a103d4b6103c
+                        resourceName: FW055 Environment-UUID
+                        accessPolicy: OPEN
+                        updatedAt: '2024-10-01T19:26:13.005418'
+                        providerName: Administrator of the IUDX platform
+                      - resourceId: ae2b8b01-f642-411a-babb-cbd1b75fa2a1
+                        resourceName: Flood level data from FWR055
+                        accessPolicy: SECURE
+                        updatedAt: '2024-09-01T19:26:13.005418'
+                        providerName: Administrator of the IUDX platform
                 List Resource by ID:
                   value:
                     type: 'urn:dx:dmp:success'
                     title: Success
                     results:
-                      - _id: a347c5b6-5281-4749-9eab-89784d8f8f9a
-                        resource_name: Chandigarh Paid Parking Locations
-                        accesspolicy: OPEN
-                        providername: Administrator of the IUDX platform
+                      - resourceId: a347c5b6-5281-4749-9eab-89784d8f8f9a
+                        resourceName: Chandigarh Paid Parking Locations
+                        accessPolicy: OPEN
+                        updatedAt: '2024-03-03T19:26:13.005418'
+                        providerName: Administrator of the IUDX platform
         '204':
           description: no content
         '400':
@@ -1470,7 +1536,8 @@ paths:
           description: ID of the provider for its details. This is an optional parameter
           required: false
           schema:
-            type: UUID
+            type: string
+            pattern: uuid
             minLength: 36
             maxLength: 36
       responses:
@@ -1491,7 +1558,8 @@ paths:
                       type: object
                       properties:
                         providerId:
-                          type: UUID
+                          type: string
+                          pattern: uuid
                           minLength: 36
                           maxLength: 36
                         providerName:
@@ -1595,14 +1663,16 @@ paths:
         - name: productId
           in: query
           description: purchases based on productId. Specifying this is optional
-          type: UUID
+          type: string
+          pattern: uuid
           minLength: 36
           maxLength: 36
           required: false
         - name: resourceId
           in: query
           description: purchases based on resourceId. Specifying this is optional
-          type: UUID
+          type: string
+          pattern: uuid
           minLength: 36
           maxLength: 36
           required: false
@@ -1657,18 +1727,20 @@ paths:
             type: string
             pattern: '^[a-zA-Z0-9\/\@\.]*$'
             maxLength: 512
-        - name: resourceID
+        - name: resourceId
           in: query
           description: ID of the resource for listing products that contain it.
           required: false
           schema:
             type: string
-        - name: providerID
+            format: uuid
+        - name: providerId
           in: query
           description: Id of the provider for listing their products
           required: false
           schema:
             type: string
+            format: uuid
       responses:
         '200':
           description: success
@@ -1686,10 +1758,13 @@ paths:
                     items:
                       type: object
                       properties:
-                        productid:
+                        productId:
                           type: string
-                        providername:
+                        providerName:
                           type: string
+                        updateAt:
+                          type: string
+                          minLength: 1
                         resources:
                           type: array
                           items:
@@ -1704,15 +1779,17 @@ paths:
                     type: 'urn:dx:dmp:success'
                     title: Success
                     results:
-                      - productid: 'urn:datakaveri.org:b2c27f3f-2524-4a84-816e-91f9ab23f837:testProduct1'
-                        providername: Administrator of the IUDX platform
+                      - productId: 'urn:datakaveri.org:b2c27f3f-2524-4a84-816e-91f9ab23f837:testProduct1'
+                        providerName: Administrator of the IUDX platform
+                        updatedAt: '2024-02-16T04:51:15.239497'
                         resources:
                           - id: 2d043bdb-fc62-4650-8426-dc72492cd621
                             name: TEST ITEM FOR APD /verify TESTS
                           - id: a347c5b6-5281-4749-9eab-89784d8f8f9a
                             name: Chandigarh Paid Parking Locations
-                      - productid: 'urn:datakaveri.org:b2c27f3f-2524-4a84-816e-91f9ab23f837:testProduct5ui'
-                        providername: Administrator of the IUDX platform
+                      - productId: 'urn:datakaveri.org:b2c27f3f-2524-4a84-816e-91f9ab23f837:testProduct5ui'
+                        providerName: Administrator of the IUDX platform
+                        updatedAt: '2024-02-15T03:51:15.239497'
                         resources:
                           - id: b58da193-23d9-43eb-b98a-a103d4b6103c
                             name: FW055 Environment-UUID
@@ -1722,15 +1799,17 @@ paths:
                     type: 'urn:dx:dmp:success'
                     title: Success
                     results:
-                      - productid: 'urn:datakaveri.org:b2c27f3f-2524-4a84-816e-91f9ab23f837:testProduct1'
-                        providername: Administrator of the IUDX platform
+                      - productId: 'urn:datakaveri.org:b2c27f3f-2524-4a84-816e-91f9ab23f837:testProduct1'
+                        providerName: Administrator of the IUDX platform
+                        updatedAt: '2024-02-16T03:51:15.239497'
                         resources:
                           - id: 2d043bdb-fc62-4650-8426-dc72492cd621
                             name: TEST ITEM FOR APD /verify TESTS
                           - id: a347c5b6-5281-4749-9eab-89784d8f8f9a
                             name: Chandigarh Paid Parking Locations
-                      - productid: 'urn:datakaveri.org:b2c27f3f-2524-4a84-816e-91f9ab23f837:testProduct5ui'
-                        providername: Administrator of the IUDX platform
+                      - productId: 'urn:datakaveri.org:b2c27f3f-2524-4a84-816e-91f9ab23f837:testProduct5ui'
+                        providerName: Administrator of the IUDX platform
+                        updatedAt: '2024-01-15T03:51:15.239497'
                         resources:
                           - id: b58da193-23d9-43eb-b98a-a103d4b6103c
                             name: FW055 Environment-UUID
@@ -1739,8 +1818,9 @@ paths:
                     type: 'urn:dx:dmp:success'
                     title: Success
                     results:
-                      - productid: 'urn:datakaveri.org:b2c27f3f-2524-4a84-816e-91f9ab23f837:testProduct1'
-                        providername: Administrator of the IUDX platform
+                      - productId: 'urn:datakaveri.org:b2c27f3f-2524-4a84-816e-91f9ab23f837:testProduct1'
+                        providerName: Administrator of the IUDX platform
+                        updatedAt: '2023-10-15T03:51:15.239497'
                         resources:
                           - id: a347c5b6-5281-4749-9eab-89784d8f8f9a
                             name: Chandigarh Paid Parking Locations
@@ -1749,15 +1829,17 @@ paths:
                     type: 'urn:dx:dmp:success'
                     title: Success
                     results:
-                      - productid: 'urn:datakaveri.org:b2c27f3f-2524-4a84-816e-91f9ab23f837:testProduct1'
-                        providername: Administrator of the IUDX platform
+                      - productId: 'urn:datakaveri.org:b2c27f3f-2524-4a84-816e-91f9ab23f837:testProduct1'
+                        providerName: Administrator of the IUDX platform
+                        updatedAt: '2023-09-15T03:51:15.239497'
                         resources:
                           - id: 2d043bdb-fc62-4650-8426-dc72492cd621
                             name: TEST ITEM FOR APD /verify TESTS
                           - id: a347c5b6-5281-4749-9eab-89784d8f8f9a
                             name: Chandigarh Paid Parking Locations
-                      - productid: 'urn:datakaveri.org:b2c27f3f-2524-4a84-816e-91f9ab23f837:testProduct5ui'
-                        providername: Administrator of the IUDX platform
+                      - productId: 'urn:datakaveri.org:b2c27f3f-2524-4a84-816e-91f9ab23f837:testProduct5ui'
+                        providerName: Administrator of the IUDX platform
+                        updatedAt: '2023-08-15T03:51:15.239497'
                         resources:
                           - id: b58da193-23d9-43eb-b98a-a103d4b6103c
                             name: FW055 Environment-UUID
@@ -1810,7 +1892,8 @@ paths:
           description: product ID for which variants need to be fetched
           required: true
           schema:
-            type: UUID
+            type: string
+            pattern: uuid
             minLength: 36
             maxLength: 36
 
@@ -1832,14 +1915,16 @@ paths:
                       type: object
                       properties:
                         productVariantId:
-                          type: UUID
+                          type: string
+                          pattern: uuid
                           minLength: 36
                           maxLength: 36
                         productVariantName:
                           type: string
                           minLength: 1
                         productId:
-                          type: UUID
+                          type: string
+                          pattern: uuid
                           minLength: 36
                           maxLength: 36
                         resourceName:
@@ -1854,6 +1939,9 @@ paths:
                         expiryInMonths:
                           type: integer
                           minimum: 1
+                        updatedAt:
+                          type: string
+                          minLength: 1
                       required:
                         - productVariantId
                         - productVariantName
@@ -1862,6 +1950,7 @@ paths:
                         - resourceIdsAndCapabilities
                         - price
                         - expiryInMonths
+                        - updatedAt
                 required:
                   - type
                   - title
@@ -1893,7 +1982,8 @@ paths:
                             ]
                           },
                           "price": 150.0,
-                          "expiryInMonths": 12
+                          "expiryInMonths": 12,
+                          "updatedAt": "2024-02-28T12:48:26.375195"
                         }
                       ]
                     }
@@ -2304,19 +2394,19 @@ components:
       title: Root type for product body
       description: example request for creating product
       properties:
-        name:
+        id:
           type: string
         resources:
           type: array
           items:
             type: object
             properties:
-              resourceID:
+              resourceIds:
                 type: string
                 format: uuid
       example:
         name: flood-sensors
-        description: some description for flod-sensors
+        description: some description for flood-sensors
         price: 50
         duration: 12
         resources:
@@ -2410,8 +2500,8 @@ components:
       example:
         type: 'urn:dx:dmp:Success'
         title: Success
-        results:
-          - productID: 'urn:datakaveri.org:iisc.ac.in/123qwerty:zxcvb'
+        detail: Successfully deleted
+
     exampleResponseListPurchases:
       type: object
       title: Root type for purchases API response
@@ -2784,6 +2874,8 @@ components:
                 type: string
               constraints:
                 type: object
+              updatedAt:
+                type: string
       required:
         - type
         - title
@@ -2803,6 +2895,7 @@ components:
             expiryAt: '2025-04-04T04:05:06'
             constraints:
               access: file
+            updatedAt: '2024-03-03T05:32:33.586454'
             consumer:
               email: vasanth.rajaraman@datakaveri.org
               name:
@@ -3185,6 +3278,9 @@ components:
                   minLength: 15
                   maxLength: 15
                   pattern: '/^[0123][0-9][a-z]{5}[0-9]{4}[a-z][0-9][a-z0-9][a-z0-9]$/gi'
+            updatedAt:
+              type: string
+              minLength: 1
           required:
             - accountId
             - type
@@ -3197,6 +3293,7 @@ components:
             - legalBusinessName
             - customerFacingBusinessName
             - accountProductId
+            - updatedAt
       required:
         - type
         - title
@@ -3234,7 +3331,8 @@ components:
             "legalInfo": {
               "pan": "ABACL1234C",
               "gst": "19AABCU9603R1ZM"
-            }
+            },
+            "updatedAt": "2024-03-02T19:50:57.704017"
           }
 
 

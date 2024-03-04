@@ -73,7 +73,7 @@ public class Constants {
 
   // query parameters | request body
 
-  public static final String PRODUCT_ID = "id";
+  public static final String PRODUCT_ID = "productId";
   public static final String PRODUCT_VARIANT_NAME = "variant";
   public static final String RESOURCE_ID = "resourceID";
 

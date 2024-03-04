@@ -91,10 +91,11 @@ public class QueryBuilder {
                             .replace("$0", productTable)
                             .replace("$9", productResourceRelationTable)
                             .replace("$8", resourceTable));
-    if (request.containsKey(RESOURCE_ID)) {
+    if (request.containsKey("resourceId")) {
       query.append(" and rt._id=$3");
     }
     query.append(" group by pt.product_id");
+    query.append(" order by pt.modified_at DESC");
 
     return query.toString();
   }

@@ -40,7 +40,7 @@ public class ProductVariantServiceImpl implements ProductVariantService {
     @Override
     public ProductVariantService createProductVariant(User user,
                                                       JsonObject request, Handler<AsyncResult<JsonObject>> handler) {
-        String productID = request.getString(PRODUCT_ID);
+        String productID = request.getString("productId");
         String variantName = request.getString(VARIANT);
         Future<Boolean> checkForExistence = checkIfProductVariantExists(productID, variantName);
         Future<JsonObject> productDetailsFuture = getProductDetails(productID);
@@ -103,7 +103,7 @@ public class ProductVariantServiceImpl implements ProductVariantService {
                                                                         new JsonArray()
                                                                                 .add(
                                                                                         new JsonObject()
-                                                                                                .put(PRODUCT_ID, productID)
+                                                                                                .put("productId", productID)
                                                                                                 .put(VARIANT, variantName)));
                                                 handler.handle(Future.succeededFuture(respBuilder.getJsonResponse()));
                                             } else {
@@ -229,7 +229,7 @@ public class ProductVariantServiceImpl implements ProductVariantService {
         String query = queryBuilder.listProductVariants(request);
 
         JsonObject params = new JsonObject()
-                .put(PRODUCT_ID, request.getString(PRODUCT_ID));
+                .put("productId", request.getString("productId"));
 
         if(request.containsKey(VARIANT)) {
             params.put(VARIANT, request.getString(VARIANT));

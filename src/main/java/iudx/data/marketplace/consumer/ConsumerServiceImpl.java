@@ -63,16 +63,16 @@ public class ConsumerServiceImpl implements ConsumerService {
         String resourceTable = config.getJsonArray(TABLES).getString(1);
         JsonObject params = new JsonObject();
         StringBuilder query = new StringBuilder(LIST_RESOURCES_QUERY.replace("$0", resourceTable));
-        if (request.containsKey(RESOURCE_ID)) {
-            String resourceID = request.getString(RESOURCE_ID);
-            params.put(RESOURCE_ID, resourceID);
+        if (request.containsKey("resourceId")) {
+            String resourceID = request.getString("resourceId");
+            params.put("resourceId", resourceID);
             query.append(" where ").append("_id").append('=').append("$1");
-        } else if (request.containsKey(PROVIDER_ID)) {
-            String providerID = request.getString(PROVIDER_ID);
-            params.put(PROVIDER_ID, providerID);
+        } else if (request.containsKey("providerId")) {
+            String providerID = request.getString("providerId");
+            params.put("providerId", providerID);
             query.append(" where ").append("provider_id").append('=').append("$1");
         }
-
+        query.append(" ORDER BY modified_at DESC");
         pgService.executePreparedQuery(
                 query.toString(),
                 params,
@@ -94,10 +94,10 @@ public class ConsumerServiceImpl implements ConsumerService {
         String resourceTable = config.getJsonArray(TABLES).getString(1);
         JsonObject params = new JsonObject();
         StringBuilder query = new StringBuilder(LIST_PROVIDERS_QUERY.replace("$0", resourceTable));
-
-        if (request.containsKey(PROVIDER_ID)) {
-            String providerID = request.getString(PROVIDER_ID);
-            params.put(PROVIDER_ID, providerID);
+        LOGGER.debug("Query : " + query);
+        if (request.containsKey("providerId")) {
+            String providerID = request.getString("providerId");
+            params.put("providerId", providerID);
             query = new StringBuilder(LIST_PROVIDER_WITH_GIVEN_PROVIDER_ID.replace("$0", resourceTable));
         }
 
@@ -131,18 +131,19 @@ public class ConsumerServiceImpl implements ConsumerService {
                                 .replace("$9", productResourceRelationTable)
                                 .replace("$8", resourceTable));
 
-        if (request.containsKey(RESOURCE_ID)) {
-            String resourceID = request.getString(RESOURCE_ID);
-            params.put(STATUS, Status.ACTIVE.toString()).put(RESOURCE_ID, resourceID);
+        if (request.containsKey("resourceId")) {
+            String resourceID = request.getString("resourceId");
+            params.put(STATUS, Status.ACTIVE.toString()).put("resourceId", resourceID);
             query.append(" and rt._id=$2");
-        } else if (request.containsKey(PROVIDER_ID)) {
-            String providerID = request.getString(PROVIDER_ID);
-            params.put(STATUS, Status.ACTIVE.toString()).put(PROVIDER_ID, providerID);
+        } else if (request.containsKey("providerId")) {
+            String providerID = request.getString("providerId");
+            params.put(STATUS, Status.ACTIVE.toString()).put("providerId", providerID);
             query.append(" and pt.provider_id=$2");
         } else {
             params.put(STATUS, Status.ACTIVE.toString());
         }
         query.append(" group by pt.product_id");
+        query.append(" order by pt.modified_at DESC");
 
         LOGGER.debug(query);
 
