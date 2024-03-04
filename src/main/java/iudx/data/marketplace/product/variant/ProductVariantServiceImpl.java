@@ -266,14 +266,14 @@ public class ProductVariantServiceImpl implements ProductVariantService {
       Future<JsonArray> pendingOrFailedPaymentFuture =
               successfulPaymentFuture.compose(
                       jsonArray -> {
-                          userResponse.add(jsonArray);
+                          userResponse.add(jsonArray.getJsonObject(0));
                           return executePurchaseQuery(fetchInvoiceForOtherPaymentStatus, resourceId, productId, user);
                       });
       Future<JsonArray> userResponseFuture =
               pendingOrFailedPaymentFuture.onComplete(
                       pgHandler -> {
                           if (pgHandler.succeeded()) {
-                              userResponse.add(pgHandler.result());
+                              userResponse.add(pgHandler.result().getJsonObject(0));
                               JsonObject response =
                                       new RespBuilder()
                                               .withType(ResponseUrn.SUCCESS_URN.getUrn())
