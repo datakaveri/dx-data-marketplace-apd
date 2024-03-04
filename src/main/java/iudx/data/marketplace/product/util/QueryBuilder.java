@@ -141,7 +141,7 @@ public class QueryBuilder {
                             .replace("$0", productVariantTable)
                             .replace("$1", pvID)
                             .replace("$2", request.getString("provider_id"))
-                            .replace("$3", request.getString(ID))
+                            .replace("$3", request.getString(PRODUCT_ID))
                             .replace("$4", request.getString(VARIANT))
                             .replace("$5", resourceNames)
                             .replace("$6", resourceIdsAndCapabilities.encode())
@@ -180,11 +180,12 @@ public class QueryBuilder {
   public String listProductVariants(JsonObject request) {
 
     StringBuilder query = new StringBuilder(
-            FETCH_ACTIVE_PRODUCT_VARIANTS.replace("'$1'","$1"));
+            FETCH_ACTIVE_PRODUCT_VARIANTS_4_PROVIDER.replace("'$1'","$1"));
     if(request.containsKey(VARIANT)) {
       query.append(" AND product_variant_name=$2");
     }
 
+    query.append(" ORDER BY modified_at DESC");
     LOGGER.debug(query);
     return query.toString();
   }

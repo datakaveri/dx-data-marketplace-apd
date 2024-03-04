@@ -70,7 +70,7 @@ paths:
                     type: 'urn:dx:dmp:Sucess'
                     title: Success
                     results:
-                      - productID: 'urn:datakaveri.org:iisc.ac.in/123qwerty:zxcvb'
+                      - productId: 'urn:datakaveri.org:iisc.ac.in/123qwerty:zxcvb'
         '400':
           description: invalid document
           content:
@@ -78,15 +78,6 @@ paths:
               schema:
                 $ref: '#/components/schemas/errorResponseWithObjects'
               examples:
-                Already exists:
-                  value:
-                    type: 'urn:dx:dmp:AlreadyExists'
-                    results:
-                      - productID: 'urn:datakaveri.org:iisc.ac.in/123qwerty:zxcvb'
-                        method: insert
-                        title: failed
-                        detail: 'Fail: Doc exists'
-                    title: Product already exists
                 Invalid productID:
                   value:
                     type: 'urn:dx:dmp:InvalidProductIDValue'
@@ -111,11 +102,16 @@ paths:
               schema:
                 $ref: '#/components/schemas/createProductForbiddenResponse'
               examples:
-                Unauthorized:
+                account not activated:
                   value:
                     type: 'urn:dx:dmp:forbidden'
                     title: Product creation is forbidden
                     detail: To activate linked account please complete the KYC, filling account information etc., in your Razorpay merchant dashboard
+                product exists:
+                  value:
+                    type: 'urn:dx:dmp:forbidden'
+                    title: Product creation is forbidden
+                    detail: Document of given id already exists
     delete:
       tags:
         - Product
@@ -151,34 +147,37 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/errorResponseWithObjects'
+                $ref: '#/components/schemas/errorResponse'
               examples:
-                Doesn't Exist:
-                  value:
-                    type: 'urn:dx:dmp:DocDoesNotExist'
-                    results:
-                      productID: 'urn:datakaveri.org:iisc.ac.in/123qwerty:zxcvb'
-                      method: delete
-                      title: failed
-                      detail: 'Fail: Cannot delete, Doc does not exist'
-                    title: Product does not exist
                 Invalid productID:
                   value:
-                    type: 'urn:dx:dmp:InvalidProductIDValue'
+                    type: 'urn:dx:dmp:invalidId'
                     title: Bad request
-                    detail: 'Invalid productID [ abc&23? ]'
+                    detail: 'Given ID is invalid [ datakaveri.org/b8bd3e3f39615c8ec96722131ae95056b5938f2f ]'
         '401':
           description: Unauthorized access
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/errorResponseWithObjects'
+                $ref: '#/components/schemas/errorResponse'
               examples:
                 Unauthorized:
                   value:
-                    type: 'urn:dx:cat:InvalidAuthorizationToken'
-                    title: Token is invalid
-                    detail: failed
+                    type: 'urn:dx:dmp:invalidAuthorizationToken'
+                    title: Not Authorized
+                    detail: Not Authorized
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/errorResponse'
+              examples:
+                Unauthorized:
+                  value:
+                    type: 'urn:dx:dmp:resourceNotFound'
+                    title: Not Found
+                    detail: Document of given id does not exist
   /provider/list/products:
     get:
       tags:
@@ -292,25 +291,25 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/errorResponseWithObjects'
+                $ref: '#/components/schemas/errorResponse'
               examples:
                 Invalid ID:
                   value:
-                    type: 'urn:dx:dmp:InvalidResourceIDValue'
+                    type: 'urn:dx:dmp:invalidId'
                     title: Bad request
-                    detail: Invalid resource ID
+                    detail: Given ID is invalid [ abcd ]
         '401':
           description: Unauthorized access
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/errorResponseWithObjects'
+                $ref: '#/components/schemas/errorResponse'
               examples:
                 Unauthorized:
                   value:
-                    type: 'urn:dx:cat:InvalidAuthorizationToken'
-                    title: Token is invalid
-                    detail: failed
+                    type: 'urn:dx:dmp:invalidAuthorizationToken'
+                    title: Not Authorized
+                    detail: Not Authorized
   /provider/list/purchases:
     get:
       tags:
@@ -425,58 +424,108 @@ paths:
                       - capabilities
                 price:
                   type: integer
-                validity:
+                duration:
                   type: integer
               required:
                 - productId
                 - variant
                 - resources
                 - price
-                - validity
+                - duration
               x-examples:
                 Example 1:
-                  productId: 'urn:datakaveri.org:iisc.ac.in/123qwerty:flood-sensors'
+                  productId: 'urn:datakaveri.org:a3ec61uer-1677-4a84-816e-91f9ab23f832:testProduct'
                   variant: sensors-1
                   resources:
-                    - id: pune-flood
+                    - id: 695e222b-3fae-4325-8db0-3e29d01c4fc0
                       capabilities:
                         - api
                         - sub
-                    - id: stqc-flood
+                    - id: 83c2e5c2-3574-4e11-9530-2b1fbdfce832
                       capabilities:
                         - sub
                         - file
                   price: 100
-                  validity: 12
+                  duration: 12
             examples:
               Example 1:
                 value:
-                  productId: 'urn:datakaveri.org:iisc.ac.in/123qwerty:flood-sensors'
+                  productId: 'urn:datakaveri.org:a3ec61uer-1677-4a84-816e-91f9ab23f832:testProduct'
                   variant: sensors-1
                   resources:
-                    - id: pune-flood
+                    - id: 695e222b-3fae-4325-8db0-3e29d01c4fc0
                       capabilities:
                         - api
                         - sub
-                    - id: stqc-flood
+                    - id: 83c2e5c2-3574-4e11-9530-2b1fbdfce832
                       capabilities:
                         - sub
                         - file
                   price: 100
-                  validity: 12
+                  duration: 12
       responses:
         '200':
-          description: ''
+          description: 'Success'
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/successResponseWithObjects'
+                $ref: '#/components/schemas/createProductVariantSuccessResponse'
               examples:
                 Example 1:
                   value:
-                    type: 'urn:dx:dmp:Success'
-                    title: Success
-                    results: [ ]
+                    {
+                      "type": "urn:dx:dmp:success",
+                      "title": "Success",
+                      "results": [
+                        {
+                          "productId": "urn:datakaveri.org:a3ec61uer-1677-4a84-816e-91f9ab23f832:testProduct",
+                          "variant": "variant1"
+                        }
+                      ]
+                    }
+        '400':
+          description: 'Bad Request'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/errorResponse'
+              examples:
+                Example 1:
+                  value:
+                    {
+                      "type": "urn:dx:dmp:invalidPayloadFormat",
+                      "title": "Bad Request",
+                      "detail": "object has missing required properties ([\"productId\"])"
+                    }
+        '401':
+          description: 'Not Authorised'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/errorResponse'
+              examples:
+                Example 1:
+                  value:
+                    {
+                      "type": "urn:dx:dmp:invalidAuthorizationToken",
+                      "title": "Not Authorized",
+                      "detail": "Not Authorized"
+                    }
+        '409':
+          description: 'Conflict'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/errorResponse'
+              examples:
+                Example 1:
+                  value:
+                    {
+                      "type": "urn:dx:dmp:resourceAlreadyExists",
+                      "title": "Conflict",
+                      "detail": "Document of given id already exists"
+                    }
+
     get:
       tags:
         - Product-Variant
@@ -689,8 +738,6 @@ paths:
                         }
                       ]
                     }
-        '204':
-          description: no content
         '400':
           description: Invalid Product ID
           content:
@@ -714,7 +761,7 @@ paths:
                 value:
                   {
                     "type": "urn:dx:dmp:resourceNotFound",
-                    "title": "Document of given id does not exist",
+                    "title": "Not Found",
                     "detail": "Product variants not found"
                   }
         '401':
@@ -762,52 +809,93 @@ paths:
                       - capabilities
                 price:
                   type: integer
-                validity:
+                duration:
                   type: integer
               required:
                 - productId
                 - variant
                 - resources
                 - price
-                - validity
+                - duration
               x-examples:
                 Example 1:
-                  id: 'urn:datakaveri.org:iisc.ac.in/123qwerty:flood-sensors'
+                  id: 'urn:datakaveri.org:a3ec61uer-1677-4a84-816e-91f9ab23f832:testProduct'
                   variant: sensors-1
                   resources:
-                    - id: pune-flood
+                    - id: 695e222b-3fae-4325-8db0-3e29d01c4fc0
                       capabilities:
                         - api
                         - sub
-                    - id: stqc-flood
+                    - id: 83c2e5c2-3574-4e11-9530-2b1fbdfce832
                       capabilities:
                         - sub
                         - file
                   price: 100
-                  validity: 12
+                  duration: 12
             examples:
               Example 1:
                 value:
-                  productId: 'urn:datakaveri.org:iisc.ac.in/123qwerty:flood-sensors'
+                  productId: 'urn:datakaveri.org:b2c27f3f-2524-4a84-816e-91f9ab23f837:testProduct'
                   variant: sensors-1
                   resources:
-                    - id: pune-flood
+                    - id: 83c2e5c2-3574-4e11-9530-2b1fbdfce832
                       capabilities:
                         - api
                         - sub
-                    - id: stqc-flood
+                    - id: 695e222b-3fae-4325-8db0-3e29d01c4fc0
                       capabilities:
                         - sub
                         - async
                   price: 100
-                  validity: 11
+                  duration: 11
       responses:
         '200':
-          description: OK
+          description: 'Success'
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/successResponseWithObjects'
+                $ref: '#/components/schemas/createProductVariantSuccessResponse'
+              examples:
+                Example 1:
+                  value:
+                    {
+                      "type": "urn:dx:dmp:success",
+                      "title": "Success",
+                      "results": [
+                        {
+                          "productId": "urn:datakaveri.org:a3ec61uer-1677-4a84-816e-91f9ab23f832:testProduct",
+                          "variant": "variant1"
+                        }
+                      ]
+                    }
+        '400':
+          description: 'Bad Request'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/errorResponse'
+              examples:
+                Example 1:
+                  value:
+                    {
+                      "type": "urn:dx:dmp:invalidPayloadFormat",
+                      "title": "Bad Request",
+                      "detail": "object has missing required properties ([\"productId\"])"
+                    }
+        '401':
+          description: 'Not Authorised'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/errorResponse'
+              examples:
+                Example 1:
+                  value:
+                    {
+                      "type": "urn:dx:dmp:invalidAuthorizationToken",
+                      "title": "Not Authorized",
+                      "detail": "Not Authorized"
+                    }
     delete:
       tags:
         - Product-Variant
@@ -830,12 +918,47 @@ paths:
             type: string
       responses:
         '200':
-          description: OK
+          description: 'Success'
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/successResponseForDeleteProduct'
-
+                $ref: '#/components/schemas/errorResponse'
+              examples:
+                Example 1:
+                  value:
+                    {
+                      "type": "urn:dx:dmp:Success",
+                      "title": "Success",
+                      "detail": "Successfully deleted"
+                    }
+        '400':
+          description: 'Bad Request'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/errorResponse'
+              examples:
+                Example 1:
+                  value:
+                    {
+                      "type": "urn:dx:dmp:invalidNameValue",
+                      "title": "Bad Request",
+                      "detail": "Invalid name"
+                    }
+        '401':
+          description: 'Not Authorized'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/errorResponse'
+              examples:
+                Example 1:
+                  value:
+                    {
+                      "type": "urn:dx:dmp:invalidAuthorizationToken",
+                      "title": "Not Authorized",
+                      "detail": "Not Authorized"
+                    }
 
   /account:
     post:
@@ -1489,7 +1612,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/errorResponseWithObjects'
+                $ref: '#/components/schemas/errorResponse'
               examples:
                 Doesn't Exist:
                   value:
@@ -1506,13 +1629,15 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/errorResponseWithObjects'
+                $ref: '#/components/schemas/errorResponse'
               examples:
                 Unauthorized:
                   value:
-                    type: 'urn:dx:cat:InvalidAuthorizationToken'
-                    title: Token is invalid
-                    detail: failed
+                    {
+                      "type": "urn:dx:dmp:invalidAuthorizationToken",
+                      "title": "Not Authorized",
+                      "detail": "Not Authorized"
+                    }
   /consumer/list/providers:
     get:
       tags:
@@ -1631,13 +1756,15 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/errorResponseWithObjects'
+                $ref: '#/components/schemas/errorResponse'
               examples:
                 Unauthorized:
                   value:
-                    type: 'urn:dx:cat:InvalidAuthorizationToken'
-                    title: Token is invalid
-                    detail: failed
+                    {
+                      "type": "urn:dx:dmp:invalidAuthorizationToken",
+                      "title": "Not Authorized",
+                      "detail": "Not Authorized"
+                    }
   /consumer/list/purchases:
     get:
       tags:
@@ -1866,9 +1993,11 @@ paths:
               examples:
                 Unauthorized:
                   value:
-                    type: 'urn:dx:cat:InvalidAuthorizationToken'
-                    title: Token is invalid
-                    detail: failed
+                    {
+                      "type": "urn:dx:dmp:invalidAuthorizationToken",
+                      "title": "Not Authorized",
+                      "detail": "Not Authorized"
+                    }
   /consumer/product-variants:
     get:
       tags:
@@ -2010,19 +2139,17 @@ paths:
               schema:
                 $ref: '#/components/schemas/errorResponse'
               example:
-                value:
-                  {
-                    "type": "urn:dx:dmp:resourceNotFound",
-                    "title": "Document of given id does not exist",
-                    "detail": "Product variants not found"
-                  }
+                  type: urn:dx:dmp:resourceNotFound
+                  title: Document of given id does not exist
+                  detail: Product variants not found
+
         '401':
           description: Unauthorized access
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/Unauthorized'
-  '/consumer/order/{variantId}':
+  /consumer/order/{variantId}:
     post:
       summary: Order
       tags:
@@ -2092,6 +2219,13 @@ paths:
                     type: 'urn:dx:dmp:invalidIdValue'
                     title: Bad Request
                     detail: 'Invalid id [ 060cc0ed-14fb-4f07-be1d-f0b66585eab ] '
+
+        '401':
+          description: Unauthorized access
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Unauthorized'
       operationId: post-consumer-order
       parameters:
         - schema:
@@ -2404,6 +2538,11 @@ components:
               resourceIds:
                 type: string
                 format: uuid
+            required:
+              resourceIds
+      required:
+        - id
+        - resources
       example:
         name: flood-sensors
         description: some description for flood-sensors
@@ -2501,6 +2640,38 @@ components:
         type: 'urn:dx:dmp:Success'
         title: Success
         detail: Successfully deleted
+
+
+    createProductVariantSuccessResponse:
+      type: object
+      title: Success Response for create product variant
+      description: example response for create pv
+      properties:
+        type:
+          type: string
+          description: URN type of the response indicating if the query was successful or if any errors have been triggered.
+        title:
+          description: A human readable title to the message response.
+        results:
+          type: array
+          description: Results which matched the query. This is an array of objects.
+          items:
+            type: object
+      required:
+        - type
+        - title
+        - results
+      example:
+        {
+          "type": "urn:dx:dmp:success",
+          "title": "Success",
+          "results": [
+            {
+              "productId": "urn:datakaveri.org:b2c27f3f-2524-4a84-816e-91f9ab23f837:testProduct",
+              "variant": "variant1"
+            }
+          ]
+        }
 
     exampleResponseListPurchases:
       type: object

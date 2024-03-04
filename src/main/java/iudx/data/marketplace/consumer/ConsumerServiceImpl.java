@@ -411,6 +411,8 @@ public class ConsumerServiceImpl implements ConsumerService {
         Promise<JsonObject> promise = Promise.promise();
         String productVariantTable = config.getJsonArray(TABLES).getString(3);
         String merchantTable = config.getJsonArray(TABLES).getString(8);
+        LOGGER.debug("productVariantTable : " + productVariantTable);
+        LOGGER.debug("merchantTable : " + merchantTable);
 
         StringBuilder query =
                 new StringBuilder(

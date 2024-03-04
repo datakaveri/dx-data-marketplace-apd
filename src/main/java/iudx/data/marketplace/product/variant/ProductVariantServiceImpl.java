@@ -235,13 +235,32 @@ public class ProductVariantServiceImpl implements ProductVariantService {
             params.put(VARIANT, request.getString(VARIANT));
         }
 
-        pgService.executePreparedQuery(query, params, pgHandler -> {
-
-            if (pgHandler.succeeded()) {
-                handler.handle(Future.succeededFuture(pgHandler.result()));
+    pgService.executePreparedQuery(
+        query,
+        params,
+        pgHandler -> {
+          if (pgHandler.succeeded()) {
+            if (pgHandler.result().getJsonArray(RESULTS).isEmpty()) {
+              String failureMessage =
+                  new RespBuilder()
+                      .withType(HttpStatusCode.NOT_FOUND.getValue())
+                      .withTitle(ResponseUrn.RESOURCE_NOT_FOUND_URN.getUrn())
+                      .withDetail("Product variants not found")
+                      .getResponse();
+              handler.handle(Future.failedFuture(failureMessage));
             } else {
-                handler.handle(Future.failedFuture(pgHandler.cause()));
+              handler.handle(Future.succeededFuture(pgHandler.result()));
             }
+          } else {
+              LOGGER.error("Failure : " + pgHandler.cause());
+            String failureMessage =
+                new RespBuilder()
+                    .withType(HttpStatusCode.INTERNAL_SERVER_ERROR.getValue())
+                    .withTitle(ResponseUrn.DB_ERROR_URN.getUrn())
+                    .withDetail(ResponseUrn.INTERNAL_SERVER_ERR_URN.getMessage())
+                    .getResponse();
+            handler.handle(Future.failedFuture(failureMessage));
+          }
         });
 
         return this;

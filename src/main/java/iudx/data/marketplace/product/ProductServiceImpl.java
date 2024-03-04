@@ -122,9 +122,13 @@ public class ProductServiceImpl implements ProductService {
                       queries,
                       pgHandler -> {
                         if (pgHandler.succeeded()) {
-                          handler.handle(
-                              Future.succeededFuture(
-                                  pgHandler.result().put(PRODUCT_ID, productID)));
+                          JsonObject result =
+                              new RespBuilder()
+                                  .withType(ResponseUrn.SUCCESS_URN.getUrn())
+                                  .withTitle(ResponseUrn.SUCCESS_URN.getMessage())
+                                  .withResult(new JsonObject().put(PRODUCT_ID, productID))
+                                  .getJsonResponse();
+                          handler.handle(Future.succeededFuture(result));
                         } else {
                           LOGGER.error(pgHandler.cause());
                           handler.handle(Future.failedFuture(pgHandler.cause()));

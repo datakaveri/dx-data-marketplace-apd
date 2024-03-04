@@ -303,7 +303,7 @@ public class ProviderApis {
           if (handler.succeeded()) {
             handleSuccessResponse(routingContext, 200, handler.result());
           } else {
-            handleFailureResponse(routingContext, handler.cause());
+            handleFailure(routingContext, handler.cause().getMessage());
           }
         });
   }

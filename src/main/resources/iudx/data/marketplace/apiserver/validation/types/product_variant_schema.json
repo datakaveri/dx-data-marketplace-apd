@@ -6,7 +6,7 @@
   "description": "The root schema comprises the entire JSON document.",
   "examples": [
     {
-      "id": "urn:datakaveri.org:0880ec14-f078-4059-bfde-4c9f022526a9:flood-sensors",
+      "productId": "urn:datakaveri.org:0880ec14-f078-4059-bfde-4c9f022526a9:flood-sensors",
       "variant": "sensors-1",
       "resources": [
         {
@@ -27,7 +27,7 @@
     }
   ],
   "required": [
-    "id",
+    "productId",
     "variant",
     "resources",
     "price",
