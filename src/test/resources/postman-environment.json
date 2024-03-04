@@ -50,6 +50,78 @@
       "enabled": true
     },
     {
+      "key": "authEndpoint",
+      "value": "https://authvertx.iudx.io",
+      "type": "default",
+      "enabled": true
+    },
+    {
+      "key": "providerDelegateTokenForbidden",
+      "value": "",
+      "type": "default",
+      "enabled": true
+    },
+    {
+      "key": "providerClientID",
+      "value": "",
+      "type": "default",
+      "enabled": true
+    },
+    {
+      "key": "providerClientSecret",
+      "value": "",
+      "type": "default",
+      "enabled": true
+    },
+    {
+      "key": "consumerClientId",
+      "value": "",
+      "type": "default",
+      "enabled": true
+    },
+    {
+      "key": "consumerClientSecret",
+      "value": "",
+      "type": "default",
+      "enabled": true
+    },
+    {
+      "key": "providerDelegateClientId",
+      "value": "",
+      "type": "default",
+      "enabled": true
+    },
+    {
+      "key": "providerDelegateClientSecret",
+      "value": "",
+      "type": "default",
+      "enabled": true
+    },
+    {
+      "key": "providerDelegateId",
+      "value": "",
+      "type": "default",
+      "enabled": true
+    },
+    {
+      "key": "consumerDelegateId",
+      "value": "",
+      "type": "default",
+      "enabled": true
+    },
+    {
+      "key": "consumerDelegateClientId",
+      "value": "",
+      "type": "default",
+      "enabled": true
+    },
+    {
+      "key": "consumerDelegateClientSecret",
+      "value": "",
+      "type": "default",
+      "enabled": true
+    },
+    {
       "key": "baseUrls",
       "value": "http://localhost:8443",
       "type": "default",
