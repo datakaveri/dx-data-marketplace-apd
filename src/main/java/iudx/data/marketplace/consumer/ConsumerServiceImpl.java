@@ -98,7 +98,7 @@ public class ConsumerServiceImpl implements ConsumerService {
         if (request.containsKey("providerId")) {
             String providerID = request.getString("providerId");
             params.put("providerId", providerID);
-            query = new StringBuilder(LIST_PROVIDER_WITH_GIVEN_PROVIDER_ID.replace("$0", resourceTable));
+            query = new StringBuilder(LIST_PROVIDER_WITH_GIVEN_PROVIDER_ID);
         }
 
         pgService.executePreparedQuery(

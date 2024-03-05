@@ -7,20 +7,26 @@ public class Constants {
           + " modified_at AS \"updatedAt\" "
           + " ,provider_name AS \"providerName\" from $0 ";
   public static final String LIST_PROVIDERS_QUERY =
-      "SELECT DISTINCT  provider_id AS \"providerId\", COUNT(_id) AS \"numberOfResources\","
-          +" provider_name AS \"providerName\", "
-          + "resource_server AS \"resourceServerUrl\"  "
-          + "FROM $0  "
-          + "GROUP BY provider_id, provider_name, resource_server "
-          + "ORDER BY provider_id ASC";
+      "SELECT DISTINCT U._id AS \"providerId\", COUNT(R._id) AS \"numberOfResources\", \n"
+          + "R.provider_name AS \"providerName\", \n"
+          + "R.resource_server AS \"resourceServerUrl\",\n"
+          + "U.modified_at AS \"updatedAt\"\n"
+          + "FROM user_table U\n"
+          + "INNER JOIN resource_entity R \n"
+          + "ON U._id = R.provider_id\n"
+          + "GROUP BY U._id, R.provider_name, R.resource_server, U.modified_at\n"
+          + "ORDER BY U.modified_at DESC";
   public static final String LIST_PROVIDER_WITH_GIVEN_PROVIDER_ID =
-  "SELECT distinct  provider_id AS \"providerId\", COUNT(_id) AS \"numberOfResources\"," +
-          " provider_name AS \"providerName\", " +
-          "resource_server AS \"resourceServerUrl\" " +
-          "FROM $0 " +
-          "WHERE provider_id = $1 " +
-          "GROUP BY provider_id, provider_name, resource_server " +
-          "ORDER BY provider_id ASC";
+      "SELECT DISTINCT U._id AS \"providerId\", COUNT(R._id) AS \"numberOfResources\", \n"
+          + "R.provider_name AS \"providerName\", \n"
+          + "R.resource_server AS \"resourceServerUrl\",\n"
+          + "U.modified_at AS \"updatedAt\"\n"
+          + "FROM user_table U\n"
+          + "INNER JOIN resource_entity R \n"
+          + "ON U._id = R.provider_id\n"
+          + "WHERE U._id = $1 \n"
+          + "GROUP BY U._id, R.provider_name, R.resource_server, U.modified_at\n"
+          + "ORDER BY U.modified_at DESC";
 
   public static final String LIST_PRODUCTS =
       "select pt.product_id AS \"productId\", pt.provider_name AS \"providerName\", "

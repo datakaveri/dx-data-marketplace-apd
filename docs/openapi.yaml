@@ -1725,13 +1725,15 @@ paths:
                           "providerId": "b2c27f3f-2524-4a84-816e-91f9ab23f837",
                           "numberOfResources": 8,
                           "providerName": "Administrator of the IUDX platform",
-                          "resourceServerUrl": "rs.iudx.io"
+                          "resourceServerUrl": "rs.iudx.io",
+                          "updatedAt": "2024-03-02T19:00:00.885808"
                         },
                         {
                           "providerId": "c3a2af3f-2524-4a84-816e-91f9ab23d375",
                           "numberOfResources": 5,
                           "providerName": "Administrator of the platform",
-                          "resourceServerUrl": "rs.iudx.io"
+                          "resourceServerUrl": "rs.iudx.io",
+                          "updatedAt": "2024-02-15T10:42:39.513330"
                         }
                       ]
                     }
@@ -1745,7 +1747,8 @@ paths:
                           "providerId": "b2c27f3f-2524-4a84-816e-91f9ab23f837",
                           "numberOfResources": 8,
                           "providerName": "Administrator of the IUDX platform",
-                          "resourceServerUrl": "rs.iudx.io"
+                          "resourceServerUrl": "rs.iudx.io",
+                          "updatedAt": "2024-03-02T19:00:00.885808"
                         }
                       ]
                     }
@@ -1764,6 +1767,21 @@ paths:
                       "type": "urn:dx:dmp:invalidAuthorizationToken",
                       "title": "Not Authorized",
                       "detail": "Not Authorized"
+                    }
+
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/errorResponse'
+              examples:
+                Unauthorized:
+                  value:
+                    {
+                      "type": "urn:dx:dmp:invalidId",
+                      "title": "Bad Request",
+                      "detail": "Given ID is invalid [ datakaveri.org/b8bd3e3f39615c8ec96722131ae95056b5938f2f/invalid ] "
                     }
   /consumer/list/purchases:
     get:
