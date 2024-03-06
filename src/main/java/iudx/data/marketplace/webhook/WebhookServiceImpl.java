@@ -45,11 +45,7 @@ public class WebhookServiceImpl implements WebhookService {
 
   @Override
   public Future<Void> recordPaymentFailure(String orderId) {
-    Promise<Void> promise = Promise.promise();
-    updatePaymentStatusForInvoice(orderId, PaymentStatus.FAILED)
-        .onSuccess(ar -> promise.complete())
-        .onFailure(ar -> promise.fail(ar.getCause()));
-    return promise.future();
+    return updatePaymentStatusForInvoice(orderId, PaymentStatus.FAILED);
   }
 
   Future<Void> updatePaymentStatusForInvoice(String orderId, PaymentStatus paymentStatus) {
