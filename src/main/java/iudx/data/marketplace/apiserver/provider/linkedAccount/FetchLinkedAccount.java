@@ -26,6 +26,7 @@ public class FetchLinkedAccount {
   AuditingService auditingService;
   String razorpayAccountProductId;
   String updatedAt;
+  String createdAt;
 
   public FetchLinkedAccount(
       PostgresService postgresService,
@@ -131,6 +132,7 @@ public class FetchLinkedAccount {
     }
     details.put("legalInfo", legalInfoJson);
     details.put("updatedAt", getUpdatedAt());
+    details.put("createdAt", getCreatedAt());
     JsonObject response =
         new RespBuilder()
             .withType(ResponseUrn.SUCCESS_URN.getUrn())
@@ -154,8 +156,10 @@ public class FetchLinkedAccount {
               String accountId = result.getString("account_id");
               String accountProductId = result.getString("rzp_account_product_id");
               String updatedAt = result.getString("updatedAt");
+              String createdAt = result.getString("createdAt");
               setRazorpayAccountProductId(accountProductId);
               setUpdatedAt(updatedAt);
+              setCreatedAt(createdAt);
               promise.complete(new JsonObject().put("accountId", accountId));
             } else {
               promise.fail(
@@ -193,5 +197,14 @@ public class FetchLinkedAccount {
 
   public void setUpdatedAt(String updatedAt) {
     this.updatedAt = updatedAt;
+  }
+  public String getCreatedAt()
+  {
+    return createdAt;
+  }
+
+  public void setCreatedAt(String createdAt)
+  {
+    this.createdAt = createdAt;
   }
 }

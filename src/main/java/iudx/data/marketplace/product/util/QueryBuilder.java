@@ -220,7 +220,7 @@ public class QueryBuilder {
               .replace("$1", resourceId)
               .replace("$2", providerId));
     }
-
+    LOGGER.debug("Query :" + query);
     return query.toString();
   }
 
@@ -245,6 +245,7 @@ public class QueryBuilder {
               .replace("$1", resourceId)
               .replace("$2", providerId));
     }
+    LOGGER.debug("Query :" + query);
     return query.toString();
   }
   public String listPurchaseForConsumer(String consumerId, String resourceId, String productId)
@@ -268,6 +269,7 @@ public class QueryBuilder {
               .replace("$1", resourceId)
               .replace("$2", consumerId));
     }
+    LOGGER.debug("Query :" + query);
     return query.toString();
   }
 
@@ -292,7 +294,7 @@ public class QueryBuilder {
               .replace("$1", resourceId)
               .replace("$2", consumerId));
     }
-
+    LOGGER.debug("Query :" + query);
     return query.toString();
   }
 

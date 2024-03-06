@@ -4,13 +4,14 @@ public class Constants {
 
   public static final String LIST_RESOURCES_QUERY =
       "select _id AS \"resourceId\", resource_name AS \"resourceName\", accessPolicy AS \"accessPolicy\","
-          + " modified_at AS \"updatedAt\" "
+          + " modified_at AS \"updatedAt\" , created_at AS \"createdAt\""
           + " ,provider_name AS \"providerName\" from $0 ";
   public static final String LIST_PROVIDERS_QUERY =
       "SELECT DISTINCT U._id AS \"providerId\", COUNT(R._id) AS \"numberOfResources\", \n"
           + "R.provider_name AS \"providerName\", \n"
           + "R.resource_server AS \"resourceServerUrl\",\n"
           + "U.modified_at AS \"updatedAt\"\n"
+          + "U.created_at AS \"createdAt\"\n"
           + "FROM user_table U\n"
           + "INNER JOIN resource_entity R \n"
           + "ON U._id = R.provider_id\n"
@@ -21,6 +22,7 @@ public class Constants {
           + "R.provider_name AS \"providerName\", \n"
           + "R.resource_server AS \"resourceServerUrl\",\n"
           + "U.modified_at AS \"updatedAt\"\n"
+          + "U.created_at AS \"createdAt\"\n"
           + "FROM user_table U\n"
           + "INNER JOIN resource_entity R \n"
           + "ON U._id = R.provider_id\n"
@@ -31,6 +33,7 @@ public class Constants {
   public static final String LIST_PRODUCTS =
       "select pt.product_id AS \"productId\", pt.provider_name AS \"providerName\", "
           + " pt.modified_at AS \"updatedAt\" , "
+          + " pt.created_at AS \"createdAt\" , "
           + "array_agg(json_build_object('id', rt._id, 'name', rt.resource_name)) as resources "
           + "from $0 as pt "
           + "inner join $9 as dpt on pt.product_id = dpt.product_id "
