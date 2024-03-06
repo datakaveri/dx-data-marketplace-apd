@@ -51,7 +51,7 @@ public class VariantServiceTest {
     postgresService = mock(PostgresService.class);
     variantServiceImpl = new ProductVariantServiceImpl(config, postgresService, util);
     lenient().when(jsonObjectMock.getString(PRODUCT_ID)).thenReturn("urn:datakaeri.org:provider-id:abcde");
-    lenient().when(jsonObjectMock.getString(VARIANT)).thenReturn("var-name");
+    lenient().when(jsonObjectMock.getString(PRODUCT_VARIANT_NAME)).thenReturn("var-name");
     variantServiceSpy = spy(variantServiceImpl);
     testContext.completeNow();
   }
@@ -178,7 +178,7 @@ public class VariantServiceTest {
       }
     }).when(postgresService).executeQuery(anyString(),any());
 
-    variantServiceSpy.updateProductVariantStatus(anyString(),anyString()).onComplete(handler -> {
+    variantServiceSpy.updateProductVariantStatus(anyString()).onComplete(handler -> {
       if(handler.succeeded()) {
         verify(postgresService, times(1)).executeQuery(anyString(),any());
         testContext.completeNow();

@@ -6,8 +6,8 @@
   "description": "The root schema comprises the entire JSON document.",
   "examples": [
     {
-      "id": "urn:datakaveri.org:0880ec14-f078-4059-bfde-4c9f022526a9:flood-sensors",
-      "variant": "sensors-1",
+      "productId": "urn:datakaveri.org:0880ec14-f078-4059-bfde-4c9f022526a9:flood-sensors",
+      "productVariantName": "sensors-1",
       "resources": [
         {
           "id": "0880ec14-f078-4059-bfde-4c9f022526a9",
@@ -27,14 +27,14 @@
     }
   ],
   "required": [
-    "id",
-    "variant",
+    "productId",
+    "productVariantName",
     "resources",
     "price",
     "duration"
   ],
   "properties": {
-    "id": {
+    "productId": {
       "$id": "#/properties/id",
       "type": "string",
       "title": "Product name schema",
@@ -43,8 +43,8 @@
       "maxLength": 512,
       "additionalItems": false
     },
-    "variant": {
-      "$id": "#/properties/variant",
+    "productVariantName": {
+      "$id": "#/properties/productVariantName",
       "type": "string",
       "title": "Product variant name schema",
       "description": "An alphanumeric name for a product variant",

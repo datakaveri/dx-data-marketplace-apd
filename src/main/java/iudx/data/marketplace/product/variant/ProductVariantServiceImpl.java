@@ -1,7 +1,5 @@
 package iudx.data.marketplace.product.variant;
 
-import static iudx.data.marketplace.apiserver.util.Constants.RESULT;
-import static iudx.data.marketplace.apiserver.util.Constants.TITLE;
 import static iudx.data.marketplace.product.util.Constants.*;
 
 import io.vertx.core.AsyncResult;
@@ -28,8 +26,8 @@ public class ProductVariantServiceImpl implements ProductVariantService {
 
     public static final Logger LOGGER = LogManager.getLogger(ProductVariantServiceImpl.class);
     private final PostgresService pgService;
-    private QueryBuilder queryBuilder;
     private final Util util;
+    private final QueryBuilder queryBuilder;
 
     public ProductVariantServiceImpl(JsonObject config, PostgresService postgresService, Util util) {
         this.pgService = postgresService;
@@ -41,7 +39,7 @@ public class ProductVariantServiceImpl implements ProductVariantService {
     public ProductVariantService createProductVariant(User user,
                                                       JsonObject request, Handler<AsyncResult<JsonObject>> handler) {
         String productID = request.getString(PRODUCT_ID);
-        String variantName = request.getString(VARIANT);
+        String variantName = request.getString(PRODUCT_VARIANT_NAME);
         Future<Boolean> checkForExistence = checkIfProductVariantExists(productID, variantName);
         Future<JsonObject> productDetailsFuture = getProductDetails(productID);
         JsonArray resources = request.getJsonArray(RESOURCES_ARRAY);
@@ -95,17 +93,7 @@ public class ProductVariantServiceImpl implements ProductVariantService {
                                         query,
                                         pgHandler -> {
                                             if (pgHandler.succeeded()) {
-                                                RespBuilder respBuilder =
-                                                        new RespBuilder()
-                                                                .withType(ResponseUrn.SUCCESS_URN.getUrn())
-                                                                .withTitle(ResponseUrn.SUCCESS_URN.getMessage())
-                                                                .withResult(
-                                                                        new JsonArray()
-                                                                                .add(
-                                                                                        new JsonObject()
-                                                                                                .put(PRODUCT_ID, productID)
-                                                                                                .put(VARIANT, variantName)));
-                                                handler.handle(Future.succeededFuture(respBuilder.getJsonResponse()));
+                                                handler.handle(Future.succeededFuture(pgHandler.result()));
                                             } else {
                                                 handler.handle(Future.failedFuture(pgHandler.cause()));
                                             }
@@ -155,7 +143,7 @@ public class ProductVariantServiceImpl implements ProductVariantService {
                                                       JsonObject request, Handler<AsyncResult<JsonObject>> handler) {
 
         String productID = request.getString(PRODUCT_ID);
-        String variant = request.getString(VARIANT);
+        String variant = request.getString(PRODUCT_VARIANT_NAME);
 
         Future<Boolean> updateProductVariantFuture = updateProductVariantStatus(productID, variant);
         updateProductVariantFuture.onComplete(
@@ -198,13 +186,30 @@ public class ProductVariantServiceImpl implements ProductVariantService {
         return promise.future();
     }
 
+    Future<Boolean> updateProductVariantStatus(String productVariantId) {
+        Promise<Boolean> promise = Promise.promise();
+        String query = queryBuilder.updateProductVariantStatusQuery(productVariantId);
+
+        pgService.executeQuery(
+            query,
+            pgHandler -> {
+                if (pgHandler.succeeded()) {
+                    LOGGER.debug(pgHandler.result());
+                    promise.complete(true);
+                } else {
+                    promise.fail(pgHandler.cause());
+                }
+            });
+
+        return promise.future();
+    }
+
     @Override
     public ProductVariantService deleteProductVariant(User user,
                                                       JsonObject request, Handler<AsyncResult<JsonObject>> handler) {
-        String productID = request.getString(PRODUCT_ID);
-        String variant = request.getString(VARIANT);
+        String productVariantId = request.getString("productVariantId");
 
-        Future<Boolean> updateProductVariantFuture = updateProductVariantStatus(productID, variant);
+      Future<Boolean> updateProductVariantFuture = updateProductVariantStatus(productVariantId);
         updateProductVariantFuture.onComplete(
                 updateHandler -> {
                     if (updateHandler.result()) {
@@ -232,8 +237,8 @@ public class ProductVariantServiceImpl implements ProductVariantService {
                 .put(PRODUCT_ID, request.getString(PRODUCT_ID))
                 .put(STATUS, Status.ACTIVE.toString());
 
-        if(request.containsKey(VARIANT)) {
-            params.put(VARIANT, request.getString(VARIANT));
+        if(request.containsKey(PRODUCT_VARIANT_NAME)) {
+            params.put(PRODUCT_VARIANT_NAME, request.getString(PRODUCT_VARIANT_NAME));
         }
 
         pgService.executePreparedQuery(query, params, pgHandler -> {

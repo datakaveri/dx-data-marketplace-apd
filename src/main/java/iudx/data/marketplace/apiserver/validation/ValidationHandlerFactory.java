@@ -51,10 +51,19 @@ public class ValidationHandlerFactory {
         break;
       case PUT_ACCOUNT:
         validator = getPutLinkedAccountValidator(body, requestType);
+        break;
+      case ORDER_PAID_WEBHOOK:
+        validator = getPaymentWebhookValidator(body);
       case PURCHASE:
         validator = getPurchaseValidator(parameters);
     }
     return validator;
+  }
+
+  private List<Validator> getPaymentWebhookValidator(JsonObject body) {
+    List<Validator> validators = new ArrayList<>();
+    validators.add(new JsonSchemaTypeValidator(body, RequestType.ORDER_PAID_WEBHOOK));
+    return validators;
   }
 
   private List<Validator> getPurchaseValidator(MultiMap parameters) {
@@ -64,6 +73,7 @@ public class ValidationHandlerFactory {
     validators.add(new ProductIDTypeValidator(parameters.get("productId"), false));
     return validators;
   }
+
   private List<Validator> getVerfiyPaymentValidator(MultiMap parameters, JsonObject body) {
     List<Validator> validators = new ArrayList<>();
     validators.add(new JsonSchemaTypeValidator(body, RequestType.VERIFY_PAYMENT));
@@ -84,7 +94,7 @@ public class ValidationHandlerFactory {
   }
   private List<Validator> getOrderValidator(MultiMap parameters) {
     List<Validator> validators = new ArrayList<>();
-    validators.add(new UUIDTypeValidator(parameters.get(PRODUCT_VARIANT_NAME), true));
+    validators.add(new UUIDTypeValidator(parameters.get(PRODUCT_VARIANT_ID), true));
     return validators;
   }
 
@@ -133,8 +143,7 @@ public class ValidationHandlerFactory {
     List<Validator> validators = new ArrayList<>();
 
     if (body == null || body.isEmpty()) {
-      validators.add(new ProductIDTypeValidator(parameters.get(PRODUCT_ID), true));
-      validators.add(new VariantNameTypeValidator(parameters.get(PRODUCT_VARIANT_NAME), false));
+      validators.add(new UUIDTypeValidator(parameters.get(PRODUCT_VARIANT_ID), false));
     } else {
       validators.add(new JsonSchemaTypeValidator(body, requestType));
     }

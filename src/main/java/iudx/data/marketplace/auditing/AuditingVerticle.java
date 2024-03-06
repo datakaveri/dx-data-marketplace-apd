@@ -83,7 +83,7 @@ public class AuditingVerticle extends AbstractVerticle {
 
         client = RabbitMQClient.create(vertx, config);
         dataBrokerService = new DataBrokerServiceImpl(client);
-        metering = new AuditingServiceImpl(dataBrokerService);
+        metering = new AuditingServiceImpl(dataBrokerService, config());
         binder = new ServiceBinder(vertx);
         /* Publish the Data Broker service with the Event Bus against an address. */
         consumer =

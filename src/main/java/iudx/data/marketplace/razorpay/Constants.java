@@ -1,4 +1,4 @@
-package iudx.data.marketplace.razorpay.util;
+package iudx.data.marketplace.razorpay;
 
 public class Constants {
 
@@ -17,6 +17,12 @@ public class Constants {
   public static final String ERROR = "error";
   public static final String REASON = "reason";
   public static final Integer ZERO = 0;
+
+  public static final String MERCHANT_ID = "merchant_id";
+  public static final String URL = "url";
+  public static final String ALERT_EMAIL = "alert_email";
+  public static final String WEBHOOK_SECRET = "webhook_secret";
+  public static final String EVENTS = "events";
   public static final String RAZORPAY_ORDER_ID = "razorpay_order_id";
   public static final String RAZORPAY_PAYMENT_ID = "razorpay_payment_id";
   public static final String RAZORPAY_SIGNATURE = "razorpay_signature";

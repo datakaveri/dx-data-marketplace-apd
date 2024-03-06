@@ -6,9 +6,9 @@ import java.util.stream.Stream;
 
 import static iudx.data.marketplace.common.ResponseUrn.PAYMENT_STATUS_NOT_FOUND;
 public enum PaymentStatus {
-  PENDING("pending"),
-  SUCCESSFUL("succeeded"),
-  FAILED("failed");
+  PENDING("PENDING"),
+  SUCCESSFUL("SUCCEEDED"),
+  FAILED("FAILED");
 
   private final String paymentStatus;
   PaymentStatus(String value)

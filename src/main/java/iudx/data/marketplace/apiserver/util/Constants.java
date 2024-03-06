@@ -27,6 +27,7 @@ public class Constants {
   public static final String HEADER_ORIGIN = "Origin";
   public static final String HEADER_REFERER = "Referer";
   public static final String HEADER_ALLOW_ORIGIN = "Access-Control-Allow-Origin";
+  public static final String HEADER_X_RAZORPAY_SIGNATURE = "X-Razorpay-Signature";
 
   // request/response params
   public static final String CONTENT_TYPE = "content-type";
@@ -49,6 +50,12 @@ public class Constants {
   public static final String LAST_NAME = "lastName";
   public static final String POLICY_ID = "id";
   public static final String ACCOUNT_ID = "account_id";
+  public static final String RAZORPAY_PAYLOAD = "payload";
+  public static final String RAZORPAY_ORDER = "order";
+  public static final String RAZORPAY_PAYMENT = "payment";
+  public static final String RAZORPAY_ENTITY = "entity";
+  public static final String RAZORPAY_ID = "id";
+  public static final String RAZORPAY_ORDER_ID = "order_id";
 
   // paths
   public static final String ROUTE_STATIC_SPEC = "/apis/spec";
@@ -73,8 +80,9 @@ public class Constants {
 
   // query parameters | request body
 
-  public static final String PRODUCT_ID = "id";
+  public static final String PRODUCT_ID = "productId";
   public static final String PRODUCT_VARIANT_NAME = "variant";
+  public static final String PRODUCT_VARIANT_ID = "productVariantId";
   public static final String RESOURCE_ID = "resourceID";
 
   public static final String PROVIDER_ID = "providerID";

@@ -21,7 +21,7 @@ public class Constants {
                   + "where pv._id=$1 and pv.status=$2";
 
   public static final String INSERT_ORDER_QUERY =
-          "insert into $0 (order_id, amount, currency, account_id, notes) values ($1, $2, $3, $4, $5)";
+          "insert into $0 (order_id, amount, currency, account_id, notes) values ('$1', $2, '$3', '$4', '$5')";
   public static final String LIST_PURCHASE = "SELECT I._id AS \"invoiceId\", P.provider_id AS \"providerId\",\n"
           + "U.email_id AS \"providerEmailId\", U.first_name AS \"providerFirstName\",\n"
           + "U.last_name AS \"providerLastName\", \n"
