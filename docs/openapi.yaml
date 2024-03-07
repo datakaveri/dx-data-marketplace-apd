@@ -602,8 +602,24 @@ paths:
                           type: array
                           items:
                             type: string
-                        resourceIdsAndCapabilities:
-                          type: object
+                        resources:
+                          type: array
+                          items:
+                            type: object
+                            properties:
+                              id:
+                                type: uuid
+                                minLength: 36
+                                maxLength: 36
+                              name:
+                                type: string
+                                minLength: 1
+                              capabilities:
+                                type: object
+                            required:
+                              - id
+                              - name
+                              - capabilities
                         price:
                           type: number
                           minimum: 0
@@ -613,15 +629,18 @@ paths:
                         updatedAt:
                           type: string
                           minLength: 1
+                        createdAt:
+                          type: string
+                          minLength: 1
                       required:
                         - productVariantId
                         - productVariantName
                         - productId
-                        - resourceName
-                        - resourceIdsAndCapabilities
+                        - resources
                         - price
                         - expiryInMonths
                         - updatedAt
+                        - createdAt
                 required:
                   - type
                   - title
@@ -648,23 +667,27 @@ paths:
                           "productVariantName": "someVariantName",
                           "productId": "urn:datakaveri.org:ef67e601-05f0-4d13-96ce-9cafaaf801db:testProduct",
                           "providerId": "ef67e601-05f0-4d13-96ce-9cafaaf801db",
-                          "resourceName": [
-                            "Resource Name 1",
-                            "Resource Name 2"
+                          "resources": [
+                            {
+                              "id": "45c2e5c2-3574-4e11-9530-2b1fbdfce832",
+                              "name": "Surat Transit Realtime Position-UUID",
+                              "capabilities": [
+                                "api"
+                              ]
+                            },
+                            {
+                              "id": "325e222b-3fae-4325-8db0-3e29d01c4fc0",
+                              "name": "RS Adaptor Test Resource",
+                              "capabilities": [
+                                "sub",
+                                "file"
+                              ]
+                            }
                           ],
-                          "resourceIdsAndCapabilities": {
-                            "1c411817-abcf-42f3-980b-fd0d62a651f1": [
-                              "sub",
-                              "file"
-                            ],
-                            "7355eed3-a337-4924-9f80-3afdd538e958": [
-                              "api",
-                              "async"
-                            ]
-                          },
                           "price": 150.0,
                           "expiryInMonths": 12,
-                          "updatedAt": "2024-02-28T12:48:26.375195"
+                          "updatedAt": "2024-02-28T12:48:26.375195",
+                          "createdAt": "2023-02-28T12:48:26.375195"
                         }
                       ]
                     }
@@ -679,69 +702,81 @@ paths:
                           "productVariantName": "someVariantName",
                           "productId": "urn:datakaveri.org:ef67e601-05f0-4d13-96ce-9cafaaf801db:testProduct1",
                           "providerId": "ef67e601-05f0-4d13-96ce-9cafaaf801db",
-                          "resourceName": [
-                            "Resource Name 1",
-                            "Resource Name 2"
+                          "resources": [
+                            {
+                              "id": "83c2e5c2-3574-4e11-9530-2b1fbdfce832",
+                              "name": "Surat Transit Realtime Position-UUID",
+                              "capabilities": [
+                                "api"
+                              ]
+                            },
+                            {
+                              "id": "695e222b-3fae-4325-8db0-3e29d01c4fc0",
+                              "name": "RS Adaptor Test Resource",
+                              "capabilities": [
+                                "sub",
+                                "file"
+                              ]
+                            }
                           ],
-                          "resourceIdsAndCapabilities": {
-                            "1c411817-abcf-42f3-980b-fd0d62a651f1": [
-                              "sub",
-                              "file"
-                            ],
-                            "7355eed3-a337-4924-9f80-3afdd538e958": [
-                              "api",
-                              "async"
-                            ]
-                          },
                           "price": 150.0,
                           "expiryInMonths": 12,
-                          "updatedAt": "2023-02-28T12:48:26.375195"
+                          "updatedAt": "2023-02-28T12:48:26.375195",
+                          "createdAt": "2023-01-28T12:48:26.375195"
                         },
                         {
                           "productVariantId": "be85f112-51e6-4248-a254-38c3e13151fa",
                           "productVariantName": "someTestVariantName",
                           "productId": "urn:datakaveri.org:ef67e601-05f0-4d13-96ce-9cafaaf801db:testProduct2",
                           "providerId": "ef67e601-05f0-4d13-96ce-9cafaaf801db",
-                          "resourceName": [
-                            "Resource Name 3",
-                            "Resource Name 4"
+                          "resources": [
+                            {
+                              "id": "82c2e5c2-3574-4e11-9530-2b1fbdfce832",
+                              "name": "Some other name",
+                              "capabilities": [
+                                "api"
+                              ]
+                            },
+                            {
+                              "id": "675e222b-3fae-4325-8db0-3e29d01c4fc0",
+                              "name": "Test resource name",
+                              "capabilities": [
+                                "sub",
+                                "file"
+                              ]
+                            }
                           ],
-                          "resourceIdsAndCapabilities": {
-                            "c3903ed7-e524-44c1-9b2e-96d50cc4234f": [
-                              "sub",
-                              "file"
-                            ],
-                            "a2cdaba0-b77e-4e2f-bb01-e2ab9c143b16": [
-                              "api",
-                              "async"
-                            ]
-                          },
                           "price": 200,
                           "expiryInMonths": 4,
-                          "updatedAt": "2022-02-28T12:48:26.375195"
+                          "updatedAt": "2022-02-28T12:48:26.375195",
+                          "createdAt": "2023-01-28T12:48:26.375195"
                         },
                         {
                           "productVariantId": "3780dedb-e0a6-4eff-a05c-8b2aa555a598",
                           "productVariantName": "someOtherVariantName",
                           "productId": "urn:datakaveri.org:ef67e601-05f0-4d13-96ce-9cafaaf801db:testProduct3",
                           "providerId": "ef67e601-05f0-4d13-96ce-9cafaaf801db",
-                          "resourceName": [
-                            "Resource Name 5",
-                            "Resource Name 6"
+                          "resources": [
+                            {
+                              "id": "94c2e5c2-3574-4e11-9530-2b1fbdfce832",
+                              "name": "Some resource name",
+                              "capabilities": [
+                                "api"
+                              ]
+                            },
+                            {
+                              "id": "655e222b-3fae-4325-8db0-3e29d01c4fc0",
+                              "name": "Dummy resource name",
+                              "capabilities": [
+                                "sub",
+                                "file"
+                              ]
+                            }
                           ],
-                          "resourceIdsAndCapabilities": {
-                            "e8237392-221d-48b9-b3af-a62f165a315b": [
-                              "sub",
-                              "file"
-                            ],
-                            "8fceca8a-86c9-4521-9cf4-f66bab2025a7": [
-                              "api",
-                              "async"
-                            ]
-                          },
                           "price": 145.0,
                           "expiryInMonths": 2,
-                          "updatedAt": "2021-02-28T12:48:26.375195"
+                          "updatedAt": "2021-02-28T12:48:26.375195",
+                          "createdAt": "2023-01-20T12:48:26.375195"
                         }
                       ]
                     }
@@ -2119,12 +2154,26 @@ paths:
                           pattern: uuid
                           minLength: 36
                           maxLength: 36
-                        resourceName:
+                        resources:
                           type: array
                           items:
-                            type: string
-                        resourceIdsAndCapabilities:
-                          type: object
+                            type: object
+                            properties:
+                              id:
+                                type: uuid
+                                minLength: 36
+                                maxLength: 36
+                              name:
+                                type: string
+                                minLength: 1
+                              capabilities:
+                                type: array
+                                items:
+                                  type: object
+                            required:
+                              - id
+                              - name
+                              - capabilities
                         price:
                           type: number
                           minimum: 0
@@ -2134,15 +2183,18 @@ paths:
                         updatedAt:
                           type: string
                           minLength: 1
+                        createdAt:
+                          type: string
+                          minLength: 1
                       required:
                         - productVariantId
                         - productVariantName
                         - productId
-                        - resourceName
-                        - resourceIdsAndCapabilities
+                        - resources
                         - price
                         - expiryInMonths
                         - updatedAt
+                        - createdAt
                 required:
                   - type
                   - title
@@ -2155,27 +2207,31 @@ paths:
                       "title": "Success",
                       "results": [
                         {
-                          "productVariantId": "74d87fcb-a17d-4ca6-8017-7cfcd4391282",
-                          "productVariantName": "someVariantName",
-                          "productId": "urn:datakaveri.org:ef67e601-05f0-4d13-96ce-9cafaaf801db:testProduct",
-                          "providerId": "ef67e601-05f0-4d13-96ce-9cafaaf801db",
-                          "resourceName": [
-                            "Resource Name 1",
-                            "Resource Name 2"
+                          "productVariantId": "fd001bb7-33c3-4c8c-948e-1aa75bd47d19",
+                          "productVariantName": "variant1",
+                          "productId": "urn:datakaveri.org:b2c27f3f-2524-4a84-816e-91f9ab23f837:testProduct",
+                          "providerId": "b2c27f3f-2524-4a84-816e-91f9ab23f837",
+                          "resources": [
+                            {
+                              "id": "83c2e5c2-3574-4e11-9530-2b1fbdfce832",
+                              "name": "Surat Transit Realtime Position-UUID",
+                              "capabilities": [
+                                "api"
+                              ]
+                            },
+                            {
+                              "id": "695e222b-3fae-4325-8db0-3e29d01c4fc0",
+                              "name": "RS Adaptor Test Resource",
+                              "capabilities": [
+                                "sub",
+                                "file"
+                              ]
+                            }
                           ],
-                          "resourceIdsAndCapabilities": {
-                            "1c411817-abcf-42f3-980b-fd0d62a651f1": [
-                              "sub",
-                              "file"
-                            ],
-                            "7355eed3-a337-4924-9f80-3afdd538e958": [
-                              "api",
-                              "async"
-                            ]
-                          },
                           "price": 150.0,
                           "expiryInMonths": 12,
-                          "updatedAt": "2024-02-28T12:48:26.375195"
+                          "updatedAt": "2024-03-07T09:59:36.825012",
+                          "createdAt": "2024-03-07T09:59:36.825012"
                         }
                       ]
                     }

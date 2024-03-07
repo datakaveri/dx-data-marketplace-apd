@@ -115,26 +115,10 @@ public class QueryBuilder {
   public String buildCreateProductVariantQuery(JsonObject request) {
 
     JsonArray resources = request.getJsonArray(RESOURCES_ARRAY);
-    JsonObject resourceIdsAndCapabilities = new JsonObject();
-
-    resources.stream().forEach(resource -> {
-      JsonObject resourceAsJson = (JsonObject) resource;
-      LOGGER.debug(resource);
-      resourceIdsAndCapabilities.put(resourceAsJson.getString(ID), resourceAsJson.getJsonArray(CAPABILITIES));
-    });
-
-
-    String resourceNames =
-            resources.stream()
-                    .map(JsonObject.class::cast)
-                    .map(d -> d.getString(NAME))
-                    .collect(Collectors.joining("','", "'", "'"));
 
     // UUID for each product variant.
     String pvID = supplier.get();
 
-    LOGGER.debug("resourceId and capabilities : {} ", resourceIdsAndCapabilities.encode());
-    LOGGER.debug("request is : " + request.encodePrettily());
     StringBuilder query =
             new StringBuilder(
                     INSERT_PV_QUERY
@@ -143,10 +127,9 @@ public class QueryBuilder {
                             .replace("$2", request.getString("provider_id"))
                             .replace("$3", request.getString(PRODUCT_ID))
                             .replace("$4", request.getString(VARIANT))
-                            .replace("$5", resourceNames)
-                            .replace("$6", resourceIdsAndCapabilities.encode())
-                            .replace("$7", request.getDouble(PRICE).toString())
-                            .replace("$8", request.getInteger(DURATION).toString())
+                            .replace("$5", resources.encode())
+                            .replace("$6", request.getDouble(PRICE).toString())
+                            .replace("$7", request.getInteger(DURATION).toString())
                             .replace("$s", Status.ACTIVE.toString()));
 
     LOGGER.debug(query);

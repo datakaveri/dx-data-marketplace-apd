@@ -125,10 +125,10 @@ public class Constants {
   public static final String FETCH_ACTIVE_PRODUCT_VARIANTS =
       "SELECT _id AS \"productVariantId\","
           + " product_variant_name AS \"productVariantName\", \"product_id\" AS \"productId\",\n"
-          + "provider_id AS \"providerId\", resource_name AS \"resourceName\", \n"
-          + "resource_ids_and_capabilities AS \"resourceIdsAndCapabilities\",\n"
+          + "provider_id AS \"providerId\", resource_info AS \"resources\", \n"
           + "price AS \"price\", validity AS \"expiryInMonths\"\n"
           + " , modified_at AS \"updatedAt\" "
+          + " , created_at AS \"createdAt\" "
           + "FROM product_variant\n"
           + "WHERE product_id = '$1'\n"
           + "AND status = 'ACTIVE'  "
@@ -136,10 +136,10 @@ public class Constants {
   public static final String FETCH_ACTIVE_PRODUCT_VARIANTS_4_PROVIDER =
           "SELECT _id AS \"productVariantId\","
                   + " product_variant_name AS \"productVariantName\", \"product_id\" AS \"productId\",\n"
-                  + "provider_id AS \"providerId\", resource_name AS \"resourceName\", \n"
-                  + "resource_ids_and_capabilities AS \"resourceIdsAndCapabilities\",\n"
+                  + "provider_id AS \"providerId\", resource_info AS \"resources\", \n"
                   + "price AS \"price\", validity AS \"expiryInMonths\"\n"
                   + " , modified_at AS \"updatedAt\" "
+                  + " , created_at AS \"createdAt\" "
                   + "FROM product_variant\n"
                   + "WHERE product_id = '$1'\n"
                   + "AND status = 'ACTIVE'  ";

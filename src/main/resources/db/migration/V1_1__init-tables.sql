@@ -10,7 +10,8 @@ CREATE TYPE policy_status AS ENUM
 CREATE TYPE payment_status_type as ENUM
 (
     'SUCCEEDED',
-    'FAILED'
+    'FAILED',
+    'PENDING'
 );
 
 CREATE TYPE status_type AS ENUM
@@ -101,8 +102,7 @@ CREATE TABLE IF NOT EXISTS product_variant
     product_variant_name varchar NOT NULL,
     product_id varchar NOT NULL,
     provider_id uuid NOT NULL,
-    resource_name varchar[] NOT NULL,
-    resource_ids_and_capabilities jsonb NOT NULL,
+    resource_info jsonb NOT NULL,
     price numeric NOT NULL,
     validity numeric NOT NULL,
     status status_type NOT NULL,
