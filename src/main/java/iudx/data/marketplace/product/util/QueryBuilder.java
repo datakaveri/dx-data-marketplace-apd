@@ -11,10 +11,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 import java.util.function.Supplier;
-import java.util.stream.Collectors;
 
-import iudx.data.marketplace.apiserver.util.Role;
-import iudx.data.marketplace.policies.User;
 import org.apache.commons.lang.StringUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -182,27 +179,54 @@ public class QueryBuilder {
     return request;
   }
 
-  public String listPurchaseForProvider(String providerId, String resourceId, String productId)
+  public String listPurchaseForProviderDuringPendingStatus(String providerId, String resourceId, String productId)
   {
     boolean isProductIdPresent = StringUtils.isNotBlank(productId);
     boolean isResourceIdPresent = StringUtils.isNotBlank(resourceId);
 
     StringBuilder query =
-            new StringBuilder(LIST_FAILED_OR_PENDING_PAYMENTS_4_PROVIDER.replace("$1", providerId));
+            new StringBuilder(LIST_PENDING_PAYMENTS_4_PROVIDER.replace("$1", providerId));
 
     if(isProductIdPresent && !isResourceIdPresent)
     {
-      query = new StringBuilder(LIST_FAILED_OR_PENDING_PAYMENTS_4_PROVIDER_WITH_GIVEN_PRODUCT
+      query = new StringBuilder(LIST_PENDING_PAYMENTS_4_PROVIDER_WITH_GIVEN_PRODUCT
               .replace("$1", productId)
               .replace("$2", providerId));
     }
 
     if(isResourceIdPresent && !isProductIdPresent)
     {
-      query = new StringBuilder(LIST_FAILED_OR_PENDING_PAYMENTS_WITH_GIVEN_RESOURCE
+      query = new StringBuilder(LIST_PENDING_PAYMENTS_WITH_GIVEN_RESOURCE
               .replace("$1", resourceId)
               .replace("$2", providerId));
     }
+    query.append(" \n ORDER BY I.modified_at DESC ");
+    LOGGER.debug("Query :" + query);
+    return query.toString();
+  }
+
+  public String listPurchaseForProviderDuringFailedPayment(String providerId, String resourceId, String productId)
+  {
+    boolean isProductIdPresent = StringUtils.isNotBlank(productId);
+    boolean isResourceIdPresent = StringUtils.isNotBlank(resourceId);
+
+    StringBuilder query =
+            new StringBuilder(LIST_FAILED_PAYMENTS_4_PROVIDER.replace("$1", providerId));
+
+    if(isProductIdPresent && !isResourceIdPresent)
+    {
+      query = new StringBuilder(LIST_FAILED_PAYMENTS_4_PROVIDER_WITH_GIVEN_PRODUCT
+              .replace("$1", productId)
+              .replace("$2", providerId));
+    }
+
+    if(isResourceIdPresent && !isProductIdPresent)
+    {
+      query = new StringBuilder(LIST_FAILED_PAYMENTS_WITH_GIVEN_RESOURCE
+              .replace("$1", resourceId)
+              .replace("$2", providerId));
+    }
+    query.append(" \n ORDER BY I.modified_at DESC ");
     LOGGER.debug("Query :" + query);
     return query.toString();
   }
@@ -228,30 +252,60 @@ public class QueryBuilder {
               .replace("$1", resourceId)
               .replace("$2", providerId));
     }
+
+    query.append(" \n ORDER BY I.modified_at DESC ");
     LOGGER.debug("Query :" + query);
     return query.toString();
   }
-  public String listPurchaseForConsumer(String consumerId, String resourceId, String productId)
+  public String listPurchaseForConsumerDuringPendingPayment(String consumerId, String resourceId, String productId)
   {
     boolean isProductIdPresent = StringUtils.isNotBlank(productId);
     boolean isResourceIdPresent = StringUtils.isNotBlank(resourceId);
 
     StringBuilder query =
-            new StringBuilder(LIST_FAILED_OR_PENDING_PAYMENTS_4_CONSUMER.replace("$1", consumerId));
+            new StringBuilder(LIST_PENDING_PAYMENTS_4_CONSUMER.replace("$1", consumerId));
 
     if(isProductIdPresent && !isResourceIdPresent)
     {
-      query = new StringBuilder(LIST_FAILED_OR_PENDING_PAYMENTS_4_CONSUMER_WITH_GIVEN_PRODUCT
+      query = new StringBuilder(LIST_PENDING_PAYMENTS_4_CONSUMER_WITH_GIVEN_PRODUCT
               .replace("$1", productId)
               .replace("$2", consumerId));
     }
 
     if(isResourceIdPresent && !isProductIdPresent)
     {
-      query = new StringBuilder(LIST_FAILED_OR_PENDING_PAYMENTS_4_CONSUMER_WITH_GIVEN_RESOURCE
+      query = new StringBuilder(LIST_PENDING_PAYMENTS_4_CONSUMER_WITH_GIVEN_RESOURCE
               .replace("$1", resourceId)
               .replace("$2", consumerId));
     }
+    query.append(" \n ORDER BY I.modified_at DESC ");
+    LOGGER.debug("Query :" + query);
+    return query.toString();
+  }
+
+
+  public String listPurchaseForConsumerDuringFailurePayment(String consumerId, String resourceId, String productId)
+  {
+    boolean isProductIdPresent = StringUtils.isNotBlank(productId);
+    boolean isResourceIdPresent = StringUtils.isNotBlank(resourceId);
+
+    StringBuilder query =
+            new StringBuilder(LIST_FAILED_PAYMENTS_4_CONSUMER.replace("$1", consumerId));
+
+    if(isProductIdPresent && !isResourceIdPresent)
+    {
+      query = new StringBuilder(LIST_FAILED_PAYMENTS_4_CONSUMER_WITH_GIVEN_PRODUCT
+              .replace("$1", productId)
+              .replace("$2", consumerId));
+    }
+
+    if(isResourceIdPresent && !isProductIdPresent)
+    {
+      query = new StringBuilder(LIST_FAILED_PAYMENTS_4_CONSUMER_WITH_GIVEN_RESOURCE
+              .replace("$1", resourceId)
+              .replace("$2", consumerId));
+    }
+    query.append(" \n ORDER BY I.modified_at DESC ");
     LOGGER.debug("Query :" + query);
     return query.toString();
   }
@@ -277,6 +331,7 @@ public class QueryBuilder {
               .replace("$1", resourceId)
               .replace("$2", consumerId));
     }
+    query.append(" \n ORDER BY I.modified_at DESC ");
     LOGGER.debug("Query :" + query);
     return query.toString();
   }

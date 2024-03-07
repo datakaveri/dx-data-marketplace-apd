@@ -224,8 +224,9 @@ public class ProviderApis {
     MultiMap requestParams = routingContext.request().params();
     String resourceId = requestParams.get("resourceId");
     String productId = requestParams.get("productId");
+    String paymentStatus = requestParams.get("paymentStatus");
     JsonObject requestJson =
-        new JsonObject().put("resourceId", resourceId).put("productId", productId);
+            new JsonObject().put("resourceId", resourceId).put("productId", productId).put("paymentStatus", paymentStatus);
     variantService
             .listPurchase(provider, requestJson, handler -> {
               if(handler.succeeded())

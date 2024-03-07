@@ -46,17 +46,18 @@ public class Constants {
                   + "where pv._id=$1 and pv.status=$2";
 
   public static final String INSERT_ORDER_QUERY =
-          "insert into $0 (order_id, amount, currency, account_id, notes) values ($1, $2, $3, $4, $5)";
+          "insert into $0 (order_id, amount, currency, account_id, notes) values ('$1', '$2', '$3', '$4', '$5')";
   public static final String LIST_FAILED_OR_PENDING_PAYMENTS =
       "SELECT DISTINCT I._id AS \"invoiceId\", P.provider_id AS \"providerId\",\n"
           + "U.email_id AS \"providerEmailId\", U.first_name AS \"providerFirstName\",\n"
           + "U.last_name AS \"providerLastName\", \n"
           + "I.order_id AS \"orderId\", I.product_variant_id AS \"productVariantId\",\n"
-          + "P.product_id AS \"productId\", P.resource_name AS \"resourceName\",\n"
+          + "P.product_id AS \"productId\", P.resource_info AS \"resources\",\n"
           + "P.product_variant_name as \"productVariantName\",\n"
-          + "P.price, P.resource_ids_and_capabilities AS \"resourcesAndCapabilities\",\n"
+          + "P.price,\n"
           + "I.payment_status AS \"paymentStatus\", I.payment_time AS \"paymentTime\",\n"
-          + "I.expiry AS \"expiryInMonths\"\n"
+          + "I.expiry AS \"expiryInMonths\" \n"
+          +  ", I.modified_at AS \"updatedAt\" ,  I.created_at AS \"createdAt\" "
           + "FROM invoice I\n"
           + "INNER JOIN product_variant P\n"
           + "ON I.product_variant_id = P._id\n"
@@ -67,11 +68,12 @@ public class Constants {
           + "U.email_id AS \"providerEmailId\", U.first_name AS \"providerFirstName\",\n"
           + "U.last_name AS \"providerLastName\",  \n"
           + "I.order_id AS \"orderId\", I.product_variant_id AS \"productVariantId\",\n"
-          + "P.product_id AS \"productId\", P.resource_name AS \"resourceName\",\n"
+          + "P.product_id AS \"productId\", P.resource_info AS \"resources\",\n"
           + "P.product_variant_name as \"productVariantName\",\n"
-          + "P.price, P.resource_ids_and_capabilities AS \"resourcesAndCapabilities\",\n"
+          + "P.price,\n"
           + "I.payment_status AS \"paymentStatus\", I.payment_time AS \"paymentTime\",\n"
-          + "I.expiry AS \"expiryInMonths\", policy.expiry_at AS \"expiryAt\"\n"
+          + "I.expiry AS \"expiryInMonths\", policy.expiry_at AS \"expiryAt\" \n"
+          +  ", I.modified_at AS \"updatedAt\" ,  I.created_at AS \"createdAt\" "
           + "FROM policy inner join invoice I \n"
           + "ON policy.invoice_id = I._id\n"
           + "INNER JOIN product_variant P\n"
@@ -93,19 +95,27 @@ public class Constants {
                   + " )\n"
                   + " AND I.consumer_id = '$2'";
 
-  public static final String LIST_FAILED_OR_PENDING_PAYMENTS_4_CONSUMER =
-          LIST_FAILED_OR_PENDING_PAYMENTS + " WHERE I.consumer_id = '$1'  AND I.payment_status != 'SUCCEEDED' ";
-  public static final String LIST_FAILED_OR_PENDING_PAYMENTS_4_CONSUMER_WITH_GIVEN_PRODUCT =
+  public static final String LIST_PENDING_PAYMENTS_4_CONSUMER =
+          LIST_FAILED_OR_PENDING_PAYMENTS + " WHERE I.consumer_id = '$1'  AND I.payment_status == 'PENDING' ";
+  public static final String LIST_PENDING_PAYMENTS_4_CONSUMER_WITH_GIVEN_PRODUCT =
           LIST_FAILED_OR_PENDING_PAYMENTS
                   + " WHERE\n"
                   + " P.product_id = '$1'\n"
-                  + " AND I.consumer_id = '$2' AND I.payment_status != 'SUCCEEDED' ";
-  public static final String LIST_FAILED_OR_PENDING_PAYMENTS_4_CONSUMER_WITH_GIVEN_RESOURCE =
+                  + " AND I.consumer_id = '$2' AND I.payment_status == 'PENDING' ";
+  public static final String LIST_PENDING_PAYMENTS_4_CONSUMER_WITH_GIVEN_RESOURCE =
           LIST_FAILED_OR_PENDING_PAYMENTS
                   + " WHERE\n"
                   + " P.product_id IN (SELECT product_id FROM product_resource_relation WHERE resource_id = '$1'\n"
                   + " )\n"
                   + " AND I.consumer_id = '$2' AND I.payment_status != 'SUCCEEDED' ";
+
+  public static final String LIST_FAILED_PAYMENTS_4_CONSUMER = LIST_PENDING_PAYMENTS_4_CONSUMER.replace("PENDING","FAILED");
+  public static final String LIST_FAILED_PAYMENTS_4_CONSUMER_WITH_GIVEN_PRODUCT = LIST_PENDING_PAYMENTS_4_CONSUMER_WITH_GIVEN_PRODUCT
+          .replace("PENDING", "FAILED");
+  public static final String LIST_FAILED_PAYMENTS_4_CONSUMER_WITH_GIVEN_RESOURCE = LIST_PENDING_PAYMENTS_4_CONSUMER_WITH_GIVEN_RESOURCE
+          .replace("PENDING", "FAILED");
+
+
 
   public static final String INSERT_INVOICE_QUERY =
           "insert into $0 (_id, consumer_id, order_id, product_variant_id, payment_status, payment_time, expiry) "

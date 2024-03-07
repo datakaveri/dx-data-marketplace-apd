@@ -16,6 +16,7 @@ import iudx.data.marketplace.common.HttpStatusCode;
 import iudx.data.marketplace.common.RespBuilder;
 import iudx.data.marketplace.common.ResponseUrn;
 import iudx.data.marketplace.common.Util;
+import iudx.data.marketplace.consumer.util.PaymentStatus;
 import iudx.data.marketplace.policies.User;
 import iudx.data.marketplace.postgres.PostgresService;
 import iudx.data.marketplace.product.util.QueryBuilder;
@@ -270,43 +271,58 @@ public class ProductVariantServiceImpl implements ProductVariantService {
   public ProductVariantService listPurchase(
       User user, JsonObject request, Handler<AsyncResult<JsonObject>> handler) {
 
-      String resourceId = request.getString("resourceId");
-      String productId = request.getString("productId");
+    String resourceId = request.getString("resourceId");
+    String productId = request.getString("productId");
+    try {
+      PaymentStatus paymentStatus = PaymentStatus.fromString(request.getString("paymentStatus"));
+
       JsonArray userResponse = new JsonArray();
+      String query;
 
-      String fetchInvoiceDuringSuccessfulPayment =
-              queryBuilder.listSuccessfulPurchaseForProvider(
-                      user.getUserId(), resourceId, productId);
-      String fetchInvoiceForOtherPaymentStatus =
-              queryBuilder.listPurchaseForProvider(user.getUserId(), resourceId, productId);
+      if (paymentStatus.equals(PaymentStatus.SUCCESSFUL)) {
+        query =
+            queryBuilder.listSuccessfulPurchaseForProvider(user.getUserId(), resourceId, productId);
+      } else if (paymentStatus.equals(PaymentStatus.FAILED)) {
+        query =
+            queryBuilder.listPurchaseForProviderDuringFailedPayment(
+                user.getUserId(), resourceId, productId);
+      } else {
+        query =
+            queryBuilder.listPurchaseForProviderDuringPendingStatus(
+                user.getUserId(), resourceId, productId);
+      }
 
-      Future<JsonArray> successfulPaymentFuture =
-              executePurchaseQuery(fetchInvoiceDuringSuccessfulPayment, resourceId, productId, user);
-      Future<JsonArray> pendingOrFailedPaymentFuture =
-              successfulPaymentFuture.compose(
-                      jsonArray -> {
-                          userResponse.add(jsonArray.getJsonObject(0));
-                          return executePurchaseQuery(fetchInvoiceForOtherPaymentStatus, resourceId, productId, user);
-                      });
+      Future<JsonArray> paymentFuture = executePurchaseQuery(query, resourceId, productId, user);
       Future<JsonArray> userResponseFuture =
-              pendingOrFailedPaymentFuture.onComplete(
-                      pgHandler -> {
-                          if (pgHandler.succeeded()) {
-                              userResponse.add(pgHandler.result().getJsonObject(0));
-                              JsonObject response =
-                                      new RespBuilder()
-                                              .withType(ResponseUrn.SUCCESS_URN.getUrn())
-                                              .withTitle(ResponseUrn.SUCCESS_URN.getMessage())
-                                              .withResult(userResponse)
-                                              .getJsonResponse();
-                              handler.handle(Future.succeededFuture(response));
+          paymentFuture.onComplete(
+              pgHandler -> {
+                if (pgHandler.succeeded()) {
+                  userResponse.add(pgHandler.result().getJsonObject(0));
+                  JsonObject response =
+                      new RespBuilder()
+                          .withType(ResponseUrn.SUCCESS_URN.getUrn())
+                          .withTitle(ResponseUrn.SUCCESS_URN.getMessage())
+                          .withResult(userResponse)
+                          .getJsonResponse();
+                  handler.handle(Future.succeededFuture(response));
 
-                          } else {
-                              handler.handle(Future.failedFuture(pgHandler.cause().getMessage()));
-                          }
-                      });
+                } else {
+                  handler.handle(Future.failedFuture(pgHandler.cause().getMessage()));
+                }
+              });
 
-      return this;
+    } catch (DxRuntimeException exception) {
+      LOGGER.debug("Exception : " + exception.getMessage());
+      String failureMessage =
+          new RespBuilder()
+              .withType(HttpStatusCode.BAD_REQUEST.getValue())
+              .withTitle(ResponseUrn.BAD_REQUEST_URN.getUrn())
+              .withDetail("Invalid payment status")
+              .getResponse();
+      handler.handle(Future.failedFuture(failureMessage));
+    }
+
+    return this;
   }
 
     public Future<JsonArray> executePurchaseQuery(

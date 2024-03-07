@@ -82,17 +82,15 @@ public class Util {
             .put("product",new JsonObject()
                     .put("productId", row.getString("productId"))
                     .put("productVariantId", row.getString("productVariantId"))
-                    .put("resourceName", row.getJsonArray("resourceName"))
+                    .put("resources", row.getJsonArray("resources"))
                     .put("productVariantName", row.getString("productVariantName"))
                     .put("price", row.getString("price"))
-                    .put("expiryInMonths", row.getString("expiryInMonths"))
-                    .put("resourcesAndCapabilities", row.getJsonObject("resourcesAndCapabilities")));
+                    .put("expiryInMonths", row.getString("expiryInMonths")));
 
     row.remove("productId");
     row.remove("productVariantId");
-    row.remove("resourceName");
+    row.remove("resources");
     row.remove("price");
-    row.remove( "resourcesAndCapabilities");
     row.remove("expiryInMonths");
     row.remove("productVariantName");
     return productJson;
