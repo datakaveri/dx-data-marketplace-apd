@@ -122,9 +122,13 @@ public class ProductServiceImpl implements ProductService {
                       queries,
                       pgHandler -> {
                         if (pgHandler.succeeded()) {
-                          handler.handle(
-                              Future.succeededFuture(
-                                  pgHandler.result().put(PRODUCT_ID, productID)));
+                          JsonObject result =
+                              new RespBuilder()
+                                  .withType(ResponseUrn.SUCCESS_URN.getUrn())
+                                  .withTitle(ResponseUrn.SUCCESS_URN.getMessage())
+                                  .withResult(new JsonObject().put(PRODUCT_ID, productID))
+                                  .getJsonResponse();
+                          handler.handle(Future.succeededFuture(result));
                         } else {
                           LOGGER.error(pgHandler.cause());
                           handler.handle(Future.failedFuture(pgHandler.cause()));
@@ -215,7 +219,13 @@ public class ProductServiceImpl implements ProductService {
                     params,
                     pgHandler -> {
                       if (pgHandler.succeeded()) {
-                        handler.handle(Future.succeededFuture(pgHandler.result()));
+                          LOGGER.debug("Success : {}", pgHandler.result().encodePrettily());
+                          RespBuilder respBuilder =
+                                  new RespBuilder()
+                                          .withType(ResponseUrn.SUCCESS_URN.getUrn())
+                                          .withTitle(ResponseUrn.SUCCESS_URN.getMessage())
+                                          .withDetail("Successfully deleted");
+                          handler.handle(Future.succeededFuture(respBuilder.getJsonResponse()));
                       } else {
                         LOGGER.error("deletion failed");
                         handler.handle(Future.failedFuture(pgHandler.cause()));
@@ -234,8 +244,8 @@ public class ProductServiceImpl implements ProductService {
     JsonObject params =
         new JsonObject().put(STATUS, Status.ACTIVE.toString()).put(PROVIDER_ID, providerID);
 
-    if (request.containsKey(RESOURCE_ID)) {
-      params.put(RESOURCE_ID, request.getString(RESOURCE_ID));
+    if (request.containsKey("resourceId")) {
+      params.put("resourceId", request.getString("resourceId"));
     }
 
     String query = queryBuilder.buildListProductsQuery(request);

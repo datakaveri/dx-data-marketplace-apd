@@ -5,7 +5,7 @@
   "type": "object",
   "examples": [
     {
-      "phone": 9000090000,
+      "phone": "9000090000",
       "legalBusinessName": "Dummy Corp V1",
       "customerFacingBusinessName": "Dummy Service Corp V1",
       "contactName": "Bob Davis",
@@ -18,7 +18,7 @@
             "street2": "MG Road",
             "city": "Bengaluru",
             "state": "KARNATAKA",
-            "postalCode": 560034,
+            "postalCode": "560034",
             "country": "IN"
           }
         }
@@ -42,7 +42,7 @@
       "minLength": 8,
       "maxLength": 15,
       "examples": [
-        9000090000
+        "9000090000"
       ]
     },
     "legalBusinessName": {

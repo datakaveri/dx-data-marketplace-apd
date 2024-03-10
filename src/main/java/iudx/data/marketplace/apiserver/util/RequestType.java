@@ -3,6 +3,9 @@ package iudx.data.marketplace.apiserver.util;
 public enum RequestType {
   PRODUCT("product"),
   PRODUCT_VARIANT("product_variant"),
+  LIST_PRODUCT_VARIANT("list_product_variant"),
+
+  DELETE_PRODUCT_VARIANT("delete_product_variant"),
   RESOURCE("resource"),
   POLICY("policy"),
   VERIFY("verify_policy"),
@@ -11,6 +14,7 @@ public enum RequestType {
   PURCHASE("purchase"),
   VERIFY_PAYMENT("verify_payment"),
   POST_ACCOUNT("post_account"),
+  CONSUMER_PRODUCT_VARIANT("consumer_list_product_variant"),
   PUT_ACCOUNT("put_account"),
   ORDER_PAID_WEBHOOK("order_paid_webhook"),
   PAYMENT_AUTHORIZED_WEBHOOK("payment_authorized_webhook"),

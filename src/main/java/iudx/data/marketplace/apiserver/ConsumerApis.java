@@ -95,7 +95,7 @@ public class ConsumerApis {
 
       router
       .get(api.getConsumerProductVariantPath())
-      //  .handler(productVariantHandler)
+        .handler(productVariantHandler)
         .handler(AuthHandler.create(authenticationService, vertx, api, postgresService, authClient))
         .handler(this::listProductVariants)
         .failureHandler(exceptionHandler);
@@ -231,8 +231,9 @@ public class ConsumerApis {
     MultiMap requestParams = routingContext.request().params();
     String resourceId = requestParams.get("resourceId");
     String productId = requestParams.get("productId");
+    String paymentStatus = requestParams.get("paymentStatus");
     JsonObject requestJson =
-            new JsonObject().put("resourceId", resourceId).put("productId", productId);
+            new JsonObject().put("resourceId", resourceId).put("productId", productId).put("paymentStatus", paymentStatus);
 
     consumerService.listPurchase(consumer,requestJson, handler -> {
       if(handler.succeeded())

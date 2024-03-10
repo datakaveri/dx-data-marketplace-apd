@@ -77,7 +77,7 @@
             "$id": "#/properties/resources/items/capabilities",
             "title": "resource capabilities",
             "type": "array",
-            "default": [],
+            "minItems": 1,
             "items": {
               "$id": "#/properties/resources/items/capabilities/items",
               "title": "items",
@@ -90,6 +90,21 @@
         "additionalItems": false
       },
       "additionalItems": false
+    },
+    "price": {
+      "$id": "#/properties/price",
+      "type": "number",
+      "title": "Price of product",
+      "description": "Price as natural number or a positive decimal",
+      "multipleOf": 0.01,
+      "minimum": 0
+    },
+    "duration": {
+      "$id": "#/properties/duration",
+      "type": "integer",
+      "title": "Duration of product variant usage",
+      "description": "A consumer could access the resources in the product variant until the expiry duration given in the product variant",
+      "minimum": 1
     }
   },
   "additionalItems": false
