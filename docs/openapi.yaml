@@ -355,13 +355,125 @@ paths:
           minLength: 36
           maxLength: 36
           required: false
+        - name: paymentStatus
+          in: query
+          description: status of payment for which the response needs to be filtered
+          type: enum
+          value: ["pending", "succeeded", "failed"]
+          required: true
+
       responses:
         '200':
           description: success
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/exampleResponseListPurchases'
+                type: object
+                properties:
+                  type:
+                    type: string
+                  title:
+                    type: string
+                  results:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        productId:
+                          type: string
+                        providerName:
+                          type: string
+                        updatedAt:
+                          type: string
+                          minLength: 1
+                        createdAt:
+                          type: string
+                          minLength: 1
+                        resources:
+                          type: array
+                          items:
+                            type: object
+                            properties:
+                              id:
+                                type: string
+                              name:
+                                type: string
+                x-examples:
+                  Example 1:
+                    type: 'urn:dx:dmp:success'
+                    title: Success
+                    results:
+                      - productId: 'urn:datakaveri.org:b2c27f3f-2524-4a84-816e-91f9ab23f837:testProduct1'
+                        providerName: Administrator of the IUDX platform
+                        updatedAt: '2024-02-16T04:51:15.239497'
+                        createdAt: '2024-02-15T04:51:15.239497'
+                        resources:
+                          - id: 2d043bdb-fc62-4650-8426-dc72492cd621
+                            name: TEST ITEM FOR APD /verify TESTS
+                          - id: a347c5b6-5281-4749-9eab-89784d8f8f9a
+                            name: Chandigarh Paid Parking Locations
+                      - productId: 'urn:datakaveri.org:b2c27f3f-2524-4a84-816e-91f9ab23f837:testProduct5ui'
+                        providerName: Administrator of the IUDX platform
+                        updatedAt: '2024-02-15T03:51:15.239497'
+                        createdAt: '2024-02-14T04:51:15.239497'
+                        resources:
+                          - id: b58da193-23d9-43eb-b98a-a103d4b6103c
+                            name: FW055 Environment-UUID
+              examples:
+                List All Products:
+                  value:
+                    type: 'urn:dx:dmp:success'
+                    title: Success
+                    results:
+                      - productId: 'urn:datakaveri.org:b2c27f3f-2524-4a84-816e-91f9ab23f837:testProduct1'
+                        providerName: Administrator of the IUDX platform
+                        updatedAt: '2024-02-16T03:51:15.239497'
+                        createdAt: '2024-02-15T03:51:15.239497'
+                        resources:
+                          - id: 2d043bdb-fc62-4650-8426-dc72492cd621
+                            name: TEST ITEM FOR APD /verify TESTS
+                          - id: a347c5b6-5281-4749-9eab-89784d8f8f9a
+                            name: Chandigarh Paid Parking Locations
+                      - productId: 'urn:datakaveri.org:b2c27f3f-2524-4a84-816e-91f9ab23f837:testProduct5ui'
+                        providerName: Administrator of the IUDX platform
+                        updatedAt: '2024-01-15T03:51:15.239497'
+                        createdAt: '2024-01-14T03:51:15.239497'
+                        resources:
+                          - id: b58da193-23d9-43eb-b98a-a103d4b6103c
+                            name: FW055 Environment-UUID
+                List Products with Resource ID:
+                  value:
+                    type: 'urn:dx:dmp:success'
+                    title: Success
+                    results:
+                      - productId: 'urn:datakaveri.org:b2c27f3f-2524-4a84-816e-91f9ab23f837:testProduct1'
+                        providerName: Administrator of the IUDX platform
+                        updatedAt: '2023-10-15T03:51:15.239497'
+                        createdAt: '2023-10-13T03:51:15.239497'
+                        resources:
+                          - id: a347c5b6-5281-4749-9eab-89784d8f8f9a
+                            name: Chandigarh Paid Parking Locations
+                List Products with Provider ID:
+                  value:
+                    type: 'urn:dx:dmp:success'
+                    title: Success
+                    results:
+                      - productId: 'urn:datakaveri.org:b2c27f3f-2524-4a84-816e-91f9ab23f837:testProduct1'
+                        providerName: Administrator of the IUDX platform
+                        updatedAt: '2023-09-15T03:51:15.239497'
+                        createdAt: '2023-09-14T03:51:15.239497'
+                        resources:
+                          - id: 2d043bdb-fc62-4650-8426-dc72492cd621
+                            name: TEST ITEM FOR APD /verify TESTS
+                          - id: a347c5b6-5281-4749-9eab-89784d8f8f9a
+                            name: Chandigarh Paid Parking Locations
+                      - productId: 'urn:datakaveri.org:b2c27f3f-2524-4a84-816e-91f9ab23f837:testProduct5ui'
+                        providerName: Administrator of the IUDX platform
+                        updatedAt: '2023-08-15T03:51:15.239497'
+                        createdAt: '2023-08-14T03:51:15.239497'
+                        resources:
+                          - id: b58da193-23d9-43eb-b98a-a103d4b6103c
+                            name: FW055 Environment-UUID
         '204':
           description: no content
         '401':
@@ -1891,13 +2003,343 @@ paths:
           minLength: 36
           maxLength: 36
           required: false
+        - name: paymentStatus
+          in: query
+          description: status of payment for which the response needs to be filtered
+          type: enum
+          value: [ "pending", "succeeded", "failed" ]
+          required: true
       responses:
         '200':
           description: success
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/exampleResponseListPurchases'
+                type: object
+                properties:
+                  type:
+                    type: string
+                  title:
+                    type: string
+                  results:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        invoiceId:
+                          type: uuid
+                          minLength: 36
+                          maxLength: 36
+                        orderId:
+                          type: string
+                          minLength: 1
+                        paymentStatus:
+                          type: string
+                          enum:
+                            - SUCCEEDED
+                            - FAILED
+                            - PENDING
+                        paymentTime:
+                          type: string
+                          minLength: 1
+                        updatedAt:
+                          type: string
+                          minLength: 1
+                        createdAt:
+                          type: string
+                          minLength: 1
+                        consumer:
+                          type: array
+                          items:
+                            type: object
+                            properties:
+                              name:
+                                type: array
+                                items:
+                                  type: object
+                                  properties:
+                                    email:
+                                      type: string
+                                    name:
+                                      type: array
+                                      items:
+                                        type: object
+                                        properties:
+                                          firstName:
+                                            type: string
+                                          lastName:
+                                            type: string
+                                    id:
+                                      type: string
+                        provider:
+                          type: array
+                          required: true
+                          items:
+                            type: object
+                            properties:
+                              name:
+                                type: array
+                                required: true
+                                items:
+                                  type: object
+                                  properties:
+                                    email:
+                                      type: string
+                                      required: true
+                                    name:
+                                      type: array
+                                      items:
+                                        type: object
+                                        properties:
+                                          firstName:
+                                            type: string
+                                            required: true
+                                          lastName:
+                                            type: string
+                                            required: true
+
+                                    id:
+                                      type: string
+                                      required: true
+
+                        product:
+                          type: array
+                          items:
+                            type: object
+                            properties:
+                              productId:
+                                type: string
+                                minLength: 1
+                              productVariantId:
+                                type: uuid
+                                minLength: 36
+                                maxLength: 36
+                              resources:
+                                type: array
+                                items:
+                                  type: object
+                                  properties:
+                                    id:
+                                      type: string
+                                    name:
+                                      type: string
+                                    capabilities:
+                                      type: object
+                                  required:
+                                    - id
+                                    - name
+                                    - capabilities
+                              productVariantName:
+                                type: string
+                                minLength: 1
+                              price:
+                                type: number
+                                minimum: 0
+                              expiryInMonths:
+                                type: integer
+                                minimum: 1
+                            required:
+                              - productId
+                              - productVariantId
+                              - resources
+                              - productVariantName
+                              - price
+                              - expiryInMonths
+
+
+
+
+                x-examples:
+                  Example 1:
+                    type: 'urn:dx:dmp:success'
+                    title: Success
+                    results:
+                      - productId: 'urn:datakaveri.org:b2c27f3f-2524-4a84-816e-91f9ab23f837:testProduct1'
+                        providerName: Administrator of the IUDX platform
+                        updatedAt: '2024-02-16T04:51:15.239497'
+                        createdAt: '2024-02-15T04:51:15.239497'
+                        resources:
+                          - id: 2d043bdb-fc62-4650-8426-dc72492cd621
+                            name: TEST ITEM FOR APD /verify TESTS
+                          - id: a347c5b6-5281-4749-9eab-89784d8f8f9a
+                            name: Chandigarh Paid Parking Locations
+                      - productId: 'urn:datakaveri.org:b2c27f3f-2524-4a84-816e-91f9ab23f837:testProduct5ui'
+                        providerName: Administrator of the IUDX platform
+                        updatedAt: '2024-02-15T03:51:15.239497'
+                        createdAt: '2024-02-14T04:51:15.239497'
+                        resources:
+                          - id: b58da193-23d9-43eb-b98a-a103d4b6103c
+                            name: FW055 Environment-UUID
+              examples:
+                List Successful purchases:
+                  value:
+                    {
+                      "type": "urn:dx:dmp:success",
+                      "title": "Success",
+                      "results": [
+                        {
+                          "invoiceId": "749c9e3c-5e9b-4149-bcf5-463ef5fda6db",
+                          "orderId": "order_NjRRg27ZUdAfKD",
+                          "paymentStatus": "SUCCEEDED",
+                          "paymentTime": "2024-03-07T11:02:31.151636",
+                          "expiryAt": "2024-06-15T13:21:01.484760",
+                          "updatedAt": "2024-03-07T12:49:08.555449",
+                          "createdAt": "2024-03-07T11:02:31.186373",
+                          "consumer": {
+                            "email": "vasanth.rajaraman@datakaveri.org",
+                            "name": {
+                              "firstName": "Vasanth",
+                              "lastName": "Rajaraman"
+                            },
+                            "id": "fd47486b-3497-4248-ac1e-082e4d37a66c"
+                          },
+                          "provider": {
+                            "email": "bryanrobert@iisc.ac.in",
+                            "name": {
+                              "firstName": "B",
+                              "lastName": "Robert A B C D"
+                            },
+                            "id": "b2c27f3f-2524-4a84-816e-91f9ab23f837"
+                          },
+                          "product": {
+                            "productId": "urn:datakaveri.org:b2c27f3f-2524-4a84-816e-91f9ab23f837:testProduct",
+                            "productVariantId": "fd001bb7-33c3-4c8c-948e-1aa75bd47d19",
+                            "resources": [
+                              {
+                                "id": "83c2e5c2-3574-4e11-9530-2b1fbdfce832",
+                                "name": "Surat Transit Realtime Position-UUID",
+                                "capabilities": [
+                                  "api"
+                                ]
+                              },
+                              {
+                                "id": "695e222b-3fae-4325-8db0-3e29d01c4fc0",
+                                "name": "RS Adaptor Test Resource",
+                                "capabilities": [
+                                  "sub",
+                                  "file"
+                                ]
+                              }
+                            ],
+                            "productVariantName": "variant1",
+                            "price": "150.0",
+                            "expiryInMonths": "12"
+                          }
+                        }
+                      ]
+                    }
+                List Pending purchases:
+                  value:
+                    {
+                      "type": "urn:dx:dmp:success",
+                      "title": "Success",
+                      "results": [
+                        {
+                          "invoiceId": "df9645ba-bb93-4f51-bdbb-f55fba0aa75a",
+                          "orderId": "order_NjRRrCKjZ4QYwd",
+                          "paymentStatus": "PENDING",
+                          "paymentTime": "2024-03-07T11:02:41.475657",
+                          "updatedAt": "2024-03-07T11:02:41.507496",
+                          "createdAt": "2024-03-07T11:02:41.507496",
+                          "consumer": {
+                            "email": "vasanth.rajaraman@datakaveri.org",
+                            "name": {
+                              "firstName": "Vasanth",
+                              "lastName": "Rajaraman"
+                            },
+                            "id": "fd47486b-3497-4248-ac1e-082e4d37a66c"
+                          },
+                          "provider": {
+                            "email": "bryanrobert@iisc.ac.in",
+                            "name": {
+                              "firstName": "B",
+                              "lastName": "Robert A B C D"
+                            },
+                            "id": "b2c27f3f-2524-4a84-816e-91f9ab23f837"
+                          },
+                          "product": {
+                            "productId": "urn:datakaveri.org:b2c27f3f-2524-4a84-816e-91f9ab23f837:testProduct",
+                            "productVariantId": "fd001bb7-33c3-4c8c-948e-1aa75bd47d19",
+                            "resources": [
+                              {
+                                "id": "83c2e5c2-3574-4e11-9530-2b1fbdfce832",
+                                "name": "Surat Transit Realtime Position-UUID",
+                                "capabilities": [
+                                  "api"
+                                ]
+                              },
+                              {
+                                "id": "695e222b-3fae-4325-8db0-3e29d01c4fc0",
+                                "name": "RS Adaptor Test Resource",
+                                "capabilities": [
+                                  "sub",
+                                  "file"
+                                ]
+                              }
+                            ],
+                            "productVariantName": "variant1",
+                            "price": "150.0",
+                            "expiryInMonths": "12"
+                          }
+                        }
+                      ]
+                    }
+                List Failed purchases:
+                  value:
+                    {
+                      "type": "urn:dx:dmp:success",
+                      "title": "Success",
+                      "results": [
+                        {
+                          "invoiceId": "ef9645ba-bb93-4f51-bdbb-f55fba0aa75a",
+                          "orderId": "order_KjRRrCKjZ4QYwd",
+                          "paymentStatus": "FAILED",
+                          "paymentTime": "2023-03-06T11:02:41.475657",
+                          "updatedAt": "2023-03-07T11:02:41.507496",
+                          "createdAt": "2023-03-07T11:02:41.507496",
+                          "consumer": {
+                            "email": "vasanth.rajaraman@datakaveri.org",
+                            "name": {
+                              "firstName": "Vasanth",
+                              "lastName": "Rajaraman"
+                            },
+                            "id": "fd47486b-3497-4248-ac1e-082e4d37a66c"
+                          },
+                          "provider": {
+                            "email": "bryanrobert@iisc.ac.in",
+                            "name": {
+                              "firstName": "B",
+                              "lastName": "Robert A B C D"
+                            },
+                            "id": "b2c27f3f-2524-4a84-816e-91f9ab23f837"
+                          },
+                          "product": {
+                            "productId": "urn:datakaveri.org:b2c27f3f-2524-4a84-816e-91f9ab23f837:testProduct",
+                            "productVariantId": "fd001bb7-33c3-4c8c-948e-1aa75bd47d19",
+                            "resources": [
+                              {
+                                "id": "83c2e5c2-3574-4e11-9530-2b1fbdfce832",
+                                "name": "Surat Transit Realtime Position-UUID",
+                                "capabilities": [
+                                  "api"
+                                ]
+                              },
+                              {
+                                "id": "695e222b-3fae-4325-8db0-3e29d01c4fc0",
+                                "name": "RS Adaptor Test Resource",
+                                "capabilities": [
+                                  "sub",
+                                  "file"
+                                ]
+                              }
+                            ],
+                            "productVariantName": "variant1",
+                            "price": "150.0",
+                            "expiryInMonths": "12"
+                          }
+                        }
+                      ]
+                    }
         '204':
           description: no content
         '401':
@@ -2811,93 +3253,8 @@ components:
         - type
         - title
         - results
-      example:
-        {
-          "type": "urn:dx:dmp:success",
-          "title": "Success",
-          "results":
-            [ {
-              "invoiceId": "0248bea1-23ca-4868-ab97-73d3da22c5ba",
-              "orderId": "order_NdPauGpjkmXEhz",
-              "paymentStatus": "SUCCEEDED",
-              "paymentTime": "2024-02-21T05:19:51.516817",
-              "expiryAt": "2024-06-15T13:21:01.484760",
-              "provider": {
-                "email": "bryanrobert@iisc.ac.in",
-                "name": {
-                  "firstName": "B",
-                  "lastName": "Robert A B C D"
-                },
-                "id": "b2c27f3f-2524-4a84-816e-91f9ab23f837"
-              },
-              "consumer": {
-                "email": "vasanth.rajaraman@datakaveri.org",
-                "name": {
-                  "firstName": "Vasanth",
-                  "lastName": "Rajaraman"
-                },
-                "id": "fd47486b-3497-4248-ac1e-082e4d37a66c"
-              },
-              "product": {
-                "productId": "urn:datakaveri.org:b2c27f3f-2524-4a84-816e-91f9ab23f837:testProduct1",
-                "productVariantId": "060cc0ed-14fb-4f07-be1d-f0b66585eab6",
-                "resourceName": ["Chandigarh Paid Parking Locations", "TEST ITEM FOR APD /verify TESTS"],
-                "productVariantName": "variant1",
-                "price": "100.0",
-                "expiryInMonths": "12",
-                "resourcesAndCapabilities": {
-                  "2d043bdb-fc62-4650-8426-dc72492cd621": [
-                    "sub",
-                    "file"
-                  ],
-                  "a347c5b6-5281-4749-9eab-89784d8f8f9a": [
-                    "api",
-                    "sub"
-                  ]
-                }
-              }
-            },
-              {
-                "invoiceId": "69bee716-36f7-48d7-a3ea-b7c68a46f7f0",
-                "orderId": "order_NghEAGk7YvDKkz",
-                "paymentStatus": "PENDING",
-                "paymentTime": "2024-02-29T12:31:49.192984",
-                "provider": {
-                  "email": "bryanrobert@iisc.ac.in",
-                  "name": {
-                    "firstName": "B",
-                    "lastName": "Robert A B C D"
-                  },
-                  "id": "b2c27f3f-2524-4a84-816e-91f9ab23f837"
-                },
-                "consumer": {
-                  "email": "vasanth.rajaraman@datakaveri.org",
-                  "name": {
-                    "firstName": "Vasanth",
-                    "lastName": "Rajaraman"
-                  },
-                  "id": "fd47486b-3497-4248-ac1e-082e4d37a66c"
-                },
-                "product": {
-                  "productId": "urn:datakaveri.org:b2c27f3f-2524-4a84-816e-91f9ab23f837:testProduct1",
-                  "productVariantId": "060cc0ed-14fb-4f07-be1d-f0b66585eab6",
-                  "resourceName": "[Chandigarh Paid Parking Locations, TEST ITEM FOR APD /verify TESTS]",
-                  "productVariantName": "variant1",
-                  "price": "100.0",
-                  "expiryInMonths": "12",
-                  "resourcesAndCapabilities": {
-                    "2d043bdb-fc62-4650-8426-dc72492cd621": [
-                      "sub",
-                      "file"
-                    ],
-                    "a347c5b6-5281-4749-9eab-89784d8f8f9a": [
-                      "api",
-                      "sub"
-                    ]
-                  }
-                }
-              } ]
-        }
+
+
     notFoundExampleResponseListPurchases:
       type: object
       title: Root type for purchases API response
