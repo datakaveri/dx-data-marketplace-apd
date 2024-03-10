@@ -367,7 +367,7 @@ public class ConsumerServiceImpl implements ConsumerService {
                         new JsonArray()
                             .add(
                                 new JsonObject()
-                                    .put(PRODUCT_VARIANT_NAME, variantId)
+                                    .put(PRODUCT_VARIANT_ID, variantId)
                                     .put("orderId", queryContainer.orderId)
                                     .put(AMOUNT, orderInfo.getInteger(AMOUNT))
                                     .put(CURRENCY, INR)

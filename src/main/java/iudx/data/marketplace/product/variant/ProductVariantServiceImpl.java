@@ -198,8 +198,8 @@ public class ProductVariantServiceImpl implements ProductVariantService {
         return promise.future();
     }
 
-    Future<Boolean> updateProductVariantStatus(String productVariantId) {
-        Promise<Boolean> promise = Promise.promise();
+    Future<JsonObject> updateProductVariantStatus(String productVariantId) {
+        Promise<JsonObject> promise = Promise.promise();
         String query = queryBuilder.updateProductVariantStatusQuery(productVariantId);
 
         pgService.executeQuery(
@@ -207,9 +207,30 @@ public class ProductVariantServiceImpl implements ProductVariantService {
             pgHandler -> {
                 if (pgHandler.succeeded()) {
                     LOGGER.debug(pgHandler.result());
-                    promise.complete(true);
+                    boolean isResultsEmpty = pgHandler.result().getJsonArray(RESULTS).isEmpty();
+                    if(isResultsEmpty)
+                    {
+                        /* the product variant id that is to be deleted, does not exist or is already in inactive status*/
+                        RespBuilder respBuilder =
+                                new RespBuilder()
+                                        .withType(ResponseUrn.RESOURCE_NOT_FOUND_URN.getUrn())
+                                        .withTitle(ResponseUrn.RESOURCE_NOT_FOUND_URN.getMessage())
+                                        .withDetail("Product variant not found");
+                        promise.complete(respBuilder.getJsonResponse());
+                    }
+                    else
+                    {
+                        RespBuilder respBuilder =
+                                new RespBuilder()
+                                        .withType(ResponseUrn.SUCCESS_URN.getUrn())
+                                        .withTitle(ResponseUrn.SUCCESS_URN.getMessage())
+                                        .withDetail("Successfully deleted");
+                        promise.complete(respBuilder.getJsonResponse());
+                    }
                 } else {
                     promise.fail(pgHandler.cause());
+                    throw new DxRuntimeException(
+                            500, ResponseUrn.DB_ERROR_URN, ResponseUrn.DB_ERROR_URN.getMessage());
                 }
             });
 
@@ -221,19 +242,14 @@ public class ProductVariantServiceImpl implements ProductVariantService {
                                                       JsonObject request, Handler<AsyncResult<JsonObject>> handler) {
         String productVariantId = request.getString("productVariantId");
 
-      Future<Boolean> updateProductVariantFuture = updateProductVariantStatus(productVariantId);
+      Future<JsonObject> updateProductVariantFuture = updateProductVariantStatus(productVariantId);
         updateProductVariantFuture.onComplete(
                 updateHandler -> {
-                    if (updateHandler.result()) {
-                        RespBuilder respBuilder =
-                                new RespBuilder()
-                                        .withType(ResponseUrn.SUCCESS_URN.getUrn())
-                                        .withTitle(ResponseUrn.SUCCESS_URN.getMessage())
-                                        .withDetail("Successfully deleted");
-                        handler.handle(Future.succeededFuture(respBuilder.getJsonResponse()));
+                    if (updateHandler.succeeded()) {
+                        handler.handle(Future.succeededFuture(updateHandler.result()));
                     } else {
-                        throw new DxRuntimeException(
-                                500, ResponseUrn.DB_ERROR_URN, ResponseUrn.DB_ERROR_URN.getMessage());
+                        handler.handle(Future.failedFuture(updateHandler.cause().getMessage()));
+
                     }
                 });
         return this;

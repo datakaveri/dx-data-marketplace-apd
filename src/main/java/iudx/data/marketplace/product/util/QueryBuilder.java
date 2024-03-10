@@ -157,6 +157,7 @@ public class QueryBuilder {
                 .replace("$3", Status.ACTIVE.toString())
                 .replace("$4", Status.INACTIVE.toString()));
 
+    LOGGER.debug("Query : " + query);
     return query.toString();
   }
 
