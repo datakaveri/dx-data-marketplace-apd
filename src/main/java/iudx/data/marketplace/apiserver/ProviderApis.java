@@ -32,6 +32,8 @@ import iudx.data.marketplace.postgres.PostgresService;
 import iudx.data.marketplace.product.ProductService;
 import iudx.data.marketplace.product.variant.ProductVariantService;
 import java.util.Map;
+
+import org.apache.commons.lang.StringUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -68,6 +70,10 @@ public class ProviderApis {
     ValidationHandler productValidationHandler = new ValidationHandler(vertx, RequestType.PRODUCT);
     ValidationHandler variantValidationHandler =
         new ValidationHandler(vertx, RequestType.PRODUCT_VARIANT);
+    ValidationHandler deleteVariantValidationHandler =
+            new ValidationHandler(vertx, RequestType.DELETE_PRODUCT_VARIANT);
+    ValidationHandler listVariantValidationHandler =
+            new ValidationHandler(vertx, RequestType.LIST_PRODUCT_VARIANT);
     ValidationHandler resourceValidationHandler =
         new ValidationHandler(vertx, RequestType.RESOURCE);
     ValidationHandler purchaseValidationHandler =
@@ -78,7 +84,7 @@ public class ProviderApis {
     variantService = ProductVariantService.createProxy(vertx, PRODUCT_VARIANT_SERVICE_ADDRESS);
 
     router
-        .post(PROVIDER_PATH + PRODUCT_PATH)
+        .post(api.getProviderProductPath())
         .consumes(APPLICATION_JSON)
         .handler(productValidationHandler)
         .handler(AuthHandler.create(authenticationService, vertx, api, postgresService, authClient))
@@ -86,50 +92,50 @@ public class ProviderApis {
         .failureHandler(exceptionHandler);
 
     router
-        .delete(PROVIDER_PATH + PRODUCT_PATH)
+        .delete(api.getProviderProductPath())
         .handler(productValidationHandler)
         .handler(AuthHandler.create(authenticationService, vertx, api, postgresService, authClient))
         .handler(this::handleDeleteProduct)
         .failureHandler(exceptionHandler);
 
     router
-        .get(PROVIDER_PATH + LIST_PRODUCTS_PATH)
+        .get(api.getProviderListProductsPath())
         .handler(resourceValidationHandler)
         .handler(AuthHandler.create(authenticationService, vertx, api, postgresService, authClient))
         .handler(this::listProducts)
         .failureHandler(exceptionHandler);
 
     router
-        .get(PROVIDER_PATH + LIST_PURCHASES_PATH)
+        .get(api.getProviderListPurchasesPath())
         .handler(purchaseValidationHandler)
         .handler(AuthHandler.create(authenticationService, vertx, api, postgresService, authClient))
         .handler(this::listPurchases)
         .failureHandler(exceptionHandler);
 
     router
-        .post(PROVIDER_PATH + PRODUCT_VARIANT_PATH)
+        .post(api.getProviderProductVariantPath())
         .handler(variantValidationHandler)
         .handler(AuthHandler.create(authenticationService, vertx, api, postgresService, authClient))
         .handler(this::handleCreateProductVariant)
         .failureHandler(exceptionHandler);
 
     router
-        .put(PROVIDER_PATH + PRODUCT_VARIANT_PATH)
+        .put(api.getProviderProductVariantPath())
         .handler(variantValidationHandler)
         .handler(AuthHandler.create(authenticationService, vertx, api, postgresService, authClient))
         .handler(this::handleUpdateProductVariant)
         .failureHandler(exceptionHandler);
 
     router
-        .get(PROVIDER_PATH + PRODUCT_VARIANT_PATH)
-        .handler(variantValidationHandler)
+        .get(api.getProviderProductVariantPath())
+        .handler(listVariantValidationHandler)
         .handler(AuthHandler.create(authenticationService, vertx, api, postgresService, authClient))
         .handler(this::handleGetProductVariants)
         .failureHandler(exceptionHandler);
 
     router
-        .delete(PROVIDER_PATH + PRODUCT_VARIANT_PATH)
-        .handler(variantValidationHandler)
+        .delete(api.getProviderProductVariantPath())
+        .handler(deleteVariantValidationHandler)
         .handler(AuthHandler.create(authenticationService, vertx, api, postgresService, authClient))
         .handler(this::handleDeleteProductVariant)
         .failureHandler(exceptionHandler);
@@ -224,8 +230,9 @@ public class ProviderApis {
     MultiMap requestParams = routingContext.request().params();
     String resourceId = requestParams.get("resourceId");
     String productId = requestParams.get("productId");
+    String paymentStatus = requestParams.get("paymentStatus");
     JsonObject requestJson =
-        new JsonObject().put("resourceId", resourceId).put("productId", productId);
+        new JsonObject().put("resourceId", resourceId).put("productId", productId).put("paymentStatus", paymentStatus);
     variantService
             .listPurchase(provider, requestJson, handler -> {
               if(handler.succeeded())
@@ -303,7 +310,7 @@ public class ProviderApis {
           if (handler.succeeded()) {
             handleSuccessResponse(routingContext, 200, handler.result());
           } else {
-            handleFailureResponse(routingContext, handler.cause());
+            handleFailure(routingContext, handler.cause().getMessage());
           }
         });
   }

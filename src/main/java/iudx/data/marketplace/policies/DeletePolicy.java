@@ -144,10 +144,12 @@ public class DeletePolicy {
               promise.fail(failureResponse.encode());
             } else {
               JsonObject result = queryHandler.result().getJsonArray(RESULT).getJsonObject(0);
-              String rsServerUrl = result.getString("resource_server_url");
+              String rsServerUrl = result.getString("resource_server");
               String ownerIdValue = result.getString("provider_id");
               String status = result.getString("status");
               /* does the policy belong to the owner who is requesting */
+              LOG.debug("resource server url : " + rsServerUrl);
+              LOG.debug("resource server url of the user : " + user.getResourceServerUrl());
               if (!rsServerUrl.equalsIgnoreCase(user.getResourceServerUrl())) {
                 LOG.error("Failure : OwnerShip error, rsServerUrl does not match");
                 promise.fail(
@@ -200,7 +202,7 @@ public class DeletePolicy {
    * @return result of the execution as Json Object
    */
   public Future<JsonObject> initiateDeletePolicy(JsonObject policy, User user) {
-    UUID policyUuid = UUID.fromString(policy.getString("id"));
+    UUID policyUuid = UUID.fromString(policy.getString("policyId"));
     Future<Boolean> policyVerificationFuture =
         verifyPolicy(user, CHECK_IF_POLICY_PRESENT_QUERY, policyUuid);
     return policyVerificationFuture.compose(

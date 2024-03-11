@@ -13,6 +13,7 @@ import io.vertx.core.Handler;
 import io.vertx.core.Promise;
 import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
+import iudx.data.marketplace.apiserver.exceptions.DxRuntimeException;
 import iudx.data.marketplace.apiserver.util.Role;
 import iudx.data.marketplace.common.HttpStatusCode;
 import iudx.data.marketplace.common.RespBuilder;
@@ -64,16 +65,16 @@ public class ConsumerServiceImpl implements ConsumerService {
     String resourceTable = config.getJsonArray(TABLES).getString(1);
     JsonObject params = new JsonObject();
     StringBuilder query = new StringBuilder(LIST_RESOURCES_QUERY.replace("$0", resourceTable));
-    if (request.containsKey(RESOURCE_ID)) {
-      String resourceID = request.getString(RESOURCE_ID);
-      params.put(RESOURCE_ID, resourceID);
+    if (request.containsKey("resourceId")) {
+      String resourceID = request.getString("resourceId");
+      params.put("resourceId", resourceID);
       query.append(" where ").append("_id").append('=').append("$1");
-    } else if (request.containsKey(PROVIDER_ID)) {
-      String providerID = request.getString(PROVIDER_ID);
-      params.put(PROVIDER_ID, providerID);
+    } else if (request.containsKey("providerId")) {
+      String providerID = request.getString("providerId");
+      params.put("providerId", providerID);
       query.append(" where ").append("provider_id").append('=').append("$1");
     }
-
+    query.append(" ORDER BY modified_at DESC");
     pgService.executePreparedQuery(
         query.toString(),
         params,
@@ -95,11 +96,11 @@ public class ConsumerServiceImpl implements ConsumerService {
     String resourceTable = config.getJsonArray(TABLES).getString(1);
     JsonObject params = new JsonObject();
     StringBuilder query = new StringBuilder(LIST_PROVIDERS_QUERY.replace("$0", resourceTable));
-
-    if (request.containsKey(PROVIDER_ID)) {
-      String providerID = request.getString(PROVIDER_ID);
-      params.put(PROVIDER_ID, providerID);
-      query.append(" where ").append("provider_id").append('=').append("$1");
+    LOGGER.debug("Query : " + query);
+    if (request.containsKey("providerId")) {
+      String providerID = request.getString("providerId");
+      params.put("providerId", providerID);
+      query = new StringBuilder(LIST_PROVIDER_WITH_GIVEN_PROVIDER_ID);
     }
 
     pgService.executePreparedQuery(
@@ -131,19 +132,19 @@ public class ConsumerServiceImpl implements ConsumerService {
                 .replace("$9", productResourceRelationTable)
                 .replace("$8", resourceTable));
 
-    if (request.containsKey(RESOURCE_ID)) {
-      String resourceID = request.getString(RESOURCE_ID);
-      params.put(STATUS, Status.ACTIVE.toString()).put(RESOURCE_ID, resourceID);
+    if (request.containsKey("resourceId")) {
+      String resourceID = request.getString("resourceId");
+      params.put(STATUS, Status.ACTIVE.toString()).put("resourceId", resourceID);
       query.append(" and rt._id=$2");
-    } else if (request.containsKey(PROVIDER_ID)) {
-      String providerID = request.getString(PROVIDER_ID);
-      params.put(STATUS, Status.ACTIVE.toString()).put(PROVIDER_ID, providerID);
+    } else if (request.containsKey("providerId")) {
+      String providerID = request.getString("providerId");
+      params.put(STATUS, Status.ACTIVE.toString()).put("providerId", providerID);
       query.append(" and pt.provider_id=$2");
     } else {
       params.put(STATUS, Status.ACTIVE.toString());
     }
     query.append(" group by pt.product_id");
-
+    query.append(" order by pt.modified_at DESC");
     LOGGER.debug(query);
 
     pgService.executePreparedQuery(
@@ -187,109 +188,125 @@ public class ConsumerServiceImpl implements ConsumerService {
     return this;
   }
 
-  /*
-  TODO: Add expiryTime stamp if there is any policy created (check if payment status is successful)
-   */
   @Override
   public ConsumerService listPurchase(
       User user, JsonObject request, Handler<AsyncResult<JsonObject>> handler) {
 
     String resourceId = request.getString("resourceId");
     String productId = request.getString("productId");
-    String query = queryBuilder.listPurchaseForConsumer(user.getUserId(), resourceId, productId);
-    pgService.executeQuery(
-        query,
-        queryHandler -> {
-          if (queryHandler.succeeded()) {
-            LOGGER.debug("Fetched invoice related information from postgres successfully");
-            JsonArray result = queryHandler.result().getJsonArray(RESULTS);
-            if (!result.isEmpty()) {
-              JsonArray userResponse = new JsonArray();
-              for (Object row : result) {
-                JsonObject rowEntry = JsonObject.mapFrom(row);
+    LOGGER.debug("payment status is {}", request.getString("paymentStatus"));
+    try {
+      PaymentStatus paymentStatus = PaymentStatus.fromString(request.getString("paymentStatus"));
 
-                // gets provider info, consumer info, product info
-                rowEntry
-                    .mergeIn(util.getUserJsonFromRowEntry(rowEntry, Role.PROVIDER))
-                    .mergeIn(util.generateUserJson(user))
-                    .mergeIn(util.getProductInfo(rowEntry));
-                userResponse.add(rowEntry);
-              }
+      JsonArray userResponse = new JsonArray();
+      String query;
 
-              JsonObject response =
-                  new RespBuilder()
-                      .withType(ResponseUrn.SUCCESS_URN.getUrn())
-                      .withTitle(ResponseUrn.SUCCESS_URN.getMessage())
-                      .withResult(new JsonArray().add(userResponse))
-                      .getJsonResponse();
+      if (paymentStatus.equals(PaymentStatus.SUCCESSFUL)) {
+        query =
+            queryBuilder.listPurchaseForConsumerDuringSuccessfulPayment(
+                user.getUserId(), resourceId, productId);
+      } else if (paymentStatus.equals(PaymentStatus.FAILED)) {
+        query =
+            queryBuilder.listPurchaseForConsumerDuringFailurePayment(
+                user.getUserId(), resourceId, productId);
+      } else {
+        query =
+            queryBuilder.listPurchaseForConsumerDuringPendingPayment(
+                user.getUserId(), resourceId, productId);
+      }
 
-              handler.handle(Future.succeededFuture(response));
-            } else {
-              LOGGER.debug(
-                  "No invoice present for the given resource "
-                      + ": {} or product : {}, for the consumer : {}",
-                  resourceId,
-                  productId,
-                  user.getUserId());
+      Future<JsonArray> paymentFuture = executePurchaseQuery(query, resourceId, productId, user);
 
-              boolean isAnyQueryParamSent =
-                  StringUtils.isNotBlank(resourceId) || StringUtils.isNotBlank(productId);
+      Future<JsonArray> userResponseFuture =
+          paymentFuture.onComplete(
+              pgHandler -> {
+                if (pgHandler.succeeded()) {
+                  userResponse.add(pgHandler.result().getJsonObject(0));
+                  JsonObject response =
+                      new RespBuilder()
+                          .withType(ResponseUrn.SUCCESS_URN.getUrn())
+                          .withTitle(ResponseUrn.SUCCESS_URN.getMessage())
+                          .withResult(userResponse)
+                          .getJsonResponse();
+                  handler.handle(Future.succeededFuture(response));
 
-              String failureMessage =
-                  new RespBuilder()
-                      .withType(HttpStatusCode.NO_CONTENT.getValue())
-                      .withTitle(HttpStatusCode.NO_CONTENT.getUrn())
-                      .getResponse();
-              if (isAnyQueryParamSent) {
-                failureMessage =
-                    new RespBuilder()
-                        .withType(HttpStatusCode.NOT_FOUND.getValue())
-                        .withTitle(ResponseUrn.RESOURCE_NOT_FOUND_URN.getUrn())
-                        .withDetail("Purchase info not found")
-                        .getResponse();
-              }
-              handler.handle(Future.failedFuture(failureMessage));
-            }
-          }
-        });
+                } else {
+                  handler.handle(Future.failedFuture(pgHandler.cause().getMessage()));
+                }
+              });
+    } catch (DxRuntimeException exception) {
+      LOGGER.debug("Exception : " + exception.getMessage());
+      String failureMessage =
+          new RespBuilder()
+              .withType(HttpStatusCode.BAD_REQUEST.getValue())
+              .withTitle(ResponseUrn.BAD_REQUEST_URN.getUrn())
+              .withDetail("Invalid payment status")
+              .getResponse();
+      handler.handle(Future.failedFuture(failureMessage));
+    }
+
     return this;
   }
 
-  ExpiryAtContainer getExpiryAtFuture(JsonObject rowEntry, User user, boolean isPaymentSuccessFul) {
-    ExpiryAtContainer expiryAtContainer = null;
-    if (isPaymentSuccessFul) {
-      /* query the policy table to see the expiryAt */
-      String fetchExpiryAtQuery = queryBuilder.fetchExpiryAtQuery(rowEntry, user);
-      pgService.executeQuery(
-          fetchExpiryAtQuery,
-          pgHandler -> {
-            if (pgHandler.succeeded()) {
-              JsonArray resultFromPolicyTable = pgHandler.result().getJsonArray(RESULTS);
-              /* if the response is not empty, the expiry time stamp is added in the final
-               * response */
-              if (!resultFromPolicyTable.isEmpty()) {
-                // TODO: What to do when multiple policies are present
-                String expiryAt = resultFromPolicyTable.getJsonObject(0).getString("expiryAt");
+  public Future<JsonArray> executePurchaseQuery(
+          String query, String resourceId, String productId, User user) {
+    Promise<JsonArray> promise = Promise.promise();
+    pgService.executeQuery(
+            query,
+            queryHandler -> {
+              if (queryHandler.succeeded()) {
+                LOGGER.debug("Fetched invoice related information from postgres successfully");
+                JsonArray result = queryHandler.result().getJsonArray(RESULTS);
+                if (!result.isEmpty()) {
+                  JsonArray userResponse = new JsonArray();
+                  for (Object row : result) {
+                    JsonObject rowEntry = JsonObject.mapFrom(row);
+
+                    // gets provider info, consumer info, product info
+                    rowEntry
+                            .mergeIn(util.getUserJsonFromRowEntry(rowEntry, Role.PROVIDER))
+                            .mergeIn(util.generateUserJson(user))
+                            .mergeIn(util.getProductInfo(rowEntry));
+                    userResponse.add(rowEntry);
+                  }
+                  promise.complete(userResponse);
+                } else {
+                  LOGGER.debug(
+                          "No invoice present for the given resource "
+                                  + ": {} or product : {}, for the consumer : {}",
+                          resourceId,
+                          productId,
+                          user.getUserId());
+
+                  boolean isAnyQueryParamSent =
+                          StringUtils.isNotBlank(resourceId) || StringUtils.isNotBlank(productId);
+
+                  String failureMessage =
+                          new RespBuilder()
+                                  .withType(HttpStatusCode.NO_CONTENT.getValue())
+                                  .withTitle(HttpStatusCode.NO_CONTENT.getUrn())
+                                  .getResponse();
+                  if (isAnyQueryParamSent) {
+                    failureMessage =
+                            new RespBuilder()
+                                    .withType(HttpStatusCode.NOT_FOUND.getValue())
+                                    .withTitle(ResponseUrn.RESOURCE_NOT_FOUND_URN.getUrn())
+                                    .withDetail("Purchase info not found")
+                                    .getResponse();
+                  }
+                  promise.fail(failureMessage);
+                }
+              } else {
+                String failureMessage =
+                        new RespBuilder()
+                                .withType(HttpStatusCode.INTERNAL_SERVER_ERROR.getValue())
+                                .withTitle(ResponseUrn.DB_ERROR_URN.getUrn())
+                                .withDetail(ResponseUrn.INTERNAL_SERVER_ERR_URN.getMessage())
+                                .getResponse();
+                promise.fail(failureMessage);
               }
-
-              // TODO: What to do when the policy is not present and the payment is successful?
-              // Do we throw an exception or internal server error or ignore it
-
-            } else {
-              LOGGER.error("Failure while fetching expiryAt : {}", pgHandler.cause().getMessage());
-              String failureMessage =
-                  new RespBuilder()
-                      .withType(HttpStatusCode.INTERNAL_SERVER_ERROR.getValue())
-                      .withTitle(ResponseUrn.DB_ERROR_URN.getUrn())
-                      .withDetail(ResponseUrn.INTERNAL_SERVER_ERR_URN.getMessage())
-                      .getResponse();
-
-              //              throw new DxRuntimeException(500, ResponseUrn.DB_ERROR_URN);
-            }
-          });
-    }
-
-    return expiryAtContainer;
+            });
+    return promise.future();
   }
 
   @Override
@@ -350,8 +367,8 @@ public class ConsumerServiceImpl implements ConsumerService {
                         new JsonArray()
                             .add(
                                 new JsonObject()
-                                    .put(PRODUCT_VARIANT_NAME, variantId)
-                                    .put("order_id", queryContainer.orderId)
+                                    .put(PRODUCT_VARIANT_ID, variantId)
+                                    .put("orderId", queryContainer.orderId)
                                     .put(AMOUNT, orderInfo.getInteger(AMOUNT))
                                     .put(CURRENCY, INR)
                                     .put(STATUS, "Created"))));
@@ -463,11 +480,4 @@ public class ConsumerServiceImpl implements ConsumerService {
     }
   }
 
-  private static class ExpiryAtContainer {
-    public final String expiryAt;
-
-    public ExpiryAtContainer(String expiryAt) {
-      this.expiryAt = expiryAt;
-    }
-  }
 }

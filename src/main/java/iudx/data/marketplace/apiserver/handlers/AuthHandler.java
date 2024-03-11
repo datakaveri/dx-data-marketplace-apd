@@ -258,6 +258,7 @@ public class AuthHandler implements Handler<RoutingContext> {
   }
 
   private void processAuthFailure(RoutingContext ctx, String result) {
+    LOGGER.error("result : " + result);
     if (result.contains("Not Found")) {
       LOGGER.error("Error : Item Not Found");
       LOGGER.error("Error : " + result);

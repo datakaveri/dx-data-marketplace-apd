@@ -48,7 +48,7 @@ public class Constants {
   public static final String RS_SERVER_URL = "resourceServerUrl";
   public static final String FIRST_NAME = "firstName";
   public static final String LAST_NAME = "lastName";
-  public static final String POLICY_ID = "id";
+  public static final String POLICY_ID = "policyId";
   public static final String ACCOUNT_ID = "account_id";
   public static final String RAZORPAY_PAYLOAD = "payload";
   public static final String RAZORPAY_ORDER = "order";
@@ -85,7 +85,7 @@ public class Constants {
   public static final String PRODUCT_VARIANT_ID = "productVariantId";
   public static final String RESOURCE_ID = "resourceID";
 
-  public static final String PROVIDER_ID = "providerID";
+  public static final String PROVIDER_ID = "providerId";
 
   // validations
   public static final int VALIDATION_URN_DELIMITER_COUNT = 3;

@@ -23,7 +23,7 @@
       },
       "item": {
         "itemId": "b58da193-23d9-43eb-b98a-a103d4b6103c",
-        "itemType": "RESOURCE_GROUP"
+        "itemType": "RESOURCE"
       }
     }
   ],
@@ -176,7 +176,7 @@
           "$id": "#root/item/itemType",
           "title": "Itemtype",
           "type": "string",
-          "enum": ["resource"],
+          "enum": ["RESOURCE"],
           "minLength": 1
         }
       }

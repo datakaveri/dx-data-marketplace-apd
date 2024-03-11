@@ -26,6 +26,7 @@ public class Util {
 
   /**
    * Generates consumer or provider json object that can be used to display in the consumer response
+   *
    * @param user Provider or consumer object
    * @return JsonObject with user related information like firstName, lastName, emailId, ID
    */
@@ -46,12 +47,12 @@ public class Util {
   }
 
   /**
-   * Generates JsonObject user JsonObject by extracting emailId, firstName, lastName, Id
-   * specific to consumer or provider from a database row as JsonObjects to
+   * Generates JsonObject user JsonObject by extracting emailId, firstName, lastName, Id specific to
+   * consumer or provider from a database row as JsonObjects to
+   *
    * @param row DB row entry as JsonObject
    * @param role Consumer or provider
-   * @return a consumer or provider object
-   *  with a specific structure
+   * @return a consumer or provider object with a specific structure
    */
   public JsonObject getUserJsonFromRowEntry(JsonObject row, Role role) {
     String user = role.getRole();
@@ -73,27 +74,29 @@ public class Util {
 
   /**
    * Gets product related info from DB row
+   *
    * @param row Database row
    * @return creates a product json object with a given structure
    */
-  public JsonObject getProductInfo(JsonObject row)
-  {
-    JsonObject productJson = new JsonObject()
-            .put("product",new JsonObject()
+  public JsonObject getProductInfo(JsonObject row) {
+    JsonObject productJson =
+        new JsonObject()
+            .put(
+                "product",
+                new JsonObject()
                     .put("productId", row.getString("productId"))
                     .put("productVariantId", row.getString("productVariantId"))
-                    .put("resourceName", row.getString("resourceName"))
+                    .put("resources", row.getJsonArray("resources"))
+                    .put("productVariantName", row.getString("productVariantName"))
                     .put("price", row.getString("price"))
-                    .put("expiryInMonths", row.getString("expiryInMonths"))
-                    .put("resourcesAndCapabilities", row.getJsonObject("resourcesAndCapabilities")));
+                    .put("expiryInMonths", row.getString("expiryInMonths")));
 
     row.remove("productId");
     row.remove("productVariantId");
-    row.remove("resourceName");
+    row.remove("resources");
     row.remove("price");
-    row.remove( "resourcesAndCapabilities");
     row.remove("expiryInMonths");
+    row.remove("productVariantName");
     return productJson;
   }
-
 }
