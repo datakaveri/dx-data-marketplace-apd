@@ -28,7 +28,7 @@ pipeline {
     stage('Unit Tests and Code Coverage Test'){
       steps{
         script{
-            mvn clean test checkstyle:checkstyle pmd:pmd
+            sh "mvn clean test checkstyle:checkstyle pmd:pmd"
         }
         xunit (
           thresholds: [ skipped(failureThreshold: '0'), failed(failureThreshold: '0') ],
