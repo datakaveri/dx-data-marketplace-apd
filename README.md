@@ -79,7 +79,7 @@ The JAR requires 3 runtime arguments when running:
 * --hostname/-i : the hostname for clustering
 * --modules/-m : comma separated list of module names to deploy
 
-e.g. `java -jar target/iudx.data.marketplace-cluster-0.0.1-SNAPSHOT-fat.jar  --host $(hostname) -c configs/config.json -m iudx.data.marketplace.postgres.PostgresVerticle,iudx.data.marketplace.product.ProductVerticle
+e.g. `java -jar target/iudx.data.marketplace-cluster-0.0.1-SNAPSHOT-fat.jar  --host $(hostname) -c secrets/all-verticles-configs/config-dev.json -m iudx.data.marketplace.postgres.PostgresVerticle,iudx.data.marketplace.product.ProductVerticle
 ,iudx.data.marketplace.authenticator.AuthenticationVerticle ,iudx.data.marketplace.consumer.ConsumerVerticle,iudx.data.marketplace.auditing.AuditingVerticle`
 
 Use the `--help/-h` argument for more information. You may additionally append an `DMP_APD_JAVA_OPTS` environment variable containing any Java options to pass to the application.
@@ -95,7 +95,7 @@ The JAR requires 1 runtime argument when running:
 
 * --config/-c : path to the config file
 
-e.g. `java -Dvertx.logger-delegate-factory-class-name=io.vertx.core.logging.Log4j2LogDelegateFactory -jar target/iudx.data.marketplace-dev-0.0.1-SNAPSHOT-fat.jar -c configs/config.json`
+e.g. `java -Dvertx.logger-delegate-factory-class-name=io.vertx.core.logging.Log4j2LogDelegateFactory -jar target/iudx.data.marketplace-dev-0.0.1-SNAPSHOT-fat.jar -c secrets/all-verticles-configs/config-dev.json`
 
 Use the `--help/-h` argument for more information. You may additionally append an `DMP_APD_JAVA_OPTS` environment variable containing any Java options to pass to the application.
 
@@ -115,7 +115,7 @@ $ java $DMP_APD_JAVA_OPTS -jar target/iudx.data.marketplace-dev-0.0.1-SNAPSHOT-f
 ## Contributing
 We follow Git Merge based workflow
 1. Fork this repo
-2. Create a new feature branch in your fork. Multiple features must have a hyphen separated name, or refer to a milestone name as mentioned in Github -> Projects
+2. Create a new feature branch in your fork. Multiple features must have a hyphen separated name
 3. Commit to your fork and raise a Pull Request with upstream
 
 

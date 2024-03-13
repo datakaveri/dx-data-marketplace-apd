@@ -16,8 +16,14 @@ public static   String UPDATE_LINKED_ACCOUNT_STATUS_QUERY =
   public static final String ACCOUNT_TYPE = "route";
   public static final String FAILURE_MESSAGE = "User registration incomplete : ";
   public static final String GET_ACCOUNT_ID_QUERY =
-          "SELECT account_id, rzp_account_product_id, modified_at AS \"updatedAt\" , created_at AS  \"createdAt\" "
-                  + " FROM merchant_table WHERE provider_id = '$1'";
+      "SELECT DISTINCT M.account_id, M.rzp_account_product_id,\n"
+          + "R.resource_server AS \"resourceServerUrl\",\n"
+          + "M.modified_at AS \"updatedAt\" , M.created_at AS  \"createdAt\" \n"
+          + "FROM merchant_table M\n"
+          + "INNER JOIN resource_entity R\n"
+          + "ON R.provider_id = M.provider_id\n"
+          + "WHERE M.provider_id = '$1'\n"
+          + "AND R.resource_server = '$2'";
   public static final String GET_MERCHANT_INFO_QUERY = "SELECT account_id, reference_id FROM merchant_table WHERE provider_id = '$1'" +
           " AND email = '$2'";
 

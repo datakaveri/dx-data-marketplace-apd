@@ -241,8 +241,10 @@ public class ProductServiceImpl implements ProductService {
       User user, JsonObject request, Handler<AsyncResult<JsonObject>> handler) {
 
     String providerID = user.getUserId();
+    String resourceServerUrl = user.getResourceServerUrl();
     JsonObject params =
-        new JsonObject().put(STATUS, Status.ACTIVE.toString()).put(PROVIDER_ID, providerID);
+        new JsonObject().put(STATUS, Status.ACTIVE.toString()).put(PROVIDER_ID, providerID)
+                .put("resourceServerUrl", resourceServerUrl);
 
     if (request.containsKey("resourceId")) {
       params.put("resourceId", request.getString("resourceId"));

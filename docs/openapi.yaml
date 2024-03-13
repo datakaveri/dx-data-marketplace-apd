@@ -224,10 +224,13 @@ paths:
                           type: string
                         providerName:
                           type: string
-                          updatedAt:
-                            type: string
-                            minLength: 1
-                          createdAt:
+                        updatedAt:
+                          type: string
+                          minLength: 1
+                        createdAt:
+                          type: string
+                          minLength: 1
+                        resourceServerUrl:
                             type: string
                             minLength: 1
                         resources:
@@ -247,6 +250,7 @@ paths:
                         - providerName
                         - updatedAt
                         - createdAt
+                        - resourceServerUrl
                         - resources
                 required:
                   - type
@@ -261,6 +265,7 @@ paths:
                         providerName: Administrator of the IUDX platform
                         updatedAt: '2024-02-16T04:51:15.239497'
                         createdAt: '2024-01-16T04:51:15.239497'
+                        resourceServerUrl: 'rs.iudx.io'
                         resources:
                           - id: 2d043bdb-fc62-4650-8426-dc72492cd621
                             name: TEST ITEM FOR APD /verify TESTS
@@ -282,6 +287,7 @@ paths:
                         providerName: Administrator of the IUDX platform
                         updatedAt: '2024-02-16T04:51:15.239497'
                         createdAt: '2024-02-16T04:51:15.239497'
+                        resourceServerUrl: 'rs.iudx.io'
                         resources:
                           - id: 2d043bdb-fc62-4650-8426-dc72492cd621
                             name: TEST ITEM FOR APD /verify TESTS
@@ -291,6 +297,7 @@ paths:
                         providerName: Administrator of the IUDX platform
                         updatedAt: '2023-12-16T04:51:15.239497'
                         createdAt: '2023-11-16T04:51:15.239497'
+                        resourceServerUrl: 'rs.iudx.io'
                         resources:
                           - id: b58da193-23d9-43eb-b98a-a103d4b6103c
                             name: FW055 Environment-UUID
@@ -303,6 +310,7 @@ paths:
                         providerName: Administrator of the IUDX platform
                         updatedAt: '2022-02-16T04:51:15.239497'
                         createdAt: '2022-02-16T04:51:15.239497'
+                        resourceServerUrl: 'rs.iudx.io'
                         resources:
                           - id: a347c5b6-5281-4749-9eab-89784d8f8f9a
                             name: Chandigarh Paid Parking Locations
@@ -1935,6 +1943,9 @@ paths:
                         createdAt:
                           type: string
                           minLength: 1
+                        resourceServerUrl:
+                          type: string
+                          minLength: 1
                         providerName:
                           type: string
                       required:
@@ -1943,6 +1954,7 @@ paths:
                         - accessPolicy
                         - updatedAt
                         - createdAt
+                        - resourceServerUrl
                         - providerName
                 required:
                   - type
@@ -1958,24 +1970,28 @@ paths:
                         accessPolicy: OPEN
                         updatedAt: '2024-12-01T19:26:13.005418'
                         createdAt: '2024-12-01T17:26:13.005418'
+                        resourceServerUrl: 'rs.iudx.io'
                         providerName: Administrator of the IUDX platform
                       - resourceId: 2d043bdb-fc62-4650-8426-dc72492cd621
                         resourceName: TEST ITEM FOR APD /verify TESTS
                         accessPolicy: SECURE
                         updatedAt: '2024-11-01T19:26:13.005418'
                         createdAt: '2024-11-01T17:26:13.005418'
+                        resourceServerUrl: 'rs.iudx.io'
                         providerName: Administrator of the IUDX platform
                       - resourceId: b58da193-23d9-43eb-b98a-a103d4b6103c
                         resourceName: FW055 Environment-UUID
                         accessPolicy: OPEN
                         updatedAt: '2024-10-01T19:26:13.005418'
                         createdAt: '2024-10-01T17:26:13.005418'
+                        resourceServerUrl: 'rs.iudx.io'
                         providerName: Administrator of the IUDX platform
                       - resourceId: ae2b8b01-f642-411a-babb-cbd1b75fa2a1
                         resourceName: Flood level data from FWR055
                         accessPolicy: SECURE
                         updatedAt: '2024-09-01T19:26:13.005418'
                         createdAt: '2024-09-01T17:26:13.005418'
+                        resourceServerUrl: 'rs.iudx.io'
                         providerName: Administrator of the IUDX platform
               examples:
                 List All Resources:
@@ -1988,24 +2004,28 @@ paths:
                         accessPolicy: OPEN
                         updatedAt: '2024-12-01T19:26:13.005418'
                         createdAt: '2024-12-01T17:26:13.005418'
+                        resourceServerUrl: 'rs.iudx.io'
                         providerName: Administrator of the IUDX platform
                       - resourceId: 2d043bdb-fc62-4650-8426-dc72492cd621
                         resourceName: TEST ITEM FOR APD /verify TESTS
                         accessPolicy: SECURE
                         updatedAt: '2024-11-01T19:26:13.005418'
                         createdAt: '2024-11-01T19:26:13.005418'
+                        resourceServerUrl: 'rs.iudx.io'
                         providerName: Administrator of the IUDX platform
                       - resourceId: b58da193-23d9-43eb-b98a-a103d4b6103c
                         resourceName: FW055 Environment-UUID
                         accessPolicy: OPEN
                         updatedAt: '2024-10-01T19:26:13.005418'
                         createdAt: '2024-10-01T17:26:13.005418'
+                        resourceServerUrl: 'rs.iudx.io'
                         providerName: Administrator of the IUDX platform
                       - resourceId: ae2b8b01-f642-411a-babb-cbd1b75fa2a1
                         resourceName: Flood level data from FWR055
                         accessPolicy: SECURE
                         updatedAt: '2024-09-01T19:26:13.005418'
                         createdAt: '2024-09-01T17:26:13.005418'
+                        resourceServerUrl: 'rs.iudx.io'
                         providerName: Administrator of the IUDX platform
                 List Resource of Provider:
                   value:
@@ -2017,24 +2037,28 @@ paths:
                         accessPolicy: OPEN
                         updatedAt: '2024-12-01T19:26:13.005418'
                         createdAt: '2024-12-01T17:26:13.005418'
+                        resourceServerUrl: 'rs.iudx.io'
                         providerName: Administrator of the IUDX platform
                       - resourceId: 2d043bdb-fc62-4650-8426-dc72492cd621
                         resourceName: TEST ITEM FOR APD /verify TESTS
                         accessPolicy: SECURE
                         updatedAt: '2024-11-01T19:26:13.005418'
                         createdAt: '2024-11-01T17:26:13.005418'
+                        resourceServerUrl: 'rs.iudx.io'
                         providerName: Administrator of the IUDX platform
                       - resourceId: b58da193-23d9-43eb-b98a-a103d4b6103c
                         resourceName: FW055 Environment-UUID
                         accessPolicy: OPEN
                         updatedAt: '2024-10-01T19:26:13.005418'
                         createdAt: '2024-10-01T17:26:13.005418'
+                        resourceServerUrl: 'rs.iudx.io'
                         providerName: Administrator of the IUDX platform
                       - resourceId: ae2b8b01-f642-411a-babb-cbd1b75fa2a1
                         resourceName: Flood level data from FWR055
                         accessPolicy: SECURE
                         updatedAt: '2024-09-01T19:26:13.005418'
                         createdAt: '2024-09-01T17:26:13.005418'
+                        resourceServerUrl: 'rs.iudx.io'
                         providerName: Administrator of the IUDX platform
                 List Resource by ID:
                   value:
@@ -2046,6 +2070,7 @@ paths:
                         accessPolicy: OPEN
                         updatedAt: '2024-03-03T19:26:13.005418'
                         createdAt: '2024-03-03T17:26:13.005418'
+                        resourceServerUrl: 'rs.iudx.io'
                         providerName: Administrator of the IUDX platform
         '204':
           description: no content
@@ -2161,9 +2186,12 @@ paths:
                     type: 'urn:dx:dmp:success'
                     title: Success
                     results:
-                      - provider_id: b2c27f3f-2524-4a84-816e-91f9ab23f837
-                        providername: Administrator of the IUDX platform
-                        resource_server: 49cf5c76-09de-11ee-be56-0242ac120002
+                      - providerId: b2c27f3f-2524-4a84-816e-91f9ab23f837
+                        numberOfResources: 8
+                        providerName: Administrator of the IUDX platform
+                        resourceServerUrl: 49cf5c76-09de-11ee-be56-0242ac120002
+                        updatedAt: '2024-03-02T19:00:00.885808'
+                        createdAt: '2024-02-02T15:00:00.885808'
               examples:
                 List All Providers:
                   value:
@@ -2701,8 +2729,13 @@ paths:
                       properties:
                         productId:
                           type: string
+                          minLength: 1
                         providerName:
                           type: string
+                          minLength: 1
+                        resourceServerUrl:
+                          type: string
+                          minLength: 1
                         updatedAt:
                           type: string
                           minLength: 1
@@ -2715,15 +2748,19 @@ paths:
                             type: object
                             properties:
                               id:
-                                type: string
+                                type: uuid
+                                minLength: 36
+                                maxLength: 36
                               name:
                                 type: string
+                                minLength: 1
                             required:
                               - id
                               - name
                       required:
                         - productId
                         - providerName
+                        - resourceServerUrl
                         - updatedAt
                         - createdAt
                         - resources
@@ -2738,6 +2775,7 @@ paths:
                     results:
                       - productId: 'urn:datakaveri.org:b2c27f3f-2524-4a84-816e-91f9ab23f837:testProduct1'
                         providerName: Administrator of the IUDX platform
+                        resourceServerUrl: 'rs.iudx.io'
                         updatedAt: '2024-02-16T04:51:15.239497'
                         createdAt: '2024-02-15T04:51:15.239497'
                         resources:
@@ -2747,6 +2785,7 @@ paths:
                             name: Chandigarh Paid Parking Locations
                       - productId: 'urn:datakaveri.org:b2c27f3f-2524-4a84-816e-91f9ab23f837:testProduct5ui'
                         providerName: Administrator of the IUDX platform
+                        resourceServerUrl: 'rs.iudx.io'
                         updatedAt: '2024-02-15T03:51:15.239497'
                         createdAt: '2024-02-14T04:51:15.239497'
                         resources:
@@ -2760,6 +2799,7 @@ paths:
                     results:
                       - productId: 'urn:datakaveri.org:b2c27f3f-2524-4a84-816e-91f9ab23f837:testProduct1'
                         providerName: Administrator of the IUDX platform
+                        resourceServerUrl: 'rs.iudx.io'
                         updatedAt: '2024-02-16T03:51:15.239497'
                         createdAt: '2024-02-15T03:51:15.239497'
                         resources:
@@ -2769,6 +2809,7 @@ paths:
                             name: Chandigarh Paid Parking Locations
                       - productId: 'urn:datakaveri.org:b2c27f3f-2524-4a84-816e-91f9ab23f837:testProduct5'
                         providerName: Administrator of the IUDX platform
+                        resourceServerUrl: 'rs.iudx.io'
                         updatedAt: '2024-01-15T03:51:15.239497'
                         createdAt: '2024-01-14T03:51:15.239497'
                         resources:
@@ -2781,6 +2822,7 @@ paths:
                     results:
                       - productId: 'urn:datakaveri.org:b2c27f3f-2524-4a84-816e-91f9ab23f837:testProduct1'
                         providerName: Administrator of the IUDX platform
+                        resourceServerUrl: 'rs.iudx.io'
                         updatedAt: '2023-10-15T03:51:15.239497'
                         createdAt: '2023-10-13T03:51:15.239497'
                         resources:
@@ -2793,6 +2835,7 @@ paths:
                     results:
                       - productId: 'urn:datakaveri.org:b2c27f3f-2524-4a84-816e-91f9ab23f837:testProduct1'
                         providerName: Administrator of the IUDX platform
+                        resourceServerUrl: 'rs.iudx.io'
                         updatedAt: '2023-09-15T03:51:15.239497'
                         createdAt: '2023-09-14T03:51:15.239497'
                         resources:
@@ -2802,6 +2845,7 @@ paths:
                             name: Chandigarh Paid Parking Locations
                       - productId: 'urn:datakaveri.org:b2c27f3f-2524-4a84-816e-91f9ab23f837:testProduct5ui'
                         providerName: Administrator of the IUDX platform
+                        resourceServerUrl: 'rs.iudx.io'
                         updatedAt: '2023-08-15T03:51:15.239497'
                         createdAt: '2023-08-14T03:51:15.239497'
                         resources:
@@ -4171,6 +4215,9 @@ components:
               type: string
               minLength: 18
               maxLength: 18
+            resourceServerUrl:
+              type: string
+              minLength: 1
             type:
               type: string
               enum: [ route ]
@@ -4273,6 +4320,7 @@ components:
               minLength: 1
           required:
             - accountId
+            - resourceServerUrl
             - type
             - status
             - email
@@ -4295,6 +4343,7 @@ components:
         results:
           {
             "accountId": "acc_GRWKk7qQsLnDjX",
+            "resourceServerUrl": "rs.iudx.io",
             "type": "route",
             "status": "created",
             "email": "test.provider@gmail.com",

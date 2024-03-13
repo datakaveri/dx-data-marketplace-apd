@@ -139,8 +139,10 @@ public class ConsumerApis {
 
     JsonObject authInfo = (JsonObject) routingContext.data().get(AUTH_INFO);
     requestBody.put(AUTH_INFO, authInfo);
+    User consumer = routingContext.get("user");
 
     consumerService.listProviders(
+            consumer,
         requestBody,
         handler -> {
          if (handler.succeeded()) {
@@ -162,10 +164,12 @@ public class ConsumerApis {
       requestBody.put(param.getKey(), param.getValue());
     }
 
+    User consumer = routingContext.get("user");
     JsonObject authInfo = (JsonObject) routingContext.data().get(AUTH_INFO);
     requestBody.put(AUTH_INFO, authInfo);
 
     consumerService.listResources(
+            consumer,
         requestBody,
         handler -> {
           if (handler.succeeded()) {
@@ -210,8 +214,10 @@ public class ConsumerApis {
 
     JsonObject authInfo = (JsonObject) routingContext.data().get(AUTH_INFO);
     requestBody.put(AUTH_INFO, authInfo);
+    User consumer = routingContext.get("user");
 
     consumerService.listProducts(
+            consumer,
         requestBody,
         handler -> {
           if (handler.succeeded()) {

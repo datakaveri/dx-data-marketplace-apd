@@ -59,22 +59,25 @@ public class ConsumerServiceImpl implements ConsumerService {
   }
 
   @Override
-  public ConsumerService listResources(
+  public ConsumerService listResources( User consumer,
       JsonObject request, Handler<AsyncResult<JsonObject>> handler) {
 
     String resourceTable = config.getJsonArray(TABLES).getString(1);
     JsonObject params = new JsonObject();
+    String resourceServerUrl = consumer.getResourceServerUrl();
+    params.put("resourceServerUrl", resourceServerUrl);
+
     StringBuilder query = new StringBuilder(LIST_RESOURCES_QUERY.replace("$0", resourceTable));
     if (request.containsKey("resourceId")) {
       String resourceID = request.getString("resourceId");
       params.put("resourceId", resourceID);
-      query.append(" where ").append("_id").append('=').append("$1");
+      query = new StringBuilder(LIST_RESOURCES_QUERY_4_RESOURCE.replace("$0", resourceTable));
     } else if (request.containsKey("providerId")) {
       String providerID = request.getString("providerId");
       params.put("providerId", providerID);
-      query.append(" where ").append("provider_id").append('=').append("$1");
+      query = new StringBuilder(LIST_RESOURCES_QUERY_4_PROVIDER.replace("$0", resourceTable));
     }
-    query.append(" ORDER BY modified_at DESC");
+    LOGGER.debug("List resources query : {}", query);
     pgService.executePreparedQuery(
         query.toString(),
         params,
@@ -90,18 +93,19 @@ public class ConsumerServiceImpl implements ConsumerService {
   }
 
   @Override
-  public ConsumerService listProviders(
+  public ConsumerService listProviders(User consumer,
       JsonObject request, Handler<AsyncResult<JsonObject>> handler) {
-
-    String resourceTable = config.getJsonArray(TABLES).getString(1);
     JsonObject params = new JsonObject();
-    StringBuilder query = new StringBuilder(LIST_PROVIDERS_QUERY.replace("$0", resourceTable));
-    LOGGER.debug("Query : " + query);
+    String resourceServerUrl = consumer.getResourceServerUrl();
+    params.put("resourceServerUrl", resourceServerUrl);
+
+    String query = LIST_PROVIDERS_QUERY;
     if (request.containsKey("providerId")) {
       String providerID = request.getString("providerId");
       params.put("providerId", providerID);
-      query = new StringBuilder(LIST_PROVIDER_WITH_GIVEN_PROVIDER_ID);
+      query = LIST_PROVIDER_WITH_GIVEN_PROVIDER_ID;
     }
+    LOGGER.debug("Query : " + query);
 
     pgService.executePreparedQuery(
         query.toString(),
@@ -118,13 +122,15 @@ public class ConsumerServiceImpl implements ConsumerService {
   }
 
   @Override
-  public ConsumerService listProducts(
+  public ConsumerService listProducts( User consumer,
       JsonObject request, Handler<AsyncResult<JsonObject>> handler) {
     String productTable = config.getJsonArray(TABLES).getString(0);
     String resourceTable = config.getJsonArray(TABLES).getString(1);
     String productResourceRelationTable = config.getJsonArray(TABLES).getString(2);
+    String resourceServerUrl = consumer.getResourceServerUrl();
 
     JsonObject params = new JsonObject();
+    params.put("resourceServerUrl", resourceServerUrl);
     StringBuilder query =
         new StringBuilder(
             LIST_PRODUCTS
@@ -134,16 +140,14 @@ public class ConsumerServiceImpl implements ConsumerService {
 
     if (request.containsKey("resourceId")) {
       String resourceID = request.getString("resourceId");
-      params.put(STATUS, Status.ACTIVE.toString()).put("resourceId", resourceID);
+      params.put("resourceId", resourceID);
       query.append(" and rt._id=$2");
     } else if (request.containsKey("providerId")) {
       String providerID = request.getString("providerId");
-      params.put(STATUS, Status.ACTIVE.toString()).put("providerId", providerID);
+      params.put("providerId", providerID);
       query.append(" and pt.provider_id=$2");
-    } else {
-      params.put(STATUS, Status.ACTIVE.toString());
     }
-    query.append(" group by pt.product_id");
+    query.append(" group by pt.product_id, rt.resource_server");
     query.append(" order by pt.modified_at DESC");
     LOGGER.debug(query);
 
@@ -165,6 +169,8 @@ public class ConsumerServiceImpl implements ConsumerService {
   @Override
   public ConsumerService createOrder(
       JsonObject request, User user, Handler<AsyncResult<JsonObject>> handler) {
+    String resourceServerUrl = user.getResourceServerUrl();
+
     String variantId = request.getString(PRODUCT_VARIANT_ID);
     String consumerId = user.getUserId();
     LOGGER.debug(variantId);
@@ -194,6 +200,8 @@ public class ConsumerServiceImpl implements ConsumerService {
 
     String resourceId = request.getString("resourceId");
     String productId = request.getString("productId");
+    String resourceServerUrl = user.getResourceServerUrl();
+
     LOGGER.debug("payment status is {}", request.getString("paymentStatus"));
     try {
       PaymentStatus paymentStatus = PaymentStatus.fromString(request.getString("paymentStatus"));
@@ -313,7 +321,10 @@ public class ConsumerServiceImpl implements ConsumerService {
   public ConsumerService listProductVariants(
       User user, JsonObject request, Handler<AsyncResult<JsonObject>> handler) {
     String productId = request.getString("productId");
+    String resourceServerUrl = user.getResourceServerUrl();
+
     String query = FETCH_ACTIVE_PRODUCT_VARIANTS.replace("$1", productId);
+    LOGGER.debug("Query to list product variants : {}", query);
     pgService.executeQuery(
         query,
         pgHandler -> {

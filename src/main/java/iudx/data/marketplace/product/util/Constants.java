@@ -31,13 +31,15 @@ public class Constants {
 
   public static final String DELETE_PRODUCT_QUERY = "update $0 set status=$1 where product_id=$2";
   public static final String LIST_PRODUCT_FOR_RESOURCE =
-          "select pt.product_id AS \"productId\", pt.provider_name AS \"providerName\", "
-                  + " pt.modified_at AS \"updatedAt\" ,  pt.created_at AS \"createdAt\" ,"
-                  + "array_agg(json_build_object('id', rt._id, 'name', rt.resource_name)) as resources "
-                  + "from $0 as pt "
-                  + "inner join $9 as dpt on pt.product_id = dpt.product_id "
-                  + "inner join $8 as rt on dpt.resource_id = rt._id "
-                  + "where  pt.status=$1 and pt.provider_id=$2";
+      "select pt.product_id AS \"productId\", pt.provider_name AS \"providerName\", "
+          + " pt.modified_at AS \"updatedAt\" ,  pt.created_at AS \"createdAt\" ,"
+          + " rt.resource_server AS \"resourceServerUrl\", "
+          + "array_agg(json_build_object('id', rt._id, 'name', rt.resource_name)) as resources "
+          + "from $0 as pt "
+          + "inner join $9 as dpt on pt.product_id = dpt.product_id "
+          + "inner join $8 as rt on dpt.resource_id = rt._id "
+          + "where  pt.status=$1 and pt.provider_id=$2"
+          + " and rt.resource_server = $3";
 
   public static final String LIST_ALL_PRODUCTS =
       "select product_id, provider_name from $0 where status=$1 and provider_id=$2";

@@ -89,9 +89,9 @@ public class QueryBuilder {
                             .replace("$9", productResourceRelationTable)
                             .replace("$8", resourceTable));
     if (request.containsKey("resourceId")) {
-      query.append(" and rt._id=$3");
+      query.append(" and rt._id=$4");
     }
-    query.append(" group by pt.product_id");
+    query.append(" group by pt.product_id, rt.resource_server");
     query.append(" order by pt.modified_at DESC");
 
     return query.toString();
