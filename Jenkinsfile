@@ -62,7 +62,7 @@ pipeline {
           }
         }        
       }
-
+    }
     stage('Start DMP-APD-SERVER for Performance/Integration Testing'){
       steps{
         script{
@@ -187,5 +187,4 @@ pipeline {
     }
 
     }
-}
 }
