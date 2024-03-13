@@ -3,9 +3,32 @@ package iudx.data.marketplace.consumer.util;
 public class Constants {
 
   public static final String LIST_RESOURCES_QUERY =
-          "select _id AS \"resourceId\", resource_name AS \"resourceName\", accessPolicy AS \"accessPolicy\","
-                  + " modified_at AS \"updatedAt\" , created_at AS \"createdAt\""
-                  + " ,provider_name AS \"providerName\" from $0 ";
+      "select _id AS \"resourceId\", resource_name AS \"resourceName\", accessPolicy  "
+          + "AS \"accessPolicy\",  "
+          + "modified_at AS \"updatedAt\" , "
+          + "created_at AS \"createdAt\" ,resource_server AS \"resourceServerUrl\",provider_name AS \"providerName\" "
+          + "from $0  "
+          + "WHERE resource_server = $1 "
+          + "ORDER BY modified_at DESC";
+
+  public static final String LIST_RESOURCES_QUERY_4_RESOURCE =
+      " select _id AS \"resourceId\", resource_name AS \"resourceName\", accessPolicy  "
+          + " AS \"accessPolicy\", modified_at AS \"updatedAt\" , created_at AS \"createdAt\" , "
+          + " resource_server AS \"resourceServerUrl\",provider_name  AS \"providerName\" "
+          + " from $0   "
+          + " WHERE resource_server = $1 "
+          + " AND _id= $2 "
+          + " ORDER BY modified_at DESC";
+  public static final String LIST_RESOURCES_QUERY_4_PROVIDER =
+      " select _id AS \"resourceId\", resource_name AS \"resourceName\",  "
+          + " accessPolicy AS \"accessPolicy\", modified_at AS \"updatedAt\" , created_at  "
+          + " AS \"createdAt\" ,  resource_server AS \"resourceServerUrl\", "
+          + " provider_name AS \"providerName\"  "
+          + " from $0  "
+          + " WHERE resource_server = $1 "
+          + " AND provider_id = $2 "
+          + " ORDER BY modified_at DESC ";
+
   public static final String LIST_PROVIDERS_QUERY =
           "SELECT DISTINCT U._id AS \"providerId\", COUNT(R._id) AS \"numberOfResources\", \n"
                   + "R.provider_name AS \"providerName\", \n"
@@ -15,6 +38,7 @@ public class Constants {
                   + "FROM user_table U\n"
                   + "INNER JOIN resource_entity R \n"
                   + "ON U._id = R.provider_id\n"
+                  + "WHERE R.resource_server = $1 \n"
                   + "GROUP BY U._id, R.provider_name, R.resource_server, U.modified_at\n"
                   + "ORDER BY U.modified_at DESC";
   public static final String LIST_PROVIDER_WITH_GIVEN_PROVIDER_ID =
@@ -26,19 +50,21 @@ public class Constants {
                   + "FROM user_table U\n"
                   + "INNER JOIN resource_entity R \n"
                   + "ON U._id = R.provider_id\n"
-                  + "WHERE U._id = $1 \n"
+                  + "WHERE R.resource_server = $1 \n"
+                  + "AND U._id = $2 \n"
                   + "GROUP BY U._id, R.provider_name, R.resource_server, U.modified_at\n"
                   + "ORDER BY U.modified_at DESC";
 
   public static final String LIST_PRODUCTS =
-          "select pt.product_id AS \"productId\", pt.provider_name AS \"providerName\", "
-                  + " pt.modified_at AS \"updatedAt\" , "
-                  + " pt.created_at AS \"createdAt\" , "
-                  + "array_agg(json_build_object('id', rt._id, 'name', rt.resource_name)) as resources "
-                  + "from $0 as pt "
-                  + "inner join $9 as dpt on pt.product_id = dpt.product_id "
-                  + "inner join $8 as rt on dpt.resource_id = rt._id "
-                  + "where  pt.status=$1";
+      "select pt.product_id AS \"productId\", pt.provider_name AS \"providerName\", "
+          + "rt.resource_server AS \"resourceServerUrl\",\n"
+          + " pt.modified_at AS \"updatedAt\" , "
+          + " pt.created_at AS \"createdAt\" , "
+          + "array_agg(json_build_object('id', rt._id, 'name', rt.resource_name)) as resources "
+          + "from $0 as pt "
+          + "inner join $9 as dpt on pt.product_id = dpt.product_id "
+          + "inner join $8 as rt on dpt.resource_id = rt._id "
+          + "where  pt.status='ACTIVE' AND rt.resource_server = $1";
 
   public static final String GET_PRODUCT_VARIANT_INFO =
           "select pv._id, pv.product_variant_name, pv.product_id, pv.provider_id, pv.price, m.account_id "
@@ -107,7 +133,7 @@ public class Constants {
                   + " WHERE\n"
                   + " P.product_id IN (SELECT product_id FROM product_resource_relation WHERE resource_id = '$1'\n"
                   + " )\n"
-                  + " AND I.consumer_id = '$2' AND I.payment_status != 'SUCCEEDED' ";
+                  + " AND I.consumer_id = '$2' AND I.payment_status = 'PENDING' ";
 
   public static final String LIST_FAILED_PAYMENTS_4_CONSUMER = LIST_PENDING_PAYMENTS_4_CONSUMER.replace("PENDING","FAILED");
   public static final String LIST_FAILED_PAYMENTS_4_CONSUMER_WITH_GIVEN_PRODUCT = LIST_PENDING_PAYMENTS_4_CONSUMER_WITH_GIVEN_PRODUCT

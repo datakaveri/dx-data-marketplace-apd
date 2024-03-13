@@ -15,37 +15,38 @@ public interface ConsumerService {
 
   /**
    * The listResources method fetches some or all resources available on the IUDX marketplace
-   *
+   * @param consumer as User object
    * @param request which is a JsonObject
    * @param handler which is a Request Handler
    * @return ConsumerService which ia service
    */
   @Fluent
-  ConsumerService listResources(JsonObject request, Handler<AsyncResult<JsonObject>> handler);
+  ConsumerService listResources(User consumer, JsonObject request, Handler<AsyncResult<JsonObject>> handler);
 
   /**
    * The listProviders method fetches all or one providers available on the IUDX marketplace
-   *
+   * @param consumer as User object
    * @param request which is a JsonObject
    * @param handler which is a Request Handler
    * @return ConsumerService which ia service
    */
   @Fluent
-  ConsumerService listProviders(JsonObject request, Handler<AsyncResult<JsonObject>> handler);
+  ConsumerService listProviders(User consumer, JsonObject request, Handler<AsyncResult<JsonObject>> handler);
 
   /**
    * The listProducts method fetches some or all products available on the IUDX marketplace
-   *
+   * @param consumer as User object
    * @param request which is a JsonObject
    * @param handler which is a Request Handler
    * @return ConsumerService which ia service
    */
   @Fluent
-  ConsumerService listProducts(JsonObject request, Handler<AsyncResult<JsonObject>> handler);
+  ConsumerService listProducts(User consumer, JsonObject request, Handler<AsyncResult<JsonObject>> handler);
 
   /**
    * The createOrder method creates an order for the consumer against a product variant
    * @param request
+   * @param user Consumer User
    * @param handler
    * @return
    */
@@ -54,6 +55,7 @@ public interface ConsumerService {
 
   /**
    * The listProductVariants method fetches all the <b>ACTIVE</b> product variants of a given product
+   * @param user as consumer User object
    * @param request containing the productId of a given product
    * @param handler AsyncResult JsonObject request handler
    * @return ConsumerService object

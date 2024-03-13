@@ -27,6 +27,7 @@ public class FetchLinkedAccount {
   String razorpayAccountProductId;
   String updatedAt;
   String createdAt;
+  String resourceServerUrl;
 
   public FetchLinkedAccount(
       PostgresService postgresService,
@@ -40,9 +41,8 @@ public class FetchLinkedAccount {
   }
 
   public Future<JsonObject> initiateFetchingLinkedAccount(User provider) {
-    String providerId = provider.getUserId();
     /*get accountId associated with the given provider ID*/
-    Future<JsonObject> getAccountFuture = getAccountId(GET_ACCOUNT_ID_QUERY, providerId);
+    Future<JsonObject> getAccountFuture = getAccountId(GET_ACCOUNT_ID_QUERY, provider);
     Future<JsonObject> accountDetailsFromRzpFuture =
         getAccountFuture.compose(
             accountFutureJson -> {
@@ -115,6 +115,7 @@ public class FetchLinkedAccount {
     JsonObject details =
         new JsonObject()
             .put("accountId", accountId)
+            .put("resourceServerUrl", getResourceServerUrl())
             .put("type", type)
             .put("status", status)
             .put("email", emailId)
@@ -143,9 +144,11 @@ public class FetchLinkedAccount {
     return Future.succeededFuture(response);
   }
 
-  Future<JsonObject> getAccountId(String query, String providerId) {
+  Future<JsonObject> getAccountId(String query, User provider) {
     Promise<JsonObject> promise = Promise.promise();
-    String finalQuery = query.replace("$1", providerId);
+    String providerId = provider.getUserId();
+    String resourceServerUrl = provider.getResourceServerUrl();
+    String finalQuery = query.replace("$1", providerId).replace("$2", resourceServerUrl);
     LOGGER.debug("Final query : " + finalQuery);
     postgresService.executeQuery(
         finalQuery,
@@ -157,9 +160,11 @@ public class FetchLinkedAccount {
               String accountProductId = result.getString("rzp_account_product_id");
               String updatedAt = result.getString("updatedAt");
               String createdAt = result.getString("createdAt");
+              String resourceServer = result.getString("resourceServerUrl");
               setRazorpayAccountProductId(accountProductId);
               setUpdatedAt(updatedAt);
               setCreatedAt(createdAt);
+              setResourceServerUrl(resourceServer);
               promise.complete(new JsonObject().put("accountId", accountId));
             } else {
               promise.fail(
@@ -205,5 +210,13 @@ public class FetchLinkedAccount {
   public void setCreatedAt(String createdAt)
   {
     this.createdAt = createdAt;
+  }
+
+  public String getResourceServerUrl() {
+    return resourceServerUrl;
+  }
+
+  public void setResourceServerUrl(String resourceServerUrl) {
+    this.resourceServerUrl = resourceServerUrl;
   }
 }

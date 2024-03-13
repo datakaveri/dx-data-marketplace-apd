@@ -86,8 +86,8 @@ public class DeployerDev {
 
   public static void main(String[] args) {
     CLI cli =
-            CLI.create("IUDX Cat")
-                    .setSummary("A CLI to deploy the resource server")
+            CLI.create("IUDX DMP APD")
+                    .setSummary("A CLI to deploy the DMP APD server")
                     .addOption(
                             new Option()
                                     .setLongName("help")
