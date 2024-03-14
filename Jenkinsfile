@@ -28,16 +28,20 @@ pipeline {
     stage('Unit Tests and Code Coverage Test'){
       steps{
         script{
-            sh 'cp /home/ubuntu/configs/dmp-apd-server-config.json ./secrets/all-verticles-configs/config-test.json'
-            sh "mvn clean test checkstyle:checkstyle pmd:pmd"
+          sh 'cp /home/ubuntu/configs/dmp-apd-server-config.json ./secrets/all-verticles-configs/config-test.json'
+           catchError(buildResult: 'SUCCESS', stageResult: 'UNSTABLE') {
+              sh "mvn clean test checkstyle:checkstyle pmd:pmd"
+            }  
         }
+        
+      }
+      post{
+
         xunit (
           thresholds: [ skipped(failureThreshold: '0'), failed(failureThreshold: '0') ],
           tools: [ JUnit(pattern: 'target/surefire-reports/*.xml') ]
         )
         jacoco classPattern: 'target/classes', execPattern: 'target/jacoco.exec', sourcePattern: 'src/main/java', exclusionPattern:'iudx/data/marketplace/apiserver/ApiServerVerticle.class,**/*VertxEBProxy.class,**/Constants.class,**/*VertxProxyHandler.class,**/*Verticle.clas,**/JwtDataConverter.class,iudx/data/marketplace/apiserver/ProviderApis.class,iudx/data/marketplace/apiserver/ConsumerApis.class,iudx/data/marketplace/deploy/*.class'
-      }
-      post{
       always {
         recordIssues(
           enabledForFailure: true,
