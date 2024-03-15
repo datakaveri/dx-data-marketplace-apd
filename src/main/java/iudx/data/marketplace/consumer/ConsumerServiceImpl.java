@@ -1,8 +1,6 @@
 package iudx.data.marketplace.consumer;
 
 import static iudx.data.marketplace.apiserver.util.Constants.PRODUCT_VARIANT_ID;
-import static iudx.data.marketplace.common.Constants.PROVIDER_ID;
-import static iudx.data.marketplace.common.Constants.RESOURCE_ID;
 import static iudx.data.marketplace.consumer.util.Constants.*;
 import static iudx.data.marketplace.consumer.util.Constants.TABLES;
 import static iudx.data.marketplace.product.util.Constants.*;
@@ -200,6 +198,7 @@ public class ConsumerServiceImpl implements ConsumerService {
 
     String resourceId = request.getString("resourceId");
     String productId = request.getString("productId");
+    String orderId = request.getString("orderId");
     String resourceServerUrl = user.getResourceServerUrl();
 
     LOGGER.debug("payment status is {}", request.getString("paymentStatus"));
@@ -212,15 +211,15 @@ public class ConsumerServiceImpl implements ConsumerService {
       if (paymentStatus.equals(PaymentStatus.SUCCESSFUL)) {
         query =
             queryBuilder.listPurchaseForConsumerDuringSuccessfulPayment(
-                user.getUserId(), resourceId, productId);
+                user.getUserId(), resourceId, productId, orderId, resourceServerUrl);
       } else if (paymentStatus.equals(PaymentStatus.FAILED)) {
         query =
             queryBuilder.listPurchaseForConsumerDuringFailurePayment(
-                user.getUserId(), resourceId, productId);
+                user.getUserId(), resourceId, productId, orderId, resourceServerUrl);
       } else {
         query =
             queryBuilder.listPurchaseForConsumerDuringPendingPayment(
-                user.getUserId(), resourceId, productId);
+                user.getUserId(), resourceId, productId, orderId, resourceServerUrl);
       }
 
       Future<JsonArray> paymentFuture = executePurchaseQuery(query, resourceId, productId, user);
@@ -323,10 +322,16 @@ public class ConsumerServiceImpl implements ConsumerService {
     String productId = request.getString("productId");
     String resourceServerUrl = user.getResourceServerUrl();
 
-    String query = FETCH_ACTIVE_PRODUCT_VARIANTS.replace("$1", productId);
+    JsonObject params = new JsonObject()
+            .put("productId", productId)
+            .put("resourceServerUrl", resourceServerUrl);
+
+    String query =
+            FETCH_ACTIVE_PRODUCT_VARIANTS + " ORDER BY P.\"updatedAt\" DESC";
     LOGGER.debug("Query to list product variants : {}", query);
-    pgService.executeQuery(
+    pgService.executePreparedQuery(
         query,
+        params,
         pgHandler -> {
           if (pgHandler.succeeded()) {
             boolean isResponseEmpty = pgHandler.result().getJsonArray(RESULTS).isEmpty();

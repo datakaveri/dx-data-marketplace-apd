@@ -15,6 +15,8 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import java.io.IOException;
+import java.io.PrintWriter;
+import java.io.StringWriter;
 
 import static iudx.data.marketplace.common.ResponseUrn.INVALID_PAYLOAD_FORMAT_URN;
 import static iudx.data.marketplace.common.ResponseUrn.SCHEMA_READ_ERROR_URN;
@@ -57,7 +59,10 @@ public class JsonSchemaTypeValidator implements Validator {
     try {
      final JsonNode sc = loadResource(schemaPath);
     } catch (Exception e) {
-      e.printStackTrace();
+      StringWriter stringWriter = new StringWriter();
+      PrintWriter pw = new PrintWriter(stringWriter);
+      e.printStackTrace(pw);
+      LOGGER.error("Validation Error {}", stringWriter.toString());
     }
     final JsonNode schemaNode = loadResource(schemaPath);
     LOGGER.debug(schemaNode.asText());

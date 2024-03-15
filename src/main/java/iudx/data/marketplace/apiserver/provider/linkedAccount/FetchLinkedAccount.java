@@ -27,7 +27,6 @@ public class FetchLinkedAccount {
   String razorpayAccountProductId;
   String updatedAt;
   String createdAt;
-  String resourceServerUrl;
 
   public FetchLinkedAccount(
       PostgresService postgresService,
@@ -115,7 +114,6 @@ public class FetchLinkedAccount {
     JsonObject details =
         new JsonObject()
             .put("accountId", accountId)
-            .put("resourceServerUrl", getResourceServerUrl())
             .put("type", type)
             .put("status", status)
             .put("email", emailId)
@@ -160,11 +158,9 @@ public class FetchLinkedAccount {
               String accountProductId = result.getString("rzp_account_product_id");
               String updatedAt = result.getString("updatedAt");
               String createdAt = result.getString("createdAt");
-              String resourceServer = result.getString("resourceServerUrl");
               setRazorpayAccountProductId(accountProductId);
               setUpdatedAt(updatedAt);
               setCreatedAt(createdAt);
-              setResourceServerUrl(resourceServer);
               promise.complete(new JsonObject().put("accountId", accountId));
             } else {
               promise.fail(
@@ -212,11 +208,4 @@ public class FetchLinkedAccount {
     this.createdAt = createdAt;
   }
 
-  public String getResourceServerUrl() {
-    return resourceServerUrl;
-  }
-
-  public void setResourceServerUrl(String resourceServerUrl) {
-    this.resourceServerUrl = resourceServerUrl;
-  }
 }

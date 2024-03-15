@@ -514,6 +514,12 @@ paths:
                               expiryInMonths:
                                 type: integer
                                 minimum: 1
+                              resourceServerUrl:
+                                type: string
+                                minLength: 1
+                              productVariantStatus:
+                                  type: string
+                                  minLength: 1
                             required:
                               - productId
                               - productVariantId
@@ -521,6 +527,8 @@ paths:
                               - productVariantName
                               - price
                               - expiryInMonths
+                              - resourceServerUrl
+                              - productVariantStatus
                       required:
                         - invoiceId
                         - orderId
@@ -609,7 +617,9 @@ paths:
                             ],
                             "productVariantName": "variant1",
                             "price": "150.0",
-                            "expiryInMonths": "12"
+                            "expiryInMonths": "12",
+                            "resourceServerUrl": "some.dummy.server",
+                            "productVariantStatus": "ACTIVE"
                           }
                         }
                       ]
@@ -665,7 +675,9 @@ paths:
                             ],
                             "productVariantName": "variant1",
                             "price": "150.0",
-                            "expiryInMonths": "12"
+                            "expiryInMonths": "12",
+                            "resourceServerUrl": "some.dummy.server",
+                            "productVariantStatus": "ACTIVE"
                           }
                         }
                       ]
@@ -721,7 +733,10 @@ paths:
                             ],
                             "productVariantName": "variant1",
                             "price": "150.0",
-                            "expiryInMonths": "12"
+                            "expiryInMonths": "12",
+                            "resourceServerUrl": "some.dummy.server",
+                            "productVariantStatus": "ACTIVE"
+
                           }
                         }
                       ]
@@ -997,6 +1012,12 @@ paths:
                         createdAt:
                           type: string
                           minLength: 1
+                        resourceServerUrl:
+                          type: string
+                          minLength: 1
+                        productVariantStatus:
+                          type: string
+                          minLength: 1
                       required:
                         - productVariantId
                         - productVariantName
@@ -1007,6 +1028,7 @@ paths:
                         - updatedAt
                         - createdAt
                         - resourceName
+                        - resourceServerUrl
                 required:
                   - type
                   - title
@@ -1053,7 +1075,9 @@ paths:
                           "price": 150.0,
                           "expiryInMonths": 12,
                           "updatedAt": "2024-02-28T12:48:26.375195",
-                          "createdAt": "2023-02-28T12:48:26.375195"
+                          "createdAt": "2023-02-28T12:48:26.375195",
+                          "resourceServerUrl": "some.dummy.server",
+                          "productVariantStatus": "ACTIVE"
                         }
                       ]
                     }
@@ -1088,7 +1112,9 @@ paths:
                           "price": 150.0,
                           "expiryInMonths": 12,
                           "updatedAt": "2023-02-28T12:48:26.375195",
-                          "createdAt": "2023-01-28T12:48:26.375195"
+                          "createdAt": "2023-01-28T12:48:26.375195",
+                          "resourceServerUrl": "some.dummy.server",
+                          "productVariantStatus": "ACTIVE"
                         },
                         {
                           "productVariantId": "be85f112-51e6-4248-a254-38c3e13151fa",
@@ -1115,7 +1141,10 @@ paths:
                           "price": 200,
                           "expiryInMonths": 4,
                           "updatedAt": "2022-02-28T12:48:26.375195",
-                          "createdAt": "2023-01-28T12:48:26.375195"
+                          "createdAt": "2023-01-28T12:48:26.375195",
+                          "resourceServerUrl": "some.dummy.server",
+                          "productVariantStatus": "ACTIVE"
+
                         },
                         {
                           "productVariantId": "3780dedb-e0a6-4eff-a05c-8b2aa555a598",
@@ -1142,7 +1171,9 @@ paths:
                           "price": 145.0,
                           "expiryInMonths": 2,
                           "updatedAt": "2021-02-28T12:48:26.375195",
-                          "createdAt": "2023-01-20T12:48:26.375195"
+                          "createdAt": "2023-01-20T12:48:26.375195",
+                          "resourceServerUrl": "some.dummy.server",
+                          "productVariantStatus": "ACTIVE"
                         }
                       ]
                     }
@@ -2312,6 +2343,14 @@ paths:
             type: string
             enum: [succeeded, pending, failed]
           required: true
+        - name: orderId
+          in: query
+          description: order ID of payment for which the succeeded, pending, failed payments needs to be filtered
+          schema:
+            type: string
+            pattern: 'order_[a-zA-Z0-9]+'
+            minLength: 6
+
       responses:
         '200':
           description: success
@@ -2438,6 +2477,12 @@ paths:
                               expiryInMonths:
                                 type: integer
                                 minimum: 1
+                              resourceServerUrl:
+                                type: string
+                                minLength: 1
+                              productVariantStatus:
+                                type: string
+                                minLength: 1
                             required:
                               - productId
                               - productVariantId
@@ -2445,6 +2490,8 @@ paths:
                               - productVariantName
                               - price
                               - expiryInMonths
+                              - productVariantStatus
+                              - resourceServerUrl
                       required:
                         - invoiceId
                         - orderId
@@ -2533,7 +2580,9 @@ paths:
                             ],
                             "productVariantName": "variant1",
                             "price": "150.0",
-                            "expiryInMonths": "12"
+                            "expiryInMonths": "12",
+                            "resourceServerUrl": "some.dummy.server",
+                            "productVariantStatus": "ACTIVE"
                           }
                         }
                       ]
@@ -2589,7 +2638,9 @@ paths:
                             ],
                             "productVariantName": "variant1",
                             "price": "150.0",
-                            "expiryInMonths": "12"
+                            "expiryInMonths": "12",
+                            "resourceServerUrl": "some.dummy.server",
+                            "productVariantStatus": "ACTIVE"
                           }
                         }
                       ]
@@ -2645,7 +2696,9 @@ paths:
                             ],
                             "productVariantName": "variant1",
                             "price": "150.0",
-                            "expiryInMonths": "12"
+                            "expiryInMonths": "12",
+                            "resourceServerUrl": "some.dummy.server",
+                            "productVariantStatus": "ACTIVE"
                           }
                         }
                       ]
@@ -2969,6 +3022,12 @@ paths:
                         createdAt:
                           type: string
                           minLength: 1
+                        resourceServerUrl:
+                          type: string
+                          minLength: 1
+                        productVariantStatus:
+                          type: string
+                          minLength: 1
                       required:
                         - productVariantId
                         - productVariantName
@@ -2978,6 +3037,8 @@ paths:
                         - expiryInMonths
                         - updatedAt
                         - createdAt
+                        - resourceServerUrl
+                        - productVariantStatus
                 required:
                   - type
                   - title
@@ -3014,7 +3075,9 @@ paths:
                           "price": 150.0,
                           "expiryInMonths": 12,
                           "updatedAt": "2024-03-07T09:59:36.825012",
-                          "createdAt": "2024-03-07T09:59:36.825012"
+                          "createdAt": "2024-03-07T09:59:36.825012",
+                          "resourceServerUrl": "some.dummy.server",
+                          "productVariantStatus": "ACTIVE"
                         }
                       ]
                     }
@@ -4215,9 +4278,6 @@ components:
               type: string
               minLength: 18
               maxLength: 18
-            resourceServerUrl:
-              type: string
-              minLength: 1
             type:
               type: string
               enum: [ route ]
@@ -4320,7 +4380,6 @@ components:
               minLength: 1
           required:
             - accountId
-            - resourceServerUrl
             - type
             - status
             - email
@@ -4343,7 +4402,6 @@ components:
         results:
           {
             "accountId": "acc_GRWKk7qQsLnDjX",
-            "resourceServerUrl": "rs.iudx.io",
             "type": "route",
             "status": "created",
             "email": "test.provider@gmail.com",

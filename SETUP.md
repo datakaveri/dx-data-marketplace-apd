@@ -359,6 +359,14 @@ In order to use the consumer and provider APIs in DMP, we need to input required
 
 ```
 
+**WebhookVerticle**
+``` 
+  {
+      "id": "iudx.data.marketplace.webhook.WebhookVerticle",
+      "verticleInstances": <num-of-verticle-instances>,
+      "isWorkerVerticle": false
+    }
+```
 
 ## Connecting with DX Catalogue Server and having base path
 
@@ -414,3 +422,4 @@ In order to connect to the DX authentication server, required information such a
       "apdURL": "<dmp-apd-url>"
     }
 ```
+

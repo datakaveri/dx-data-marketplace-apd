@@ -7,6 +7,7 @@ import io.vertx.core.json.JsonObject;
 import io.vertx.junit5.VertxExtension;
 import io.vertx.junit5.VertxTestContext;
 import iudx.data.marketplace.common.Util;
+import iudx.data.marketplace.policies.User;
 import iudx.data.marketplace.postgres.PostgresService;
 import iudx.data.marketplace.razorpay.RazorPayService;
 import org.junit.jupiter.api.BeforeEach;
@@ -40,7 +41,8 @@ public class ConsumerServiceTest {
     RazorPayService razorPayService;
   @Mock
     Util util;
-
+@Mock
+User consumer;
   @BeforeEach
   public void setup(VertxTestContext testContext) {
     postgresService = mock(PostgresService.class);
@@ -72,6 +74,7 @@ public class ConsumerServiceTest {
         .executePreparedQuery(anyString(), any(), any());
 
     consumerService.listResources(
+            consumer,
         request,
         handler -> {
           if (handler.succeeded()) {
@@ -102,6 +105,7 @@ public class ConsumerServiceTest {
         .executePreparedQuery(anyString(), any(), any());
 
     consumerService.listResources(
+            consumer,
         request,
         handler -> {
           if (handler.succeeded()) {
@@ -133,6 +137,7 @@ public class ConsumerServiceTest {
         .executePreparedQuery(anyString(), any(), any());
 
     consumerService.listProviders(
+            consumer,
         request,
         handler -> {
           if (handler.succeeded()) {
@@ -164,6 +169,7 @@ public class ConsumerServiceTest {
         .executePreparedQuery(anyString(), any(), any());
 
     consumerService.listProviders(
+            consumer,
         request,
         handler -> {
           if (handler.succeeded()) {
@@ -195,6 +201,7 @@ public class ConsumerServiceTest {
         .executePreparedQuery(anyString(), any(), any());
 
     consumerService.listProducts(
+            consumer,
         request,
         handler -> {
           if (handler.succeeded()) {
@@ -227,6 +234,7 @@ public class ConsumerServiceTest {
         .executePreparedQuery(anyString(), any(), any());
 
     consumerService.listProducts(
+            consumer,
         request,
         handler -> {
           if (handler.succeeded()) {
@@ -260,6 +268,7 @@ public class ConsumerServiceTest {
         .executePreparedQuery(anyString(), any(), any());
 
     consumerService.listProducts(
+            consumer,
         request,
         handler -> {
           if (handler.succeeded()) {
