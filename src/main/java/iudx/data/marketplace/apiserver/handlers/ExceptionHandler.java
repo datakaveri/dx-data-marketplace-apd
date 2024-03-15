@@ -54,6 +54,11 @@ public class ExceptionHandler implements Handler<RoutingContext> {
           .end(validationFailureReponse(MSG_BAD_QUERY).toString());
 
     } else {
+
+      LOGGER.error(failure.getCause());
+      LOGGER.error(" -------------- ");
+      LOGGER.error(failure.fillInStackTrace());
+
       String INTERNAL_ERROR_RESP =
         new RespBuilder()
             .withType(ResponseUrn.INTERNAL_SERVER_ERR_URN.getUrn())
