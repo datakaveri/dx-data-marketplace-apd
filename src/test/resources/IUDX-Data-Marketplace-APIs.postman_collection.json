@@ -1311,7 +1311,7 @@
 											}
 										],
 										"url": {
-											"raw": "{{baseUrl}}/provider/list/purchases?paymentStatus=succeeded&resourceId=83c2e5c2-3574-4e11-9530-2b1fbdfce832",
+											"raw": "{{baseUrl}}/provider/list/purchases?paymentStatus=pending&resourceId=83c2e5c2-3574-4e11-9530-2b1fbdfce832",
 											"host": [
 												"{{baseUrl}}"
 											],
@@ -1323,7 +1323,7 @@
 											"query": [
 												{
 													"key": "paymentStatus",
-													"value": "succeeded"
+													"value": "pending"
 												},
 												{
 													"key": "resourceId",
@@ -1346,7 +1346,7 @@
 											}
 										],
 										"url": {
-											"raw": "{{baseUrl}}/provider/list/purchases?paymentStatus=succeeded&productId=urn:datakaveri.org:b2c27f3f-2524-4a84-816e-91f9ab23f837:testProduct",
+											"raw": "{{baseUrl}}/provider/list/purchases?paymentStatus=pending&productId=urn:datakaveri.org:b2c27f3f-2524-4a84-816e-91f9ab23f837:testProduct",
 											"host": [
 												"{{baseUrl}}"
 											],
@@ -1358,7 +1358,7 @@
 											"query": [
 												{
 													"key": "paymentStatus",
-													"value": "succeeded"
+													"value": "pending"
 												},
 												{
 													"key": "productId",
@@ -1549,7 +1549,7 @@
 											}
 										],
 										"url": {
-											"raw": "{{baseUrl}}/provider/product-variant?productId=urn:datakaveri.org:b2c27f3f-2524-4a84-816e-91f9ab23f837:testProduct&productVariantName=variant1",
+											"raw": "{{baseUrl}}/provider/product-variant?productId=urn:datakaveri.org:b2c27f3f-2524-4a84-816e-91f9ab23f837:testProduct&productVariantName=variant213",
 											"host": [
 												"{{baseUrl}}"
 											],
@@ -1565,7 +1565,7 @@
 												},
 												{
 													"key": "productVariantName",
-													"value": "variant1"
+													"value": "variant213"
 												}
 											]
 										}
@@ -2747,7 +2747,7 @@
 							"response": []
 						},
 						{
-							"name": "200 - List all successful consumer purchases",
+							"name": "200 - List all failed consumer purchases",
 							"request": {
 								"method": "GET",
 								"header": [
@@ -2758,7 +2758,7 @@
 									}
 								],
 								"url": {
-									"raw": "{{baseUrl}}/consumer/list/purchases?paymentStatus=succeeded",
+									"raw": "{{baseUrl}}/consumer/list/purchases?paymentStatus=failed",
 									"host": [
 										"{{baseUrl}}"
 									],
@@ -2770,7 +2770,7 @@
 									"query": [
 										{
 											"key": "paymentStatus",
-											"value": "succeeded"
+											"value": "failed"
 										}
 									]
 								}
@@ -2872,6 +2872,41 @@
 										{
 											"key": "paymentStatus",
 											"value": "succeeded"
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "200 - List consumer purchases by orderId",
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "token",
+										"value": "{{consumerToken}}",
+										"type": "text"
+									}
+								],
+								"url": {
+									"raw": "{{baseUrl}}/consumer/list/purchases?orderId=order_NmTravDc9v3NhH&paymentStatus=pending",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"consumer",
+										"list",
+										"purchases"
+									],
+									"query": [
+										{
+											"key": "orderId",
+											"value": "order_NmTravDc9v3NhH"
+										},
+										{
+											"key": "paymentStatus",
+											"value": "pending"
 										}
 									]
 								}
@@ -3289,7 +3324,7 @@
 									"variable": [
 										{
 											"key": "productVariantId",
-											"value": "060cc0ed-14fb-4f07-be1d-f0b66585eab6"
+											"value": "7bc89d79-ae23-44ce-8c7e-74e2879bd710"
 										}
 									]
 								}

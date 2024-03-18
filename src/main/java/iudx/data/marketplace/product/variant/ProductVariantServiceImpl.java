@@ -259,10 +259,12 @@ public class ProductVariantServiceImpl implements ProductVariantService {
     public ProductVariantService listProductVariants(User user, JsonObject request, Handler<AsyncResult<JsonObject>> handler) {
 
         LOGGER.debug(request);
+        String resourceServerUrl = user.getResourceServerUrl();
         String query = queryBuilder.listProductVariants(request);
 
         JsonObject params = new JsonObject()
-                .put(PRODUCT_ID, request.getString(PRODUCT_ID));
+                .put(PRODUCT_ID, request.getString(PRODUCT_ID))
+                .put("resourceServerUrl", resourceServerUrl);
 
         if(request.containsKey(PRODUCT_VARIANT_NAME)) {
             params.put(PRODUCT_VARIANT_NAME, request.getString(PRODUCT_VARIANT_NAME));
@@ -304,6 +306,7 @@ public class ProductVariantServiceImpl implements ProductVariantService {
 
     String resourceId = request.getString("resourceId");
     String productId = request.getString("productId");
+    String resourceServerUrl = user.getResourceServerUrl();
     try {
       PaymentStatus paymentStatus = PaymentStatus.fromString(request.getString("paymentStatus"));
 
@@ -312,15 +315,15 @@ public class ProductVariantServiceImpl implements ProductVariantService {
 
       if (paymentStatus.equals(PaymentStatus.SUCCESSFUL)) {
         query =
-            queryBuilder.listSuccessfulPurchaseForProvider(user.getUserId(), resourceId, productId);
+            queryBuilder.listSuccessfulPurchaseForProvider(user.getUserId(), resourceId, productId, resourceServerUrl);
       } else if (paymentStatus.equals(PaymentStatus.FAILED)) {
         query =
             queryBuilder.listPurchaseForProviderDuringFailedPayment(
-                user.getUserId(), resourceId, productId);
+                user.getUserId(), resourceId, productId, resourceServerUrl);
       } else {
         query =
             queryBuilder.listPurchaseForProviderDuringPendingStatus(
-                user.getUserId(), resourceId, productId);
+                user.getUserId(), resourceId, productId, resourceServerUrl);
       }
 
       Future<JsonArray> paymentFuture = executePurchaseQuery(query, resourceId, productId, user);

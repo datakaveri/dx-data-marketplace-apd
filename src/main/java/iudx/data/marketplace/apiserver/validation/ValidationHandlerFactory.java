@@ -88,6 +88,7 @@ public class ValidationHandlerFactory {
 
     validators.add(new UUIDTypeValidator(parameters.get("resourceId"),false));
     validators.add(new ProductIDTypeValidator(parameters.get("productId"), false));
+    validators.add(new OrderIdTypeValidator(parameters.get("orderId"), false));
     return validators;
   }
 
