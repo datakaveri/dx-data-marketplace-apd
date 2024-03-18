@@ -165,7 +165,11 @@ public class ProviderApis {
             } else if (errorMessage.contains(ResponseUrn.INTERNAL_SERVER_ERR_URN.getMessage())) {
               routingContext.fail(
                   new DxRuntimeException(500, ResponseUrn.INTERNAL_SERVER_ERR_URN, errorMessage));
-            } else {
+            } else if( errorMessage.contains(ResponseUrn.FORBIDDEN_URN.getUrn()))
+            {
+              handleFailureResponse(routingContext, errorMessage, HttpStatusCode.FORBIDDEN.getValue());
+            }
+            else {
               handleFailureResponse(routingContext, handler.cause());
             }
           }
@@ -267,6 +271,9 @@ public class ProviderApis {
                       ResponseUrn.RESOURCE_ALREADY_EXISTS_URN,
                       ResponseUrn.RESOURCE_ALREADY_EXISTS_URN.getMessage()));
 
+            } else if (errMessage.contains(ResponseUrn.FORBIDDEN_URN.getUrn())){
+              handleFailureResponse(
+                  routingContext, errMessage, HttpStatusCode.FORBIDDEN.getValue());
             } else {
               handleFailureResponse(routingContext, handler.cause());
             }
@@ -331,7 +338,8 @@ public class ProviderApis {
           if (handler.succeeded()) {
             handleSuccessResponse(routingContext, 200, handler.result());
           } else {
-            handleFailureResponse(routingContext, handler.cause());
+            handleFailure(
+                routingContext, handler.cause().getMessage());
           }
         });
   }
@@ -342,6 +350,14 @@ public class ProviderApis {
         .putHeader(CONTENT_TYPE, APPLICATION_JSON)
         .setStatusCode(400)
         .end(cause.getMessage());
+  }
+
+  private void handleFailureResponse(RoutingContext routingContext, String failureMessage, int statusCode) {
+    routingContext
+            .response()
+            .putHeader(CONTENT_TYPE, APPLICATION_JSON)
+            .setStatusCode(statusCode)
+            .end(failureMessage);
   }
 
   private void handleFailure(RoutingContext routingContext, String failureMessage) {

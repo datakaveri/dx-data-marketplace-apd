@@ -42,7 +42,8 @@ public class ProductVariantServiceImpl implements ProductVariantService {
         String productID = request.getString(PRODUCT_ID);
         String variantName = request.getString(PRODUCT_VARIANT_NAME);
         Future<Boolean> checkForExistence = checkIfProductVariantExists(productID, variantName);
-        Future<JsonObject> productDetailsFuture = getProductDetails(productID);
+        String providerId = user.getUserId();
+        Future<JsonObject> productDetailsFuture = getProductDetails(productID, providerId);
         JsonArray resources = request.getJsonArray(RESOURCES_ARRAY);
 
     checkForExistence
@@ -64,8 +65,8 @@ public class ProductVariantServiceImpl implements ProductVariantService {
                   handler.handle(
                       Future.failedFuture(
                           new RespBuilder()
-                              .withType(ResponseUrn.BAD_REQUEST_URN.getUrn())
-                              .withTitle(ResponseUrn.BAD_REQUEST_URN.getMessage())
+                              .withType(ResponseUrn.FORBIDDEN_URN.getUrn())
+                              .withTitle(ResponseUrn.FORBIDDEN_URN.getMessage())
                               .withDetail(
                                   "Product Variant is only created after product is created")
                               .getResponse()));
@@ -95,6 +96,13 @@ public class ProductVariantServiceImpl implements ProductVariantService {
                     query,
                     pgHandler -> {
                       if (pgHandler.succeeded()) {
+                        /* get the product variant ID */
+                        String productVariantId =
+                            pgHandler
+                                .result()
+                                .getJsonArray(RESULTS)
+                                .getJsonObject(0)
+                                .getString("_id");
                         RespBuilder respBuilder =
                             new RespBuilder()
                                 .withType(ResponseUrn.SUCCESS_URN.getUrn())
@@ -103,6 +111,7 @@ public class ProductVariantServiceImpl implements ProductVariantService {
                                     new JsonArray()
                                         .add(
                                             new JsonObject()
+                                                .put("productVariantId", productVariantId)
                                                 .put("productId", productID)
                                                 .put(PRODUCT_VARIANT_NAME, variantName)));
                         handler.handle(Future.succeededFuture(respBuilder.getJsonResponse()));
@@ -133,10 +142,10 @@ public class ProductVariantServiceImpl implements ProductVariantService {
         return promise.future();
     }
 
-    Future<JsonObject> getProductDetails(String productID) {
+    Future<JsonObject> getProductDetails(String productID, String providerId) {
         Promise<JsonObject> promise = Promise.promise();
 
-        String query = queryBuilder.buildProductDetailsQuery(productID);
+        String query = queryBuilder.buildProductDetailsQuery(productID, providerId);
         LOGGER.debug(query);
         pgService.executeQuery(
                 query,
@@ -213,10 +222,10 @@ public class ProductVariantServiceImpl implements ProductVariantService {
                         /* the product variant id that is to be deleted, does not exist or is already in inactive status*/
                         RespBuilder respBuilder =
                                 new RespBuilder()
-                                        .withType(ResponseUrn.RESOURCE_NOT_FOUND_URN.getUrn())
-                                        .withTitle(ResponseUrn.RESOURCE_NOT_FOUND_URN.getMessage())
+                                        .withType(HttpStatusCode.NOT_FOUND.getValue())
+                                        .withTitle(ResponseUrn.RESOURCE_NOT_FOUND_URN.getUrn())
                                         .withDetail("Product variant not found");
-                        promise.complete(respBuilder.getJsonResponse());
+                        promise.fail(respBuilder.getResponse());
                     }
                     else
                     {

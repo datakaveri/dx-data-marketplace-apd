@@ -29,7 +29,7 @@ public class Constants {
   public static final String INSERT_P_R_REL_QUERY =
       "insert into $0 (product_id, resource_id) values ('$1', '$2')";
 
-  public static final String DELETE_PRODUCT_QUERY = "update $0 set status=$1 where product_id=$2";
+  public static final String DELETE_PRODUCT_QUERY = "update $0 set status=$1 where product_id=$2 and status = 'ACTIVE' returning product_id";
   public static final String LIST_PRODUCT_FOR_RESOURCE =
       "select pt.product_id AS \"productId\", pt.provider_name AS \"providerName\", "
           + " pt.modified_at AS \"updatedAt\" ,  pt.created_at AS \"createdAt\" ,"
@@ -51,11 +51,12 @@ public class Constants {
           + "inner join $9 as prt on pt.product_id = prt.product_id "
           + " inner join $8 as rt on prt.resource_id = rt._id "
           + "where pt.product_id = '$1' "
+          + " and pt.provider_id = '$2' "
           + "group by pt.product_id";
 
   public static final String INSERT_PV_QUERY =
           "insert into $0 (_id, provider_id, product_id, product_variant_name, resource_info, price, validity, status)" +
-                  " values ('$1', '$2', '$3', '$4','$5'::JSON, '$6', $7, '$s')";
+                  " values ('$1', '$2', '$3', '$4','$5'::JSON, '$6', $7, '$s') RETURNING _id";
 
   public static final String UPDATE_PV_STATUS = "update $0 set status='$4' where product_id='$1' and product_variant_name='$2' and status='$3'";
   public static final String UPDATE_PV_STATUS_QUERY =

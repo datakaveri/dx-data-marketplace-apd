@@ -88,7 +88,7 @@ public class Util {
                     .put("productVariantId", row.getString("productVariantId"))
                     .put("resources", row.getJsonArray("resources"))
                     .put("productVariantName", row.getString("productVariantName"))
-                    .put("price", row.getString("price"))
+                    .put("price", row.getFloat("price"))
                     .put("expiryInMonths", row.getInteger("expiryInMonths")));
 
     row.remove("productId");
