@@ -200,7 +200,7 @@ public class ConsumerApis {
             handleSuccessResponse(
                 routingContext, HttpStatusCode.SUCCESS.getValue(), handler.result());
           } else {
-            handleFailureResponse(routingContext, handler.cause());
+            handleFailureResponse(routingContext, handler.cause().getMessage());
           }
         });
   }

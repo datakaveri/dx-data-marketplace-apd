@@ -77,7 +77,7 @@ public class VariantServiceTest {
                                         .put(PRODUCT_ID, "urn:datakaeri.org:provider-id:abcde")
                                         .put(resourceNames, new JsonArray().add(new JsonObject().put(ID, "resource-1").put(NAME, "dat-name")))))))
         .when(variantServiceSpy)
-        .getProductDetails(anyString());
+        .getProductDetails(anyString(), anyString());
     when(jsonArrayMock.size()).thenReturn(1);
     when(jsonArrayMock.getJsonObject(anyInt())).thenReturn(jsonObjectMock);
 
@@ -113,7 +113,7 @@ public class VariantServiceTest {
         jsonObjectMock,
         handler -> {
           if (handler.succeeded()) {
-            verify(variantServiceSpy, times(1)).getProductDetails(anyString());
+            verify(variantServiceSpy, times(1)).getProductDetails(anyString(), anyString());
             verify(postgresService, times(1)).executeQuery(anyString(),any());
             verify(postgresService, times(1)).executeCountQuery(anyString(),any());
             testContext.completeNow();
@@ -200,7 +200,7 @@ public class VariantServiceTest {
       }
     }).when(postgresService).executeQuery(anyString(),any());
 
-    variantServiceSpy.getProductDetails(anyString()).onComplete(handler -> {
+    variantServiceSpy.getProductDetails(anyString(), anyString()).onComplete(handler -> {
       if(handler.succeeded()) {
         verify(postgresService, times(1)).executeQuery(anyString(),any());
         testContext.completeNow();
