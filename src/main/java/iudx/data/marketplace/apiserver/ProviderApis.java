@@ -12,7 +12,6 @@ import io.vertx.core.Vertx;
 import io.vertx.core.http.HttpServerRequest;
 import io.vertx.core.http.HttpServerResponse;
 import io.vertx.core.json.DecodeException;
-import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
 import io.vertx.ext.web.Router;
 import io.vertx.ext.web.RoutingContext;
@@ -25,7 +24,6 @@ import iudx.data.marketplace.authenticator.AuthClient;
 import iudx.data.marketplace.authenticator.AuthenticationService;
 import iudx.data.marketplace.common.Api;
 import iudx.data.marketplace.common.HttpStatusCode;
-import iudx.data.marketplace.common.RespBuilder;
 import iudx.data.marketplace.common.ResponseUrn;
 import iudx.data.marketplace.policies.User;
 import iudx.data.marketplace.postgres.PostgresService;
@@ -33,7 +31,6 @@ import iudx.data.marketplace.product.ProductService;
 import iudx.data.marketplace.product.variant.ProductVariantService;
 import java.util.Map;
 
-import org.apache.commons.lang.StringUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -87,56 +84,56 @@ public class ProviderApis {
         .post(api.getProviderProductPath())
         .consumes(APPLICATION_JSON)
         .handler(productValidationHandler)
-        .handler(AuthHandler.create(authenticationService, vertx, api, postgresService, authClient))
+        .handler(AuthHandler.create(authenticationService, api, postgresService, authClient))
         .handler(this::handleCreateProduct)
         .failureHandler(exceptionHandler);
 
     router
         .delete(api.getProviderProductPath())
         .handler(productValidationHandler)
-        .handler(AuthHandler.create(authenticationService, vertx, api, postgresService, authClient))
+        .handler(AuthHandler.create(authenticationService, api, postgresService, authClient))
         .handler(this::handleDeleteProduct)
         .failureHandler(exceptionHandler);
 
     router
         .get(api.getProviderListProductsPath())
         .handler(resourceValidationHandler)
-        .handler(AuthHandler.create(authenticationService, vertx, api, postgresService, authClient))
+        .handler(AuthHandler.create(authenticationService, api, postgresService, authClient))
         .handler(this::listProducts)
         .failureHandler(exceptionHandler);
 
     router
         .get(api.getProviderListPurchasesPath())
         .handler(purchaseValidationHandler)
-        .handler(AuthHandler.create(authenticationService, vertx, api, postgresService, authClient))
+        .handler(AuthHandler.create(authenticationService, api, postgresService, authClient))
         .handler(this::listPurchases)
         .failureHandler(exceptionHandler);
 
     router
         .post(api.getProviderProductVariantPath())
         .handler(variantValidationHandler)
-        .handler(AuthHandler.create(authenticationService, vertx, api, postgresService, authClient))
+        .handler(AuthHandler.create(authenticationService, api, postgresService, authClient))
         .handler(this::handleCreateProductVariant)
         .failureHandler(exceptionHandler);
 
     router
         .put(api.getProviderProductVariantPath())
         .handler(variantValidationHandler)
-        .handler(AuthHandler.create(authenticationService, vertx, api, postgresService, authClient))
+        .handler(AuthHandler.create(authenticationService, api, postgresService, authClient))
         .handler(this::handleUpdateProductVariant)
         .failureHandler(exceptionHandler);
 
     router
         .get(api.getProviderProductVariantPath())
         .handler(listVariantValidationHandler)
-        .handler(AuthHandler.create(authenticationService, vertx, api, postgresService, authClient))
+        .handler(AuthHandler.create(authenticationService, api, postgresService, authClient))
         .handler(this::handleGetProductVariants)
         .failureHandler(exceptionHandler);
 
     router
         .delete(api.getProviderProductVariantPath())
         .handler(deleteVariantValidationHandler)
-        .handler(AuthHandler.create(authenticationService, vertx, api, postgresService, authClient))
+        .handler(AuthHandler.create(authenticationService, api, postgresService, authClient))
         .handler(this::handleDeleteProductVariant)
         .failureHandler(exceptionHandler);
     return this.router;
