@@ -257,9 +257,7 @@ public class ApiServerVerticle extends AbstractVerticle {
     router
         .post(api.getVerifyPaymentApi())
         .handler(verifyPaymentValidationHandler)
-        // TODO : handle authentication and authorization for verify payment api
-        //        .handler(AuthHandler.create(authenticationService, vertx, api, postgresService,
-        // authClient))
+        .handler(AuthHandler.create(authenticationService, vertx, api, postgresService, authClient))
         .handler(this::handleVerifyPayment)
         .failureHandler(exceptionHandler);
 
@@ -377,9 +375,10 @@ public class ApiServerVerticle extends AbstractVerticle {
             statusUpdated -> {
               handleSuccessResponse(response, 200, "Payment status updated");
             })
-        .onFailure(statusUpdateFailed -> {
-          handleFailureResponse(routingContext, statusUpdateFailed.getMessage());
-        });
+        .onFailure(
+            statusUpdateFailed -> {
+              handleFailureResponse(routingContext, statusUpdateFailed.getMessage());
+            });
   }
 
   private void paymentAuthorizedRequestHandler(RoutingContext routingContext) {
