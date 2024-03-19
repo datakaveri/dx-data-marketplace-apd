@@ -7,6 +7,1629 @@
 	},
 	"item": [
 		{
+			"name": "Provider APIs",
+			"item": [
+				{
+					"name": "Product",
+					"item": [
+						{
+							"name": "Create Product",
+							"item": [
+								{
+									"name": "200 - Create Product",
+									"event": [
+										{
+											"listen": "prerequest",
+											"script": {
+												"exec": [
+													""
+												],
+												"type": "text/javascript"
+											}
+										}
+									],
+									"request": {
+										"method": "POST",
+										"header": [],
+										"body": {
+											"mode": "raw",
+											"raw": "{\n    \"id\": \"abcedede\",\n    \"resources\": [\n        \"datakaveri.org/b8bd3e3f39615c8ec96722131ae95056b5938f2f/rs.iudx.io/agra-swachhata-app\",\n        \"datakaveri.org/b8bd3e3f39615c8ec96722131ae95056b5938f2f/rs.iudx.io/agra-point-of-interests\"\n    ]\n}",
+											"options": {
+												"raw": {
+													"language": "json"
+												}
+											}
+										},
+										"url": {
+											"raw": "{{baseUrl}}/provider/product",
+											"protocol": "https",
+											"host": [
+												"localhost"
+											],
+											"port": "8445",
+											"path": [
+												"provider",
+												"product"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "400 - Invalid Payload",
+									"event": [
+										{
+											"listen": "prerequest",
+											"script": {
+												"exec": [
+													""
+												],
+												"type": "text/javascript"
+											}
+										}
+									],
+									"request": {
+										"method": "POST",
+										"header": [],
+										"body": {
+											"mode": "raw",
+											"raw": "{\n    \"id\": \"abcedede\",\n    \"resources\": [\n        \"datakaveri.org/b8bd3e3f39615c8ec96722131ae95056b5938f2f/rs.iudx.io////agra-swachhata-app\",\n        \"datakaveri.org/b8bd3e3f39615c8ec96722131ae95056b5938f2f/rs.iudx.io/agra-point-of-interests\"\n    ]\n}",
+											"options": {
+												"raw": {
+													"language": "json"
+												}
+											}
+										},
+										"url": {
+											"raw": "{{baseUrl}}/provider/product",
+											"protocol": "https",
+											"host": [
+												"localhost"
+											],
+											"port": "8445",
+											"path": [
+												"provider",
+												"product"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "401 - Unauthorized",
+									"event": [
+										{
+											"listen": "prerequest",
+											"script": {
+												"exec": [
+													""
+												],
+												"type": "text/javascript"
+											}
+										}
+									],
+									"request": {
+										"auth": {
+											"type": "noauth"
+										},
+										"method": "POST",
+										"header": [],
+										"body": {
+											"mode": "raw",
+											"raw": "{\n    \"id\": \"abcedede\",\n    \"resources\": [\n        \"datakaveri.org/b8bd3e3f39615c8ec96722131ae95056b5938f2f/rs.iudx.io/agra-swachhata-app\",\n        \"datakaveri.org/b8bd3e3f39615c8ec96722131ae95056b5938f2f/rs.iudx.io/agra-point-of-interests\"\n    ]\n}",
+											"options": {
+												"raw": {
+													"language": "json"
+												}
+											}
+										},
+										"url": {
+											"raw": "{{baseUrl}}/provider/product",
+											"protocol": "https",
+											"host": [
+												"localhost"
+											],
+											"port": "8445",
+											"path": [
+												"provider",
+												"product"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "409 - Product Already Exists",
+									"event": [
+										{
+											"listen": "prerequest",
+											"script": {
+												"exec": [
+													""
+												],
+												"type": "text/javascript"
+											}
+										}
+									],
+									"request": {
+										"method": "POST",
+										"header": [],
+										"body": {
+											"mode": "raw",
+											"raw": "{\n    \"id\": \"abcedede\",\n    \"resources\": [\n        \"datakaveri.org/b8bd3e3f39615c8ec96722131ae95056b5938f2f/rs.iudx.io/agra-swachhata-app\",\n        \"datakaveri.org/b8bd3e3f39615c8ec96722131ae95056b5938f2f/rs.iudx.io/agra-point-of-interests\"\n    ]\n}",
+											"options": {
+												"raw": {
+													"language": "json"
+												}
+											}
+										},
+										"url": {
+											"raw": "{{baseUrl}}/provider/product",
+											"protocol": "https",
+											"host": [
+												"localhost"
+											],
+											"port": "8445",
+											"path": [
+												"provider",
+												"product"
+											]
+										}
+									},
+									"response": []
+								}
+							],
+							"event": [
+								{
+									"listen": "prerequest",
+									"script": {
+										"type": "text/javascript",
+										"exec": [
+											""
+										]
+									}
+								},
+								{
+									"listen": "test",
+									"script": {
+										"type": "text/javascript",
+										"exec": [
+											""
+										]
+									}
+								}
+							]
+						},
+						{
+							"name": "Delete Product",
+							"item": [
+								{
+									"name": "200 - Delete Product",
+									"request": {
+										"method": "DELETE",
+										"header": [],
+										"url": {
+											"raw": "{{baseUrl}}/provider/product?id=urn:datakaveri.org:datakaveri.org/b8bd3e3f39615c8ec96722131ae95056b5938f2f:abcedede",
+											"protocol": "https",
+											"host": [
+												"localhost"
+											],
+											"port": "8445",
+											"path": [
+												"provider",
+												"product"
+											],
+											"query": [
+												{
+													"key": "id",
+													"value": "urn:datakaveri.org:datakaveri.org/b8bd3e3f39615c8ec96722131ae95056b5938f2f:abcedede"
+												}
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "401 - Unauthorized",
+									"request": {
+										"auth": {
+											"type": "noauth"
+										},
+										"method": "DELETE",
+										"header": [],
+										"url": {
+											"raw": "{{baseUrl}}/provider/product?id=urn:datakaveri.org:datakaveri.org/b8bd3e3f39615c8ec96722131ae95056b5938f2f:abcedede",
+											"protocol": "https",
+											"host": [
+												"localhost"
+											],
+											"port": "8445",
+											"path": [
+												"provider",
+												"product"
+											],
+											"query": [
+												{
+													"key": "id",
+													"value": "urn:datakaveri.org:datakaveri.org/b8bd3e3f39615c8ec96722131ae95056b5938f2f:abcedede"
+												}
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "400 - Invalid ID",
+									"request": {
+										"method": "DELETE",
+										"header": [],
+										"url": {
+											"raw": "{{baseUrl}}/provider/product?id=urn:datakaveri.org:datakaveri.org/b8bd3e3f39615c8ec96722131ae95056b5938f2f:xyz123***",
+											"protocol": "https",
+											"host": [
+												"localhost"
+											],
+											"port": "8445",
+											"path": [
+												"provider",
+												"product"
+											],
+											"query": [
+												{
+													"key": "id",
+													"value": "urn:datakaveri.org:datakaveri.org/b8bd3e3f39615c8ec96722131ae95056b5938f2f:xyz123***"
+												}
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "404 - Not Found",
+									"request": {
+										"method": "DELETE",
+										"header": [],
+										"url": {
+											"raw": "{{baseUrl}}/provider/product?id=urn:datakaveri.org:datakaveri.org/b8bd3e3f39615c8ec96722131ae95056b5938f2f:xyz123",
+											"protocol": "https",
+											"host": [
+												"localhost"
+											],
+											"port": "8445",
+											"path": [
+												"provider",
+												"product"
+											],
+											"query": [
+												{
+													"key": "id",
+													"value": "urn:datakaveri.org:datakaveri.org/b8bd3e3f39615c8ec96722131ae95056b5938f2f:xyz123"
+												}
+											]
+										}
+									},
+									"response": []
+								}
+							],
+							"event": [
+								{
+									"listen": "prerequest",
+									"script": {
+										"type": "text/javascript",
+										"exec": [
+											""
+										]
+									}
+								},
+								{
+									"listen": "test",
+									"script": {
+										"type": "text/javascript",
+										"exec": [
+											""
+										]
+									}
+								}
+							]
+						}
+					]
+				},
+				{
+					"name": "Product Variant (P.V.)",
+					"item": [
+						{
+							"name": "Create P.V.",
+							"item": [
+								{
+									"name": "201 - Create P.V.",
+									"event": [
+										{
+											"listen": "prerequest",
+											"script": {
+												"exec": [
+													""
+												],
+												"type": "text/javascript"
+											}
+										}
+									],
+									"request": {
+										"method": "POST",
+										"header": [
+											{
+												"key": "token",
+												"value": "{{token}}",
+												"type": "text"
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": "{\n    \"id\": \"urn:datakaveri.org:datakaveri.org/b8bd3e3f39615c8ec96722131ae95056b5938f2f:abcedede\",\n    \"variant\": \"variant1\",\n    \"resources\": [\n        {\n          \"id\": \"datakaveri.org/b8bd3e3f39615c8ec96722131ae95056b5938f2f/rs.iudx.io/agra-swachhata-app\",\n          \"capabilities\": [\n            \"api\", \"sub\"\n          ]\n        },\n        {\n          \"id\": \"datakaveri.org/b8bd3e3f39615c8ec96722131ae95056b5938f2f/rs.iudx.io/agra-point-of-interests\",\n          \"capabilities\": [\n            \"sub\", \"file\"\n          ]\n        }\n      ],\n      \"price\": 100.0,\n      \"duration\": 12\n}",
+											"options": {
+												"raw": {
+													"language": "json"
+												}
+											}
+										},
+										"url": {
+											"raw": "{{baseUrl}}/provider/product-variant",
+											"protocol": "https",
+											"host": [
+												"localhost"
+											],
+											"port": "8445",
+											"path": [
+												"provider",
+												"product-variant"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "400 - Invalid Payload",
+									"event": [
+										{
+											"listen": "prerequest",
+											"script": {
+												"exec": [
+													""
+												],
+												"type": "text/javascript"
+											}
+										}
+									],
+									"request": {
+										"method": "POST",
+										"header": [],
+										"body": {
+											"mode": "raw",
+											"raw": "{\n    \"variant\": \"variant1\",\n    \"resources\": [\n        {\n          \"id\": \"datakaveri.org/b8bd3e3f39615c8ec96722131ae95056b5938f2f/rs.iudx.io/agra-swachhata-app\",\n          \"capabilities\": [\n            \"api\", \"sub\"\n          ]\n        },\n        {\n          \"id\": \"datakaveri.org/b8bd3e3f39615c8ec96722131ae95056b5938f2f/rs.iudx.io/agra-point-of-interests\",\n          \"capabilities\": [\n            \"sub\", \"file\"\n          ]\n        }\n      ],\n      \"price\": 100.0,\n      \"duration\": 12\n}",
+											"options": {
+												"raw": {
+													"language": "json"
+												}
+											}
+										},
+										"url": {
+											"raw": "{{baseUrl}}/provider/product-variant",
+											"protocol": "https",
+											"host": [
+												"localhost"
+											],
+											"port": "8445",
+											"path": [
+												"provider",
+												"product-variant"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "401 - Unauthorized",
+									"event": [
+										{
+											"listen": "prerequest",
+											"script": {
+												"exec": [
+													""
+												],
+												"type": "text/javascript"
+											}
+										}
+									],
+									"request": {
+										"method": "POST",
+										"header": [],
+										"body": {
+											"mode": "raw",
+											"raw": "{\n    \"id\": \"urn:datakaveri.org:datakaveri.org/b8bd3e3f39615c8ec96722131ae95056b5938f2f:abcedede\",\n    \"variant\": \"variant1\",\n    \"resources\": [\n        {\n          \"id\": \"datakaveri.org/b8bd3e3f39615c8ec96722131ae95056b5938f2f/rs.iudx.io/agra-swachhata-app\",\n          \"capabilities\": [\n            \"api\", \"sub\"\n          ]\n        },\n        {\n          \"id\": \"datakaveri.org/b8bd3e3f39615c8ec96722131ae95056b5938f2f/rs.iudx.io/agra-point-of-interests\",\n          \"capabilities\": [\n            \"sub\", \"file\"\n          ]\n        }\n      ],\n      \"price\": 100.0,\n      \"duration\": 12\n}",
+											"options": {
+												"raw": {
+													"language": "json"
+												}
+											}
+										},
+										"url": {
+											"raw": "{{baseUrl}}/provider/product-variant",
+											"protocol": "https",
+											"host": [
+												"localhost"
+											],
+											"port": "8445",
+											"path": [
+												"provider",
+												"product-variant"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "409 - P.V. Alreaady Exists",
+									"event": [
+										{
+											"listen": "prerequest",
+											"script": {
+												"exec": [
+													""
+												],
+												"type": "text/javascript"
+											}
+										}
+									],
+									"request": {
+										"method": "POST",
+										"header": [],
+										"body": {
+											"mode": "raw",
+											"raw": "{\n    \"id\": \"urn:datakaveri.org:datakaveri.org/b8bd3e3f39615c8ec96722131ae95056b5938f2f:abcedede\",\n    \"variant\": \"variant1\",\n    \"resources\": [\n        {\n          \"id\": \"datakaveri.org/b8bd3e3f39615c8ec96722131ae95056b5938f2f/rs.iudx.io/agra-swachhata-app\",\n          \"capabilities\": [\n            \"api\", \"sub\"\n          ]\n        },\n        {\n          \"id\": \"datakaveri.org/b8bd3e3f39615c8ec96722131ae95056b5938f2f/rs.iudx.io/agra-point-of-interests\",\n          \"capabilities\": [\n            \"sub\", \"file\"\n          ]\n        }\n      ],\n      \"price\": 100.0,\n      \"duration\": 12\n}",
+											"options": {
+												"raw": {
+													"language": "json"
+												}
+											}
+										},
+										"url": {
+											"raw": "{{baseUrl}}/provider/product-variant",
+											"protocol": "https",
+											"host": [
+												"localhost"
+											],
+											"port": "8445",
+											"path": [
+												"provider",
+												"product-variant"
+											]
+										}
+									},
+									"response": []
+								}
+							]
+						},
+						{
+							"name": "Update P.V.",
+							"item": [
+								{
+									"name": "200 - Update P.V.",
+									"event": [
+										{
+											"listen": "prerequest",
+											"script": {
+												"exec": [
+													""
+												],
+												"type": "text/javascript"
+											}
+										}
+									],
+									"request": {
+										"method": "PUT",
+										"header": [],
+										"body": {
+											"mode": "raw",
+											"raw": "{\n    \"id\": \"urn:datakaveri.org:datakaveri.org/b8bd3e3f39615c8ec96722131ae95056b5938f2f:abcedede\",\n    \"variant\": \"variant1\",\n    \"resources\": [\n        {\n          \"id\": \"datakaveri.org/b8bd3e3f39615c8ec96722131ae95056b5938f2f/rs.iudx.io/agra-swachhata-app\",\n          \"capabilities\": [\n            \"api\", \"sub\"\n          ]\n        },\n        {\n          \"id\": \"datakaveri.org/b8bd3e3f39615c8ec96722131ae95056b5938f2f/rs.iudx.io/agra-point-of-interests\",\n          \"capabilities\": [\n            \"sub\", \"file\"\n          ]\n        }\n      ],\n      \"price\": 100.0,\n      \"duration\": 12\n}",
+											"options": {
+												"raw": {
+													"language": "json"
+												}
+											}
+										},
+										"url": {
+											"raw": "{{baseUrl}}/provider/product-variant",
+											"protocol": "https",
+											"host": [
+												"localhost"
+											],
+											"port": "8445",
+											"path": [
+												"provider",
+												"product-variant"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "400 - Invalid Payload",
+									"event": [
+										{
+											"listen": "prerequest",
+											"script": {
+												"exec": [
+													""
+												],
+												"type": "text/javascript"
+											}
+										}
+									],
+									"request": {
+										"method": "PUT",
+										"header": [],
+										"body": {
+											"mode": "raw",
+											"raw": "{\n    \n    \"variant\": \"variant1\",\n    \"resources\": [\n        {\n          \"id\": \"datakaveri.org/b8bd3e3f39615c8ec96722131ae95056b5938f2f/rs.iudx.io/agra-swachhata-app\",\n          \"capabilities\": [\n            \"api\", \"sub\"\n          ]\n        },\n        {\n          \"id\": \"datakaveri.org/b8bd3e3f39615c8ec96722131ae95056b5938f2f/rs.iudx.io/agra-point-of-interests\",\n          \"capabilities\": [\n            \"sub\", \"file\"\n          ]\n        }\n      ],\n      \"price\": 100.0,\n      \"duration\": 12\n}",
+											"options": {
+												"raw": {
+													"language": "json"
+												}
+											}
+										},
+										"url": {
+											"raw": "{{baseUrl}}/provider/product-variant",
+											"protocol": "https",
+											"host": [
+												"localhost"
+											],
+											"port": "8445",
+											"path": [
+												"provider",
+												"product-variant"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "401 - Unauthorized",
+									"event": [
+										{
+											"listen": "prerequest",
+											"script": {
+												"exec": [
+													""
+												],
+												"type": "text/javascript"
+											}
+										}
+									],
+									"request": {
+										"auth": {
+											"type": "noauth"
+										},
+										"method": "PUT",
+										"header": [],
+										"body": {
+											"mode": "raw",
+											"raw": "{\n    \"id\": \"urn:datakaveri.org:datakaveri.org/b8bd3e3f39615c8ec96722131ae95056b5938f2f:abcedede\",\n    \"variant\": \"variant1\",\n    \"resources\": [\n        {\n          \"id\": \"datakaveri.org/b8bd3e3f39615c8ec96722131ae95056b5938f2f/rs.iudx.io/agra-swachhata-app\",\n          \"capabilities\": [\n            \"api\", \"sub\"\n          ]\n        },\n        {\n          \"id\": \"datakaveri.org/b8bd3e3f39615c8ec96722131ae95056b5938f2f/rs.iudx.io/agra-point-of-interests\",\n          \"capabilities\": [\n            \"sub\", \"file\"\n          ]\n        }\n      ],\n      \"price\": 100.0,\n      \"duration\": 12\n}",
+											"options": {
+												"raw": {
+													"language": "json"
+												}
+											}
+										},
+										"url": {
+											"raw": "{{baseUrl}}/provider/product-variant",
+											"protocol": "https",
+											"host": [
+												"localhost"
+											],
+											"port": "8445",
+											"path": [
+												"provider",
+												"product-variant"
+											]
+										}
+									},
+									"response": []
+								}
+							]
+						},
+						{
+							"name": "Delete P.V.",
+							"item": [
+								{
+									"name": "200 - Delete P.V.",
+									"request": {
+										"method": "DELETE",
+										"header": [],
+										"url": {
+											"raw": "{{baseUrl}}/provider/product-variant?id=urn:datakaveri.org:datakaveri.org/b8bd3e3f39615c8ec96722131ae95056b5938f2f:abcedede&variant=variant1",
+											"protocol": "https",
+											"host": [
+												"localhost"
+											],
+											"port": "8445",
+											"path": [
+												"provider",
+												"product-variant"
+											],
+											"query": [
+												{
+													"key": "id",
+													"value": "urn:datakaveri.org:datakaveri.org/b8bd3e3f39615c8ec96722131ae95056b5938f2f:abcedede"
+												},
+												{
+													"key": "variant",
+													"value": "variant1"
+												}
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "400 - Invalid Name",
+									"request": {
+										"method": "DELETE",
+										"header": [],
+										"url": {
+											"raw": "{{baseUrl}}/provider/product-variant?id=urn:datakaveri.org:datakaveri.org/b8bd3e3f39615c8ec96722131ae95056b5938f2f:abced&variant=variant1!!",
+											"protocol": "https",
+											"host": [
+												"localhost"
+											],
+											"port": "8445",
+											"path": [
+												"provider",
+												"product-variant"
+											],
+											"query": [
+												{
+													"key": "id",
+													"value": "urn:datakaveri.org:datakaveri.org/b8bd3e3f39615c8ec96722131ae95056b5938f2f:abced"
+												},
+												{
+													"key": "variant",
+													"value": "variant1!!"
+												}
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "400 - Invalid Name Copy",
+									"request": {
+										"method": "DELETE",
+										"header": [],
+										"url": {
+											"raw": "{{baseUrl}}/provider/product-variant?id=urn:datakaveri.org:datakaveri.org/b8bd3e3f39615c8ec96722131ae95056b5938f2f:abced&variant=variant1",
+											"protocol": "https",
+											"host": [
+												"localhost"
+											],
+											"port": "8445",
+											"path": [
+												"provider",
+												"product-variant"
+											],
+											"query": [
+												{
+													"key": "id",
+													"value": "urn:datakaveri.org:datakaveri.org/b8bd3e3f39615c8ec96722131ae95056b5938f2f:abced"
+												},
+												{
+													"key": "variant",
+													"value": "variant1"
+												}
+											]
+										}
+									},
+									"response": []
+								}
+							]
+						}
+					]
+				},
+				{
+					"name": "List APIs",
+					"item": [
+						{
+							"name": "List Products",
+							"item": [
+								{
+									"name": "200 - List Products",
+									"request": {
+										"method": "GET",
+										"header": [],
+										"url": {
+											"raw": "{{baseUrl}}/provider/list/products",
+											"protocol": "https",
+											"host": [
+												"localhost"
+											],
+											"port": "8445",
+											"path": [
+												"provider",
+												"list",
+												"products"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "200 - List Products for Resource",
+									"request": {
+										"method": "GET",
+										"header": [],
+										"url": {
+											"raw": "{{baseUrl}}/provider/list/products?resourceID=datakaveri.org/b8bd3e3f39615c8ec96722131ae95056b5938f2f/rs.iudx.io/agra-point-of-interests",
+											"protocol": "https",
+											"host": [
+												"localhost"
+											],
+											"port": "8445",
+											"path": [
+												"provider",
+												"list",
+												"products"
+											],
+											"query": [
+												{
+													"key": "resourceID",
+													"value": "datakaveri.org/b8bd3e3f39615c8ec96722131ae95056b5938f2f/rs.iudx.io/agra-point-of-interests"
+												}
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "204 - No Content",
+									"request": {
+										"method": "GET",
+										"header": [],
+										"url": {
+											"raw": "{{baseUrl}}/provider/list/products?resourceID=datakaveri.org/b8bd3e3f39615c8ec96722131ae95056b5938f2f/rs.iudx.io/pune-point-of-interests",
+											"protocol": "https",
+											"host": [
+												"localhost"
+											],
+											"port": "8445",
+											"path": [
+												"provider",
+												"list",
+												"products"
+											],
+											"query": [
+												{
+													"key": "resourceID",
+													"value": "datakaveri.org/b8bd3e3f39615c8ec96722131ae95056b5938f2f/rs.iudx.io/pune-point-of-interests"
+												}
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "401 - Unauthorized",
+									"request": {
+										"auth": {
+											"type": "noauth"
+										},
+										"method": "GET",
+										"header": [],
+										"url": {
+											"raw": "{{baseUrl}}/provider/list/products",
+											"protocol": "https",
+											"host": [
+												"localhost"
+											],
+											"port": "8445",
+											"path": [
+												"provider",
+												"list",
+												"products"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "400 - Invalid resource ID",
+									"request": {
+										"method": "GET",
+										"header": [],
+										"url": {
+											"raw": "{{baseUrl}}/provider/list/products?datasetID=datakaveri.org/b8bd3e3f39615c8ec96722131ae95056b5938f2f/rs.iudx.io/pune-point-of-interests***",
+											"protocol": "https",
+											"host": [
+												"localhost"
+											],
+											"port": "8445",
+											"path": [
+												"provider",
+												"list",
+												"products"
+											],
+											"query": [
+												{
+													"key": "datasetID",
+													"value": "datakaveri.org/b8bd3e3f39615c8ec96722131ae95056b5938f2f/rs.iudx.io/pune-point-of-interests***"
+												}
+											]
+										}
+									},
+									"response": []
+								}
+							],
+							"auth": {
+								"type": "noauth"
+							},
+							"event": [
+								{
+									"listen": "prerequest",
+									"script": {
+										"type": "text/javascript",
+										"exec": [
+											""
+										]
+									}
+								},
+								{
+									"listen": "test",
+									"script": {
+										"type": "text/javascript",
+										"exec": [
+											""
+										]
+									}
+								}
+							]
+						},
+						{
+							"name": "List Purchases",
+							"item": [
+								{
+									"name": "List Purchases",
+									"request": {
+										"method": "GET",
+										"header": [],
+										"url": {
+											"raw": ""
+										}
+									},
+									"response": []
+								}
+							]
+						}
+					],
+					"auth": {
+						"type": "noauth"
+					},
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									""
+								]
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									""
+								]
+							}
+						}
+					]
+				}
+			],
+			"auth": {
+				"type": "apikey",
+				"apikey": [
+					{
+						"key": "value",
+						"value": "{{token}}",
+						"type": "string"
+					},
+					{
+						"key": "key",
+						"value": "token",
+						"type": "string"
+					}
+				]
+			},
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"type": "text/javascript",
+						"exec": [
+							"const clientId = pm.environment.get(\"providerClientID\");",
+							"const clientSecret = pm.environment.get(\"providerClientSecret\");",
+							"",
+							"const authReq = {",
+							"    url : 'https://authvertx.iudx.io/auth/v1/token',",
+							"    method: 'POST',",
+							"    header : {",
+							"        'Content-Type': 'application/json',",
+							"        'clientId': clientId,",
+							"        'clientSecret': clientSecret",
+							"    },",
+							"    body: {",
+							"        mode: 'raw',",
+							"        raw: JSON.stringify({",
+							"  itemId: 'rs.iudx.io', ",
+							"  itemType: 'resource_server',",
+							"  role: 'provider'",
+							"})",
+							"    }",
+							"};",
+							"",
+							"pm.sendRequest(authReq, function (err, response) {",
+							"    console.log(response.json());",
+							"    var jsonData = response.json();",
+							"    pm.environment.set(\"token\", jsonData.results.accessToken);",
+							"});"
+						]
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"type": "text/javascript",
+						"exec": [
+							""
+						]
+					}
+				}
+			]
+		},
+		{
+			"name": "Consumer APIs",
+			"item": [
+				{
+					"name": "List Resources",
+					"item": [
+						{
+							"name": "200 - Get Resources",
+							"event": [
+								{
+									"listen": "prerequest",
+									"script": {
+										"exec": [
+											""
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{baseUrl}}/consumer/list/datasets",
+									"protocol": "https",
+									"host": [
+										"localhost"
+									],
+									"port": "8445",
+									"path": [
+										"consumer",
+										"list",
+										"datasets"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "200 - Get Resources for Provider",
+							"event": [
+								{
+									"listen": "prerequest",
+									"script": {
+										"exec": [
+											""
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{baseUrl}}/consumer/list/datasets?providerID=datakaveri.org/b8bd3e3f39615c8ec96722131ae95056b5938f2f",
+									"protocol": "https",
+									"host": [
+										"localhost"
+									],
+									"port": "8445",
+									"path": [
+										"consumer",
+										"list",
+										"datasets"
+									],
+									"query": [
+										{
+											"key": "providerID",
+											"value": "datakaveri.org/b8bd3e3f39615c8ec96722131ae95056b5938f2f"
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "200 - Get Resource by ID",
+							"event": [
+								{
+									"listen": "prerequest",
+									"script": {
+										"exec": [
+											""
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{baseUrl}}/consumer/list/datasets?datasetID=datakaveri.org/b8bd3e3f39615c8ec96722131ae95056b5938f2f/rs.iudx.io/agra-point-of-interests",
+									"protocol": "https",
+									"host": [
+										"localhost"
+									],
+									"port": "8445",
+									"path": [
+										"consumer",
+										"list",
+										"datasets"
+									],
+									"query": [
+										{
+											"key": "datasetID",
+											"value": "datakaveri.org/b8bd3e3f39615c8ec96722131ae95056b5938f2f/rs.iudx.io/agra-point-of-interests"
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "204 - No Content",
+							"event": [
+								{
+									"listen": "prerequest",
+									"script": {
+										"exec": [
+											""
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{baseUrl}}/consumer/list/datasets?providerID=datakaveri.org/b8bd3e3f39615c8ec96722131ae95056b5938f2f",
+									"protocol": "https",
+									"host": [
+										"localhost"
+									],
+									"port": "8445",
+									"path": [
+										"consumer",
+										"list",
+										"datasets"
+									],
+									"query": [
+										{
+											"key": "providerID",
+											"value": "datakaveri.org/b8bd3e3f39615c8ec96722131ae95056b5938f2f"
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "400 - Invalid ResourceID",
+							"event": [
+								{
+									"listen": "prerequest",
+									"script": {
+										"exec": [
+											""
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "token",
+										"value": "{{openToken}}",
+										"type": "text"
+									}
+								],
+								"url": {
+									"raw": "{{baseUrl}}/consumer/list/datasets?datasetID=datakaveri.org/b8bd3e3f39615c8ec96722131ae95056b5938f2f/rs.iudx.io/agra-point-of-interests",
+									"protocol": "https",
+									"host": [
+										"localhost"
+									],
+									"port": "8445",
+									"path": [
+										"consumer",
+										"list",
+										"datasets"
+									],
+									"query": [
+										{
+											"key": "datasetID",
+											"value": "datakaveri.org/b8bd3e3f39615c8ec96722131ae95056b5938f2f/rs.iudx.io/agra-point-of-interests"
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "401 - Unauthorized",
+							"event": [
+								{
+									"listen": "prerequest",
+									"script": {
+										"exec": [
+											""
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"auth": {
+									"type": "noauth"
+								},
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{baseUrl}}/consumer/list/datasets?datasetID=datakaveri.org/b8bd3e3f39615c8ec96722131ae95056b5938f2f/rs.iudx.io/agra-point-of-interests",
+									"protocol": "https",
+									"host": [
+										"localhost"
+									],
+									"port": "8445",
+									"path": [
+										"consumer",
+										"list",
+										"datasets"
+									],
+									"query": [
+										{
+											"key": "datasetID",
+											"value": "datakaveri.org/b8bd3e3f39615c8ec96722131ae95056b5938f2f/rs.iudx.io/agra-point-of-interests"
+										}
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				},
+				{
+					"name": "List Providers",
+					"item": [
+						{
+							"name": "200 - Get Providers",
+							"event": [
+								{
+									"listen": "prerequest",
+									"script": {
+										"exec": [
+											""
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{baseUrl}}/consumer/list/providers",
+									"protocol": "https",
+									"host": [
+										"localhost"
+									],
+									"port": "8445",
+									"path": [
+										"consumer",
+										"list",
+										"providers"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "200 - Get Provider by ID",
+							"event": [
+								{
+									"listen": "prerequest",
+									"script": {
+										"exec": [
+											""
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{baseUrl}}/consumer/list/providers?providerID=datakaveri.org/b8bd3e3f39615c8ec96722131ae95056b5938f2f",
+									"protocol": "https",
+									"host": [
+										"localhost"
+									],
+									"port": "8445",
+									"path": [
+										"consumer",
+										"list",
+										"providers"
+									],
+									"query": [
+										{
+											"key": "providerID",
+											"value": "datakaveri.org/b8bd3e3f39615c8ec96722131ae95056b5938f2f"
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "204 - No Content",
+							"event": [
+								{
+									"listen": "prerequest",
+									"script": {
+										"exec": [
+											""
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{baseUrl}}/consumer/list/providers?providerID=datakaveri.org/b8bd3e3f39615c8ec96722131ae95056b5938f2nocontent",
+									"protocol": "https",
+									"host": [
+										"localhost"
+									],
+									"port": "8445",
+									"path": [
+										"consumer",
+										"list",
+										"providers"
+									],
+									"query": [
+										{
+											"key": "providerID",
+											"value": "datakaveri.org/b8bd3e3f39615c8ec96722131ae95056b5938f2nocontent"
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "400 - Invalid ProviderID",
+							"event": [
+								{
+									"listen": "prerequest",
+									"script": {
+										"exec": [
+											""
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{baseUrl}}/consumer/list/providers?providerID=datakaveri.org/b8bd3e3f39615c8ec96722131ae95056b5938f2f/invalid",
+									"protocol": "https",
+									"host": [
+										"localhost"
+									],
+									"port": "8445",
+									"path": [
+										"consumer",
+										"list",
+										"providers"
+									],
+									"query": [
+										{
+											"key": "providerID",
+											"value": "datakaveri.org/b8bd3e3f39615c8ec96722131ae95056b5938f2f/invalid"
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "401 - Unathorized",
+							"event": [
+								{
+									"listen": "prerequest",
+									"script": {
+										"exec": [
+											""
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"auth": {
+									"type": "noauth"
+								},
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{baseUrl}}/consumer/list/providers?providerID=datakaveri.org/b8bd3e3f39615c8ec96722131ae95056b5938f2f",
+									"protocol": "https",
+									"host": [
+										"localhost"
+									],
+									"port": "8445",
+									"path": [
+										"consumer",
+										"list",
+										"providers"
+									],
+									"query": [
+										{
+											"key": "providerID",
+											"value": "datakaveri.org/b8bd3e3f39615c8ec96722131ae95056b5938f2f"
+										}
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				},
+				{
+					"name": "List Products",
+					"item": [
+						{
+							"name": "200 - List Products",
+							"event": [
+								{
+									"listen": "prerequest",
+									"script": {
+										"exec": [
+											""
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{baseUrl}}/consumer/list/products",
+									"protocol": "https",
+									"host": [
+										"localhost"
+									],
+									"port": "8445",
+									"path": [
+										"consumer",
+										"list",
+										"products"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "200 - List Products having given dataset",
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{baseUrl}}/consumer/list/products?datasetId=datakaveri.org/b8bd3e3f39615c8ec96722131ae95056b5938f2f/rs.iudx.io/agra-point-of-interests",
+									"protocol": "https",
+									"host": [
+										"localhost"
+									],
+									"port": "8445",
+									"path": [
+										"consumer",
+										"list",
+										"products"
+									],
+									"query": [
+										{
+											"key": "datasetId",
+											"value": "datakaveri.org/b8bd3e3f39615c8ec96722131ae95056b5938f2f/rs.iudx.io/agra-point-of-interests"
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "200 - List Products of a Provider",
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{baseUrl}}/consumer/list/products?providerID=datakaveri.org/b8bd3e3f39615c8ec96722131ae95056b5938f2f",
+									"protocol": "https",
+									"host": [
+										"localhost"
+									],
+									"port": "8445",
+									"path": [
+										"consumer",
+										"list",
+										"products"
+									],
+									"query": [
+										{
+											"key": "providerID",
+											"value": "datakaveri.org/b8bd3e3f39615c8ec96722131ae95056b5938f2f"
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "204 - No content",
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{baseUrl}}/consumer/list/products?providerID=datakaveri.org/b8bd3e3f39615c8ec96722131ae95056b5938f2nocontent",
+									"protocol": "https",
+									"host": [
+										"localhost"
+									],
+									"port": "8445",
+									"path": [
+										"consumer",
+										"list",
+										"products"
+									],
+									"query": [
+										{
+											"key": "providerID",
+											"value": "datakaveri.org/b8bd3e3f39615c8ec96722131ae95056b5938f2nocontent"
+										}
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				},
+				{
+					"name": "List Purchases",
+					"item": [
+						{
+							"name": "List Purchases",
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{baseUrl}}/consumer/list/purchases",
+									"protocol": "https",
+									"host": [
+										"localhost"
+									],
+									"port": "8445",
+									"path": [
+										"consumer",
+										"list",
+										"purchases"
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				}
+			],
+			"auth": {
+				"type": "apikey",
+				"apikey": [
+					{
+						"key": "value",
+						"value": "{{token}}",
+						"type": "string"
+					},
+					{
+						"key": "key",
+						"value": "token",
+						"type": "string"
+					}
+				]
+			},
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"type": "text/javascript",
+						"exec": [
+							"const clientId = pm.environment.get(\"clientID\");",
+							"const clientSecret = pm.environment.get(\"clientSecret\");",
+							"",
+							"const authReq = {",
+							"    url : 'https://authvertx.iudx.io/auth/v1/token',",
+							"    method: 'POST',",
+							"    header : {",
+							"        'Content-Type': 'application/json',",
+							"        'clientId': clientId,",
+							"        'clientSecret': clientSecret",
+							"    },",
+							"    body: {",
+							"        mode: 'raw',",
+							"        raw: JSON.stringify({",
+							"  itemId: 'rs.iudx.io', ",
+							"  itemType: 'resource_server',",
+							"  role: 'consumer'",
+							"})",
+							"    }",
+							"};",
+							"",
+							"pm.sendRequest(authReq, function (err, response) {",
+							"    var jsonData = response.json();",
+							"    pm.environment.set(\"token\", jsonData.results.accessToken);",
+							"});"
+						]
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"type": "text/javascript",
+						"exec": [
+							""
+						]
+					}
+				}
+			]
+		},
+		{
 			"name": "token",
 			"item": [
 				{
@@ -31,20 +1654,20 @@
 						"header": [
 							{
 								"key": "clientId",
-								"value": "{{providerClientID}}",
+								"value": "{{clientId}}",
 								"type": "text",
 								"description": "Client ID (UUID)"
 							},
 							{
 								"key": "clientSecret",
-								"value": "{{providerClientSecret}}",
+								"value": "{{clientSecret}}",
 								"type": "text",
 								"description": "Client secret (40 chars in hexadecimal)"
 							}
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"itemId\": \"\",\n    \"itemType\": \"resource_server\",\n    \"role\": \"provider\"\n}",
+							"raw": "{\n    \"itemId\": \"\",\n    \"itemType\": \"\",\n    \"role\": \"\"\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -88,20 +1711,20 @@
 						"header": [
 							{
 								"key": "clientId",
-								"value": "{{consumerClientId}}",
+								"value": "{{clientId}}",
 								"type": "text",
 								"description": "Client ID (UUID)"
 							},
 							{
 								"key": "clientSecret",
-								"value": "{{consumerClientSecret}}",
+								"value": "{{clientSecret}}",
 								"type": "text",
 								"description": "Client secret (40 chars in hexadecimal)"
 							}
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"itemId\": \"\",\n    \"itemType\": \"resource_server\",\n    \"role\": \"consumer\"\n}",
+							"raw": "{\n    \"itemId\": \"\",\n    \"itemType\": \"\",\n    \"role\": \"\"\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -145,13 +1768,13 @@
 						"header": [
 							{
 								"key": "clientId",
-								"value": "{{providerDelegateClientId}}",
+								"value": "{{clientId}}",
 								"type": "text",
 								"description": "Client ID (UUID)"
 							},
 							{
 								"key": "clientSecret",
-								"value": "{{providerDelegateClientSecret}}",
+								"value": "{{clientSecret}}",
 								"type": "text",
 								"description": "Client secret (40 chars in hexadecimal)"
 							}
@@ -202,13 +1825,13 @@
 						"header": [
 							{
 								"key": "clientId",
-								"value": "{{consumerDelegateClientId}}",
+								"value": "{{clientId}}",
 								"type": "text",
 								"description": "Client ID (UUID)"
 							},
 							{
 								"key": "clientSecret",
-								"value": "{{consumerDelegateClientSecret}}",
+								"value": "{{clientSecret}}",
 								"type": "text",
 								"description": "Client secret (40 chars in hexadecimal)"
 							}
@@ -241,1438 +1864,734 @@
 			"description": "The collection comprises APIs that provide the Identity Access Token, which is essential for executing Policy and Access Request APIs."
 		},
 		{
-			"name": "Provider APIs",
+			"name": "policy",
 			"item": [
 				{
-					"name": "Product APIs",
-					"item": [
+					"name": "200 Verify Policy: Success",
+					"event": [
 						{
-							"name": "Create Product",
-							"item": [
-								{
-									"name": "200 - Create Product Copy",
-									"event": [
-										{
-											"listen": "prerequest",
-											"script": {
-												"exec": [
-													""
-												],
-												"type": "text/javascript"
-											}
-										}
-									],
-									"request": {
-										"auth": {
-											"type": "noauth"
-										},
-										"method": "POST",
-										"header": [
-											{
-												"key": "token",
-												"value": "{{providerDelegateToken}}",
-												"type": "text"
-											}
-										],
-										"body": {
-											"mode": "raw",
-											"raw": "{\n    \"productId\": \"testProduct\",\n    \"resourceIds\": [\n        \"83c2e5c2-3574-4e11-9530-2b1fbdfce832\",\n        \"695e222b-3fae-4325-8db0-3e29d01c4fc0\"\n    ]\n}",
-											"options": {
-												"raw": {
-													"language": "json"
-												}
-											}
-										},
-										"url": {
-											"raw": "{{baseUrl}}/provider/product",
-											"host": [
-												"{{baseUrl}}"
-											],
-											"path": [
-												"provider",
-												"product"
-											]
-										}
-									},
-									"response": []
-								},
-								{
-									"name": "400 - Invalid Payload",
-									"event": [
-										{
-											"listen": "prerequest",
-											"script": {
-												"exec": [
-													""
-												],
-												"type": "text/javascript"
-											}
-										}
-									],
-									"request": {
-										"method": "POST",
-										"header": [],
-										"body": {
-											"mode": "raw",
-											"raw": "{\n    \"id\": \"abcedede\",\n    \"resources\": [\n        \"datakaveri.org/b8bd3e3f39615c8ec96722131ae95056b5938f2f/rs.iudx.io////agra-swachhata-app\",\n        \"datakaveri.org/b8bd3e3f39615c8ec96722131ae95056b5938f2f/rs.iudx.io/agra-point-of-interests\"\n    ]\n}",
-											"options": {
-												"raw": {
-													"language": "json"
-												}
-											}
-										},
-										"url": {
-											"raw": "{{baseUrl}}/provider/product",
-											"host": [
-												"{{baseUrl}}"
-											],
-											"path": [
-												"provider",
-												"product"
-											]
-										}
-									},
-									"response": []
-								},
-								{
-									"name": "401 - Unauthorized",
-									"event": [
-										{
-											"listen": "prerequest",
-											"script": {
-												"exec": [
-													""
-												],
-												"type": "text/javascript"
-											}
-										}
-									],
-									"request": {
-										"auth": {
-											"type": "noauth"
-										},
-										"method": "POST",
-										"header": [
-											{
-												"key": "token",
-												"value": "skfjdfgjdfkgjdfkgj",
-												"type": "text"
-											}
-										],
-										"body": {
-											"mode": "raw",
-											"raw": "{\n    \"productId\": \"testProduct\",\n    \"resourceIds\": [\n        \"83c2e5c2-3574-4e11-9530-2b1fbdfce832\",\n        \"695e222b-3fae-4325-8db0-3e29d01c4fc0\"\n    ]\n}",
-											"options": {
-												"raw": {
-													"language": "json"
-												}
-											}
-										},
-										"url": {
-											"raw": "{{baseUrl}}/provider/product",
-											"host": [
-												"{{baseUrl}}"
-											],
-											"path": [
-												"provider",
-												"product"
-											]
-										}
-									},
-									"response": []
-								},
-								{
-									"name": "403 - Forbidden (Linked account not activated)",
-									"event": [
-										{
-											"listen": "prerequest",
-											"script": {
-												"exec": [
-													""
-												],
-												"type": "text/javascript"
-											}
-										}
-									],
-									"request": {
-										"auth": {
-											"type": "noauth"
-										},
-										"method": "POST",
-										"header": [
-											{
-												"key": "token",
-												"value": "{{notRegisteredProviderToken}}",
-												"type": "text"
-											}
-										],
-										"body": {
-											"mode": "raw",
-											"raw": "{\n    \"productId\": \"testProduct\",\n    \"resourceIds\": [\n        \"83c2e5c2-3574-4e11-9530-2b1fbdfce832\",\n        \"695e222b-3fae-4325-8db0-3e29d01c4fc0\"\n    ]\n}",
-											"options": {
-												"raw": {
-													"language": "json"
-												}
-											}
-										},
-										"url": {
-											"raw": "{{baseUrl}}/provider/product",
-											"host": [
-												"{{baseUrl}}"
-											],
-											"path": [
-												"provider",
-												"product"
-											]
-										}
-									},
-									"response": []
-								},
-								{
-									"name": "409 - Product Already Exists",
-									"event": [
-										{
-											"listen": "prerequest",
-											"script": {
-												"exec": [
-													""
-												],
-												"type": "text/javascript"
-											}
-										}
-									],
-									"request": {
-										"method": "POST",
-										"header": [
-											{
-												"key": "token",
-												"value": "{{providerDelegateToken}}",
-												"type": "text"
-											}
-										],
-										"body": {
-											"mode": "raw",
-											"raw": "{\n    \"productId\": \"testProduct\",\n    \"resourceIds\": [\n        \"83c2e5c2-3574-4e11-9530-2b1fbdfce832\",\n        \"695e222b-3fae-4325-8db0-3e29d01c4fc0\"\n    ]\n}",
-											"options": {
-												"raw": {
-													"language": "json"
-												}
-											}
-										},
-										"url": {
-											"raw": "{{baseUrl}}/provider/product",
-											"host": [
-												"{{baseUrl}}"
-											],
-											"path": [
-												"provider",
-												"product"
-											]
-										}
-									},
-									"response": []
+							"listen": "test",
+							"script": {
+								"exec": [
+									"// Test the response code",
+									"pm.test(\"response is 200 (OK)\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"// Test the response header",
+									"pm.test(\"Check response header\", function () {",
+									"    pm.response.to.have.header(\"Content-Type\",\"application/json\");",
+									"});",
+									"",
+									"// Test the response",
+									"pm.test(\"Check response body\", function () {    ",
+									"    const body = pm.response.json();",
+									"    pm.expect(body).to.have.property(\"type\", \"urn:apd:Allow\");",
+									"    }",
+									");"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "{{authToken}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"user\": {\n    \"id\": \"fd47486b-3497-4248-ac1e-082e4d37a66c\",\n    \"name\": {\n    \"firstName\":\"Vasanth\",\n    \"lastName\":\"Rajaraman\"\n    },\n    \"email\": \"vasanth.rajaraman@datakaveri.org\"\n  },\n  \"owner\": {\n    \"id\": \"b2c27f3f-2524-4a84-816e-91f9ab23f837\",\n    \"name\": {\n    \"firstName\":\"B\",\n    \"lastName\":\"Robert A B C D\"\n    },\n    \"email\": \"bryanrobert@iisc.ac.in\"\n  },\n   \"item\": {\n     \"itemId\": \"8b95ab80-2aaf-4636-a65e-7f2563d0d371\",\n     \"itemType\": \"resource_group\"\n   }\n}",
+							"options": {
+								"raw": {
+									"language": "json"
 								}
-							]
+							}
 						},
-						{
-							"name": "Delete Product",
-							"item": [
-								{
-									"name": "200 - Delete Product",
-									"request": {
-										"method": "DELETE",
-										"header": [
-											{
-												"key": "token",
-												"value": "{{providerDelegateToken}}",
-												"type": "text"
-											}
-										],
-										"url": {
-											"raw": "{{baseUrl}}/provider/product?productId=urn:datakaveri.org:b2c27f3f-2524-4a84-816e-91f9ab23f837:testProduct111",
-											"host": [
-												"{{baseUrl}}"
-											],
-											"path": [
-												"provider",
-												"product"
-											],
-											"query": [
-												{
-													"key": "productId",
-													"value": "urn:datakaveri.org:b2c27f3f-2524-4a84-816e-91f9ab23f837:testProduct111"
-												}
-											]
-										}
-									},
-									"response": []
-								},
-								{
-									"name": "400 - Invalid ID",
-									"request": {
-										"method": "DELETE",
-										"header": [
-											{
-												"key": "token",
-												"value": "{{providerDelegateToken}}",
-												"type": "text"
-											}
-										],
-										"url": {
-											"raw": "{{baseUrl}}/provider/product?productId=urn:datakaveri.org:datakaveri.org/b8bd3e3f39615c8ec96722131ae95056b5938f2f:xyz123***",
-											"host": [
-												"{{baseUrl}}"
-											],
-											"path": [
-												"provider",
-												"product"
-											],
-											"query": [
-												{
-													"key": "productId",
-													"value": "urn:datakaveri.org:datakaveri.org/b8bd3e3f39615c8ec96722131ae95056b5938f2f:xyz123***"
-												}
-											]
-										}
-									},
-									"response": []
-								},
-								{
-									"name": "401 - Unauthorized",
-									"request": {
-										"auth": {
-											"type": "noauth"
-										},
-										"method": "DELETE",
-										"header": [
-											{
-												"key": "token",
-												"value": "{{consumerToken}}",
-												"type": "text"
-											}
-										],
-										"url": {
-											"raw": "{{baseUrl}}/provider/product?productId=urn:datakaveri.org:b2c27f3f-2524-4a84-816e-91f9ab23f837:testProduct112",
-											"host": [
-												"{{baseUrl}}"
-											],
-											"path": [
-												"provider",
-												"product"
-											],
-											"query": [
-												{
-													"key": "productId",
-													"value": "urn:datakaveri.org:b2c27f3f-2524-4a84-816e-91f9ab23f837:testProduct112"
-												}
-											]
-										}
-									},
-									"response": []
-								},
-								{
-									"name": "404 - Not Found",
-									"request": {
-										"method": "DELETE",
-										"header": [
-											{
-												"key": "token",
-												"value": "{{providerToken}}",
-												"type": "text"
-											}
-										],
-										"url": {
-											"raw": "{{baseUrl}}/provider/product?productId=urn:datakaveri.org:b2c27f3f-2524-4a84-816e-91f9ab23f837:testProduct1012245",
-											"host": [
-												"{{baseUrl}}"
-											],
-											"path": [
-												"provider",
-												"product"
-											],
-											"query": [
-												{
-													"key": "productId",
-													"value": "urn:datakaveri.org:b2c27f3f-2524-4a84-816e-91f9ab23f837:testProduct1012245"
-												}
-											]
-										}
-									},
-									"response": []
-								}
+						"url": {
+							"raw": "{{baseUrl}}/verify",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"verify"
 							]
 						}
-					]
+					},
+					"response": []
 				},
 				{
-					"name": "Product Variant (P.V.)",
-					"item": [
+					"name": "403 Verify Policy: No Policy Exist",
+					"event": [
 						{
-							"name": "Create P.V.",
-							"item": [
-								{
-									"name": "201 - Create P.V.",
-									"event": [
-										{
-											"listen": "prerequest",
-											"script": {
-												"exec": [
-													""
-												],
-												"type": "text/javascript"
-											}
-										}
-									],
-									"request": {
-										"method": "POST",
-										"header": [
-											{
-												"key": "token",
-												"value": "{{providerDelegateToken}}",
-												"type": "text"
-											}
-										],
-										"body": {
-											"mode": "raw",
-											"raw": "{\n    \"productId\": \"urn:datakaveri.org:b2c27f3f-2524-4a84-816e-91f9ab23f837:testProduct\",\n    \"productVariantName\": \"variant2\",\n    \"resources\": [\n        {\n          \"id\": \"83c2e5c2-3574-4e11-9530-2b1fbdfce832\",\n          \"capabilities\": [\n            \"api\"\n          ]\n        },\n        {\n          \"id\": \"695e222b-3fae-4325-8db0-3e29d01c4fc0\",\n          \"capabilities\": [\n            \"sub\", \"file\"\n          ]\n        }\n      ],\n      \"price\": 150,\n      \"duration\": 12\n}",
-											"options": {
-												"raw": {
-													"language": "json"
-												}
-											}
-										},
-										"url": {
-											"raw": "{{baseUrl}}/provider/product-variant",
-											"host": [
-												"{{baseUrl}}"
-											],
-											"path": [
-												"provider",
-												"product-variant"
-											]
-										}
-									},
-									"response": []
-								},
-								{
-									"name": "400 - Invalid Payload",
-									"event": [
-										{
-											"listen": "prerequest",
-											"script": {
-												"exec": [
-													""
-												],
-												"type": "text/javascript"
-											}
-										}
-									],
-									"request": {
-										"method": "POST",
-										"header": [
-											{
-												"key": "token",
-												"value": "{{providerDelegateToken}}",
-												"type": "text"
-											}
-										],
-										"body": {
-											"mode": "raw",
-											"raw": "{\n    \"productVariantName\": \"variant1\",\n    \"resources\": [\n        {\n          \"id\": \"datakaveri.org/b8bd3e3f39615c8ec96722131ae95056b5938f2f/rs.iudx.io/agra-swachhata-app\",\n          \"capabilities\": [\n            \"api\", \"sub\"\n          ]\n        },\n        {\n          \"id\": \"datakaveri.org/b8bd3e3f39615c8ec96722131ae95056b5938f2f/rs.iudx.io/agra-point-of-interests\",\n          \"capabilities\": [\n            \"sub\", \"file\"\n          ]\n        }\n      ],\n      \"price\": 100.0,\n      \"duration\": 12\n}",
-											"options": {
-												"raw": {
-													"language": "json"
-												}
-											}
-										},
-										"url": {
-											"raw": "{{baseUrl}}/provider/product-variant",
-											"host": [
-												"{{baseUrl}}"
-											],
-											"path": [
-												"provider",
-												"product-variant"
-											]
-										}
-									},
-									"response": []
-								},
-								{
-									"name": "401 - Unauthorized",
-									"event": [
-										{
-											"listen": "prerequest",
-											"script": {
-												"exec": [
-													""
-												],
-												"type": "text/javascript"
-											}
-										}
-									],
-									"request": {
-										"method": "POST",
-										"header": [
-											{
-												"key": "token",
-												"value": "sdklfjsflgjsflgk",
-												"type": "text"
-											}
-										],
-										"body": {
-											"mode": "raw",
-											"raw": "{\n    \"productId\": \"urn:datakaveri.org:b2c27f3f-2524-4a84-816e-91f9ab23f837:testProduct111\",\n    \"productVariantName\": \"variant1\",\n    \"resources\": [\n        {\n          \"id\": \"83c2e5c2-3574-4e11-9530-2b1fbdfce832\",\n          \"capabilities\": [\n            \"api\", \"sub\"\n          ]\n        },\n        {\n          \"id\": \"695e222b-3fae-4325-8db0-3e29d01c4fc0\",\n          \"capabilities\": [\n            \"sub\", \"file\"\n          ]\n        }\n      ],\n      \"price\": 150,\n      \"duration\": 12\n}",
-											"options": {
-												"raw": {
-													"language": "json"
-												}
-											}
-										},
-										"url": {
-											"raw": "{{baseUrl}}/provider/product-variant",
-											"host": [
-												"{{baseUrl}}"
-											],
-											"path": [
-												"provider",
-												"product-variant"
-											]
-										}
-									},
-									"response": []
-								},
-								{
-									"name": "409 - P.V. Already Exists",
-									"event": [
-										{
-											"listen": "prerequest",
-											"script": {
-												"exec": [
-													""
-												],
-												"type": "text/javascript"
-											}
-										}
-									],
-									"request": {
-										"method": "POST",
-										"header": [
-											{
-												"key": "token",
-												"value": "{{providerDelegateToken}}",
-												"type": "text"
-											}
-										],
-										"body": {
-											"mode": "raw",
-											"raw": "{\n    \"productId\": \"urn:datakaveri.org:b2c27f3f-2524-4a84-816e-91f9ab23f837:testProduct111\",\n    \"productVariantName\": \"variant1\",\n    \"resources\": [\n        {\n          \"id\": \"83c2e5c2-3574-4e11-9530-2b1fbdfce832\",\n          \"capabilities\": [\n            \"api\", \"sub\"\n          ]\n        },\n        {\n          \"id\": \"695e222b-3fae-4325-8db0-3e29d01c4fc0\",\n          \"capabilities\": [\n            \"sub\", \"file\"\n          ]\n        }\n      ],\n      \"price\": 150,\n      \"duration\": 12\n}",
-											"options": {
-												"raw": {
-													"language": "json"
-												}
-											}
-										},
-										"url": {
-											"raw": "{{baseUrl}}/provider/product-variant",
-											"host": [
-												"{{baseUrl}}"
-											],
-											"path": [
-												"provider",
-												"product-variant"
-											]
-										}
-									},
-									"response": []
+							"listen": "test",
+							"script": {
+								"exec": [
+									"// Test the response code",
+									"pm.test(\"response is 403 (Forbidden)\", function () {",
+									"    pm.response.to.have.status(403);",
+									"});",
+									"",
+									"// Test the response header",
+									"pm.test(\"Check response header\", function () {",
+									"    pm.response.to.have.header(\"Content-Type\",\"application/json\");",
+									"});",
+									"",
+									"// Test the response",
+									"pm.test(\"Check response body\", function () {    ",
+									"    const body = pm.response.json();",
+									"    pm.expect(body).to.have.property(\"type\", \"urn:apd:Deny\");",
+									"    pm.expect(body).to.have.property(\"title\", \"Forbidden\");",
+									"    pm.expect(body).to.have.property(\"detail\", \"No policy exist for given Resource Group\");",
+									"    }",
+									");"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "{{authToken}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"user\": {\n    \"id\": \"d67a19d5-9a26-5d7c-b0e7-58e7f3b222e2\",\n    \"name\": {\n    \"firstName\":\"demo\",\n    \"lastName\":\"name\"\n    },\n    \"email\": \"abc31111111221ac@xyz.com\"\n  },\n  \"owner\": {\n    \"id\": \"4e563a5f-35f0-4f32-92be-8830775a1c5e\",\n    \"name\": {\n    \"firstName\":\"Test\",\n    \"lastName\":\"provider\"\n    },\n    \"email\": \"testprovider@example.com\"\n  },\n   \"item\": {\n     \"itemId\": \"d67a19d5-9a26-5d7c-b0e7-58e7f3b222e2\",\n     \"itemType\": \"resource_group\"\n   }\n}",
+							"options": {
+								"raw": {
+									"language": "json"
 								}
-							]
+							}
 						},
-						{
-							"name": "Update P.V.",
-							"item": [
-								{
-									"name": "200 - Update P.V.",
-									"event": [
-										{
-											"listen": "prerequest",
-											"script": {
-												"exec": [
-													""
-												],
-												"type": "text/javascript"
-											}
-										}
-									],
-									"request": {
-										"method": "PUT",
-										"header": [
-											{
-												"key": "token",
-												"value": "{{providerDelegateToken}}",
-												"type": "text"
-											}
-										],
-										"body": {
-											"mode": "raw",
-											"raw": "{\n    \"productId\": \"urn:datakaveri.org:b2c27f3f-2524-4a84-816e-91f9ab23f837:testProduct111\",\n    \"productVariantName\": \"variant1\",\n    \"resources\": [\n        {\n          \"id\": \"83c2e5c2-3574-4e11-9530-2b1fbdfce832\",\n          \"capabilities\": [\n            \"api\", \"sub\"\n          ]\n        },\n        {\n          \"id\": \"695e222b-3fae-4325-8db0-3e29d01c4fc0\",\n          \"capabilities\": [\n            \"sub\", \"file\"\n          ]\n        }\n      ],\n      \"price\": 200,\n      \"duration\": 24\n}",
-											"options": {
-												"raw": {
-													"language": "json"
-												}
-											}
-										},
-										"url": {
-											"raw": "{{baseUrl}}/provider/product-variant",
-											"host": [
-												"{{baseUrl}}"
-											],
-											"path": [
-												"provider",
-												"product-variant"
-											]
-										}
-									},
-									"response": []
-								},
-								{
-									"name": "400 - Invalid Payload",
-									"event": [
-										{
-											"listen": "prerequest",
-											"script": {
-												"exec": [
-													""
-												],
-												"type": "text/javascript"
-											}
-										}
-									],
-									"request": {
-										"method": "PUT",
-										"header": [
-											{
-												"key": "token",
-												"value": "{{providerDelegateToken}}",
-												"type": "text"
-											}
-										],
-										"body": {
-											"mode": "raw",
-											"raw": "{\n    \"variant\": \"variant1\",\n    \"resources\": [\n        {\n          \"id\": \"datakaveri.org/b8bd3e3f39615c8ec96722131ae95056b5938f2f/rs.iudx.io/agra-swachhata-app\",\n          \"capabilities\": [\n            \"api\", \"sub\"\n          ]\n        },\n        {\n          \"id\": \"datakaveri.org/b8bd3e3f39615c8ec96722131ae95056b5938f2f/rs.iudx.io/agra-point-of-interests\",\n          \"capabilities\": [\n            \"sub\", \"file\"\n          ]\n        }\n      ],\n      \"price\": 100.0,\n      \"duration\": 12\n}",
-											"options": {
-												"raw": {
-													"language": "json"
-												}
-											}
-										},
-										"url": {
-											"raw": "{{baseUrl}}/provider/product-variant",
-											"host": [
-												"{{baseUrl}}"
-											],
-											"path": [
-												"provider",
-												"product-variant"
-											]
-										}
-									},
-									"response": []
-								},
-								{
-									"name": "401 - Unauthorized",
-									"event": [
-										{
-											"listen": "prerequest",
-											"script": {
-												"exec": [
-													""
-												],
-												"type": "text/javascript"
-											}
-										}
-									],
-									"request": {
-										"auth": {
-											"type": "noauth"
-										},
-										"method": "PUT",
-										"header": [
-											{
-												"key": "token",
-												"value": "sdjsfgkjskfgjdkfgj",
-												"type": "text"
-											}
-										],
-										"body": {
-											"mode": "raw",
-											"raw": "{\n    \"productId\": \"urn:datakaveri.org:b2c27f3f-2524-4a84-816e-91f9ab23f837:testProduct111\",\n    \"productVariantName\": \"variant1\",\n    \"resources\": [\n        {\n          \"id\": \"83c2e5c2-3574-4e11-9530-2b1fbdfce832\",\n          \"capabilities\": [\n            \"api\", \"sub\"\n          ]\n        },\n        {\n          \"id\": \"695e222b-3fae-4325-8db0-3e29d01c4fc0\",\n          \"capabilities\": [\n            \"sub\", \"file\"\n          ]\n        }\n      ],\n      \"price\": 200,\n      \"duration\": 24\n}",
-											"options": {
-												"raw": {
-													"language": "json"
-												}
-											}
-										},
-										"url": {
-											"raw": "{{baseUrl}}/provider/product-variant",
-											"host": [
-												"{{baseUrl}}"
-											],
-											"path": [
-												"provider",
-												"product-variant"
-											]
-										}
-									},
-									"response": []
-								}
-							]
-						},
-						{
-							"name": "Delete P.V.",
-							"item": [
-								{
-									"name": "200 - Delete P.V.",
-									"request": {
-										"method": "DELETE",
-										"header": [
-											{
-												"key": "token",
-												"value": "{{providerDelegateToken}}",
-												"type": "text"
-											}
-										],
-										"url": {
-											"raw": "{{baseUrl}}/provider/product-variant?productVariantId=7fc815a0-4fc8-4bdf-96e2-e495316d1bf8",
-											"host": [
-												"{{baseUrl}}"
-											],
-											"path": [
-												"provider",
-												"product-variant"
-											],
-											"query": [
-												{
-													"key": "productVariantId",
-													"value": "7fc815a0-4fc8-4bdf-96e2-e495316d1bf8"
-												}
-											]
-										}
-									},
-									"response": []
-								},
-								{
-									"name": "200 - Bad Request [Invalid Product Variant ID]",
-									"request": {
-										"method": "DELETE",
-										"header": [
-											{
-												"key": "token",
-												"value": "{{providerDelegateToken}}",
-												"type": "text"
-											}
-										],
-										"url": {
-											"raw": "{{baseUrl}}/provider/product-variant?productVariantId=dummyProductVariantId",
-											"host": [
-												"{{baseUrl}}"
-											],
-											"path": [
-												"provider",
-												"product-variant"
-											],
-											"query": [
-												{
-													"key": "productVariantId",
-													"value": "dummyProductVariantId"
-												}
-											]
-										}
-									},
-									"response": []
-								},
-								{
-									"name": "401 - Not Authorised",
-									"request": {
-										"method": "DELETE",
-										"header": [
-											{
-												"key": "token",
-												"value": "sdkjfskfgjskfgjsdfkglj",
-												"type": "text"
-											}
-										],
-										"url": {
-											"raw": "{{baseUrl}}/provider/product-variant?productVariantId=20fed015-c552-4342-9184-9401c2012634",
-											"host": [
-												"{{baseUrl}}"
-											],
-											"path": [
-												"provider",
-												"product-variant"
-											],
-											"query": [
-												{
-													"key": "productVariantId",
-													"value": "20fed015-c552-4342-9184-9401c2012634"
-												}
-											]
-										}
-									},
-									"response": []
-								},
-								{
-									"name": "404 - Not Found",
-									"request": {
-										"method": "DELETE",
-										"header": [
-											{
-												"key": "token",
-												"value": "{{providerDelegateToken}}",
-												"type": "text"
-											}
-										],
-										"url": {
-											"raw": "{{baseUrl}}/provider/product-variant?productVariantId=23fed015-c552-4342-9184-9401c2012635",
-											"host": [
-												"{{baseUrl}}"
-											],
-											"path": [
-												"provider",
-												"product-variant"
-											],
-											"query": [
-												{
-													"key": "productVariantId",
-													"value": "23fed015-c552-4342-9184-9401c2012635"
-												}
-											]
-										}
-									},
-									"response": []
-								}
+						"url": {
+							"raw": "{{baseUrl}}/verify",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"verify"
 							]
 						}
-					]
+					},
+					"response": []
 				},
 				{
-					"name": "List APIs",
-					"item": [
+					"name": "400 Verify Policy: Bad Request",
+					"event": [
 						{
-							"name": "Products",
-							"item": [
-								{
-									"name": "200 - List Products",
-									"request": {
-										"method": "GET",
-										"header": [
-											{
-												"key": "token",
-												"value": "{{providerDelegateToken}}",
-												"type": "text"
-											}
-										],
-										"url": {
-											"raw": "{{baseUrl}}/provider/list/products",
-											"host": [
-												"{{baseUrl}}"
-											],
-											"path": [
-												"provider",
-												"list",
-												"products"
-											]
-										}
-									},
-									"response": []
-								},
-								{
-									"name": "200 - List products for resource",
-									"request": {
-										"method": "GET",
-										"header": [
-											{
-												"key": "token",
-												"value": "{{providerDelegateToken}}",
-												"type": "text"
-											}
-										],
-										"url": {
-											"raw": "{{baseUrl}}/provider/list/products?resourceId=83c2e5c2-3574-4e11-9530-2b1fbdfce832",
-											"host": [
-												"{{baseUrl}}"
-											],
-											"path": [
-												"provider",
-												"list",
-												"products"
-											],
-											"query": [
-												{
-													"key": "resourceId",
-													"value": "83c2e5c2-3574-4e11-9530-2b1fbdfce832"
-												}
-											]
-										}
-									},
-									"response": []
-								},
-								{
-									"name": "204 - No Content",
-									"request": {
-										"method": "GET",
-										"header": [
-											{
-												"key": "token",
-												"value": "{{notRegisteredProviderToken}}",
-												"type": "text"
-											}
-										],
-										"url": {
-											"raw": "{{baseUrl}}/provider/list/products",
-											"host": [
-												"{{baseUrl}}"
-											],
-											"path": [
-												"provider",
-												"list",
-												"products"
-											]
-										}
-									},
-									"response": []
-								},
-								{
-									"name": "400 - Invalid resource ID",
-									"request": {
-										"method": "GET",
-										"header": [
-											{
-												"key": "token",
-												"value": "{{providerDelegateToken}}",
-												"type": "text"
-											}
-										],
-										"url": {
-											"raw": "{{baseUrl}}/provider/list/products?resourceID=abcd",
-											"host": [
-												"{{baseUrl}}"
-											],
-											"path": [
-												"provider",
-												"list",
-												"products"
-											],
-											"query": [
-												{
-													"key": "resourceID",
-													"value": "abcd"
-												}
-											]
-										}
-									},
-									"response": []
-								},
-								{
-									"name": "401 - Unauthorized",
-									"request": {
-										"auth": {
-											"type": "noauth"
-										},
-										"method": "GET",
-										"header": [
-											{
-												"key": "token",
-												"value": "sdkfjskfdjgskfgjsfjg",
-												"type": "text"
-											}
-										],
-										"url": {
-											"raw": "{{baseUrl}}/provider/list/products",
-											"host": [
-												"{{baseUrl}}"
-											],
-											"path": [
-												"provider",
-												"list",
-												"products"
-											]
-										}
-									},
-									"response": []
+							"listen": "test",
+							"script": {
+								"exec": [
+									"// Test the response code",
+									"pm.test(\"response is 400 (Bad Request)\", function () {",
+									"    pm.response.to.have.status(400);",
+									"});",
+									"",
+									"// Test the response header",
+									"pm.test(\"Check response header\", function () {",
+									"    pm.response.to.have.header(\"Content-Type\",\"application/json\");",
+									"});",
+									"",
+									"// Test the response",
+									"pm.test(\"Check response body\", function () {    ",
+									"    const body = pm.response.json();",
+									"    pm.expect(body).to.have.property(\"type\", \"urn:dx:acl:backend\");",
+									"    pm.expect(body).to.have.property(\"title\", \"Bad Request\");",
+									"    pm.expect(body).to.have.property(\"detail\", \"Bad Request\");",
+									"    }",
+									");"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "{{authToken}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"user\": {\n    \"id\": \"d67a19d5-9a26-5d7c-b0e7-58e7f3b222e2\",\n    \"name\": {\n    \"firstName\":\"demo\",\n    \"lastName\":\"name\"\n    },\n    \"email\": \"abc31111111221ac@xyz.com\"\n  },\n  \"owner\": {\n    \"id\": \"4e563a5f-35f0-4f32-92be-8830775a1c5e\",\n    \"name\": {\n    \"firstName\":\"Test\",\n    \"lastName\":\"provider\"\n    },\n    \"email\": \"testprovider@example.com\"\n  },\n   \"item\": {\n     \"itemId\": \"d67a19d5-9a26-5d7c-b0e7-58e7f3b222e2\",\n     \"itemType\": \"resource\"\n   }\n}",
+							"options": {
+								"raw": {
+									"language": "json"
 								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/verify",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"verify"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "200 Delete Policy: Success",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"// Test the response code",
+									"pm.test(\"response is 200 (OK)\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"// Test the response header",
+									"pm.test(\"Check response header\", function () {",
+									"    pm.response.to.have.header(\"Content-Type\",\"application/json\");",
+									"});",
+									"",
+									"// Test the response",
+									"pm.test(\"Check response body\", function () {    ",
+									"    const body = pm.response.json();",
+									"    pm.expect(body).to.have.property(\"type\", \"urn:dx:acl:success\");",
+									"    }",
+									");"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"protocolProfileBehavior": {
+						"disabledSystemHeaders": {
+							"content-type": true
+						}
+					},
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "{{providerToken}}",
+								"disabled": true
+							},
+							{
+								"key": "Authorization",
+								"value": "{{providerDelegateToken}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\"id\": \"ecefcebc-2949-4b01-b3d8-1f488dc4ca45\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}{{basePath}}/policies",
+							"host": [
+								"{{baseUrl}}{{basePath}}"
+							],
+							"path": [
+								"policies"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "400 Delete Policy: Bad Request [Policy not active, expired, or withdrawn]",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"// Test the response code",
+									"pm.test(\"response is 400 (Bad Request)\", function () {",
+									"    pm.response.to.have.status(400);",
+									"});",
+									"",
+									"// Test the response header",
+									"pm.test(\"Check response header\", function () {",
+									"    pm.response.to.have.header(\"Content-Type\",\"application/json\");",
+									"});",
+									"",
+									"// Test the response",
+									"pm.test(\"Check response body\", function () {    ",
+									"    const body = pm.response.json();",
+									"    pm.expect(body).to.have.property(\"type\", \"urn:dx:acl:badRequest\");",
+									"    pm.expect(body).to.have.property(\"title\", \"Bad Request\");",
+									"    pm.expect(body).to.have.property(\"detail\", \"Policy could not be deleted, as policy is not ACTIVE\");",
+									"    }",
+									");"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"protocolProfileBehavior": {
+						"disabledSystemHeaders": {
+							"content-type": true
+						}
+					},
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "{{providerToken}}",
+								"disabled": true
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "{{providerDelegateToken}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\"id\": \"ecefcebc-2949-4b01-b3d8-1f488dc4ca45\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}{{basePath}}/policies",
+							"host": [
+								"{{baseUrl}}{{basePath}}"
+							],
+							"path": [
+								"policies"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "401 Delete Policy : Unauthorized",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"// Test the response code",
+									"pm.test(\"response is 401 (Not Authorized)\", function () {",
+									"    pm.response.to.have.status(401);",
+									"});",
+									"",
+									"// Test the response header",
+									"pm.test(\"Check response header\", function () {",
+									"    pm.response.to.have.header(\"Content-Type\",\"application/json\");",
+									"});",
+									"",
+									"// Test the response",
+									"pm.test(\"Check response body\", function () {    ",
+									"    const body = pm.response.json();",
+									"    pm.expect(body).to.have.property(\"type\", \"urn:dx:acl:invalidAuthorizationToken\");",
+									"    pm.expect(body).to.have.property(\"title\", \"Not Authorized\");",
+									"    pm.expect(body).to.have.property(\"detail\", \"Not Authorized\");",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "{{consumerToken}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\"id\": \"b5dd534d-231c-4674-8167-2e39467d0643\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}{{basePath}}/policies",
+							"host": [
+								"{{baseUrl}}{{basePath}}"
+							],
+							"path": [
+								"policies"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "403 Delete Policy:  Forbidden",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"// Test the response code",
+									"pm.test(\"response is 403 (Forbidden)\", function () {",
+									"    pm.response.to.have.status(403);",
+									"});",
+									"",
+									"// Test the response header",
+									"pm.test(\"Check response header\", function () {",
+									"    pm.response.to.have.header(\"Content-Type\",\"application/json\");",
+									"});",
+									"",
+									"// Test the response",
+									"pm.test(\"Check response body\", function () {    ",
+									"    const body = pm.response.json();",
+									"    pm.expect(body).to.have.property(\"type\", \"urn:dx:acl:forbidden\");",
+									"    pm.expect(body).to.have.property(\"title\", \"Forbidden\");",
+									"    pm.expect(body).to.have.property(\"detail\", \"Access Denied: You do not have ownership rights for this policy.\");",
+									"    }",
+									");"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"protocolProfileBehavior": {
+						"disabledSystemHeaders": {
+							"content-type": true
+						}
+					},
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "{{providerToken}}",
+								"disabled": true
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "{{providerDelegateTokenForbidden}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\"id\": \"ecefcebc-2949-4b01-b3d8-1f488dc4ca45\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}{{basePath}}/policies",
+							"host": [
+								"{{baseUrl}}{{basePath}}"
+							],
+							"path": [
+								"policies"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "404 Delete Policy: Not Found",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"// Test the response code",
+									"pm.test(\"response is 404 (Not Found)\", function () {",
+									"    pm.response.to.have.status(404);",
+									"});",
+									"",
+									"// Test the response header",
+									"pm.test(\"Check response header\", function () {",
+									"    pm.response.to.have.header(\"Content-Type\",\"application/json\");",
+									"});",
+									"",
+									"// Test the response",
+									"pm.test(\"Check response body\", function () {    ",
+									"    const body = pm.response.json();",
+									"    pm.expect(body).to.have.property(\"type\", \"urn:dx:acl:resourceNotFound\");",
+									"    pm.expect(body).to.have.property(\"title\", \"Not Found\");",
+									"    pm.expect(body).to.have.property(\"detail\", \"Policy could not be deleted, as it doesn't exist\");",
+									"    }",
+									");"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"protocolProfileBehavior": {
+						"disabledSystemHeaders": {
+							"content-type": true
+						}
+					},
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "{{providerToken}}"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "{{providerDelegateToken}}",
+								"type": "text",
+								"disabled": true
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\"id\": \"394608f9-b370-4606-a947-1cf300dab04c\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}{{basePath}}/policies",
+							"host": [
+								"{{baseUrl}}{{basePath}}"
+							],
+							"path": [
+								"policies"
 							]
 						},
+						"description": "specific thing to be written here"
+					},
+					"response": []
+				},
+				{
+					"name": "200 Get Policy : Success",
+					"event": [
 						{
-							"name": "Purchase",
-							"item": [
+							"listen": "test",
+							"script": {
+								"exec": [
+									"// Test the response code",
+									"pm.test(\"response is 200 (OK)\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"// Test the response header",
+									"pm.test(\"Check response header\", function () {",
+									"    pm.response.to.have.header(\"Content-Type\",\"application/json\");",
+									"});",
+									"",
+									"// Test the response",
+									"pm.test(\"Check response body\", function () {    ",
+									"    const body = pm.response.json();",
+									"    pm.expect(body).to.have.property(\"type\", \"urn:dx:acl:success\");",
+									"    pm.expect(body).to.have.property(\"title\", \"Success\");",
+									"    }",
+									");"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"protocolProfileBehavior": {
+						"disabledSystemHeaders": {}
+					},
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "{{providerToken}}",
+								"disabled": true
+							},
+							{
+								"key": "Authorization",
+								"value": "{{consumerToken}}",
+								"type": "text"
+							},
+							{
+								"key": "Authorization",
+								"value": "{{providerDelegateToken}}",
+								"type": "text",
+								"disabled": true
+							},
+							{
+								"key": "Authorization",
+								"value": "{{consumerDelegateToken}}",
+								"type": "text",
+								"disabled": true
+							}
+						],
+						"url": {
+							"raw": "{{baseUrls}}{{basePath}}/policies",
+							"host": [
+								"{{baseUrls}}{{basePath}}"
+							],
+							"path": [
+								"policies"
+							],
+							"query": [
 								{
-									"name": "200 - List all purchases",
-									"request": {
-										"method": "GET",
-										"header": [
-											{
-												"key": "token",
-												"value": "{{providerDelegateToken}}",
-												"type": "text"
-											}
-										],
-										"url": {
-											"raw": "{{baseUrl}}/provider/list/purchases?paymentStatus=succeeded",
-											"host": [
-												"{{baseUrl}}"
-											],
-											"path": [
-												"provider",
-												"list",
-												"purchases"
-											],
-											"query": [
-												{
-													"key": "paymentStatus",
-													"value": "succeeded"
-												}
-											]
-										}
-									},
-									"response": []
-								},
-								{
-									"name": "200 - List all failed purchases",
-									"request": {
-										"method": "GET",
-										"header": [
-											{
-												"key": "token",
-												"value": "{{providerDelegateToken}}",
-												"type": "text"
-											}
-										],
-										"url": {
-											"raw": "{{baseUrl}}/provider/list/purchases?paymentStatus=failed",
-											"host": [
-												"{{baseUrl}}"
-											],
-											"path": [
-												"provider",
-												"list",
-												"purchases"
-											],
-											"query": [
-												{
-													"key": "paymentStatus",
-													"value": "failed"
-												}
-											]
-										}
-									},
-									"response": []
-								},
-								{
-									"name": "200 - List all pending purchases",
-									"request": {
-										"method": "GET",
-										"header": [
-											{
-												"key": "token",
-												"value": "{{providerDelegateToken}}",
-												"type": "text"
-											}
-										],
-										"url": {
-											"raw": "{{baseUrl}}/provider/list/purchases?paymentStatus=pending",
-											"host": [
-												"{{baseUrl}}"
-											],
-											"path": [
-												"provider",
-												"list",
-												"purchases"
-											],
-											"query": [
-												{
-													"key": "paymentStatus",
-													"value": "pending"
-												}
-											]
-										}
-									},
-									"response": []
-								},
-								{
-									"name": "200 - List purchases by resourceId",
-									"request": {
-										"method": "GET",
-										"header": [
-											{
-												"key": "token",
-												"value": "{{providerDelegateToken}}",
-												"type": "text"
-											}
-										],
-										"url": {
-											"raw": "{{baseUrl}}/provider/list/purchases?paymentStatus=pending&resourceId=83c2e5c2-3574-4e11-9530-2b1fbdfce832",
-											"host": [
-												"{{baseUrl}}"
-											],
-											"path": [
-												"provider",
-												"list",
-												"purchases"
-											],
-											"query": [
-												{
-													"key": "paymentStatus",
-													"value": "pending"
-												},
-												{
-													"key": "resourceId",
-													"value": "83c2e5c2-3574-4e11-9530-2b1fbdfce832"
-												}
-											]
-										}
-									},
-									"response": []
-								},
-								{
-									"name": "200 - List purchases by productId",
-									"request": {
-										"method": "GET",
-										"header": [
-											{
-												"key": "token",
-												"value": "{{providerDelegateToken}}",
-												"type": "text"
-											}
-										],
-										"url": {
-											"raw": "{{baseUrl}}/provider/list/purchases?paymentStatus=pending&productId=urn:datakaveri.org:b2c27f3f-2524-4a84-816e-91f9ab23f837:testProduct",
-											"host": [
-												"{{baseUrl}}"
-											],
-											"path": [
-												"provider",
-												"list",
-												"purchases"
-											],
-											"query": [
-												{
-													"key": "paymentStatus",
-													"value": "pending"
-												},
-												{
-													"key": "productId",
-													"value": "urn:datakaveri.org:b2c27f3f-2524-4a84-816e-91f9ab23f837:testProduct"
-												}
-											]
-										}
-									},
-									"response": []
-								},
-								{
-									"name": "204 - No Content",
-									"request": {
-										"method": "GET",
-										"header": [
-											{
-												"key": "token",
-												"value": "{{notRegisteredProviderToken}}",
-												"type": "text"
-											}
-										],
-										"url": {
-											"raw": "{{baseUrl}}/provider/list/purchases?paymentStatus=succeeded",
-											"host": [
-												"{{baseUrl}}"
-											],
-											"path": [
-												"provider",
-												"list",
-												"purchases"
-											],
-											"query": [
-												{
-													"key": "paymentStatus",
-													"value": "succeeded"
-												}
-											]
-										}
-									},
-									"response": []
-								},
-								{
-									"name": "400 - Bad Request [Invalid ID]",
-									"request": {
-										"method": "GET",
-										"header": [
-											{
-												"key": "token",
-												"value": "{{providerDelegateToken}}",
-												"type": "text"
-											}
-										],
-										"url": {
-											"raw": "{{baseUrl}}/provider/list/purchases?resourceId=sdkjfsdfkgjsfg&paymentStatus=failed",
-											"host": [
-												"{{baseUrl}}"
-											],
-											"path": [
-												"provider",
-												"list",
-												"purchases"
-											],
-											"query": [
-												{
-													"key": "resourceId",
-													"value": "sdkjfsdfkgjsfg"
-												},
-												{
-													"key": "paymentStatus",
-													"value": "failed"
-												}
-											]
-										}
-									},
-									"response": []
-								},
-								{
-									"name": "401 - Not Authorised",
-									"request": {
-										"method": "GET",
-										"header": [
-											{
-												"key": "token",
-												"value": "sadlhfjsdfsdf",
-												"type": "text"
-											}
-										],
-										"url": {
-											"raw": "{{baseUrl}}/provider/list/purchases?paymentStatus=pending",
-											"host": [
-												"{{baseUrl}}"
-											],
-											"path": [
-												"provider",
-												"list",
-												"purchases"
-											],
-											"query": [
-												{
-													"key": "paymentStatus",
-													"value": "pending"
-												}
-											]
-										}
-									},
-									"response": []
-								},
-								{
-									"name": "404 - Not Found",
-									"request": {
-										"method": "GET",
-										"header": [
-											{
-												"key": "token",
-												"value": "{{providerDelegateToken}}",
-												"type": "text"
-											}
-										],
-										"url": {
-											"raw": "{{baseUrl}}/provider/list/purchases?paymentStatus=succeeded&resourceId=93c2e5c2-3574-4e11-9530-5b1fbdfce832",
-											"host": [
-												"{{baseUrl}}"
-											],
-											"path": [
-												"provider",
-												"list",
-												"purchases"
-											],
-											"query": [
-												{
-													"key": "paymentStatus",
-													"value": "succeeded"
-												},
-												{
-													"key": "resourceId",
-													"value": "93c2e5c2-3574-4e11-9530-5b1fbdfce832"
-												}
-											]
-										}
-									},
-									"response": []
-								}
-							]
-						},
-						{
-							"name": "Product Variants",
-							"item": [
-								{
-									"name": "200 - List product variants for a product",
-									"request": {
-										"method": "GET",
-										"header": [
-											{
-												"key": "token",
-												"value": "{{providerDelegateToken}}",
-												"type": "text"
-											}
-										],
-										"url": {
-											"raw": "{{baseUrl}}/provider/product-variant?productId=urn:datakaveri.org:b2c27f3f-2524-4a84-816e-91f9ab23f837:testProduct111",
-											"host": [
-												"{{baseUrl}}"
-											],
-											"path": [
-												"provider",
-												"product-variant"
-											],
-											"query": [
-												{
-													"key": "productId",
-													"value": "urn:datakaveri.org:b2c27f3f-2524-4a84-816e-91f9ab23f837:testProduct111",
-													"description": "product ID for which variants need to be fetched"
-												}
-											]
-										}
-									},
-									"response": []
-								},
-								{
-									"name": "200 - List product variants for provider with variant name",
-									"request": {
-										"method": "GET",
-										"header": [
-											{
-												"key": "token",
-												"value": "{{providerDelegateToken}}",
-												"type": "text"
-											}
-										],
-										"url": {
-											"raw": "{{baseUrl}}/provider/product-variant?productId=urn:datakaveri.org:b2c27f3f-2524-4a84-816e-91f9ab23f837:testProduct&productVariantName=variant213",
-											"host": [
-												"{{baseUrl}}"
-											],
-											"path": [
-												"provider",
-												"product-variant"
-											],
-											"query": [
-												{
-													"key": "productId",
-													"value": "urn:datakaveri.org:b2c27f3f-2524-4a84-816e-91f9ab23f837:testProduct",
-													"description": "product ID for which variants need to be fetched"
-												},
-												{
-													"key": "productVariantName",
-													"value": "variant213"
-												}
-											]
-										}
-									},
-									"response": []
-								},
-								{
-									"name": "400 - Invalid product ID",
-									"request": {
-										"method": "GET",
-										"header": [
-											{
-												"key": "token",
-												"value": "{{providerDelegateToken}}",
-												"type": "text"
-											}
-										],
-										"url": {
-											"raw": "{{baseUrl}}/provider/product-variant?productId=adjhfasdfadf",
-											"host": [
-												"{{baseUrl}}"
-											],
-											"path": [
-												"provider",
-												"product-variant"
-											],
-											"query": [
-												{
-													"key": "productId",
-													"value": "adjhfasdfadf"
-												}
-											]
-										}
-									},
-									"response": []
-								},
-								{
-									"name": "401 - Unauthorized",
-									"request": {
-										"auth": {
-											"type": "noauth"
-										},
-										"method": "GET",
-										"header": [
-											{
-												"key": "token",
-												"value": "sdkjfskldjf slkdfgjs",
-												"type": "text"
-											}
-										],
-										"url": {
-											"raw": "{{baseUrl}}/provider/product-variant?productId=urn:datakaveri.org:b2c27f3f-2524-4a84-816e-91f9ab23f837:testProductAbcd2",
-											"host": [
-												"{{baseUrl}}"
-											],
-											"path": [
-												"provider",
-												"product-variant"
-											],
-											"query": [
-												{
-													"key": "productId",
-													"value": "urn:datakaveri.org:b2c27f3f-2524-4a84-816e-91f9ab23f837:testProductAbcd2"
-												}
-											]
-										}
-									},
-									"response": []
-								},
-								{
-									"name": "404 - Not Found",
-									"request": {
-										"method": "GET",
-										"header": [
-											{
-												"key": "token",
-												"value": "{{providerDelegateToken}}",
-												"type": "text"
-											}
-										],
-										"url": {
-											"raw": "{{baseUrl}}/provider/product-variant?productId=urn:datakaveri.org:b2c27f3f-2524-4a84-816e-91f9ab23f837:testProduct1&variant=variant28465845",
-											"host": [
-												"{{baseUrl}}"
-											],
-											"path": [
-												"provider",
-												"product-variant"
-											],
-											"query": [
-												{
-													"key": "productId",
-													"value": "urn:datakaveri.org:b2c27f3f-2524-4a84-816e-91f9ab23f837:testProduct1",
-													"description": "product ID for which variants need to be fetched"
-												},
-												{
-													"key": "variant",
-													"value": "variant28465845"
-												}
-											]
-										}
-									},
-									"response": []
+									"key": "asdkfjsklfjdg",
+									"value": "sfl;gjkksfjgksjfgksjfgksf",
+									"disabled": true
 								}
 							]
 						}
-					]
+					},
+					"response": []
+				},
+				{
+					"name": "401 Get Policy: Unauthorized",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"// Test the response code",
+									"pm.test(\"response is 401 (Not Authorized)\", function () {",
+									"    pm.response.to.have.status(401);",
+									"});",
+									"",
+									"// Test the response header",
+									"pm.test(\"Check response header\", function () {",
+									"    pm.response.to.have.header(\"Content-Type\",\"application/json\");",
+									"});",
+									"",
+									"// Test the response",
+									"pm.test(\"Check response body\", function () {    ",
+									"    const body = pm.response.json();",
+									"    pm.expect(body).to.have.property(\"type\", \"urn:dx:acl:invalidAuthorizationToken\");",
+									"    pm.expect(body).to.have.property(\"title\", \"Not Authorized\");",
+									"    pm.expect(body).to.have.property(\"detail\", \"Not Authorized\");",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "someToken",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}{{basePath}}/policies",
+							"host": [
+								"{{baseUrl}}{{basePath}}"
+							],
+							"path": [
+								"policies"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "404 Get Policy: Not Found",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"// Test the response code",
+									"pm.test(\"response is 404 (Not Found)\", function () {",
+									"    pm.response.to.have.status(404);",
+									"});",
+									"",
+									"// Test the response header",
+									"pm.test(\"Check response header\", function () {",
+									"    pm.response.to.have.header(\"Content-Type\",\"application/json\");",
+									"});",
+									"",
+									"// Test the response",
+									"pm.test(\"Check response body\", function () {    ",
+									"    const body = pm.response.json();",
+									"    pm.expect(body).to.have.property(\"type\", \"urn:dx:acl:resourceNotFound\");",
+									"    pm.expect(body).to.have.property(\"title\", \"Not Found\");",
+									"    pm.expect(body).to.have.property(\"detail\", \"Policy not found\");",
+									"    }",
+									");"
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "{{providerToken}}",
+								"disabled": true
+							},
+							{
+								"key": "Authorization",
+								"value": "{{consumerToken}}",
+								"type": "text",
+								"disabled": true
+							},
+							{
+								"key": "Authorization",
+								"value": "{{providerDelegateToken}}",
+								"type": "text",
+								"disabled": true
+							},
+							{
+								"key": "Authorization",
+								"value": "{{consumerDelegateToken}}",
+								"type": "text",
+								"disabled": true
+							},
+							{
+								"key": "Authorization",
+								"value": "{{consumerTokenForbidden}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}{{basePath}}/policies",
+							"host": [
+								"{{baseUrl}}{{basePath}}"
+							],
+							"path": [
+								"policies"
+							]
+						}
+					},
+					"response": []
 				}
 			]
 		},
@@ -1725,13 +2644,13 @@
 							},
 							{
 								"key": "token",
-								"value": "{{providerToken}}",
+								"value": "{{providerDelegateToken}}",
 								"type": "text"
 							}
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"phone\": \"9444477733\",\n    \"legalBusinessName\": \"Test corp 1\",\n    \"customerFacingBusinessName\": \"Test corp 2\",\n    \"businessType\": \"partnership\",\n    \"contactName\": \"Some name\",\n    \"profile\": {\n        \"category\": \"healthcare\",\n        \"subcategory\": \"clinic\",\n        \"addresses\": {\n            \"registered\": {\n                \"street1\": \"507, Koramangala 1st block\",\n                \"street2\": \"MG Road\",\n                \"city\": \"Bengaluru\",\n                \"state\": \"KARNATAKA\",\n                \"postalCode\": \"560038\",\n                \"country\": \"IN\"\n            }\n        }\n    },\n    \"legalInfo\": {\n        \"pan\": \"AAACL1234C\",\n        \"gst\": \"18AABCU9603R1ZM\"\n    }\n}"
+							"raw": "{\n    \"email\": \"123dummyseller_123@gmail.com\",\n    \"phone\": \"9444477733\",\n    \"legalBusinessName\": \"Test corp 1\",\n    \"customerFacingBusinessName\": \"Test corp 2\",\n    \"businessType\": \"partnership\",\n    \"contactName\": \"Some name\",\n    \"profile\": {\n        \"category\": \"healthcare\",\n        \"subcategory\": \"clinic\",\n        \"addresses\": {\n            \"registered\": {\n                \"street1\": \"507, Koramangala 1st block\",\n                \"street2\": \"MG Road\",\n                \"city\": \"Bengaluru\",\n                \"state\": \"KARNATAKA\",\n                \"postalCode\": \"560038\",\n                \"country\": \"IN\"\n            }\n        }\n    },\n    \"legalInfo\": {\n        \"pan\": \"AAACL1234C\",\n        \"gst\": \"18AABCU9603R1ZM\"\n    }\n}"
 						},
 						"url": {
 							"raw": "{{baseUrl}}{{basePath}}/account",
@@ -1795,13 +2714,13 @@
 							},
 							{
 								"key": "token",
-								"value": "{{providerToken}}",
+								"value": "{{providerDelegateToken}}",
 								"type": "text"
 							}
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"phone\": \"9444477733\",\n    \"legalBusinessName\": \"Test corp 1\",\n    \"customerFacingBusinessName\": \"Test corp 2\",\n    \"businessType\": \"partnership\",\n    \"contactName\": \"Some name\",\n    \"profile\": {\n        \"category\": \"healthcare\",\n        \"subcategory\": \"Abcd\",\n        \"addresses\": {\n            \"registered\": {\n                \"street1\": \"507, Koramangala 1st block\",\n                \"street2\": \"MG Road\",\n                \"city\": \"Bengaluru\",\n                \"state\": \"KARNATAKA\",\n                \"postalCode\": \"560038\",\n                \"country\": \"IN\"\n            }\n        }\n    },\n    \"legalInfo\": {\n        \"pan\": \"AAACL1234C\",\n        \"gst\": \"18AABCU9603R1ZM\"\n    }\n}"
+							"raw": "{\n    \"email\": \"09efghseller1@gmail.com\",\n    \"phone\": \"9444477733\",\n    \"legalBusinessName\": \"Test corp 1\",\n    \"customerFacingBusinessName\": \"Test corp 2\",\n    \"businessType\": \"partnership\",\n    \"contactName\": \"Some name\",\n    \"profile\": {\n        \"category\": \"healthcare\",\n        \"subcategory\": \"Abcd\",\n        \"addresses\": {\n            \"registered\": {\n                \"street1\": \"507, Koramangala 1st block\",\n                \"street2\": \"MG Road\",\n                \"city\": \"Bengaluru\",\n                \"state\": \"KARNATAKA\",\n                \"postalCode\": \"560038\",\n                \"country\": \"IN\"\n            }\n        }\n    },\n    \"legalInfo\": {\n        \"pan\": \"AAACL1234C\",\n        \"gst\": \"18AABCU9603R1ZM\"\n    }\n}"
 						},
 						"url": {
 							"raw": "{{baseUrl}}{{basePath}}/account",
@@ -1866,7 +2785,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"phone\": \"9444477733\",\n    \"legalBusinessName\": \"Test corp 1\",\n    \"customerFacingBusinessName\": \"Test corp 2\",\n    \"businessType\": \"partnership\",\n    \"contactName\": \"Some name\",\n    \"profile\": {\n        \"category\": \"healthcare\",\n        \"subcategory\": \"doctors\",\n        \"addresses\": {\n            \"registered\": {\n                \"street1\": \"507, Koramangala 1st block\",\n                \"street2\": \"MG Road\",\n                \"city\": \"Bengaluru\",\n                \"state\": \"KARNATAKA\",\n                \"postalCode\": \"560038\",\n                \"country\": \"IN\"\n            }\n        }\n    },\n    \"legalInfo\": {\n        \"pan\": \"AAACL1234C\",\n        \"gst\": \"18AABCU9603R1ZM\"\n    }\n}"
+							"raw": "{\n    \"email\": \"dummySeller@gmail.com\",\n    \"phone\": \"9444477733\",\n    \"legalBusinessName\": \"Test corp 1\",\n    \"customerFacingBusinessName\": \"Test corp 2\",\n    \"businessType\": \"partnership\",\n    \"contactName\": \"Some name\",\n    \"profile\": {\n        \"category\": \"healthcare\",\n        \"subcategory\": \"doctors\",\n        \"addresses\": {\n            \"registered\": {\n                \"street1\": \"507, Koramangala 1st block\",\n                \"street2\": \"MG Road\",\n                \"city\": \"Bengaluru\",\n                \"state\": \"KARNATAKA\",\n                \"postalCode\": \"560038\",\n                \"country\": \"IN\"\n            }\n        }\n    },\n    \"legalInfo\": {\n        \"pan\": \"AAACL1234C\",\n        \"gst\": \"18AABCU9603R1ZM\"\n    }\n}"
 						},
 						"url": {
 							"raw": "{{baseUrl}}{{basePath}}/account",
@@ -1927,7 +2846,7 @@
 							},
 							{
 								"key": "token",
-								"value": "{{providerToken}}",
+								"value": "{{providerDelegateToken}}",
 								"type": "text"
 							}
 						],
@@ -2116,7 +3035,7 @@
 							},
 							{
 								"key": "token",
-								"value": "{{providerToken}}",
+								"value": "{{providerDelegateToken}}",
 								"type": "text"
 							}
 						],
@@ -2183,7 +3102,7 @@
 							},
 							{
 								"key": "token",
-								"value": "{{providerToken}}",
+								"value": "{{providerDelegateToken}}",
 								"type": "text"
 							}
 						],
@@ -2335,1094 +3254,15 @@
 						}
 					},
 					"response": []
-				}
-			]
-		},
-		{
-			"name": "Consumer APIs",
-			"item": [
-				{
-					"name": "List Resources",
-					"item": [
-						{
-							"name": "200 - Get all resources",
-							"event": [
-								{
-									"listen": "prerequest",
-									"script": {
-										"exec": [
-											""
-										],
-										"type": "text/javascript"
-									}
-								}
-							],
-							"request": {
-								"method": "GET",
-								"header": [
-									{
-										"key": "token",
-										"value": "{{consumerToken}}",
-										"type": "text"
-									}
-								],
-								"url": {
-									"raw": "{{baseUrl}}/consumer/list/resources",
-									"host": [
-										"{{baseUrl}}"
-									],
-									"path": [
-										"consumer",
-										"list",
-										"resources"
-									]
-								}
-							},
-							"response": []
-						},
-						{
-							"name": "200 - Get Resource by ID",
-							"event": [
-								{
-									"listen": "prerequest",
-									"script": {
-										"exec": [
-											""
-										],
-										"type": "text/javascript"
-									}
-								}
-							],
-							"request": {
-								"method": "GET",
-								"header": [
-									{
-										"key": "token",
-										"value": "{{consumerToken}}",
-										"type": "text"
-									}
-								],
-								"url": {
-									"raw": "{{baseUrl}}/consumer/list/resources?resourceId=83c2e5c2-3574-4e11-9530-2b1fbdfce832",
-									"host": [
-										"{{baseUrl}}"
-									],
-									"path": [
-										"consumer",
-										"list",
-										"resources"
-									],
-									"query": [
-										{
-											"key": "resourceId",
-											"value": "83c2e5c2-3574-4e11-9530-2b1fbdfce832"
-										}
-									]
-								}
-							},
-							"response": []
-						},
-						{
-							"name": "200 - Get Resources for Provider",
-							"event": [
-								{
-									"listen": "prerequest",
-									"script": {
-										"exec": [
-											""
-										],
-										"type": "text/javascript"
-									}
-								}
-							],
-							"request": {
-								"method": "GET",
-								"header": [
-									{
-										"key": "token",
-										"value": "{{consumerToken}}",
-										"type": "text"
-									}
-								],
-								"url": {
-									"raw": "{{baseUrl}}/consumer/list/resources?providerId=b2c27f3f-2524-4a84-816e-91f9ab23f837",
-									"host": [
-										"{{baseUrl}}"
-									],
-									"path": [
-										"consumer",
-										"list",
-										"resources"
-									],
-									"query": [
-										{
-											"key": "providerId",
-											"value": "b2c27f3f-2524-4a84-816e-91f9ab23f837"
-										}
-									]
-								}
-							},
-							"response": []
-						},
-						{
-							"name": "400 - Bad Request Invalid ID",
-							"event": [
-								{
-									"listen": "prerequest",
-									"script": {
-										"exec": [
-											""
-										],
-										"type": "text/javascript"
-									}
-								}
-							],
-							"request": {
-								"method": "GET",
-								"header": [
-									{
-										"key": "token",
-										"value": "{{consumerToken}}",
-										"type": "text"
-									}
-								],
-								"url": {
-									"raw": "{{baseUrl}}/consumer/list/resources?resourceId=sdcjsdfh294",
-									"host": [
-										"{{baseUrl}}"
-									],
-									"path": [
-										"consumer",
-										"list",
-										"resources"
-									],
-									"query": [
-										{
-											"key": "resourceId",
-											"value": "sdcjsdfh294"
-										}
-									]
-								}
-							},
-							"response": []
-						},
-						{
-							"name": "401 - Unauthorized",
-							"event": [
-								{
-									"listen": "prerequest",
-									"script": {
-										"exec": [
-											""
-										],
-										"type": "text/javascript"
-									}
-								}
-							],
-							"request": {
-								"auth": {
-									"type": "noauth"
-								},
-								"method": "GET",
-								"header": [
-									{
-										"key": "token",
-										"value": "s;dfjskdfjgsrfg",
-										"type": "text"
-									}
-								],
-								"url": {
-									"raw": "{{baseUrl}}/consumer/list/resources?resourceId=b58da193-23d9-43eb-b98a-a103d4b6103c",
-									"host": [
-										"{{baseUrl}}"
-									],
-									"path": [
-										"consumer",
-										"list",
-										"resources"
-									],
-									"query": [
-										{
-											"key": "resourceId",
-											"value": "b58da193-23d9-43eb-b98a-a103d4b6103c"
-										}
-									]
-								}
-							},
-							"response": []
-						}
-					]
 				},
 				{
-					"name": "List Providers",
-					"item": [
-						{
-							"name": "200 - Get Providers",
-							"request": {
-								"method": "GET",
-								"header": [
-									{
-										"key": "token",
-										"value": "{{consumerToken}}",
-										"type": "text"
-									}
-								],
-								"url": {
-									"raw": "{{baseUrl}}/consumer/list/providers",
-									"host": [
-										"{{baseUrl}}"
-									],
-									"path": [
-										"consumer",
-										"list",
-										"providers"
-									]
-								}
-							},
-							"response": []
-						},
-						{
-							"name": "200 - Get Provider by ID",
-							"event": [
-								{
-									"listen": "prerequest",
-									"script": {
-										"exec": [
-											""
-										],
-										"type": "text/javascript"
-									}
-								}
-							],
-							"request": {
-								"method": "GET",
-								"header": [
-									{
-										"key": "token",
-										"value": "{{consumerToken}}",
-										"type": "text"
-									}
-								],
-								"url": {
-									"raw": "{{baseUrl}}/consumer/list/providers?providerId=b2c27f3f-2524-4a84-816e-91f9ab23f837",
-									"host": [
-										"{{baseUrl}}"
-									],
-									"path": [
-										"consumer",
-										"list",
-										"providers"
-									],
-									"query": [
-										{
-											"key": "providerId",
-											"value": "b2c27f3f-2524-4a84-816e-91f9ab23f837"
-										}
-									]
-								}
-							},
-							"response": []
-						},
-						{
-							"name": "400 - Invalid ProviderID",
-							"event": [
-								{
-									"listen": "prerequest",
-									"script": {
-										"exec": [
-											""
-										],
-										"type": "text/javascript"
-									}
-								}
-							],
-							"request": {
-								"method": "GET",
-								"header": [
-									{
-										"key": "token",
-										"value": "{{consumerToken}}",
-										"type": "text"
-									}
-								],
-								"url": {
-									"raw": "{{baseUrl}}/consumer/list/providers?providerId=datakaveri.org/b8bd3e3f39615c8ec96722131ae95056b5938f2f/invalid",
-									"host": [
-										"{{baseUrl}}"
-									],
-									"path": [
-										"consumer",
-										"list",
-										"providers"
-									],
-									"query": [
-										{
-											"key": "providerId",
-											"value": "datakaveri.org/b8bd3e3f39615c8ec96722131ae95056b5938f2f/invalid"
-										}
-									]
-								}
-							},
-							"response": []
-						},
-						{
-							"name": "401 - Unathorized",
-							"event": [
-								{
-									"listen": "prerequest",
-									"script": {
-										"exec": [
-											""
-										],
-										"type": "text/javascript"
-									}
-								}
-							],
-							"request": {
-								"auth": {
-									"type": "noauth"
-								},
-								"method": "GET",
-								"header": [
-									{
-										"key": "token",
-										"value": "token",
-										"type": "text"
-									}
-								],
-								"url": {
-									"raw": "{{baseUrl}}/consumer/list/providers?providerId=b2c27f3f-2524-4a84-816e-91f9ab23f837",
-									"host": [
-										"{{baseUrl}}"
-									],
-									"path": [
-										"consumer",
-										"list",
-										"providers"
-									],
-									"query": [
-										{
-											"key": "providerId",
-											"value": "b2c27f3f-2524-4a84-816e-91f9ab23f837"
-										}
-									]
-								}
-							},
-							"response": []
-						}
-					]
-				},
-				{
-					"name": "List Purchases",
-					"item": [
-						{
-							"name": "200 - List all successful consumer purchases",
-							"request": {
-								"method": "GET",
-								"header": [
-									{
-										"key": "token",
-										"value": "{{consumerToken}}",
-										"type": "text"
-									}
-								],
-								"url": {
-									"raw": "{{baseUrl}}/consumer/list/purchases?paymentStatus=succeeded",
-									"host": [
-										"{{baseUrl}}"
-									],
-									"path": [
-										"consumer",
-										"list",
-										"purchases"
-									],
-									"query": [
-										{
-											"key": "paymentStatus",
-											"value": "succeeded"
-										}
-									]
-								}
-							},
-							"response": []
-						},
-						{
-							"name": "200 - List all failed consumer purchases",
-							"request": {
-								"method": "GET",
-								"header": [
-									{
-										"key": "token",
-										"value": "{{consumerToken}}",
-										"type": "text"
-									}
-								],
-								"url": {
-									"raw": "{{baseUrl}}/consumer/list/purchases?paymentStatus=failed",
-									"host": [
-										"{{baseUrl}}"
-									],
-									"path": [
-										"consumer",
-										"list",
-										"purchases"
-									],
-									"query": [
-										{
-											"key": "paymentStatus",
-											"value": "failed"
-										}
-									]
-								}
-							},
-							"response": []
-						},
-						{
-							"name": "200 - List all pending consumer purchases",
-							"request": {
-								"method": "GET",
-								"header": [
-									{
-										"key": "token",
-										"value": "{{consumerToken}}",
-										"type": "text"
-									}
-								],
-								"url": {
-									"raw": "{{baseUrl}}/consumer/list/purchases?paymentStatus=pending",
-									"host": [
-										"{{baseUrl}}"
-									],
-									"path": [
-										"consumer",
-										"list",
-										"purchases"
-									],
-									"query": [
-										{
-											"key": "paymentStatus",
-											"value": "pending"
-										}
-									]
-								}
-							},
-							"response": []
-						},
-						{
-							"name": "200 - List consumer purchases by resourceId",
-							"request": {
-								"method": "GET",
-								"header": [
-									{
-										"key": "token",
-										"value": "{{consumerToken}}",
-										"type": "text"
-									}
-								],
-								"url": {
-									"raw": "{{baseUrl}}/consumer/list/purchases?resourceId=695e222b-3fae-4325-8db0-3e29d01c4fc0&paymentStatus=pending",
-									"host": [
-										"{{baseUrl}}"
-									],
-									"path": [
-										"consumer",
-										"list",
-										"purchases"
-									],
-									"query": [
-										{
-											"key": "resourceId",
-											"value": "695e222b-3fae-4325-8db0-3e29d01c4fc0"
-										},
-										{
-											"key": "paymentStatus",
-											"value": "pending"
-										}
-									]
-								}
-							},
-							"response": []
-						},
-						{
-							"name": "200 - List consumer purchases by productId",
-							"request": {
-								"method": "GET",
-								"header": [
-									{
-										"key": "token",
-										"value": "{{consumerToken}}",
-										"type": "text"
-									}
-								],
-								"url": {
-									"raw": "{{baseUrl}}/consumer/list/purchases?productId=urn:datakaveri.org:b2c27f3f-2524-4a84-816e-91f9ab23f837:testProduct&paymentStatus=succeeded",
-									"host": [
-										"{{baseUrl}}"
-									],
-									"path": [
-										"consumer",
-										"list",
-										"purchases"
-									],
-									"query": [
-										{
-											"key": "productId",
-											"value": "urn:datakaveri.org:b2c27f3f-2524-4a84-816e-91f9ab23f837:testProduct"
-										},
-										{
-											"key": "paymentStatus",
-											"value": "succeeded"
-										}
-									]
-								}
-							},
-							"response": []
-						},
-						{
-							"name": "200 - List consumer purchases by orderId",
-							"request": {
-								"method": "GET",
-								"header": [
-									{
-										"key": "token",
-										"value": "{{consumerToken}}",
-										"type": "text"
-									}
-								],
-								"url": {
-									"raw": "{{baseUrl}}/consumer/list/purchases?orderId=order_NmTravDc9v3NhH&paymentStatus=pending",
-									"host": [
-										"{{baseUrl}}"
-									],
-									"path": [
-										"consumer",
-										"list",
-										"purchases"
-									],
-									"query": [
-										{
-											"key": "orderId",
-											"value": "order_NmTravDc9v3NhH"
-										},
-										{
-											"key": "paymentStatus",
-											"value": "pending"
-										}
-									]
-								}
-							},
-							"response": []
-						},
-						{
-							"name": "400 - Bad Request",
-							"request": {
-								"method": "GET",
-								"header": [
-									{
-										"key": "token",
-										"value": "{{consumerToken}}",
-										"type": "text"
-									}
-								],
-								"url": {
-									"raw": "{{baseUrl}}/consumer/list/purchases?productId=urn:abcd.org:b2c27f3f-2524-4a84-816e-91f9ab23f837:testProduct1&paymentStatus=succeeded",
-									"host": [
-										"{{baseUrl}}"
-									],
-									"path": [
-										"consumer",
-										"list",
-										"purchases"
-									],
-									"query": [
-										{
-											"key": "productId",
-											"value": "urn:abcd.org:b2c27f3f-2524-4a84-816e-91f9ab23f837:testProduct1"
-										},
-										{
-											"key": "paymentStatus",
-											"value": "succeeded"
-										}
-									]
-								}
-							},
-							"response": []
-						},
-						{
-							"name": "401 - Not Authorised",
-							"request": {
-								"method": "GET",
-								"header": [
-									{
-										"key": "token",
-										"value": "someToken",
-										"type": "text"
-									}
-								],
-								"url": {
-									"raw": "{{baseUrl}}/consumer/list/purchases?productId=urn:datakaveri.org:b2c27f3f-2524-4a84-816e-91f9ab23f837:testProductAbcd2&paymentStatus=pending",
-									"host": [
-										"{{baseUrl}}"
-									],
-									"path": [
-										"consumer",
-										"list",
-										"purchases"
-									],
-									"query": [
-										{
-											"key": "productId",
-											"value": "urn:datakaveri.org:b2c27f3f-2524-4a84-816e-91f9ab23f837:testProductAbcd2"
-										},
-										{
-											"key": "paymentStatus",
-											"value": "pending"
-										}
-									]
-								}
-							},
-							"response": []
-						},
-						{
-							"name": "404 - Not Found",
-							"request": {
-								"method": "GET",
-								"header": [
-									{
-										"key": "token",
-										"value": "{{consumerToken}}",
-										"type": "text"
-									}
-								],
-								"url": {
-									"raw": "{{baseUrl}}/consumer/list/purchases?productId=urn:datakaveri.org:b2c27f3f-2524-4a84-816e-91f9ab23f837:testProductAbcdefg&paymentStatus=pending",
-									"host": [
-										"{{baseUrl}}"
-									],
-									"path": [
-										"consumer",
-										"list",
-										"purchases"
-									],
-									"query": [
-										{
-											"key": "productId",
-											"value": "urn:datakaveri.org:b2c27f3f-2524-4a84-816e-91f9ab23f837:testProductAbcdefg"
-										},
-										{
-											"key": "paymentStatus",
-											"value": "pending"
-										}
-									]
-								}
-							},
-							"response": []
-						}
-					]
-				},
-				{
-					"name": "List Products",
-					"item": [
-						{
-							"name": "200 - List Products",
-							"request": {
-								"method": "GET",
-								"header": [
-									{
-										"key": "token",
-										"value": "{{consumerToken}}",
-										"type": "text"
-									}
-								],
-								"url": {
-									"raw": "{{baseUrl}}/consumer/list/products",
-									"host": [
-										"{{baseUrl}}"
-									],
-									"path": [
-										"consumer",
-										"list",
-										"products"
-									]
-								}
-							},
-							"response": []
-						},
-						{
-							"name": "200 - List Products by resourceId",
-							"request": {
-								"method": "GET",
-								"header": [
-									{
-										"key": "token",
-										"value": "{{consumerToken}}",
-										"type": "text"
-									}
-								],
-								"url": {
-									"raw": "{{baseUrl}}/consumer/list/products?resourceId=83c2e5c2-3574-4e11-9530-2b1fbdfce832",
-									"host": [
-										"{{baseUrl}}"
-									],
-									"path": [
-										"consumer",
-										"list",
-										"products"
-									],
-									"query": [
-										{
-											"key": "resourceId",
-											"value": "83c2e5c2-3574-4e11-9530-2b1fbdfce832"
-										}
-									]
-								}
-							},
-							"response": []
-						},
-						{
-							"name": "200 - List Products by providerId",
-							"request": {
-								"method": "GET",
-								"header": [
-									{
-										"key": "token",
-										"value": "{{consumerToken}}",
-										"type": "text"
-									}
-								],
-								"url": {
-									"raw": "{{baseUrl}}/consumer/list/products?providerId=b2c27f3f-2524-4a84-816e-91f9ab23f837",
-									"host": [
-										"{{baseUrl}}"
-									],
-									"path": [
-										"consumer",
-										"list",
-										"products"
-									],
-									"query": [
-										{
-											"key": "providerId",
-											"value": "b2c27f3f-2524-4a84-816e-91f9ab23f837"
-										}
-									]
-								}
-							},
-							"response": []
-						},
-						{
-							"name": "400 - Bad Request Invalid provider ID",
-							"request": {
-								"method": "GET",
-								"header": [
-									{
-										"key": "token",
-										"value": "{{consumerToken}}",
-										"type": "text"
-									}
-								],
-								"url": {
-									"raw": "{{baseUrl}}/consumer/list/products?providerId=datakaveri.org/b8bd3e3f39615c8ec96722131ae95056b5938f2nocontent",
-									"host": [
-										"{{baseUrl}}"
-									],
-									"path": [
-										"consumer",
-										"list",
-										"products"
-									],
-									"query": [
-										{
-											"key": "providerId",
-											"value": "datakaveri.org/b8bd3e3f39615c8ec96722131ae95056b5938f2nocontent"
-										}
-									]
-								}
-							},
-							"response": []
-						},
-						{
-							"name": "401 - Not Authorized",
-							"request": {
-								"method": "GET",
-								"header": [
-									{
-										"key": "token",
-										"value": "kjsfgkjdfgkjdfgk",
-										"type": "text"
-									}
-								],
-								"url": {
-									"raw": "{{baseUrl}}/consumer/list/products",
-									"host": [
-										"{{baseUrl}}"
-									],
-									"path": [
-										"consumer",
-										"list",
-										"products"
-									]
-								}
-							},
-							"response": []
-						}
-					]
-				},
-				{
-					"name": "List Product Variants",
-					"item": [
-						{
-							"name": "200 - List product variants",
-							"request": {
-								"method": "GET",
-								"header": [
-									{
-										"key": "token",
-										"value": "{{consumerToken}}",
-										"type": "text"
-									}
-								],
-								"url": {
-									"raw": "{{baseUrl}}/consumer/product-variant?productId=urn:datakaveri.org:b2c27f3f-2524-4a84-816e-91f9ab23f837:testProduct",
-									"host": [
-										"{{baseUrl}}"
-									],
-									"path": [
-										"consumer",
-										"product-variant"
-									],
-									"query": [
-										{
-											"key": "productId",
-											"value": "urn:datakaveri.org:b2c27f3f-2524-4a84-816e-91f9ab23f837:testProduct",
-											"description": "product ID for which variants need to be fetched"
-										}
-									]
-								}
-							},
-							"response": []
-						},
-						{
-							"name": "400 - Bad Request",
-							"request": {
-								"method": "GET",
-								"header": [
-									{
-										"key": "token",
-										"value": "{{consumerToken}}",
-										"type": "text"
-									}
-								],
-								"url": {
-									"raw": "{{baseUrl}}/consumer/product-variant?productId=abcsdjhf",
-									"host": [
-										"{{baseUrl}}"
-									],
-									"path": [
-										"consumer",
-										"product-variant"
-									],
-									"query": [
-										{
-											"key": "productId",
-											"value": "abcsdjhf",
-											"description": "product ID for which variants need to be fetched"
-										}
-									]
-								}
-							},
-							"response": []
-						},
-						{
-							"name": "401 - Not Authorized",
-							"request": {
-								"method": "GET",
-								"header": [
-									{
-										"key": "token",
-										"value": "{{providerDelegateToken}}",
-										"type": "text"
-									}
-								],
-								"url": {
-									"raw": "{{baseUrl}}/consumer/product-variant?productId=urn:datakaveri.org:b2c27f3f-2524-4a84-816e-91f9ab23f837:testProductAbcd2",
-									"host": [
-										"{{baseUrl}}"
-									],
-									"path": [
-										"consumer",
-										"product-variant"
-									],
-									"query": [
-										{
-											"key": "productId",
-											"value": "urn:datakaveri.org:b2c27f3f-2524-4a84-816e-91f9ab23f837:testProductAbcd2",
-											"description": "product ID for which variants need to be fetched"
-										}
-									]
-								}
-							},
-							"response": []
-						},
-						{
-							"name": "404 - Not Found",
-							"request": {
-								"method": "GET",
-								"header": [
-									{
-										"key": "token",
-										"value": "{{consumerToken}}",
-										"type": "text"
-									}
-								],
-								"url": {
-									"raw": "{{baseUrl}}/consumer/product-variant?productId=urn:datakaveri.org:b2c27f3f-2524-4a84-816e-91f9ab23f837:testProductAbcd3424545",
-									"host": [
-										"{{baseUrl}}"
-									],
-									"path": [
-										"consumer",
-										"product-variant"
-									],
-									"query": [
-										{
-											"key": "productId",
-											"value": "urn:datakaveri.org:b2c27f3f-2524-4a84-816e-91f9ab23f837:testProductAbcd3424545",
-											"description": "product ID for which variants need to be fetched"
-										}
-									]
-								}
-							},
-							"response": []
-						}
-					]
-				},
-				{
-					"name": "Create Order",
-					"item": [
-						{
-							"name": "200 - Create Order",
-							"request": {
-								"method": "POST",
-								"header": [
-									{
-										"key": "token",
-										"value": "{{consumerToken}}",
-										"type": "text"
-									}
-								],
-								"url": {
-									"raw": "{{baseUrl}}/consumer/order/:productVariantId",
-									"host": [
-										"{{baseUrl}}"
-									],
-									"path": [
-										"consumer",
-										"order",
-										":productVariantId"
-									],
-									"variable": [
-										{
-											"key": "productVariantId",
-											"value": "7bc89d79-ae23-44ce-8c7e-74e2879bd710"
-										}
-									]
-								}
-							},
-							"response": []
-						},
-						{
-							"name": "400 - Bad Request",
-							"request": {
-								"method": "POST",
-								"header": [
-									{
-										"key": "token",
-										"value": "{{consumerToken}}",
-										"type": "text"
-									}
-								],
-								"url": {
-									"raw": "{{baseUrl}}/consumer/order/:variant",
-									"host": [
-										"{{baseUrl}}"
-									],
-									"path": [
-										"consumer",
-										"order",
-										":variant"
-									],
-									"variable": [
-										{
-											"key": "variant",
-											"value": "abcd"
-										}
-									]
-								}
-							},
-							"response": []
-						},
-						{
-							"name": "401 - Not Authorized",
-							"request": {
-								"method": "POST",
-								"header": [
-									{
-										"key": "token",
-										"value": "{{providerDelegateToken}}",
-										"type": "text"
-									}
-								],
-								"url": {
-									"raw": "{{baseUrl}}/consumer/order/:productVariantId",
-									"host": [
-										"{{baseUrl}}"
-									],
-									"path": [
-										"consumer",
-										"order",
-										":productVariantId"
-									],
-									"variable": [
-										{
-											"key": "productVariantId",
-											"value": "060cc0ed-14fb-4f07-be1d-f0b66585eab6"
-										}
-									]
-								}
-							},
-							"response": []
-						}
-					]
-				}
-			]
-		},
-		{
-			"name": "policy",
-			"item": [
-				{
-					"name": "200 Verify Policy: Success",
+					"name": "200 Create Policy: Success",
 					"event": [
 						{
 							"listen": "test",
 							"script": {
 								"exec": [
-									"// Test the response code",
-									"pm.test(\"response is 200 (OK)\", function () {",
-									"    pm.response.to.have.status(200);",
-									"});",
-									"",
-									"// Test the response header",
-									"pm.test(\"Check response header\", function () {",
-									"    pm.response.to.have.header(\"Content-Type\",\"application/json\");",
-									"});",
-									"",
-									"// Test the response",
-									"pm.test(\"Check response body\", function () {    ",
-									"    const body = pm.response.json();",
-									"    pm.expect(body).to.have.property(\"type\", \"urn:apd:Allow\");",
-									"    }",
-									");"
+									""
 								],
 								"type": "text/javascript"
 							}
@@ -3439,7 +3279,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n  \"user\": {\n    \"id\": \"fd47486b-3497-4248-ac1e-082e4d37a66c\",\n    \"name\": {\n    \"firstName\":\"Vasanth\",\n    \"lastName\":\"Rajaraman\"\n    },\n    \"email\": \"vasanth.rajaraman@datakaveri.org\"\n  },\n  \"owner\": {\n    \"id\": \"b2c27f3f-2524-4a84-816e-91f9ab23f837\",\n    \"name\": {\n    \"firstName\":\"B\",\n    \"lastName\":\"Robert A B C D\"\n    },\n    \"email\": \"bryanrobert@iisc.ac.in\"\n  },\n   \"item\": {\n     \"itemId\": \"83c2e5c2-3574-4e11-9530-2b1fbdfce832\",\n     \"itemType\": \"RESOURCE\"\n   }\n}",
+							"raw": "{\n    \"orderId\": \"order_NS5unmgvVfBptz\"\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -3447,624 +3287,20 @@
 							}
 						},
 						"url": {
-							"raw": "{{baseUrl}}/verify",
+							"raw": "{{baseUrls}}/policy",
 							"host": [
-								"{{baseUrl}}"
+								"{{baseUrls}}"
 							],
 							"path": [
-								"verify"
+								"policy"
 							]
 						}
 					},
 					"response": []
 				},
 				{
-					"name": "403 Verify Policy: No Policy Exist",
+					"name": "200 - Create Product Copy",
 					"event": [
-						{
-							"listen": "test",
-							"script": {
-								"exec": [
-									"// Test the response code",
-									"pm.test(\"response is 403 (Forbidden)\", function () {",
-									"    pm.response.to.have.status(403);",
-									"});",
-									"",
-									"// Test the response header",
-									"pm.test(\"Check response header\", function () {",
-									"    pm.response.to.have.header(\"Content-Type\",\"application/json\");",
-									"});",
-									"",
-									"// Test the response",
-									"pm.test(\"Check response body\", function () {    ",
-									"    const body = pm.response.json();",
-									"    pm.expect(body).to.have.property(\"type\", \"urn:apd:Deny\");",
-									"    pm.expect(body).to.have.property(\"title\", \"Forbidden\");",
-									"    pm.expect(body).to.have.property(\"detail\", \"No policy exists for the given resource\");",
-									"    }",
-									");"
-								],
-								"type": "text/javascript"
-							}
-						}
-					],
-					"request": {
-						"method": "POST",
-						"header": [
-							{
-								"key": "Authorization",
-								"value": "{{authToken}}",
-								"type": "text"
-							}
-						],
-						"body": {
-							"mode": "raw",
-							"raw": "{\n  \"user\": {\n    \"id\": \"d67a19d5-9a26-5d7c-b0e7-58e7f3b222e2\",\n    \"name\": {\n    \"firstName\":\"demo\",\n    \"lastName\":\"name\"\n    },\n    \"email\": \"abc31111111221ac@xyz.com\"\n  },\n  \"owner\": {\n    \"id\": \"4e563a5f-35f0-4f32-92be-8830775a1c5e\",\n    \"name\": {\n    \"firstName\":\"Test\",\n    \"lastName\":\"provider\"\n    },\n    \"email\": \"testprovider@example.com\"\n  },\n   \"item\": {\n     \"itemId\": \"d67a19d5-9a26-5d7c-b0e7-58e7f3b222e2\",\n     \"itemType\": \"RESOURCE\"\n   }\n}",
-							"options": {
-								"raw": {
-									"language": "json"
-								}
-							}
-						},
-						"url": {
-							"raw": "{{baseUrl}}/verify",
-							"host": [
-								"{{baseUrl}}"
-							],
-							"path": [
-								"verify"
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "400 Verify Policy: Bad Request",
-					"event": [
-						{
-							"listen": "test",
-							"script": {
-								"exec": [
-									"// Test the response code",
-									"pm.test(\"response is 400 (Bad Request)\", function () {",
-									"    pm.response.to.have.status(400);",
-									"});",
-									"",
-									"// Test the response header",
-									"pm.test(\"Check response header\", function () {",
-									"    pm.response.to.have.header(\"Content-Type\",\"application/json\");",
-									"});",
-									"",
-									"// Test the response",
-									"pm.test(\"Check response body\", function () {    ",
-									"    const body = pm.response.json();",
-									"    pm.expect(body).to.have.property(\"type\", \"urn:dx:dmp:invalidPayloadFormat\");",
-									"    pm.expect(body).to.have.property(\"title\", \"Bad Request\");",
-									"    }",
-									");"
-								],
-								"type": "text/javascript"
-							}
-						}
-					],
-					"request": {
-						"method": "POST",
-						"header": [
-							{
-								"key": "Authorization",
-								"value": "{{authToken}}",
-								"type": "text"
-							}
-						],
-						"body": {
-							"mode": "raw",
-							"raw": "{\n  \"user\": {\n    \"id\": \"d67a19d5-9a26-5d7c-b0e7-58e7f3b222e2\",\n    \"name\": {\n    \"firstName\":\"demo\",\n    \"lastName\":\"name\"\n    },\n    \"email\": \"abc31111111221ac@xyz.com\"\n  },\n  \"owner\": {\n    \"id\": \"4e563a5f-35f0-4f32-92be-8830775a1c5e\",\n    \"name\": {\n    \"firstName\":\"Test\",\n    \"lastName\":\"provider\"\n    },\n    \"email\": \"testprovider@example.com\"\n  },\n   \"item\": {\n     \"itemId\": \"d67a19d5-9a26-5d7c-b0e7-58e7f3b222e2\",\n     \"itemType\": \"resource\"\n   }\n}",
-							"options": {
-								"raw": {
-									"language": "json"
-								}
-							}
-						},
-						"url": {
-							"raw": "{{baseUrl}}/verify",
-							"host": [
-								"{{baseUrl}}"
-							],
-							"path": [
-								"verify"
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "200 Delete Policy: Success",
-					"event": [
-						{
-							"listen": "test",
-							"script": {
-								"exec": [
-									"// Test the response code",
-									"pm.test(\"response is 200 (OK)\", function () {",
-									"    pm.response.to.have.status(200);",
-									"});",
-									"",
-									"// Test the response header",
-									"pm.test(\"Check response header\", function () {",
-									"    pm.response.to.have.header(\"Content-Type\",\"application/json\");",
-									"});",
-									"",
-									"// Test the response",
-									"pm.test(\"Check response body\", function () {    ",
-									"    const body = pm.response.json();",
-									"    pm.expect(body).to.have.property(\"type\", \"urn:dx:dmp:success\");",
-									"    }",
-									");"
-								],
-								"type": "text/javascript"
-							}
-						}
-					],
-					"protocolProfileBehavior": {
-						"disabledSystemHeaders": {
-							"content-type": true
-						}
-					},
-					"request": {
-						"method": "DELETE",
-						"header": [
-							{
-								"key": "Content-Type",
-								"value": "application/json"
-							},
-							{
-								"key": "token",
-								"value": "{{providerToken}}",
-								"disabled": true
-							},
-							{
-								"key": "token",
-								"value": "{{providerDelegateToken}}",
-								"type": "text"
-							}
-						],
-						"body": {
-							"mode": "raw",
-							"raw": "{\n\"policyId\": \"55c4ec4f-29b4-4c9a-94ad-c9113140697b\"\n}"
-						},
-						"url": {
-							"raw": "{{baseUrl}}{{basePath}}/policies",
-							"host": [
-								"{{baseUrl}}{{basePath}}"
-							],
-							"path": [
-								"policies"
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "400 Delete Policy: Bad Request [Policy not active, expired, or withdrawn]",
-					"event": [
-						{
-							"listen": "test",
-							"script": {
-								"exec": [
-									"// Test the response code",
-									"pm.test(\"response is 400 (Bad Request)\", function () {",
-									"    pm.response.to.have.status(400);",
-									"});",
-									"",
-									"// Test the response header",
-									"pm.test(\"Check response header\", function () {",
-									"    pm.response.to.have.header(\"Content-Type\",\"application/json\");",
-									"});",
-									"",
-									"// Test the response",
-									"pm.test(\"Check response body\", function () {    ",
-									"    const body = pm.response.json();",
-									"    pm.expect(body).to.have.property(\"type\", \"urn:dx:dmp:badRequest\");",
-									"    pm.expect(body).to.have.property(\"title\", \"Bad Request\");",
-									"    pm.expect(body).to.have.property(\"detail\", \"Policy could not be deleted, as policy is not ACTIVE\");",
-									"    }",
-									");"
-								],
-								"type": "text/javascript"
-							}
-						}
-					],
-					"protocolProfileBehavior": {
-						"disabledSystemHeaders": {
-							"content-type": true
-						}
-					},
-					"request": {
-						"method": "DELETE",
-						"header": [
-							{
-								"key": "token",
-								"value": "{{providerToken}}",
-								"disabled": true
-							},
-							{
-								"key": "Content-Type",
-								"value": "application/json"
-							},
-							{
-								"key": "token",
-								"value": "{{providerDelegateToken}}",
-								"type": "text"
-							}
-						],
-						"body": {
-							"mode": "raw",
-							"raw": "{\n\"policyId\": \"ecefcebc-2949-4b01-b3d8-1f488dc4ca45\"\n}"
-						},
-						"url": {
-							"raw": "{{baseUrl}}{{basePath}}/policies",
-							"host": [
-								"{{baseUrl}}{{basePath}}"
-							],
-							"path": [
-								"policies"
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "401 Delete Policy : Unauthorized",
-					"event": [
-						{
-							"listen": "test",
-							"script": {
-								"exec": [
-									"// Test the response code",
-									"pm.test(\"response is 401 (Not Authorized)\", function () {",
-									"    pm.response.to.have.status(401);",
-									"});",
-									"",
-									"// Test the response header",
-									"pm.test(\"Check response header\", function () {",
-									"    pm.response.to.have.header(\"Content-Type\",\"application/json\");",
-									"});",
-									"",
-									"// Test the response",
-									"pm.test(\"Check response body\", function () {    ",
-									"    const body = pm.response.json();",
-									"    pm.expect(body).to.have.property(\"type\", \"urn:dx:dmp:invalidAuthorizationToken\");",
-									"    pm.expect(body).to.have.property(\"title\", \"Not Authorized\");",
-									"    pm.expect(body).to.have.property(\"detail\", \"Not Authorized\");",
-									"});"
-								],
-								"type": "text/javascript"
-							}
-						}
-					],
-					"request": {
-						"method": "DELETE",
-						"header": [
-							{
-								"key": "Authorization",
-								"value": "{{consumerToken}}",
-								"type": "text"
-							}
-						],
-						"body": {
-							"mode": "raw",
-							"raw": "{\n\"policyId\": \"b5dd534d-231c-4674-8167-2e39467d0643\"\n}",
-							"options": {
-								"raw": {
-									"language": "json"
-								}
-							}
-						},
-						"url": {
-							"raw": "{{baseUrl}}{{basePath}}/policies",
-							"host": [
-								"{{baseUrl}}{{basePath}}"
-							],
-							"path": [
-								"policies"
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "403 Delete Policy:  Forbidden",
-					"event": [
-						{
-							"listen": "test",
-							"script": {
-								"exec": [
-									"// Test the response code",
-									"pm.test(\"response is 403 (Forbidden)\", function () {",
-									"    pm.response.to.have.status(403);",
-									"});",
-									"",
-									"// Test the response header",
-									"pm.test(\"Check response header\", function () {",
-									"    pm.response.to.have.header(\"Content-Type\",\"application/json\");",
-									"});",
-									"",
-									"// Test the response",
-									"pm.test(\"Check response body\", function () {    ",
-									"    const body = pm.response.json();",
-									"    pm.expect(body).to.have.property(\"type\", \"urn:dx:dmp:forbidden\");",
-									"    pm.expect(body).to.have.property(\"title\", \"Forbidden\");",
-									"    pm.expect(body).to.have.property(\"detail\", \"Access Denied: You do not have ownership rights for this policy.\");",
-									"    }",
-									");"
-								],
-								"type": "text/javascript"
-							}
-						}
-					],
-					"protocolProfileBehavior": {
-						"disabledSystemHeaders": {
-							"content-type": true
-						}
-					},
-					"request": {
-						"method": "DELETE",
-						"header": [
-							{
-								"key": "token",
-								"value": "{{providerToken}}",
-								"disabled": true
-							},
-							{
-								"key": "Content-Type",
-								"value": "application/json"
-							},
-							{
-								"key": "token",
-								"value": "{{notRegisteredProviderToken}}",
-								"type": "text"
-							}
-						],
-						"body": {
-							"mode": "raw",
-							"raw": "{\n\"policyId\": \"ecefcebc-2949-4b01-b3d8-1f488dc4ca45\"\n}",
-							"options": {
-								"raw": {
-									"language": "json"
-								}
-							}
-						},
-						"url": {
-							"raw": "{{baseUrl}}{{basePath}}/policies",
-							"host": [
-								"{{baseUrl}}{{basePath}}"
-							],
-							"path": [
-								"policies"
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "404 Delete Policy: Not Found",
-					"event": [
-						{
-							"listen": "test",
-							"script": {
-								"exec": [
-									"// Test the response code",
-									"pm.test(\"response is 404 (Not Found)\", function () {",
-									"    pm.response.to.have.status(404);",
-									"});",
-									"",
-									"// Test the response header",
-									"pm.test(\"Check response header\", function () {",
-									"    pm.response.to.have.header(\"Content-Type\",\"application/json\");",
-									"});",
-									"",
-									"// Test the response",
-									"pm.test(\"Check response body\", function () {    ",
-									"    const body = pm.response.json();",
-									"    pm.expect(body).to.have.property(\"type\", \"urn:dx:dmp:resourceNotFound\");",
-									"    pm.expect(body).to.have.property(\"title\", \"Not Found\");",
-									"    pm.expect(body).to.have.property(\"detail\", \"Policy could not be deleted, as it doesn't exist\");",
-									"    }",
-									");"
-								],
-								"type": "text/javascript"
-							}
-						}
-					],
-					"protocolProfileBehavior": {
-						"disabledSystemHeaders": {
-							"content-type": true
-						}
-					},
-					"request": {
-						"method": "DELETE",
-						"header": [
-							{
-								"key": "token",
-								"value": "{{providerToken}}"
-							},
-							{
-								"key": "Content-Type",
-								"value": "application/json"
-							},
-							{
-								"key": "token",
-								"value": "{{providerDelegateToken}}",
-								"type": "text",
-								"disabled": true
-							}
-						],
-						"body": {
-							"mode": "raw",
-							"raw": "{\n\"policyId\": \"394608f9-b370-4606-a947-1cf300dab04c\"\n}"
-						},
-						"url": {
-							"raw": "{{baseUrl}}{{basePath}}/policies",
-							"host": [
-								"{{baseUrl}}{{basePath}}"
-							],
-							"path": [
-								"policies"
-							]
-						},
-						"description": "specific thing to be written here"
-					},
-					"response": []
-				},
-				{
-					"name": "200 Get Policy : Success",
-					"event": [
-						{
-							"listen": "test",
-							"script": {
-								"exec": [
-									"// Test the response code",
-									"pm.test(\"response is 200 (OK)\", function () {",
-									"    pm.response.to.have.status(200);",
-									"});",
-									"",
-									"// Test the response header",
-									"pm.test(\"Check response header\", function () {",
-									"    pm.response.to.have.header(\"Content-Type\",\"application/json\");",
-									"});",
-									"",
-									"// Test the response",
-									"pm.test(\"Check response body\", function () {    ",
-									"    const body = pm.response.json();",
-									"    pm.expect(body).to.have.property(\"type\", \"urn:dx:dmp:success\");",
-									"    pm.expect(body).to.have.property(\"title\", \"Success\");",
-									"    }",
-									");"
-								],
-								"type": "text/javascript"
-							}
-						}
-					],
-					"protocolProfileBehavior": {
-						"disabledSystemHeaders": {}
-					},
-					"request": {
-						"method": "GET",
-						"header": [
-							{
-								"key": "token",
-								"value": "{{providerToken}}",
-								"disabled": true
-							},
-							{
-								"key": "token",
-								"value": "{{consumerToken}}",
-								"type": "text",
-								"disabled": true
-							},
-							{
-								"key": "token",
-								"value": "{{providerDelegateToken}}",
-								"type": "text"
-							},
-							{
-								"key": "token",
-								"value": "{{consumerDelegateToken}}",
-								"type": "text",
-								"disabled": true
-							}
-						],
-						"url": {
-							"raw": "{{baseUrl}}{{basePath}}/policies",
-							"host": [
-								"{{baseUrl}}{{basePath}}"
-							],
-							"path": [
-								"policies"
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "401 Get Policy: Unauthorized",
-					"event": [
-						{
-							"listen": "test",
-							"script": {
-								"exec": [
-									"// Test the response code",
-									"pm.test(\"response is 401 (Not Authorized)\", function () {",
-									"    pm.response.to.have.status(401);",
-									"});",
-									"",
-									"// Test the response header",
-									"pm.test(\"Check response header\", function () {",
-									"    pm.response.to.have.header(\"Content-Type\",\"application/json\");",
-									"});",
-									"",
-									"// Test the response",
-									"pm.test(\"Check response body\", function () {    ",
-									"    const body = pm.response.json();",
-									"    pm.expect(body).to.have.property(\"type\", \"urn:dx:dmp:invalidAuthorizationToken\");",
-									"    pm.expect(body).to.have.property(\"title\", \"Not Authorized\");",
-									"    pm.expect(body).to.have.property(\"detail\", \"Not Authorized\");",
-									"});"
-								],
-								"type": "text/javascript"
-							}
-						}
-					],
-					"request": {
-						"method": "GET",
-						"header": [
-							{
-								"key": "Authorization",
-								"value": "someToken",
-								"type": "text"
-							}
-						],
-						"url": {
-							"raw": "{{baseUrl}}{{basePath}}/policies",
-							"host": [
-								"{{baseUrl}}{{basePath}}"
-							],
-							"path": [
-								"policies"
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "404 Get Policy: Not Found",
-					"event": [
-						{
-							"listen": "test",
-							"script": {
-								"exec": [
-									"// Test the response code",
-									"pm.test(\"response is 404 (Not Found)\", function () {",
-									"    pm.response.to.have.status(404);",
-									"});",
-									"",
-									"// Test the response header",
-									"pm.test(\"Check response header\", function () {",
-									"    pm.response.to.have.header(\"Content-Type\",\"application/json\");",
-									"});",
-									"",
-									"// Test the response",
-									"pm.test(\"Check response body\", function () {    ",
-									"    const body = pm.response.json();",
-									"    pm.expect(body).to.have.property(\"type\", \"urn:dx:dmp:resourceNotFound\");",
-									"    pm.expect(body).to.have.property(\"title\", \"Not Found\");",
-									"    pm.expect(body).to.have.property(\"detail\", \"Policy Not found\");",
-									"    }",
-									");"
-								],
-								"type": "text/javascript"
-							}
-						},
 						{
 							"listen": "prerequest",
 							"script": {
@@ -4076,44 +3312,36 @@
 						}
 					],
 					"request": {
-						"method": "GET",
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "POST",
 						"header": [
 							{
 								"key": "token",
-								"value": "{{providerToken}}",
-								"disabled": true
-							},
-							{
-								"key": "token",
-								"value": "{{consumerToken}}",
-								"type": "text",
-								"disabled": true
-							},
-							{
-								"key": "token",
 								"value": "{{providerDelegateToken}}",
-								"type": "text",
-								"disabled": true
-							},
-							{
-								"key": "token",
-								"value": "{{consumerDelegateToken}}",
-								"type": "text",
-								"disabled": true
-							},
-							{
-								"key": "token",
-								"value": "{{notRegisteredProviderToken}}",
 								"type": "text"
 							}
 						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"id\": \"newProductAbcd\",\n    \"resourceIds\": [\n        \"83c2e5c2-3574-4e11-9530-2b1fbdfce832\",\n        \"695e222b-3fae-4325-8db0-3e29d01c4fc0\"\n    ]\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
 						"url": {
-							"raw": "{{baseUrl}}{{basePath}}/policies",
+							"raw": "http://localhost:8443/provider/product",
+							"protocol": "http",
 							"host": [
-								"{{baseUrl}}{{basePath}}"
+								"localhost"
 							],
+							"port": "8443",
 							"path": [
-								"policies"
+								"provider",
+								"product"
 							]
 						}
 					},
