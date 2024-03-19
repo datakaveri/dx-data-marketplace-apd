@@ -228,7 +228,7 @@ public class ApiServerVerticle extends AbstractVerticle {
 
     router
         .get(api.getPoliciesUrl())
-        .handler(AuthHandler.create(authenticationService, vertx, api, postgresService, authClient))
+        .handler(AuthHandler.create(authenticationService, api, postgresService, authClient))
         .handler(this::getPoliciesHandler)
         .failureHandler(exceptionHandler);
     router.post(api.getPoliciesUrl()).handler(this::createPolicy).failureHandler(exceptionHandler);
@@ -236,7 +236,7 @@ public class ApiServerVerticle extends AbstractVerticle {
     router
         .delete(api.getPoliciesUrl())
         .handler(policyValidationHandler)
-        .handler(AuthHandler.create(authenticationService, vertx, api, postgresService, authClient))
+        .handler(AuthHandler.create(authenticationService, api, postgresService, authClient))
         .handler(this::deletePoliciesHandler)
         .failureHandler(exceptionHandler);
 
@@ -248,7 +248,7 @@ public class ApiServerVerticle extends AbstractVerticle {
     router
         .post(api.getVerifyUrl())
         .handler(verifyValidationHandler)
-        .handler(AuthHandler.create(authenticationService, vertx, api, postgresService, authClient))
+        .handler(AuthHandler.create(authenticationService, api, postgresService, authClient))
         .handler(this::handleVerify)
         .failureHandler(exceptionHandler);
 
@@ -257,27 +257,27 @@ public class ApiServerVerticle extends AbstractVerticle {
     router
         .post(api.getVerifyPaymentApi())
         .handler(verifyPaymentValidationHandler)
-        .handler(AuthHandler.create(authenticationService, vertx, api, postgresService, authClient))
+        .handler(AuthHandler.create(authenticationService, api, postgresService, authClient))
         .handler(this::handleVerifyPayment)
         .failureHandler(exceptionHandler);
 
     router
         .post(api.getLinkedAccountService())
         .handler(postLinkedAccountHandler)
-        .handler(AuthHandler.create(authenticationService, vertx, api, postgresService, authClient))
+        .handler(AuthHandler.create(authenticationService, api, postgresService, authClient))
         .handler(this::handlePostLinkedAccount)
         .failureHandler(exceptionHandler);
 
     router
         .put(api.getLinkedAccountService())
         .handler(putLinkedAccountHandler)
-        .handler(AuthHandler.create(authenticationService, vertx, api, postgresService, authClient))
+        .handler(AuthHandler.create(authenticationService, api, postgresService, authClient))
         .handler(this::handlePutLinkedAccount)
         .failureHandler(exceptionHandler);
 
     router
         .get(api.getLinkedAccountService())
-        .handler(AuthHandler.create(authenticationService, vertx, api, postgresService, authClient))
+        .handler(AuthHandler.create(authenticationService, api, postgresService, authClient))
         .handler(this::handleFetchLinkedAccount)
         .failureHandler(exceptionHandler);
 
@@ -419,6 +419,7 @@ public class ApiServerVerticle extends AbstractVerticle {
 
   private void handleVerifyPayment(RoutingContext routingContext) {
 
+    LOGGER.debug("here 1");
     JsonObject requestBody = routingContext.body().asJsonObject();
     HttpServerResponse response = routingContext.response();
 
