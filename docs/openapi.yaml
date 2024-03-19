@@ -155,7 +155,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/successResponseForDeleteProduct'
         '400':
-          description: invalid document
+          description: invalid document or product deleted previously
           content:
             application/json:
               schema:
@@ -166,6 +166,14 @@ paths:
                     type: 'urn:dx:dmp:invalidId'
                     title: Bad request
                     detail: 'Given ID is invalid [ datakaveri.org/b8bd3e3f39615c8ec96722131ae95056b5938f2f ]'
+
+                Product deleted previously:
+                  value:
+                    {
+                      "type": "urn:dx:dmp:badRequest",
+                      "title": "bad request parameter",
+                      "detail": "Product cannot be deleted, as it was deleted previously"
+                    }
         '401':
           description: Unauthorized access
           content:
@@ -1397,7 +1405,7 @@ paths:
                       "detail": "Successfully deleted"
                     }
         '400':
-          description: 'Bad Request or product deleted previously'
+          description: 'Bad Request'
           content:
             application/json:
               schema:
