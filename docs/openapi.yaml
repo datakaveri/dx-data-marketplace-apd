@@ -97,6 +97,20 @@ paths:
                       "title": "Not Authorized",
                       "detail": "Not Authorized"
                     }
+        '409':
+          description: Conflict
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/errorResponse'
+              examples:
+                Unauthorized:
+                  value:
+                    {
+                      "type": "urn:dx:dmp:resourceAlreadyExists",
+                      "title": "Conflict",
+                      "detail": "Document of given id already exists"
+                    }
         '403':
           description: Forbidden
           content:
@@ -109,11 +123,7 @@ paths:
                     type: 'urn:dx:dmp:forbidden'
                     title: Product creation is forbidden
                     detail: To activate linked account please complete the KYC, filling account information etc., in your Razorpay merchant dashboard
-                product exists:
-                  value:
-                    type: 'urn:dx:dmp:forbidden'
-                    title: Product creation is forbidden
-                    detail: Document of given id already exists
+
     delete:
       tags:
         - Product
@@ -616,8 +626,8 @@ paths:
                               }
                             ],
                             "productVariantName": "variant1",
-                            "price": "150.0",
-                            "expiryInMonths": "12",
+                            "price": 150.0,
+                            "expiryInMonths": 12,
                             "resourceServerUrl": "some.dummy.server",
                             "productVariantStatus": "ACTIVE"
                           }
@@ -674,8 +684,8 @@ paths:
                               }
                             ],
                             "productVariantName": "variant1",
-                            "price": "150.0",
-                            "expiryInMonths": "12",
+                            "price": 150.0,
+                            "expiryInMonths": 12,
                             "resourceServerUrl": "some.dummy.server",
                             "productVariantStatus": "ACTIVE"
                           }
@@ -732,8 +742,8 @@ paths:
                               }
                             ],
                             "productVariantName": "variant1",
-                            "price": "150.0",
-                            "expiryInMonths": "12",
+                            "price": 150.0,
+                            "expiryInMonths": 12,
                             "resourceServerUrl": "some.dummy.server",
                             "productVariantStatus": "ACTIVE"
 
@@ -865,6 +875,7 @@ paths:
                       "title": "Success",
                       "results": [
                         {
+                          "productVariantId": "f9eab2d7-b60b-4d32-aaa1-1fdc82ba0de7",
                           "productId": "urn:datakaveri.org:a3ec61uer-1677-4a84-816e-91f9ab23f832:testProduct",
                           "productVariantName": "variant1"
                         }
@@ -911,6 +922,20 @@ paths:
                       "type": "urn:dx:dmp:resourceAlreadyExists",
                       "title": "Conflict",
                       "detail": "Document of given id already exists"
+                    }
+        '403':
+          description: 'Forbidden'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/errorResponse'
+              examples:
+                Example 1:
+                  value:
+                    {
+                      "type": "urn:dx:dmp:forbidden",
+                      "title": "Resource is forbidden to access",
+                      "detail": "Product Variant is only created after product is created"
                     }
 
     get:
@@ -1372,7 +1397,7 @@ paths:
                       "detail": "Successfully deleted"
                     }
         '400':
-          description: 'Bad Request'
+          description: 'Bad Request or product deleted previously'
           content:
             application/json:
               schema:
@@ -2579,8 +2604,8 @@ paths:
                               }
                             ],
                             "productVariantName": "variant1",
-                            "price": "150.0",
-                            "expiryInMonths": "12",
+                            "price": 150.0,
+                            "expiryInMonths": 12,
                             "resourceServerUrl": "some.dummy.server",
                             "productVariantStatus": "ACTIVE"
                           }
@@ -2637,8 +2662,8 @@ paths:
                               }
                             ],
                             "productVariantName": "variant1",
-                            "price": "150.0",
-                            "expiryInMonths": "12",
+                            "price": 150.0,
+                            "expiryInMonths": 12,
                             "resourceServerUrl": "some.dummy.server",
                             "productVariantStatus": "ACTIVE"
                           }
@@ -2695,8 +2720,8 @@ paths:
                               }
                             ],
                             "productVariantName": "variant1",
-                            "price": "150.0",
-                            "expiryInMonths": "12",
+                            "price": 150.0,
+                            "expiryInMonths": 12,
                             "resourceServerUrl": "some.dummy.server",
                             "productVariantStatus": "ACTIVE"
                           }
