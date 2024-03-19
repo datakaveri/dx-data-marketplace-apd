@@ -1,32 +1,30 @@
 package iudx.data.marketplace.apiserver.handlers;
 
+import static iudx.data.marketplace.apiserver.util.Constants.*;
+import static iudx.data.marketplace.authenticator.util.Constants.GET_USER;
+import static iudx.data.marketplace.authenticator.util.Constants.INSERT_USER_TABLE;
+import static iudx.data.marketplace.authenticator.util.Constants.TOKEN;
+import static iudx.data.marketplace.common.Constants.AUTH_INFO;
+import static iudx.data.marketplace.common.ResponseUrn.INVALID_TOKEN_URN;
+import static iudx.data.marketplace.common.ResponseUrn.RESOURCE_NOT_FOUND_URN;
+
 import io.vertx.core.Future;
 import io.vertx.core.Handler;
 import io.vertx.core.Promise;
-import io.vertx.core.Vertx;
 import io.vertx.core.http.HttpServerRequest;
 import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
 import io.vertx.ext.web.RoutingContext;
-import io.vertx.sqlclient.Tuple;
 import iudx.data.marketplace.authenticator.AuthClient;
-import iudx.data.marketplace.common.Api;
-import iudx.data.marketplace.common.RespBuilder;
 import iudx.data.marketplace.authenticator.AuthenticationService;
+import iudx.data.marketplace.common.Api;
 import iudx.data.marketplace.common.HttpStatusCode;
+import iudx.data.marketplace.common.RespBuilder;
 import iudx.data.marketplace.common.ResponseUrn;
 import iudx.data.marketplace.policies.User;
 import iudx.data.marketplace.postgres.PostgresService;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-
-import static iudx.data.marketplace.apiserver.util.Constants.*;
-import static iudx.data.marketplace.authenticator.util.Constants.TOKEN;
-import static iudx.data.marketplace.authenticator.util.Constants.GET_USER;
-import static iudx.data.marketplace.authenticator.util.Constants.INSERT_USER_TABLE;
-import static iudx.data.marketplace.common.Constants.AUTH_INFO;
-import static iudx.data.marketplace.common.ResponseUrn.INVALID_TOKEN_URN;
-import static iudx.data.marketplace.common.ResponseUrn.RESOURCE_NOT_FOUND_URN;
 
 public class AuthHandler implements Handler<RoutingContext> {
 
@@ -40,7 +38,6 @@ public class AuthHandler implements Handler<RoutingContext> {
 
   public static AuthHandler create(
       AuthenticationService authenticationService,
-      Vertx vertx,
       Api apis,
       PostgresService postgresService,
       AuthClient authClientObj) {
@@ -247,12 +244,12 @@ public class AuthHandler implements Handler<RoutingContext> {
       return api.getConsumerOrderApi();
     } else if(url.matches(api.getLinkedAccountService())){
       return api.getLinkedAccountService();
-    } else if(url.matches(api.getConsumerListResourcePath()))
-    {
+    } else if(url.matches(api.getConsumerListResourcePath())) {
       return api.getConsumerListResourcePath();
-    }else if(url.matches(api.getConsumerProductVariantPath()))
-    {
+    } else if(url.matches(api.getConsumerProductVariantPath())) {
       return api.getConsumerProductVariantPath();
+    } else if(url.matches(api.getVerifyPaymentApi())) {
+      return api.getVerifyPaymentApi();
     }
     return null;
   }

@@ -22,7 +22,6 @@ import iudx.data.marketplace.authenticator.AuthClient;
 import iudx.data.marketplace.authenticator.AuthenticationService;
 import iudx.data.marketplace.common.Api;
 import iudx.data.marketplace.common.HttpStatusCode;
-import iudx.data.marketplace.common.RespBuilder;
 import iudx.data.marketplace.common.ResponseUrn;
 import iudx.data.marketplace.consumer.ConsumerService;
 import iudx.data.marketplace.policies.User;
@@ -68,42 +67,42 @@ public class ConsumerApis {
     router
         .get(api.getConsumerListProviders())
         .handler(providerValidationHandler)
-        .handler(AuthHandler.create(authenticationService, vertx, api, postgresService, authClient))
+        .handler(AuthHandler.create(authenticationService, api, postgresService, authClient))
         .handler(this::listProviders)
         .failureHandler(exceptionHandler);
 
     router
         .get(api.getConsumerListResourcePath())
         .handler(resourceValidationHandler)
-        .handler(AuthHandler.create(authenticationService, vertx, api, postgresService, authClient))
+        .handler(AuthHandler.create(authenticationService, api, postgresService, authClient))
         .handler(this::listResources)
         .failureHandler(exceptionHandler);
 
     router
         .get(api.getConsumerListProducts())
         .handler(resourceValidationHandler)
-        .handler(AuthHandler.create(authenticationService, vertx, api, postgresService, authClient))
+        .handler(AuthHandler.create(authenticationService, api, postgresService, authClient))
         .handler(this::listProducts)
         .failureHandler(exceptionHandler);
 
     router
         .get(api.getConsumerListPurchases())
         .handler(purchaseValidationHandler)
-        .handler(AuthHandler.create(authenticationService, vertx, api, postgresService, authClient))
+        .handler(AuthHandler.create(authenticationService, api, postgresService, authClient))
         .handler(this::listPurchases)
         .failureHandler(exceptionHandler);
 
       router
       .get(api.getConsumerProductVariantPath())
         .handler(productVariantHandler)
-        .handler(AuthHandler.create(authenticationService, vertx, api, postgresService, authClient))
+        .handler(AuthHandler.create(authenticationService, api, postgresService, authClient))
         .handler(this::listProductVariants)
         .failureHandler(exceptionHandler);
 
     router
         .post(CONSUMER_PATH + ORDERS_PATH + "/:productVariantId")
         .handler(orderValidationHandler)
-        .handler(AuthHandler.create(authenticationService, vertx, api, postgresService, authClient))
+        .handler(AuthHandler.create(authenticationService, api, postgresService, authClient))
         .handler(this::createOrder)
         .failureHandler(exceptionHandler);
     return this.router;

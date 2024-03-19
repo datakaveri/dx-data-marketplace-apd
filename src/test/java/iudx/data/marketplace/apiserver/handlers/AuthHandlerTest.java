@@ -3,7 +3,6 @@ package iudx.data.marketplace.apiserver.handlers;
 import io.vertx.core.AsyncResult;
 import io.vertx.core.Handler;
 import io.vertx.core.MultiMap;
-import io.vertx.core.Vertx;
 import io.vertx.core.http.HttpMethod;
 import io.vertx.core.http.HttpServerRequest;
 import io.vertx.core.http.HttpServerResponse;
@@ -57,9 +56,9 @@ public class AuthHandlerTest {
   AuthenticationService authenticationService;
 
   @BeforeEach
-  public void setup(Vertx vertx, VertxTestContext testContext) {
+  public void setup(VertxTestContext testContext) {
     api = Api.getInstance("some/base/path");
-    authHandler = AuthHandler.create(authenticationService, vertx, api, postgresService, authClient);
+    authHandler = AuthHandler.create(authenticationService, api, postgresService, authClient);
     ctx = mock(RoutingContext.class);
     req = mock(HttpServerRequest.class);
     map = mock(MultiMap.class);
@@ -74,9 +73,9 @@ public class AuthHandlerTest {
   }
   @Test
   @DisplayName("Test create method")
-  public void testAuthHandlerCreateMethod(Vertx vertx, VertxTestContext testContext) {
+  public void testAuthHandlerCreateMethod(VertxTestContext testContext) {
     authenticator = mock(AuthenticationService.class);
-    assertNotNull(AuthHandler.create(authenticationService,vertx,api, postgresService, authClient));
+    assertNotNull(AuthHandler.create(authenticationService, api, postgresService, authClient));
     testContext.completeNow();
   }
 

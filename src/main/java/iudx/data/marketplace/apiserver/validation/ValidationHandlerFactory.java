@@ -50,7 +50,7 @@ public class ValidationHandlerFactory {
         validator = getOrderValidator(parameters);
         break;
       case VERIFY_PAYMENT:
-        validator = getVerfiyPaymentValidator(parameters, body);
+        validator = getVerfiyPaymentValidator(body);
         break;
       case POST_ACCOUNT:
         validator = getPostLinkedAccountValidator(body, requestType);
@@ -92,7 +92,7 @@ public class ValidationHandlerFactory {
     return validators;
   }
 
-  private List<Validator> getVerfiyPaymentValidator(MultiMap parameters, JsonObject body) {
+  private List<Validator> getVerfiyPaymentValidator(JsonObject body) {
     List<Validator> validators = new ArrayList<>();
     validators.add(new JsonSchemaTypeValidator(body, RequestType.VERIFY_PAYMENT));
     return validators;
