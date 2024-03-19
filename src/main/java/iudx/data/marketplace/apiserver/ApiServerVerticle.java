@@ -419,7 +419,6 @@ public class ApiServerVerticle extends AbstractVerticle {
 
   private void handleVerifyPayment(RoutingContext routingContext) {
 
-    LOGGER.debug("here 1");
     JsonObject requestBody = routingContext.body().asJsonObject();
     HttpServerResponse response = routingContext.response();
 
