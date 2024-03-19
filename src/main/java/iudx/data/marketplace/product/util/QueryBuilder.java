@@ -94,14 +94,15 @@ public class QueryBuilder {
     return query.toString();
   }
 
-  public String buildProductDetailsQuery(String productID) {
+  public String buildProductDetailsQuery(String productID, String providerId) {
     StringBuilder query =
             new StringBuilder(
                     SELECT_PRODUCT_DETAILS
                             .replace("$0", productTable)
                             .replace("$9", productResourceRelationTable)
                             .replace("$8", resourceTable)
-                            .replace("$1", productID));
+                            .replace("$1", productID)
+                            .replace("$2", providerId));
 
     return query.toString();
   }
@@ -166,6 +167,7 @@ public class QueryBuilder {
                             .replace("$1", productID)
                             .replace("$2", variantName)
                             .replace("$3", Status.ACTIVE.toString()));
+    LOGGER.debug("select product variant query : {}", query);
     return query.toString();
   }
 

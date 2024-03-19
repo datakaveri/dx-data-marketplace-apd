@@ -136,13 +136,25 @@ public class ProductServiceImpl implements ProductService {
                       });
                 }
               } else {
-                handler.handle(
-                    Future.failedFuture(
-                        new RespBuilder()
-                            .withType(ResponseUrn.FORBIDDEN_PRODUCT_CREATION.getUrn())
-                            .withTitle(ResponseUrn.FORBIDDEN_PRODUCT_CREATION.getMessage())
-                            .withDetail(completeHandler.cause().getLocalizedMessage())
-                            .getResponse()));
+                  String failureMessage = new RespBuilder()
+                          .withType(ResponseUrn.FORBIDDEN_PRODUCT_CREATION.getUrn())
+                          .withTitle(ResponseUrn.FORBIDDEN_PRODUCT_CREATION.getMessage())
+                          .withDetail(completeHandler.cause().getLocalizedMessage())
+                          .getResponse();
+
+                if (completeHandler
+                    .cause()
+                    .getMessage()
+                    .contains(ResponseUrn.RESOURCE_ALREADY_EXISTS_URN.getMessage())) {
+
+                    failureMessage = new RespBuilder()
+                            .withType(ResponseUrn.RESOURCE_ALREADY_EXISTS_URN.getUrn())
+                            .withTitle(ResponseUrn.RESOURCE_ALREADY_EXISTS_URN.getMessage())
+                            .withDetail("Product already exists")
+                            .getResponse();
+                }
+                  handler.handle(
+                          Future.failedFuture(failureMessage));
               }
             });
 
@@ -219,13 +231,28 @@ public class ProductServiceImpl implements ProductService {
                     params,
                     pgHandler -> {
                       if (pgHandler.succeeded()) {
-                          LOGGER.debug("Success : {}", pgHandler.result().encodePrettily());
-                          RespBuilder respBuilder =
-                                  new RespBuilder()
-                                          .withType(ResponseUrn.SUCCESS_URN.getUrn())
-                                          .withTitle(ResponseUrn.SUCCESS_URN.getMessage())
-                                          .withDetail("Successfully deleted");
-                          handler.handle(Future.succeededFuture(respBuilder.getJsonResponse()));
+                          if(!pgHandler.result().getJsonArray(RESULTS).isEmpty())
+                          {
+                              LOGGER.debug("Success : {}", pgHandler.result().encodePrettily());
+                              RespBuilder respBuilder =
+                                      new RespBuilder()
+                                              .withType(ResponseUrn.SUCCESS_URN.getUrn())
+                                              .withTitle(ResponseUrn.SUCCESS_URN.getMessage())
+                                              .withDetail("Successfully deleted");
+                              handler.handle(Future.succeededFuture(respBuilder.getJsonResponse()));
+
+                          }
+                          else
+                          {
+                              /* product has been previously deleted */
+                              RespBuilder respBuilder = new RespBuilder()
+                                      .withType(ResponseUrn.BAD_REQUEST_URN.getUrn())
+                                      .withTitle(ResponseUrn.BAD_REQUEST_URN.getMessage())
+                                      .withDetail("Product cannot be deleted, as it was deleted previously");
+                              handler.handle(Future.failedFuture(respBuilder.getResponse()));
+                          }
+
+
                       } else {
                         LOGGER.error("deletion failed");
                         handler.handle(Future.failedFuture(pgHandler.cause()));
@@ -314,7 +341,7 @@ public class ProductServiceImpl implements ProductService {
                   promise.fail(updateStatusHandler.cause().getMessage());
                 }
               });
-      ;
+
 
     } else {
       promise.complete();

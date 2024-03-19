@@ -342,8 +342,8 @@ public class ConsumerServiceImpl implements ConsumerService {
               LOGGER.info("Response from DB is empty while fetching " + "product variant");
               String failureMessage =
                   new RespBuilder()
-                      .withType(ResponseUrn.RESOURCE_NOT_FOUND_URN.getUrn())
-                      .withTitle(ResponseUrn.RESOURCE_NOT_FOUND_URN.getMessage())
+                      .withType(HttpStatusCode.NOT_FOUND.getValue())
+                      .withTitle(ResponseUrn.RESOURCE_NOT_FOUND_URN.getUrn())
                       .withDetail("Product variants not found")
                       .getResponse();
               handler.handle(Future.failedFuture(failureMessage));
@@ -353,8 +353,8 @@ public class ConsumerServiceImpl implements ConsumerService {
                 "Failure while fetching product variant : {}", pgHandler.cause().getMessage());
             String failureMessage =
                 new RespBuilder()
-                    .withType(ResponseUrn.DB_ERROR_URN.getUrn())
-                    .withTitle(ResponseUrn.INTERNAL_SERVER_ERR_URN.getMessage())
+                    .withType(HttpStatusCode.INTERNAL_SERVER_ERROR.getValue())
+                    .withTitle(ResponseUrn.INTERNAL_SERVER_ERR_URN.getUrn())
                     .withDetail(
                         "Product variants could not be fetched as there was internal server error")
                     .getResponse();
