@@ -1,0 +1,37 @@
+version: '3.7'
+
+networks:
+  dmp-apd-server-net:
+    driver: bridge
+
+services:
+
+  integTest:
+    image: ghcr.io/datakaveri/dmp-apd-server-depl:latest
+    volumes:
+      - /home/ubuntu/configs/dmp-apd-server-config.json:/usr/share/app/configs/dmp-apd-server.json
+      - /home/ubuntu/configs/dmp-apd-server-keystore.jks:/usr/share/app/configs/keystore.jks
+      - dmp-apd-server-volume:/usr/share/app/storage/temp-dir
+    depends_on:
+      - zookeeper
+    ports:
+      - "8080:8080"
+    restart: on-failure
+    networks:
+      - dmp-apd-server-net
+    logging:
+      driver: "json-file"
+      options:
+        max-file: "5"
+        max-size: "100m"
+    command: bash -c "exec java $$DMP_JAVA_OPTS -Dvertx.logger-delegate-factory-class-name=io.vertx.core.logging.Log4j2LogDelegateFactory -jar ./fatjar.jar --host $$(hostname) -c configs/dmp-apd-server.json"
+
+  zookeeper:
+    image: zookeeper:latest
+    expose:
+      - "2181"
+    networks:
+      - dmp-apd-server-net
+
+volumes:
+  dmp-apd-server-volume:
