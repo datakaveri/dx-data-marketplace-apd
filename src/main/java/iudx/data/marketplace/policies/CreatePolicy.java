@@ -66,8 +66,6 @@ public class CreatePolicy {
     /* create policy ID */
     /* get each constraint for each resource */
     /* set status = ACTIVE */
-    //        var abcd = LocalDateTime.now();
-    //        var expiryAt = abcd.plusMonths(expiryInMonths);
     String getResourceInfoQuery = GET_REQUIRED_INFO_QUERY.replace("$1", orderId);
     Future<JsonObject> fetchResourceInfoFuture =
         executePostgresQuery(getResourceInfoQuery, "get resource info");
