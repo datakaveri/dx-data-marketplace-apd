@@ -74,6 +74,7 @@ public class CreatePolicy {
     Future<Boolean> future =
         fetchResourceInfoFuture.compose(
             jsonObject -> {
+              LOGGER.debug("Json object : {}", jsonObject.encodePrettily());
               invoiceId = jsonObject.getString("invoiceId");
               productVariantId = jsonObject.getString("productVariantId");
               expiryInMonths = jsonObject.getInteger("expiry");
@@ -85,13 +86,18 @@ public class CreatePolicy {
               User provider = new User(providerUser);
 
               consumerEmailId = jsonObject.getString("consumerEmailId");
-              JsonObject resourceIdsAndCapabilities =
-                  jsonObject.getJsonObject("resourceIdsAndConstraints");
-              Set<String> resourceIds = resourceIdsAndCapabilities.fieldNames();
+              JsonArray resourceIdsAndCapabilities = jsonObject.getJsonArray("resourceInfo");
 
-              Collection<Object> capabilities = resourceIdsAndCapabilities.getMap().values();
-              List<String> listOfConstraints =
-                  capabilities.stream().map(Object::toString).collect(Collectors.toList());
+                List<String> resourceIds =
+                  resourceIdsAndCapabilities.stream()
+                      .map(e -> JsonObject.mapFrom(e).getString("id"))
+                      .collect(Collectors.toList());
+
+                List<JsonArray> listOfConstraints =
+                        resourceIdsAndCapabilities.stream()
+                                .map(e -> JsonObject.mapFrom(e).getJsonArray("capabilities"))
+                                .collect(Collectors.toList());
+
 
               LocalDateTime presentTime = LocalDateTime.now();
               expiryAt = presentTime.plusMonths(expiryInMonths).toString();
@@ -110,7 +116,7 @@ public class CreatePolicy {
               List<String> listOfQueries = new ArrayList<>();
               for (String resourceItem : resourceIds) {
                 String policyId = UUID.randomUUID().toString();
-                JsonArray list = new JsonArray(listOfConstraints.get(index++));
+                JsonArray list = listOfConstraints.get(index++);
                 constraint.put("access", list);
                 createPolicyFinalQuery =
                     createPolicyFinalQuery
