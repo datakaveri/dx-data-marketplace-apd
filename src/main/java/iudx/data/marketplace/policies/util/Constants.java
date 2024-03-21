@@ -64,21 +64,19 @@ public class Constants {
                     + " INNER JOIN resource_entity r ON p.resource_id = r._id"
                     + " WHERE p._id = $1;";
 
-
-    public static final String GET_REQUIRED_INFO_QUERY =
-            "SELECT DISTINCT I._id AS \"invoiceId\", I.product_variant_id AS \"productVariantId\", I.expiry, "
-                    + " PV.provider_id AS \"providerId\", U.email_id AS \"consumerEmailId\", "
-                    + " PV.resource_ids_and_capabilities AS \"resourceIdsAndConstraints\", "
-                    + " U.email_id AS \"emailId\", U.first_name AS \"firstName\", U.last_name AS \"lastName\", "
-                    + " R.resource_server AS \"resourceServerUrl\""
-                    + " FROM invoice AS I "
-                    + " INNER JOIN product_variant AS PV "
-                    + " ON I.product_variant_id = PV._id "
-                    + " INNER JOIN user_table AS U "
-                    + " ON I.consumer_id = U._id "
-                    + " INNER JOIN resource_entity  R "
-                    + " ON PV.provider_id = R.provider_id "
-                    + " WHERE payment_status = 'SUCCEEDED' "
-                    + " AND order_id = '$1';";
-
+  public static final String GET_REQUIRED_INFO_QUERY =
+      "SELECT DISTINCT I._id AS \"invoiceId\", I.product_variant_id AS \"productVariantId\", I.expiry, "
+          + " PV.provider_id AS \"providerId\", U.email_id AS \"consumerEmailId\", "
+          + " PV.resource_info AS \"resourceInfo\" , "
+          + " U.email_id AS \"emailId\", U.first_name AS \"firstName\", U.last_name AS \"lastName\", "
+          + " R.resource_server AS \"resourceServerUrl\""
+          + " FROM invoice AS I "
+          + " INNER JOIN product_variant AS PV "
+          + " ON I.product_variant_id = PV._id "
+          + " INNER JOIN user_table AS U "
+          + " ON I.consumer_id = U._id "
+          + " INNER JOIN resource_entity  R "
+          + " ON PV.provider_id = R.provider_id "
+          + " WHERE payment_status = 'SUCCEEDED' "
+          + " AND order_id = '$1';";
 }
