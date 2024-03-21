@@ -51,6 +51,7 @@ public class JsonSchemaTypeValidator implements Validator {
   }
 
   private boolean validateJson(JsonObject body, RequestType requestType) throws IOException, ProcessingException, DxRuntimeException {
+    LOGGER.debug(body);
     boolean isValid;
     String schemaPath = PACKAGE_NAME + "/".concat(requestType.getFilename()).concat("_schema.json");
 
