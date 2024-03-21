@@ -9,11 +9,16 @@ import io.vertx.core.json.JsonObject;
 import io.vertx.junit5.VertxExtension;
 import io.vertx.junit5.VertxTestContext;
 import iudx.data.marketplace.common.CatalogueService;
+import iudx.data.marketplace.common.ResponseUrn;
 import iudx.data.marketplace.configuration.Configuration;
 import iudx.data.marketplace.policies.User;
 import iudx.data.marketplace.postgres.PostgresService;
+import iudx.data.marketplace.product.util.QueryBuilder;
 import iudx.data.marketplace.razorpay.RazorPayService;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -23,8 +28,11 @@ import org.mockito.invocation.InvocationOnMock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.mockito.stubbing.Answer;
 
+import static iudx.data.marketplace.apiserver.util.Constants.DETAIL;
+import static iudx.data.marketplace.apiserver.util.Constants.TITLE;
 import static iudx.data.marketplace.common.Constants.*;
 import static iudx.data.marketplace.product.util.Constants.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(VertxExtension.class)
@@ -42,6 +50,7 @@ public class ProductServiceTest {
     User user;
   @Mock
   static RazorPayService razorPayService;
+    public static final Logger LOGGER = LogManager.getLogger(QueryBuilder.class);
 
   @BeforeAll
   public static void setup(Vertx vertx, VertxTestContext testContext) {
@@ -55,42 +64,45 @@ public class ProductServiceTest {
     testContext.completeNow();
   }
 
+
   @Test
-  @DisplayName("test create product - success")
-  public void testCreateProduct(VertxTestContext testContext) {
-
-    JsonArray resourceIDs = new JsonArray().add("resource-1");
-
-    ProductServiceImpl productServiceSpy = spy(productServiceImpl);
-    when(jsonObjectMock.getJsonObject(AUTH_INFO)).thenReturn(jsonObjectMock);
-    when(jsonObjectMock.getString(IID)).thenReturn("provider-id");
-    when(jsonObjectMock.getString(PROVIDER_ID)).thenReturn("provider-id");
-    when(jsonObjectMock.getString(PROVIDER_NAME)).thenReturn("new-provider");
-    when(jsonObjectMock.getString(PRODUCT_ID)).thenReturn("abcde");
-    when(jsonObjectMock.put(anyString(), anyString())).thenReturn(jsonObjectMock);
-    when(jsonObjectMock.getJsonArray(resourceNames)).thenReturn(resourceIDs);
-
-    doAnswer(Answer -> Future.succeededFuture(false))
-        .when(productServiceSpy)
-        .checkIfProductExists(anyString(), anyString());
-    doAnswer(
-            Answer ->
-                Future.succeededFuture(
-                    new JsonObject()
-                        .put(RESOURCE_ID, resourceIDs.getString(0))
-                        .put(RESOURCE_NAME, "dat-name")
-                        .put("accessPolicy", "OPEN")))
-        .when(catService)
-        .getItemDetails(anyString());
-    doAnswer(
-            Answer ->
-                Future.succeededFuture(
-                    new JsonObject().put(RESOURCE_ID, resourceIDs.getString(0)).put("totalHits", 1)))
-        .when(catService)
-        .getResourceCount(anyString());
-
-    when(asyncResult.result()).thenReturn(jsonObjectMock);
+  @DisplayName("Test create product : Success")
+  public void testCreateProductSuccess(VertxTestContext vertxTestContext) {
+    JsonObject request = mock(JsonObject.class);
+    JsonArray jsonArray = mock(JsonArray.class);
+    when(user.getUserId()).thenReturn("someUserId");
+    when(user.getResourceServerUrl()).thenReturn("someResourceServerUrl");
+    when(request.getString(anyString())).thenReturn("dummyValue");
+    when(request.getString("status")).thenReturn("ACTIVATED");
     when(asyncResult.succeeded()).thenReturn(true);
+    when(request.getInteger("totalHits")).thenReturn(0);
+    when(asyncResult.result()).thenReturn(request);
+    when(request.getJsonArray(anyString())).thenReturn(jsonArray);
+    when(jsonArray.isEmpty()).thenReturn(false);
+    when(jsonArray.getJsonObject(anyInt())).thenReturn(request);
+    when(request.getJsonArray(RESOURCE_IDS)).thenReturn(new JsonArray().add("abcd").add("abcd"));
+    when(request.put(anyString(), anyString())).thenReturn(request);
+    doAnswer(
+            new Answer<AsyncResult<JsonObject>>() {
+              @Override
+              public AsyncResult<JsonObject> answer(InvocationOnMock arg0) throws Throwable {
+                ((Handler<AsyncResult<JsonObject>>) arg0.getArgument(1)).handle(asyncResult);
+                return null;
+              }
+            })
+        .when(postgresService)
+        .executeQuery(anyString(), any());
+
+    doAnswer(
+            new Answer<AsyncResult<JsonObject>>() {
+              @Override
+              public AsyncResult<JsonObject> answer(InvocationOnMock arg0) throws Throwable {
+                ((Handler<AsyncResult<JsonObject>>) arg0.getArgument(1)).handle(asyncResult);
+                return null;
+              }
+            })
+        .when(postgresService)
+        .executeCountQuery(anyString(), any());
 
     doAnswer(
             new Answer<AsyncResult<JsonObject>>() {
@@ -102,17 +114,35 @@ public class ProductServiceTest {
             })
         .when(postgresService)
         .executeTransaction(anyList(), any());
+    doAnswer(
+            Answer ->
+                Future.succeededFuture(
+                    new JsonObject()
+                        .put(PROVIDER, "dummyProviderId")
+                        .put("ownerUserId", "someUserId")
+                        .put("providerName", "dummyName")
+                        .put(RESOURCE_ID, "dummyResourceId")
+                        .put(RESOURCE_NAME, "dummyResourceName")
+                        .put("accessPolicy", "SECURE")))
+        .when(catService)
+        .getItemDetails(anyString());
 
-    productServiceSpy.createProduct(
-            user,
-        jsonObjectMock,
+    productServiceImpl.createProduct(
+        user,
+        request,
         handler -> {
           if (handler.succeeded()) {
-            //            verify(catService, times(2)).getItemDetails(anyString());
-            verify(postgresService, times(1)).executeTransaction(anyList(), any());
-            testContext.completeNow();
+            JsonObject actual = handler.result();
+            assertEquals(ResponseUrn.SUCCESS_URN.getUrn(), actual.getString(TYPE));
+            assertEquals(ResponseUrn.SUCCESS_URN.getMessage(), actual.getString(TITLE));
+            assertEquals(
+                "urn:datakaveri.org:someUserId:dummyValue",
+                actual.getJsonObject(RESULTS).getString(PRODUCT_ID));
+            vertxTestContext.completeNow();
+
           } else {
-            testContext.failNow("create product test failed");
+
+            vertxTestContext.failNow("Failed to create product");
           }
         });
   }
@@ -122,11 +152,15 @@ public class ProductServiceTest {
   public void testDeleteProduct(VertxTestContext testContext) {
 
     JsonObject auth_info = new JsonObject().put(IID, "iid");
+    JsonArray jsonArray = new JsonArray();
+    jsonArray.add(0,new JsonObject().put("key", "deleted successfully"));
     JsonObject request =
-        new JsonObject().put(AUTH_INFO, auth_info).put(PRODUCT_ID, "id").put("totalHits", 1);
+        new JsonObject().put(AUTH_INFO, auth_info).put(PRODUCT_ID, "id").put("totalHits", 1)
+                        .put(RESULTS, jsonArray);
     when(asyncResult.succeeded()).thenReturn(true);
     when(asyncResult.result()).thenReturn(request);
-    doAnswer(
+      when(user.getUserId()).thenReturn("dummyProviderId");
+      doAnswer(
             new Answer<AsyncResult<JsonObject>>() {
               @Override
               public AsyncResult<JsonObject> answer(InvocationOnMock arg0) throws Throwable {
@@ -153,8 +187,10 @@ public class ProductServiceTest {
         request,
         handler -> {
           if (handler.succeeded()) {
-            verify(postgresService, times(2)).executePreparedQuery(anyString(), any(), any());
-            verify(postgresService, times(2)).executeCountQuery(anyString(), any());
+              LOGGER.info("handler.result().encodePrettily() : " + handler.result().encodePrettily());
+              assertEquals(ResponseUrn.SUCCESS_URN.getUrn(), handler.result().getString(TYPE));
+              assertEquals(ResponseUrn.SUCCESS_URN.getMessage(), handler.result().getString(TITLE));
+              assertEquals("Successfully deleted", handler.result().getString(DETAIL));
             testContext.completeNow();
           } else {
             testContext.failNow("delete product test failed");

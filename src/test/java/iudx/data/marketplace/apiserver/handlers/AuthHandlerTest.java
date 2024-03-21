@@ -17,6 +17,7 @@ import iudx.data.marketplace.authenticator.AuthenticationService;
 import iudx.data.marketplace.common.Api;
 import iudx.data.marketplace.postgres.PostgresServiceImpl;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -108,7 +109,7 @@ public class AuthHandlerTest {
     assertEquals("token", ctx.request().headers().get(HEADER_TOKEN));
     assertEquals("POST", ctx.request().method().toString());
     verify(AuthHandler.authenticator, times(1)).tokenIntrospect(any(), any(), any());
-    verify(jsonObject, times(3)).getValue(anyString());
+    verify(jsonObject, times(1)).getString(anyString());
 
     testContext.completeNow();
   }

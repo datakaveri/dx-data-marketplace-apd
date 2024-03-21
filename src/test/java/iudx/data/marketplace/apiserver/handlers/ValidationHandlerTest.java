@@ -11,6 +11,7 @@ import io.vertx.junit5.VertxExtension;
 import io.vertx.junit5.VertxTestContext;
 import iudx.data.marketplace.apiserver.util.RequestType;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -50,17 +51,17 @@ public class ValidationHandlerTest {
         Arguments.of(
             RequestType.PRODUCT,
             new JsonObject()
-                .put("id", "newid")
+                .put("productId", "newid")
                 .put(
-                    "resources",
+                    "resourceIds",
                     new JsonArray()
                         .add(
-                            "datakaveri.org/b8bd3e3f39615c8ec96722131ae95056b5938f2f/rs.iudx.io/agra-swachhata-app"))),
+                            "695e222b-3fae-4325-8db0-3e29d01c4fc0"))),
         Arguments.of(
             RequestType.PRODUCT_VARIANT,
             new JsonObject()
-                .put("id", "urn:datakaveri.org:iisc.ac.in/123qwerty:newid")
-                .put("variant", "var1")
+                .put("productId", "urn:datakaveri.org:b2c27f3f-2524-4a84-816e-91f9ab23f837:newid")
+                .put("productVariantName", "var1")
                 .put(
                     "resources",
                     new JsonArray()
@@ -68,7 +69,7 @@ public class ValidationHandlerTest {
                             new JsonObject()
                                 .put(
                                     "id",
-                                    "datakaveri.org/b8bd3e3f39615c8ec96722131ae95056b5938f2f/rs.iudx.io/agra-swachhata-app")
+                                    "695e222b-3fae-4325-8db0-3e29d01c4fc0")
                                 .put("capabilities", new JsonArray().add("api").add("sub"))))
                 .put("price", 100.0)
                 .put("duration", 12)));

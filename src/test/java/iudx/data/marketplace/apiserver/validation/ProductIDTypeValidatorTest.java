@@ -4,6 +4,7 @@ import io.vertx.junit5.VertxExtension;
 import io.vertx.junit5.VertxTestContext;
 import iudx.data.marketplace.apiserver.exceptions.DxRuntimeException;
 import iudx.data.marketplace.apiserver.validation.types.ProductIDTypeValidator;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -27,7 +28,7 @@ public class ProductIDTypeValidatorTest {
   @Test
   @DisplayName("Test for valid ID")
   public void testForValidId(VertxTestContext testContext) {
-    productIDTypeValidator = new ProductIDTypeValidator("urn:datakaveri.org:iisc.ac.in/123qwerty:newid", true);
+    productIDTypeValidator = new ProductIDTypeValidator("urn:datakaveri.org:b2c27f3f-2524-4a84-816e-91f9ab23f837:testProduct", true);
 
     boolean valid = productIDTypeValidator.isValid();
     assertTrue(valid);

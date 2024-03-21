@@ -62,7 +62,7 @@ public class ProviderAuthStatergy implements AuthorizationStatergy {
 
   @Override
   public boolean isAuthorized(AuthorizationRequest authorizationRequest, JwtData jwtData) {
-    String endpoint = authorizationRequest.getApi().toString();
+    String endpoint = authorizationRequest.getApi();
     Method method = authorizationRequest.getMethod();
     LOGGER.info("authorization request for : " + endpoint + " with method : " + method.name());
 
