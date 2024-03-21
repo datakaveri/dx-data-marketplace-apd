@@ -7,7 +7,6 @@ import io.vertx.junit5.VertxTestContext;
 import iudx.data.marketplace.apiserver.exceptions.DxRuntimeException;
 import iudx.data.marketplace.apiserver.util.RequestType;
 import iudx.data.marketplace.apiserver.validation.types.JsonSchemaTypeValidator;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -16,6 +15,7 @@ import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import java.io.IOException;
 import java.util.stream.Stream;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -79,23 +79,17 @@ public class JsonSchemaTypeValidatorTest {
     body = new JsonObject();
     requestType = RequestType.PRODUCT;
 
-    try{
-      jsonSchemaTypeValidator = new JsonSchemaTypeValidator(body, requestType);
       Exception exception =
               assertThrows(
                       DxRuntimeException.class,
                       () ->
-                              jsonSchemaTypeValidator.isValid()
+                              new JsonSchemaTypeValidator(body, requestType).isValid()
               );
-    }catch (DxRuntimeException exception)
-    {
+
       assertEquals(
               "object has missing required properties ([\"productId\",\"resourceIds\"])",
               exception.getMessage());
       testContext.completeNow();
-
-    }
-
 
 
   }
@@ -106,15 +100,13 @@ public class JsonSchemaTypeValidatorTest {
     body = new JsonObject();
     requestType = mock(RequestType.class);
     when(requestType.getFilename()).thenReturn("dummyString");
-    try {
-      jsonSchemaTypeValidator = new JsonSchemaTypeValidator(body, requestType);
-      Exception exception =
-          assertThrows(DxRuntimeException.class, () -> jsonSchemaTypeValidator.isValid());
 
-    } catch (Exception exception) {
+      Exception exception =
+          assertThrows(DxRuntimeException.class, () -> new JsonSchemaTypeValidator(body, requestType).isValid());
+
       assertEquals(
           "Invalid json format in post request [schema mismatch] [ {} ] ", exception.getMessage());
-    }
+
 
     testContext.completeNow();
   }
