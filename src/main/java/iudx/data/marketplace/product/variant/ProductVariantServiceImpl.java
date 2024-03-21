@@ -346,7 +346,7 @@ public class ProductVariantServiceImpl implements ProductVariantService {
                       new JsonObject()
                           .put(TYPE, ResponseUrn.SUCCESS_URN.getUrn())
                           .put(TITLE, ResponseUrn.SUCCESS_URN.getMessage())
-                          .put(RESULTS, userResponse);
+                          .put(RESULTS, userResponse.getValue(0));
                   handler.handle(Future.succeededFuture(response));
 
                 } else {
