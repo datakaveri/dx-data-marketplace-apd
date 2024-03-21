@@ -94,15 +94,24 @@
                                 },
                                 "international": {
                                     "$id": "#/properties/payload/properties/payment/properties/entity/properties/international",
-                                    "type": "boolean"
+                                    "type": [
+                                        "boolean",
+                                        "null"
+                                    ]
                                 },
                                 "method": {
                                     "$id": "#/properties/payload/properties/payment/properties/entity/properties/method",
-                                    "type": "string"
+                                    "type": [
+                                        "string",
+                                        "null"
+                                    ]
                                 },
                                 "amount_refunded": {
                                     "$id": "#/properties/payload/properties/payment/properties/entity/properties/amount_refunded",
-                                    "type": "integer"
+                                    "type": [
+                                        "integer",
+                                        "null"
+                                    ]
                                 },
                                 "refund_status": {
                                     "$id": "#/properties/payload/properties/payment/properties/entity/properties/refund_status",
@@ -113,11 +122,17 @@
                                 },
                                 "captured": {
                                     "$id": "#/properties/payload/properties/payment/properties/entity/properties/captured",
-                                    "type": "boolean"
+                                    "type": [
+                                        "boolean",
+                                        "null"
+                                    ]
                                 },
                                 "description": {
                                     "$id": "#/properties/payload/properties/payment/properties/entity/properties/description",
-                                    "type": "string"
+                                    "type": [
+                                        "string",
+                                        "null"
+                                    ]
                                 },
                                 "card_id": {
                                     "$id": "#/properties/payload/properties/payment/properties/entity/properties/card_id",
@@ -149,28 +164,44 @@
                                 },
                                 "email": {
                                     "$id": "#/properties/payload/properties/payment/properties/entity/properties/email",
-                                    "type": "string",
+                                    "type": [
+                                        "string",
+                                        "null"
+                                    ],
                                     "format": "email"
                                 },
                                 "contact": {
                                     "$id": "#/properties/payload/properties/payment/properties/entity/properties/contact",
-                                    "type": "string",
+                                    "type": [
+                                        "string",
+                                        "null"
+                                    ],
                                     "pattern": "^\\+91\\d{10}$"
                                 },
                                 "notes": {
                                     "$id": "#/properties/payload/properties/payment/properties/entity/properties/notes",
-                                    "type": "object",
+                                    "type": [
+                                        "object",
+                                        "array",
+                                        "null"
+                                    ],
                                     "additionalProperties": {
                                         "type": "string"
                                     }
                                 },
                                 "fee": {
                                     "$id": "#/properties/payload/properties/payment/properties/entity/properties/fee",
-                                    "type": "integer"
+                                    "type": [
+                                        "integer",
+                                        "null"
+                                    ]
                                 },
                                 "tax": {
                                     "$id": "#/properties/payload/properties/payment/properties/entity/properties/tax",
-                                    "type": "integer"
+                                    "type": [
+                                        "integer",
+                                        "null"
+                                    ]
                                 },
                                 "error_code": {
                                     "$id": "#/properties/payload/properties/payment/properties/entity/properties/error_code",
@@ -209,7 +240,10 @@
                                 },
                                 "created_at": {
                                     "$id": "#/properties/payload/properties/payment/properties/entity/properties/created_at",
-                                    "type": "integer"
+                                    "type": [
+                                        "integer",
+                                        "null"
+                                    ]
                                 },
                                 "reward": {
                                     "$id": "#/properties/payload/properties/payment/properties/entity/properties/reward",
@@ -224,7 +258,10 @@
                                     "properties": {
                                         "vpa": {
                                             "$id": "#/properties/payload/properties/payment/properties/entity/properties/upi/properties/vpa",
-                                            "type": "string"
+                                            "type": [
+                                                "string",
+                                                "null"
+                                            ]
                                         }
                                     },
                                     "required": [
@@ -295,7 +332,10 @@
                                 },
                                 "receipt": {
                                     "$id": "#/properties/payload/properties/order/properties/entity/properties/receipt",
-                                    "type": "string"
+                                    "type": [
+                                        "string",
+                                        "null"
+                                    ]
                                 },
                                 "offer_id": {
                                     "$id": "#/properties/payload/properties/order/properties/entity/properties/offer_id",
@@ -306,20 +346,32 @@
                                 },
                                 "status": {
                                     "$id": "#/properties/payload/properties/order/properties/entity/properties/status",
-                                    "type": "string"
+                                    "type": [
+                                        "string",
+                                        "null"
+                                    ]
                                 },
                                 "attempts": {
                                     "$id": "#/properties/payload/properties/order/properties/entity/properties/attempts",
-                                    "type": "integer"
+                                    "type": [
+                                        "integer",
+                                        "null"
+                                    ]
                                 },
                                 "notes": {
                                     "$id": "#/properties/payload/properties/order/properties/entity/properties/notes",
-                                    "type": "array",
-                                    "items": {}
+                                    "type": [
+                                        "array",
+                                        "object",
+                                        "null"
+                                    ]
                                 },
                                 "created_at": {
                                     "$id": "#/properties/payload/properties/order/properties/entity/properties/created_at",
-                                    "type": "integer"
+                                    "type": [
+                                        "integer",
+                                        "null"
+                                    ]
                                 }
                             },
                             "required": [
@@ -351,7 +403,10 @@
             "$id": "#/properties/created_at",
             "title": "Created At",
             "description": "Timestamp when the event occurred, in Unix format.",
-            "type": "integer"
+            "type": [
+                "integer",
+                "null"
+            ]
         }
     },
     "required": [
