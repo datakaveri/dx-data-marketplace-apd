@@ -1,6 +1,7 @@
 package iudx.data.marketplace.consumer;
 
 import static iudx.data.marketplace.apiserver.util.Constants.PRODUCT_VARIANT_ID;
+import static iudx.data.marketplace.apiserver.util.Constants.TITLE;
 import static iudx.data.marketplace.consumer.util.Constants.*;
 import static iudx.data.marketplace.consumer.util.Constants.TABLES;
 import static iudx.data.marketplace.product.util.Constants.*;
@@ -228,13 +229,12 @@ public class ConsumerServiceImpl implements ConsumerService {
           paymentFuture.onComplete(
               pgHandler -> {
                 if (pgHandler.succeeded()) {
-                  userResponse.add(pgHandler.result().getJsonObject(0));
+                  userResponse.add(pgHandler.result());
                   JsonObject response =
-                      new RespBuilder()
-                          .withType(ResponseUrn.SUCCESS_URN.getUrn())
-                          .withTitle(ResponseUrn.SUCCESS_URN.getMessage())
-                          .withResult(userResponse)
-                          .getJsonResponse();
+                      new JsonObject()
+                          .put(TYPE, ResponseUrn.SUCCESS_URN.getUrn())
+                          .put(TITLE,ResponseUrn.SUCCESS_URN.getMessage())
+                          .put(RESULTS,userResponse);
                   handler.handle(Future.succeededFuture(response));
 
                 } else {
