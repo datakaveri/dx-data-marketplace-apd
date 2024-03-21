@@ -378,7 +378,7 @@ public class RazorPayServiceImpl implements RazorPayService {
             .withTitle(ResponseUrn.INTERNAL_SERVER_ERR_URN.getUrn())
             .withDetail(FAILURE_MESSAGE + ResponseUrn.INTERNAL_SERVER_ERR_URN.getMessage())
             .getResponse();
-    ;
+
     for (var error : errorMap.entrySet()) {
       boolean isErrorPresent = rzpFailureMessage.contains(error.getKey());
       if (isErrorPresent) {
