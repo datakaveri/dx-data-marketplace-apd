@@ -206,7 +206,6 @@ public class ConsumerServiceImpl implements ConsumerService {
     try {
       PaymentStatus paymentStatus = PaymentStatus.fromString(request.getString("paymentStatus"));
 
-      JsonArray userResponse = new JsonArray();
       String query;
 
       if (paymentStatus.equals(PaymentStatus.SUCCESSFUL)) {
@@ -229,12 +228,11 @@ public class ConsumerServiceImpl implements ConsumerService {
           paymentFuture.onComplete(
               pgHandler -> {
                 if (pgHandler.succeeded()) {
-                  userResponse.add(pgHandler.result());
                   JsonObject response =
                       new JsonObject()
                           .put(TYPE, ResponseUrn.SUCCESS_URN.getUrn())
                           .put(TITLE,ResponseUrn.SUCCESS_URN.getMessage())
-                          .put(RESULTS,userResponse);
+                          .put(RESULTS,pgHandler.result());
                   handler.handle(Future.succeededFuture(response));
 
                 } else {
