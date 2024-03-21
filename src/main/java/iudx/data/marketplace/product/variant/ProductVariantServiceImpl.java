@@ -1,5 +1,6 @@
 package iudx.data.marketplace.product.variant;
 
+import static iudx.data.marketplace.apiserver.util.Constants.TITLE;
 import static iudx.data.marketplace.product.util.Constants.*;
 
 import io.vertx.core.AsyncResult;
@@ -340,13 +341,12 @@ public class ProductVariantServiceImpl implements ProductVariantService {
           paymentFuture.onComplete(
               pgHandler -> {
                 if (pgHandler.succeeded()) {
-                  userResponse.add(pgHandler.result().getJsonObject(0));
+                  userResponse.add(pgHandler.result());
                   JsonObject response =
-                      new RespBuilder()
-                          .withType(ResponseUrn.SUCCESS_URN.getUrn())
-                          .withTitle(ResponseUrn.SUCCESS_URN.getMessage())
-                          .withResult(userResponse)
-                          .getJsonResponse();
+                      new JsonObject()
+                          .put(TYPE, ResponseUrn.SUCCESS_URN.getUrn())
+                          .put(TITLE, ResponseUrn.SUCCESS_URN.getMessage())
+                          .put(RESULTS, userResponse);
                   handler.handle(Future.succeededFuture(response));
 
                 } else {
