@@ -15,6 +15,7 @@ import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import java.io.IOException;
 import java.util.stream.Stream;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -34,17 +35,17 @@ public class JsonSchemaTypeValidatorTest {
         Arguments.of(
             RequestType.PRODUCT,
             new JsonObject()
-                .put("id", "newid")
+                .put("productId", "newid")
                 .put(
-                    "resources",
+                    "resourceIds",
                     new JsonArray()
                         .add(
-                            "datakaveri.org/b8bd3e3f39615c8ec96722131ae95056b5938f2f/rs.iudx.io/agra-swachhata-app"))),
+                            "83c2e5c2-3574-4e11-9530-2b1fbdfce832"))),
         Arguments.of(
             RequestType.PRODUCT_VARIANT,
             new JsonObject()
-                .put("id", "urn:datakaveri.org:iisc.ac.in/123qwerty:newid")
-                .put("variant", "var1")
+                .put("productId", "urn:datakaveri.org:83c2e5c2-3574-4e11-9530-2b1fbdfce832:newid")
+                .put("productVariantName", "var1")
                 .put(
                     "resources",
                     new JsonArray()
@@ -52,7 +53,7 @@ public class JsonSchemaTypeValidatorTest {
                             new JsonObject()
                                 .put(
                                     "id",
-                                    "datakaveri.org/b8bd3e3f39615c8ec96722131ae95056b5938f2f/rs.iudx.io/agra-swachhata-app")
+                                    "83c2e5c2-3574-4e11-9530-2b1fbdfce832")
                                 .put("capabilities", new JsonArray().add("api").add("sub"))))
                 .put("price", 100.0)
                 .put("duration", 12)));
@@ -77,16 +78,20 @@ public class JsonSchemaTypeValidatorTest {
   public void testInvalidSchemaOrInput(VertxTestContext testContext) {
     body = new JsonObject();
     requestType = RequestType.PRODUCT;
-    jsonSchemaTypeValidator = new JsonSchemaTypeValidator(body, requestType);
 
-    Exception exception =
-        assertThrows(
-            DxRuntimeException.class,
-            () -> {
-              jsonSchemaTypeValidator.isValid();
-            });
+      Exception exception =
+              assertThrows(
+                      DxRuntimeException.class,
+                      () ->
+                              new JsonSchemaTypeValidator(body, requestType).isValid()
+              );
 
-    testContext.completeNow();
+      assertEquals(
+              "object has missing required properties ([\"productId\",\"resourceIds\"])",
+              exception.getMessage());
+      testContext.completeNow();
+
+
   }
 
   @Test
@@ -95,14 +100,13 @@ public class JsonSchemaTypeValidatorTest {
     body = new JsonObject();
     requestType = mock(RequestType.class);
     when(requestType.getFilename()).thenReturn("dummyString");
-    jsonSchemaTypeValidator = new JsonSchemaTypeValidator(body, requestType);
 
-    Exception exception =
-        assertThrows(
-            DxRuntimeException.class,
-            () -> {
-              jsonSchemaTypeValidator.isValid();
-            });
+      Exception exception =
+          assertThrows(DxRuntimeException.class, () -> new JsonSchemaTypeValidator(body, requestType).isValid());
+
+      assertEquals(
+          "Invalid json format in post request [schema mismatch] [ {} ] ", exception.getMessage());
+
 
     testContext.completeNow();
   }

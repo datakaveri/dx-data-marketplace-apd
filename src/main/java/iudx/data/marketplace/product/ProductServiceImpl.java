@@ -47,7 +47,7 @@ public class ProductServiceImpl implements ProductService {
   }
 
   private static boolean isSameProviderForAll(JsonArray resourceDetails) {
-    LOGGER.debug(resourceDetails);
+    LOGGER.debug("resourceDetails : " + resourceDetails);
     String providerOfFirstResource = resourceDetails.getJsonObject(0).getString(PROVIDER);
     boolean sameProviderForAll = true;
     for (int i = 1; i < resourceDetails.size() && sameProviderForAll; i++) {
@@ -198,9 +198,15 @@ public class ProductServiceImpl implements ProductService {
     pgService.executeCountQuery(
         query.toString(),
         handler -> {
-          if (handler.succeeded()) {
-            if (handler.result().getInteger("totalHits") != 0) promise.complete(true);
-            else promise.complete(false);
+            if (handler.succeeded()) {
+            if (handler.result().getInteger("totalHits") != 0)
+            {
+                promise.complete(true);
+            }
+            else
+            {
+                promise.complete(false);
+            }
           } else {
             throw new DxRuntimeException(
                 500, ResponseUrn.DB_ERROR_URN, handler.cause().getLocalizedMessage());

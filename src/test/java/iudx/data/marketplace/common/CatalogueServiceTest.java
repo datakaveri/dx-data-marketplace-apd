@@ -13,6 +13,7 @@ import io.vertx.junit5.VertxExtension;
 import io.vertx.junit5.VertxTestContext;
 import iudx.data.marketplace.configuration.Configuration;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -21,8 +22,7 @@ import org.mockito.invocation.InvocationOnMock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.mockito.stubbing.Answer;
 
-import static iudx.data.marketplace.common.Constants.PROVIDER_NAME;
-import static iudx.data.marketplace.common.Constants.TYPE_RG;
+import static iudx.data.marketplace.common.Constants.*;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.anyString;
@@ -47,7 +47,7 @@ public class CatalogueServiceTest {
   @DisplayName("setup")
   public void setup(Vertx vertx, VertxTestContext testContext) {
     configuration = new Configuration();
-    JsonObject config = configuration.configLoader(3, vertx);
+    JsonObject config = configuration.configLoader(4, vertx);
     CatalogueService.catWebClient = mock(WebClient.class);
     when(CatalogueService.catWebClient.get(anyInt(), anyString(), anyString()))
         .thenReturn(httpRequest);
@@ -82,6 +82,8 @@ public class CatalogueServiceTest {
     when(jsonArrayMock.getJsonObject(anyInt())).thenReturn(jsonObjectMock);
     when(jsonObjectMock.getJsonArray("type").contains("iudx:Provider")).thenReturn(true);
     when(jsonObjectMock.getString("description", "")).thenReturn("new desc");
+    when(jsonObjectMock.getString("ownerUserId", "")).thenReturn("new owner");
+
     catalogueService
         .getItemDetails("new-item-id")
         .onComplete(
@@ -104,9 +106,13 @@ public class CatalogueServiceTest {
     when(jsonArrayMock.isEmpty()).thenReturn(false);
     when(jsonArrayMock.getJsonObject(anyInt())).thenReturn(jsonObjectMock);
     when(jsonObjectMock.getJsonArray("type").contains("iudx:Provider")).thenReturn(false);
-    when(jsonObjectMock.getJsonArray("type").contains("iudx:ResourceGroup")).thenReturn(true);
+    when(jsonObjectMock.getJsonArray("type").contains("iudx:Resource")).thenReturn(true);
     when(jsonObjectMock.getString("label", "")).thenReturn("labelxyz");
     when(jsonObjectMock.getString("accessPolicy", "")).thenReturn("OPEN");
+    when(jsonObjectMock.getString("accessPolicy", "")).thenReturn("OPEN");
+    when(jsonObjectMock.getValue("resourceServer")).thenReturn("someResourceServer");
+    when(jsonObjectMock.getValue("provider")).thenReturn("dummyProviderId");
+
     catalogueService
         .getItemDetails("new-item-id")
         .onComplete(
@@ -117,10 +123,13 @@ public class CatalogueServiceTest {
                 verify(httpRequest, times(1)).addQueryParam(anyString(), anyString());
                 assertEquals(
                     new JsonObject()
-                        .put("type", TYPE_RG)
+                        .put("type", TYPE_RI)
                         .put("resourceID", "new-item-id")
                         .put("resourceName", "labelxyz")
-                        .put("accessPolicy", "OPEN"),
+                            .put("resourceServer","someResourceServer")
+                            .put("provider","dummyProviderId")
+                        .put("accessPolicy", "OPEN")
+                            ,
                     handler.result());
                 testContext.completeNow();
               }

@@ -87,12 +87,7 @@
             <version>4.4.14</version>
         </dependency>
 
-        <dependency>
-            <groupId>org.apache.maven.plugins</groupId>
-            <artifactId>maven-checkstyle-plugin</artifactId>
-            <version>${maven-checkstyle-plugin-google.version}</version>
-            <scope>test</scope>
-        </dependency>
+
         <dependency>
             <groupId>io.vertx</groupId>
             <artifactId>vertx-json-schema</artifactId>
@@ -192,7 +187,27 @@
             <version>33.0.0-jre</version>
         </dependency>
 
-
+        <!-- test container dependency-->
+        <dependency>
+            <groupId>org.testcontainers</groupId>
+            <artifactId>testcontainers</artifactId>
+            <version>${testcontainer.params}</version>
+            <scope>test</scope>
+        </dependency>
+        <!-- test container dependency for JUnit5-->
+        <dependency>
+            <groupId>org.testcontainers</groupId>
+            <artifactId>junit-jupiter</artifactId>
+            <version>${testcontainer.params}</version>
+            <scope>test</scope>
+        </dependency>
+        <!-- test container dependency for postgresql-->
+        <dependency>
+            <groupId>org.testcontainers</groupId>
+            <artifactId>postgresql</artifactId>
+            <version>${testcontainer.params}</version>
+            <scope>test</scope>
+        </dependency>
         <!-- Razorpay Client dependency  -->
         <dependency>
             <groupId>com.razorpay</groupId>
@@ -271,6 +286,8 @@
                         <exclude>iudx/data/marketplace/apiserver/ConsumerApis.class</exclude>
 
                         <!-- service proxy interfaces -->
+                        <exclude>*Service.class</exclude>
+
 
                         <!-- deployment helper classes -->
                         <exclude>iudx/data/marketplace/deploy/*.class</exclude>

@@ -19,6 +19,7 @@ import iudx.data.marketplace.authenticator.authorization.Method;
 import iudx.data.marketplace.authenticator.model.JwtData;
 import iudx.data.marketplace.common.CatalogueService;
 import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -42,6 +43,7 @@ public class AuthServiceTest {
     config.put("catServerHost", "host");
     config.put("catServerPort", 1234);
     config.put("catItemPath", "/item");
+    config.put("issuer", "cos.iudx.io");
     config.put("catRelPath", "/relationship");
     JWTAuthOptions jwtAuthOptions =
         new JWTAuthOptions()
@@ -76,7 +78,7 @@ public class AuthServiceTest {
         authInfo(),
         handler -> {
           if (handler.succeeded()) testContext.completeNow();
-          else testContext.failNow("Token Introspect test failed");
+          else testContext.failNow("Token Introspect test failed : " + handler.cause());
         });
   }
 
