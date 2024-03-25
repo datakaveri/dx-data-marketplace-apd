@@ -430,7 +430,7 @@ public class ApiServerVerticle extends AbstractVerticle {
             })
         .onFailure(
             verifyFailed -> {
-              handleFailureResponse(routingContext, verifyFailed.getMessage());
+                handleResponse(response, BAD_REQUEST.getValue(), verifyFailed.getMessage());
             });
   }
 
@@ -591,6 +591,9 @@ public class ApiServerVerticle extends AbstractVerticle {
   private void handleSuccessResponse(HttpServerResponse response, int statusCode, String result) {
     response.putHeader(CONTENT_TYPE, APPLICATION_JSON).setStatusCode(statusCode).end(result);
   }
+    private void handleResponse(HttpServerResponse response, int statusCode, String result) {
+        response.putHeader(CONTENT_TYPE, APPLICATION_JSON).setStatusCode(statusCode).end(result);
+    }
 
   /**
    * Handles Failed HTTP Response
