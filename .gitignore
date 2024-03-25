@@ -25,3 +25,4 @@ hs_err_pid*
 /.idea/
 /secrets/all-verticles-configs/config-dev.json
 /secrets/all-verticles-configs/config-test.json
+/flyway.conf
