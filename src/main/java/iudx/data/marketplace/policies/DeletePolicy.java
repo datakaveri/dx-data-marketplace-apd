@@ -105,7 +105,11 @@ public class DeletePolicy {
             LOG.debug("update query failed");
             LOG.error("Failure while executing the query : {}", queryHandler.cause().getMessage());
             promise.fail(
-                getFailureResponse(new JsonObject(), FAILURE_MESSAGE + ", update query failed"));
+                    new JsonObject()
+                            .put(TYPE, HttpStatusCode.INTERNAL_SERVER_ERROR.getValue())
+                            .put(TITLE, ResponseUrn.DB_ERROR_URN.getUrn())
+                            .put(DETAIL, "Policy could not be deleted, update query failed")
+                            .encode());
           }
         });
     return promise.future();
@@ -125,8 +129,7 @@ public class DeletePolicy {
     LOG.debug("inside verifyPolicy");
     Promise<Boolean> promise = Promise.promise();
     String ownerId = user.getUserId();
-    LOG.trace("What's the ownerId : " + ownerId);
-    Tuple tuple = Tuple.of(policyUuid);
+    LOG.info("What's the ownerId : " + ownerId);
 
     JsonObject param = new JsonObject()
             .put("$1", policyUuid.toString());
