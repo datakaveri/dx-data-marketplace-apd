@@ -108,7 +108,7 @@ public class GetPolicy {
 //    Tuple tuple = Tuple.of("consumer@gmail.com", resourceServerUrl);
     JsonObject jsonObject =
         new JsonObject()
-            .put("email", consumer.getEmailId())
+            .put("email", emailId)
             .put(
                 "name",
                 new JsonObject()

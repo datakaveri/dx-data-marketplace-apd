@@ -3,7 +3,6 @@ package iudx.data.marketplace.apiserver.provider.linkedAccount;
 import io.vertx.core.Future;
 import io.vertx.core.Promise;
 import io.vertx.core.json.JsonObject;
-import iudx.data.marketplace.auditing.AuditingService;
 import iudx.data.marketplace.common.Api;
 import iudx.data.marketplace.common.HttpStatusCode;
 import iudx.data.marketplace.common.RespBuilder;
@@ -23,7 +22,6 @@ public class FetchLinkedAccount {
   PostgresService postgresService;
   Api api;
   RazorPayService razorPayService;
-  AuditingService auditingService;
   String razorpayAccountProductId;
   String updatedAt;
   String createdAt;
@@ -31,12 +29,10 @@ public class FetchLinkedAccount {
   public FetchLinkedAccount(
       PostgresService postgresService,
       Api api,
-      RazorPayService razorPayService,
-      AuditingService auditingService) {
+      RazorPayService razorPayService) {
     this.postgresService = postgresService;
     this.api = api;
     this.razorPayService = razorPayService;
-    this.auditingService = auditingService;
   }
 
   public Future<JsonObject> initiateFetchingLinkedAccount(User provider) {
