@@ -1,66 +1,7 @@
 {
-  "id": "bd547fc4-c712-418b-a1f6-96de53a6dfec",
-  "name": "IUDX DMP Server",
+  "id": "735e0d61-cf0d-473f-a1e1-11b79f6b0429",
+  "name": "DMP",
   "values": [
-    {
-      "key": "providerToken",
-      "value": "",
-      "enabled": true
-    },
-    {
-      "key": "consumerToken",
-      "value": "",
-      "enabled": true
-    },
-    {
-      "key": "providerDelegateToken",
-      "value": "",
-      "enabled": true
-    },
-    {
-      "key": "consumerDelegateToken",
-      "value": "",
-      "enabled": true
-    },
-    {
-      "key": "baseUrl",
-      "value": "https://dmp-apd.iudx.io",
-      "enabled": true
-    },
-    {
-      "key": "basePath",
-      "value": "/dx/apd/dmp/v1",
-      "enabled": true
-    },
-    {
-      "key": "authToken",
-      "value": "",
-      "enabled": true
-    },
-    {
-      "key": "consumerTokenForbidden",
-      "value": "",
-      "type": "default",
-      "enabled": true
-    },
-    {
-      "key": "providerDelegateTokenForbidden",
-      "value": "",
-      "type": "default",
-      "enabled": true
-    },
-    {
-      "key": "authEndpoint",
-      "value": "https://authvertx.iudx.io",
-      "type": "default",
-      "enabled": true
-    },
-    {
-      "key": "providerDelegateTokenForbidden",
-      "value": "",
-      "type": "default",
-      "enabled": true
-    },
     {
       "key": "providerClientID",
       "value": "",
@@ -69,6 +10,36 @@
     },
     {
       "key": "providerClientSecret",
+      "value": "",
+      "type": "default",
+      "enabled": true
+    },
+    {
+      "key": "accessToken",
+      "value": "",
+      "type": "default",
+      "enabled": true
+    },
+    {
+      "key": "clientSecret",
+      "value": "",
+      "type": "default",
+      "enabled": true
+    },
+    {
+      "key": "baseUrl",
+      "value": "https://dmp-apd.iudx.io",
+      "type": "default",
+      "enabled": true
+    },
+    {
+      "key": "basePath",
+      "value": "/dx/apd/dmp/v1",
+      "type": "default",
+      "enabled": true
+    },
+    {
+      "key": "notRegisteredProviderToken",
       "value": "",
       "type": "default",
       "enabled": true
@@ -98,18 +69,6 @@
       "enabled": true
     },
     {
-      "key": "providerDelegateId",
-      "value": "",
-      "type": "default",
-      "enabled": true
-    },
-    {
-      "key": "consumerDelegateId",
-      "value": "",
-      "type": "default",
-      "enabled": true
-    },
-    {
       "key": "consumerDelegateClientId",
       "value": "",
       "type": "default",
@@ -122,19 +81,37 @@
       "enabled": true
     },
     {
-      "key": "baseUrls",
-      "value": "http://localhost:8443",
+      "key": "providerDelegateId",
+      "value": "",
       "type": "default",
       "enabled": true
     },
     {
-      "key": "authToken",
+      "key": "consumerDelegateId",
       "value": "",
       "type": "default",
+      "enabled": true
+    },
+    {
+      "key": "authEndpoint",
+      "value": "https://authvertx.iudx.io",
+      "type": "default",
+      "enabled": true
+    },
+    {
+      "key": "isIntegrationTestsBeingRunInPipeline",
+      "value": "true",
+      "type": "default",
+      "enabled": true
+    },
+    {
+      "key": "token",
+      "value": "",
+      "type": "any",
       "enabled": true
     }
   ],
   "_postman_variable_scope": "environment",
-  "_postman_exported_at": "2024-01-04T04:38:06.434Z",
-  "_postman_exported_using": "Postman/9.31.30"
+  "_postman_exported_at": "2024-03-26T06:58:12.776Z",
+  "_postman_exported_using": "Postman/9.30.4"
 }
