@@ -106,9 +106,13 @@ public class ProductServiceImpl implements ProductService {
                     .result()
                     .getString("ownerUserId")
                     .equalsIgnoreCase(providerID)) {
+
                   handler.handle(
                       Future.failedFuture(
-                          "The user with given token does not own the resource listed"));
+                              new RespBuilder()
+                                      .withType(ResponseUrn.FORBIDDEN_URN.getUrn())
+                                      .withTitle(ResponseUrn.FORBIDDEN_URN.getMessage())
+                                      .withDetail("The user with given token does not own the resource listed").getResponse()));
                 } else {
                   request
                       .put(PROVIDER_NAME, completeHandler.result().getString(PROVIDER_NAME, ""))
