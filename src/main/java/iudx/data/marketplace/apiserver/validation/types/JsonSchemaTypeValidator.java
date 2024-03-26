@@ -60,10 +60,7 @@ public class JsonSchemaTypeValidator implements Validator {
     try {
      final JsonNode sc = loadResource(schemaPath);
     } catch (Exception e) {
-      StringWriter stringWriter = new StringWriter();
-      PrintWriter pw = new PrintWriter(stringWriter);
-      e.printStackTrace(pw);
-      LOGGER.error("Validation Error {}", stringWriter.toString());
+      LOGGER.error("Validation Error {}", e.getMessage());
     }
     final JsonNode schemaNode = loadResource(schemaPath);
     LOGGER.debug(schemaNode.asText());
