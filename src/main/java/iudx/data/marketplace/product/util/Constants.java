@@ -30,6 +30,10 @@ public class Constants {
       "insert into $0 (product_id, resource_id) values ('$1', '$2')";
 
   public static final String DELETE_PRODUCT_QUERY = "update $0 set status=$1 where product_id=$2 and status = 'ACTIVE' returning product_id";
+  public static final String DELETE_PV_QUERY = "UPDATE product_variant SET status = 'ACTIVE' WHERE \n " +
+          "product_id = $1 \n " +
+          "AND provider_id = $2 \n " +
+          "RETURNING _id";
   public static final String LIST_PRODUCT_FOR_RESOURCE =
       "select pt.product_id AS \"productId\", pt.provider_name AS \"providerName\", "
           + " pt.modified_at AS \"updatedAt\" ,  pt.created_at AS \"createdAt\" ,"

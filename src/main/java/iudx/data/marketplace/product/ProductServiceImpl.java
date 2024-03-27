@@ -232,6 +232,9 @@ public class ProductServiceImpl implements ProductService {
     JsonObject params =
         new JsonObject().put(STATUS, Status.INACTIVE.toString()).put(PRODUCT_ID, productID);
 
+    JsonObject deleteProductVariantParams =
+        new JsonObject().put(PRODUCT_ID, productID).put(PROVIDER_ID, providerID);
+
     checkIfProductExists(providerID, productID)
         .onComplete(
             existsHandler -> {
@@ -240,6 +243,23 @@ public class ProductServiceImpl implements ProductService {
                 LOGGER.error("deletion failed");
                 handler.handle(Future.failedFuture(ResponseUrn.RESOURCE_NOT_FOUND_URN.getUrn()));
               } else {
+//                  pgService.executePreparedQuery(DELETE_PV_QUERY,
+//                          deleteProductVariantParams, deleteProductVariantHandler -> {
+//                      if(deleteProductVariantHandler.succeeded())
+//                      {
+//                          LOGGER.info("Product variants deleted successfully : {}",
+//                                  deleteProductVariantHandler.result());
+//
+//                      }
+//                      else
+//                      {
+//                          LOGGER.error("Failed to delete product variants : "+ deleteProductVariantHandler.cause());
+//                          RespBuilder respBuilder = new RespBuilder()
+//                                  .withType(ResponseUrn.INTERNAL_SERVER_ERR_URN.getUrn())
+//                                  .withTitle(ResponseUrn.BAD_REQUEST_URN.getMessage())
+//                                  .withDetail("Product cannot be deleted, as it was deleted previously");
+//                      }
+//                          });
                 pgService.executePreparedQuery(
                     DELETE_PRODUCT_QUERY.replace("$0", productTableName),
                     params,

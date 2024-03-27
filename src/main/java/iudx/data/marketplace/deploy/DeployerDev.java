@@ -34,6 +34,7 @@ public class DeployerDev {
     DeploymentOptions deploymentOptions =
             new DeploymentOptions().setInstances(numInstances).setConfig(moduleConfigurations);
 
+    LOGGER.debug("moduleConfiguration : {}", moduleConfigurations.encodePrettily());
     boolean isWorkerVerticle = moduleConfigurations.getBoolean("isWorkerVerticle");
     if (isWorkerVerticle) {
       LOGGER.info("worker verticle : " + moduleConfigurations.getString("id"));
