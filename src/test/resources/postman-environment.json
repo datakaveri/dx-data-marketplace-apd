@@ -33,6 +33,12 @@
       "enabled": true
     },
     {
+      "key": "dxAuthBasePath",
+      "value": "/auth/v1",
+      "type": "default",
+      "enabled": true
+    },
+    {
       "key": "notRegisteredProviderToken",
       "value": "",
       "type": "default",

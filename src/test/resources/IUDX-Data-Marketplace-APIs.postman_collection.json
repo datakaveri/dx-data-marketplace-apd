@@ -52,13 +52,12 @@
 							}
 						},
 						"url": {
-							"raw": "{{authEndpoint}}/auth/v1/token",
+							"raw": "{{authEndpoint}{{dxAuthBasePath}}/token",
 							"host": [
 								"{{authEndpoint}}"
 							],
 							"path": [
-								"auth",
-								"v1",
+								"{{dxAuthBasePath}}",
 								"token"
 							]
 						},
@@ -109,13 +108,12 @@
 							}
 						},
 						"url": {
-							"raw": "{{authEndpoint}}/auth/v1/token",
+							"raw": "{{authEndpoint}}{{dxAuthBasePath}}/token",
 							"host": [
 								"{{authEndpoint}}"
 							],
 							"path": [
-								"auth",
-								"v1",
+								"{{dxAuthBasePath}}",
 								"token"
 							]
 						},
@@ -171,13 +169,12 @@
 							}
 						},
 						"url": {
-							"raw": "{{authEndpoint}}/auth/v1/token",
+							"raw": "{{authEndpoint}}{{dxAuthBasePath}}/token",
 							"host": [
 								"{{authEndpoint}}"
 							],
 							"path": [
-								"auth",
-								"v1",
+								"{{dxAuthBasePath}}",
 								"token"
 							]
 						},
@@ -233,13 +230,12 @@
 							}
 						},
 						"url": {
-							"raw": "{{authEndpoint}}/auth/v1/token",
+							"raw": "{{authEndpoint}}{{dxAuthBasePath}}/token",
 							"host": [
 								"{{authEndpoint}}"
 							],
 							"path": [
-								"auth",
-								"v1",
+								"{{dxAuthBasePath}}",
 								"token"
 							]
 						},
