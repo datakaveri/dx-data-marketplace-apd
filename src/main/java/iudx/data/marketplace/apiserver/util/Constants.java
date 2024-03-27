@@ -92,7 +92,7 @@ public class Constants {
   public static final String STRING_URN = "urn";
   public static final String DOMAIN = "datakaveri.org";
   public static final int VALIDATION_PRODUCT_ID_MAXLEN = 150;
-  public static final Pattern VALIDATION_PRODUCT_ID_REGEX = Pattern.compile("^[a-zA-Z0-9]{3,150}$");
+  public static final Pattern VALIDATION_PRODUCT_ID_REGEX = Pattern.compile("^[a-zA-Z0-9-]{3,150}$");
   public static final int VALIDATION_VARIANT_NAME_MAX_LEN = 100;
   public static final Pattern VALIDATION_VARIANT_NAME_REGEX =
       Pattern.compile("^[a-zA-Z0-9-]{3,100}$");
