@@ -932,7 +932,8 @@
 									"",
 									"var randomValue = \"testProduct\" + ",
 									"pm.variables.replaceIn('{{$guid}}');",
-									"randomValue = randomValue.replaceAll('-', '');",
+									"randomValue = randomValue.replace(/-/g, '');",
+									"console.log(\"randomValue : \" + randomValue); ",
 									"pm.environment.set(\"idForCreatingProduct\", randomValue)"
 								],
 								"type": "text/javascript"
