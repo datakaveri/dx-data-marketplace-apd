@@ -109,10 +109,12 @@ public class ProductServiceImpl implements ProductService {
 
                   handler.handle(
                       Future.failedFuture(
-                              new RespBuilder()
-                                      .withType(ResponseUrn.FORBIDDEN_URN.getUrn())
-                                      .withTitle(ResponseUrn.FORBIDDEN_URN.getMessage())
-                                      .withDetail("The user with given token does not own the resource listed").getResponse()));
+                          new RespBuilder()
+                              .withType(ResponseUrn.FORBIDDEN_URN.getUrn())
+                              .withTitle(ResponseUrn.FORBIDDEN_URN.getMessage())
+                              .withDetail(
+                                  "The user with given token does not own the resource listed")
+                              .getResponse()));
                 } else {
                   request
                       .put(PROVIDER_NAME, completeHandler.result().getString(PROVIDER_NAME, ""))
@@ -131,6 +133,7 @@ public class ProductServiceImpl implements ProductService {
                                   .withType(ResponseUrn.SUCCESS_URN.getUrn())
                                   .withTitle(ResponseUrn.SUCCESS_URN.getMessage())
                                   .withResult(new JsonObject().put(PRODUCT_ID, productID))
+                                  .withDetail("Product created successfully")
                                   .getJsonResponse();
                           handler.handle(Future.succeededFuture(result));
                         } else {
@@ -140,25 +143,26 @@ public class ProductServiceImpl implements ProductService {
                       });
                 }
               } else {
-                  String failureMessage = new RespBuilder()
-                          .withType(ResponseUrn.FORBIDDEN_PRODUCT_CREATION.getUrn())
-                          .withTitle(ResponseUrn.FORBIDDEN_PRODUCT_CREATION.getMessage())
-                          .withDetail(completeHandler.cause().getLocalizedMessage())
-                          .getResponse();
+                String failureMessage =
+                    new RespBuilder()
+                        .withType(ResponseUrn.FORBIDDEN_PRODUCT_CREATION.getUrn())
+                        .withTitle(ResponseUrn.FORBIDDEN_PRODUCT_CREATION.getMessage())
+                        .withDetail(completeHandler.cause().getLocalizedMessage())
+                        .getResponse();
 
                 if (completeHandler
                     .cause()
                     .getMessage()
                     .contains(ResponseUrn.RESOURCE_ALREADY_EXISTS_URN.getMessage())) {
 
-                    failureMessage = new RespBuilder()
-                            .withType(ResponseUrn.RESOURCE_ALREADY_EXISTS_URN.getUrn())
-                            .withTitle(ResponseUrn.RESOURCE_ALREADY_EXISTS_URN.getMessage())
-                            .withDetail("Product already exists")
-                            .getResponse();
+                  failureMessage =
+                      new RespBuilder()
+                          .withType(ResponseUrn.RESOURCE_ALREADY_EXISTS_URN.getUrn())
+                          .withTitle(ResponseUrn.RESOURCE_ALREADY_EXISTS_URN.getMessage())
+                          .withDetail("Product already exists")
+                          .getResponse();
                 }
-                  handler.handle(
-                          Future.failedFuture(failureMessage));
+                handler.handle(Future.failedFuture(failureMessage));
               }
             });
 

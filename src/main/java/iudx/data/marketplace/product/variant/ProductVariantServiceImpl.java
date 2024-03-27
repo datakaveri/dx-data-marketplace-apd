@@ -1,5 +1,6 @@
 package iudx.data.marketplace.product.variant;
 
+import static iudx.data.marketplace.apiserver.util.Constants.DETAIL;
 import static iudx.data.marketplace.apiserver.util.Constants.TITLE;
 import static iudx.data.marketplace.product.util.Constants.*;
 
@@ -114,7 +115,8 @@ public class ProductVariantServiceImpl implements ProductVariantService {
                                             new JsonObject()
                                                 .put("productVariantId", productVariantId)
                                                 .put("productId", productID)
-                                                .put(PRODUCT_VARIANT_NAME, variantName)));
+                                                .put(PRODUCT_VARIANT_NAME, variantName)))
+                                        .withDetail("Product Variant created successfully");
                         handler.handle(Future.succeededFuture(respBuilder.getJsonResponse()));
                       } else {
                         handler.handle(Future.failedFuture(pgHandler.cause()));
@@ -176,7 +178,8 @@ public class ProductVariantServiceImpl implements ProductVariantService {
                                 request,
                                 insertHandler -> {
                                     if (insertHandler.succeeded()) {
-                                        handler.handle(Future.succeededFuture(insertHandler.result()));
+                                        handler.handle(Future.succeededFuture(insertHandler.result().put(DETAIL,
+                                                "Product Variant updated successfully")));
                                     } else {
                                         handler.handle(Future.failedFuture(insertHandler.cause()));
                                     }

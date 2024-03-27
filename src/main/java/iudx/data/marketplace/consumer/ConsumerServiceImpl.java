@@ -1,10 +1,12 @@
 package iudx.data.marketplace.consumer;
 
-import static iudx.data.marketplace.apiserver.util.Constants.PRODUCT_VARIANT_ID;
-import static iudx.data.marketplace.apiserver.util.Constants.TITLE;
+import static iudx.data.marketplace.apiserver.util.Constants.*;
 import static iudx.data.marketplace.consumer.util.Constants.*;
 import static iudx.data.marketplace.consumer.util.Constants.TABLES;
 import static iudx.data.marketplace.product.util.Constants.*;
+import static iudx.data.marketplace.product.util.Constants.RESULTS;
+import static iudx.data.marketplace.product.util.Constants.STATUS;
+import static iudx.data.marketplace.product.util.Constants.TYPE;
 
 import io.vertx.core.AsyncResult;
 import io.vertx.core.Future;
@@ -183,7 +185,7 @@ public class ConsumerServiceImpl implements ConsumerService {
             completeHandler -> {
               if (completeHandler.succeeded()) {
                 LOGGER.info("order created");
-                handler.handle(Future.succeededFuture(completeHandler.result()));
+                handler.handle(Future.succeededFuture(completeHandler.result().put(DETAIL, "Order created successfully")));
               } else {
                 LOGGER.info("order creation failed");
                 handler.handle(Future.failedFuture(completeHandler.cause()));
