@@ -106,9 +106,15 @@ public class ProductServiceImpl implements ProductService {
                     .result()
                     .getString("ownerUserId")
                     .equalsIgnoreCase(providerID)) {
+
                   handler.handle(
                       Future.failedFuture(
-                          "The user with given token does not own the resource listed"));
+                          new RespBuilder()
+                              .withType(ResponseUrn.FORBIDDEN_URN.getUrn())
+                              .withTitle(ResponseUrn.FORBIDDEN_URN.getMessage())
+                              .withDetail(
+                                  "The user with given token does not own the resource listed")
+                              .getResponse()));
                 } else {
                   request
                       .put(PROVIDER_NAME, completeHandler.result().getString(PROVIDER_NAME, ""))
@@ -127,6 +133,7 @@ public class ProductServiceImpl implements ProductService {
                                   .withType(ResponseUrn.SUCCESS_URN.getUrn())
                                   .withTitle(ResponseUrn.SUCCESS_URN.getMessage())
                                   .withResult(new JsonObject().put(PRODUCT_ID, productID))
+                                  .withDetail("Product created successfully")
                                   .getJsonResponse();
                           handler.handle(Future.succeededFuture(result));
                         } else {
@@ -136,25 +143,26 @@ public class ProductServiceImpl implements ProductService {
                       });
                 }
               } else {
-                  String failureMessage = new RespBuilder()
-                          .withType(ResponseUrn.FORBIDDEN_PRODUCT_CREATION.getUrn())
-                          .withTitle(ResponseUrn.FORBIDDEN_PRODUCT_CREATION.getMessage())
-                          .withDetail(completeHandler.cause().getLocalizedMessage())
-                          .getResponse();
+                String failureMessage =
+                    new RespBuilder()
+                        .withType(ResponseUrn.FORBIDDEN_PRODUCT_CREATION.getUrn())
+                        .withTitle(ResponseUrn.FORBIDDEN_PRODUCT_CREATION.getMessage())
+                        .withDetail(completeHandler.cause().getLocalizedMessage())
+                        .getResponse();
 
                 if (completeHandler
                     .cause()
                     .getMessage()
                     .contains(ResponseUrn.RESOURCE_ALREADY_EXISTS_URN.getMessage())) {
 
-                    failureMessage = new RespBuilder()
-                            .withType(ResponseUrn.RESOURCE_ALREADY_EXISTS_URN.getUrn())
-                            .withTitle(ResponseUrn.RESOURCE_ALREADY_EXISTS_URN.getMessage())
-                            .withDetail("Product already exists")
-                            .getResponse();
+                  failureMessage =
+                      new RespBuilder()
+                          .withType(ResponseUrn.RESOURCE_ALREADY_EXISTS_URN.getUrn())
+                          .withTitle(ResponseUrn.RESOURCE_ALREADY_EXISTS_URN.getMessage())
+                          .withDetail("Product already exists")
+                          .getResponse();
                 }
-                  handler.handle(
-                          Future.failedFuture(failureMessage));
+                handler.handle(Future.failedFuture(failureMessage));
               }
             });
 
@@ -224,6 +232,9 @@ public class ProductServiceImpl implements ProductService {
     JsonObject params =
         new JsonObject().put(STATUS, Status.INACTIVE.toString()).put(PRODUCT_ID, productID);
 
+    JsonObject deleteProductVariantParams =
+        new JsonObject().put(PRODUCT_ID, productID).put(PROVIDER_ID, providerID);
+
     checkIfProductExists(providerID, productID)
         .onComplete(
             existsHandler -> {
@@ -232,32 +243,57 @@ public class ProductServiceImpl implements ProductService {
                 LOGGER.error("deletion failed");
                 handler.handle(Future.failedFuture(ResponseUrn.RESOURCE_NOT_FOUND_URN.getUrn()));
               } else {
+
                 pgService.executePreparedQuery(
                     DELETE_PRODUCT_QUERY.replace("$0", productTableName),
                     params,
                     pgHandler -> {
                       if (pgHandler.succeeded()) {
-                          if(!pgHandler.result().getJsonArray(RESULTS).isEmpty())
-                          {
-                              LOGGER.debug("Success : {}", pgHandler.result().encodePrettily());
-                              RespBuilder respBuilder =
+                        if (!pgHandler.result().getJsonArray(RESULTS).isEmpty()) {
+                          LOGGER.debug(
+                              "Successfully deleted product : {}",
+                              pgHandler.result().encodePrettily());
+
+                          pgService.executePreparedQuery(
+                              DELETE_PV_QUERY,
+                              deleteProductVariantParams,
+                              deleteProductVariantHandler -> {
+                                if (deleteProductVariantHandler.succeeded()) {
+                                  LOGGER.info(
+                                      "Product variants deleted successfully : {}",
+                                      deleteProductVariantHandler.result());
+                                  RespBuilder respBuilder =
                                       new RespBuilder()
-                                              .withType(ResponseUrn.SUCCESS_URN.getUrn())
-                                              .withTitle(ResponseUrn.SUCCESS_URN.getMessage())
-                                              .withDetail("Successfully deleted");
-                              handler.handle(Future.succeededFuture(respBuilder.getJsonResponse()));
+                                          .withType(ResponseUrn.SUCCESS_URN.getUrn())
+                                          .withTitle(ResponseUrn.SUCCESS_URN.getMessage())
+                                          .withDetail("Successfully deleted");
+                                  handler.handle(
+                                      Future.succeededFuture(respBuilder.getJsonResponse()));
+                                } else {
+                                  LOGGER.error(
+                                      "Failed to delete product variants : "
+                                          + deleteProductVariantHandler.cause());
+                                  RespBuilder respBuilder =
+                                      new RespBuilder()
+                                          .withType(ResponseUrn.INTERNAL_SERVER_ERR_URN.getUrn())
+                                          .withTitle(
+                                              ResponseUrn.INTERNAL_SERVER_ERR_URN.getMessage())
+                                          .withDetail(
+                                              "Something went wrong while deleting the product variants");
+                                  handler.handle(Future.failedFuture(respBuilder.getResponse()));
+                                }
+                              });
 
-                          }
-                          else
-                          {
-                              /* product has been previously deleted */
-                              RespBuilder respBuilder = new RespBuilder()
-                                      .withType(ResponseUrn.BAD_REQUEST_URN.getUrn())
-                                      .withTitle(ResponseUrn.BAD_REQUEST_URN.getMessage())
-                                      .withDetail("Product cannot be deleted, as it was deleted previously");
-                              handler.handle(Future.failedFuture(respBuilder.getResponse()));
-                          }
-
+                        } else {
+                          /* product has been previously deleted */
+                          RespBuilder respBuilder =
+                              new RespBuilder()
+                                  .withType(ResponseUrn.BAD_REQUEST_URN.getUrn())
+                                  .withTitle(ResponseUrn.BAD_REQUEST_URN.getMessage())
+                                  .withDetail(
+                                      "Product cannot be deleted, as it was deleted previously");
+                          handler.handle(Future.failedFuture(respBuilder.getResponse()));
+                        }
 
                       } else {
                         LOGGER.error("deletion failed");

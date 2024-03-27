@@ -143,6 +143,27 @@ public class QueryBuilder {
                             .replace("$3", Status.ACTIVE.toString())
                             .replace("$4", Status.INACTIVE.toString()));
 
+    LOGGER.debug("Query to update pv status : {}", query);
+    return query.toString();
+  }
+
+  public String checkProductVariantExistence(String productId, String variantName)
+  {
+    StringBuilder query =
+            new StringBuilder(CHECK_IF_PV_EXISTS
+                    .replace("$1", productId)
+                    .replace("$2", variantName));
+    LOGGER.debug("Query to check pv existence : {}", query);
+    return query.toString();
+  }
+
+  public String checkIfProductExists(String productId, String providerId)
+  {
+    StringBuilder query = new StringBuilder(
+            CHECK_IF_PRODUCT_EXISTS
+                    .replace("$1", productId)
+    );
+    LOGGER.debug("Query to check if product exists : {}", query);
     return query.toString();
   }
 

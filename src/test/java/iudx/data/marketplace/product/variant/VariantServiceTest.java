@@ -62,73 +62,84 @@ public class VariantServiceTest {
   }
 
   @Test
-  @DisplayName("Test product variant : Success")
+  @DisplayName("Test createProductVariant : Success")
   public void testProductVariantSuccess(VertxTestContext vertxTestContext) {
     when(user.getUserId()).thenReturn("someUserId");
     JsonObject request = mock(JsonObject.class);
-    JsonArray jsonArray = new JsonArray();
-    jsonArray.add(request);
-    when(request.getString(anyString())).thenReturn("someDummyValue");
-    when(request.getJsonArray(anyString())).thenReturn(jsonArray);
+    JsonArray mockJsonArray = mock(JsonArray.class);
+    JsonObject existenceJson = new JsonObject().put("status", "active").put("provider_id", "someUserId");
+    JsonArray resources = new JsonArray().add(new JsonObject().put(ID, "resourceId1"));
+    JsonObject resourceJson = new JsonObject()
+            .put(RESOURCES_ARRAY,resources);
+
     when(asyncResult.succeeded()).thenReturn(true);
     when(asyncResult.result()).thenReturn(request);
     when(request.getInteger("totalHits")).thenReturn(0);
+    when(request.getString(PRODUCT_ID)).thenReturn("someProductId");
+    when(request.getString(PRODUCT_VARIANT_NAME)).thenReturn("someProductVariantName");
+    when(request.getJsonArray(RESULTS)).thenReturn(mockJsonArray);
+    when(request.getJsonArray(RESOURCES_ARRAY)).thenReturn(resources);
+    when(request.getString("provider_id")).thenReturn("someUserId");
+    when(mockJsonArray.isEmpty()).thenReturn(false);
+    when(mockJsonArray.getJsonObject(anyInt()))
+            .thenReturn(existenceJson, resourceJson, new JsonObject().put("_id", "someDummyValue"));
 
     doAnswer(
             new Answer<AsyncResult<JsonObject>>() {
               @Override
               public AsyncResult<JsonObject> answer(InvocationOnMock invocationOnMock)
-                  throws Throwable {
+                      throws Throwable {
                 ((Handler<AsyncResult<JsonObject>>) invocationOnMock.getArgument(1))
-                    .handle(asyncResult);
+                        .handle(asyncResult);
                 return null;
               }
             })
-        .when(postgresService)
-        .executeCountQuery(anyString(), any(Handler.class));
+            .when(postgresService)
+            .executeCountQuery(anyString(), any(Handler.class));
 
     doAnswer(
             new Answer<AsyncResult<JsonObject>>() {
               @Override
               public AsyncResult<JsonObject> answer(InvocationOnMock invocationOnMock)
-                  throws Throwable {
+                      throws Throwable {
                 ((Handler<AsyncResult<JsonObject>>) invocationOnMock.getArgument(1))
-                    .handle(asyncResult);
+                        .handle(asyncResult);
                 return null;
               }
             })
-        .when(postgresService)
-        .executeQuery(anyString(), any(Handler.class));
+            .when(postgresService)
+            .executeQuery(anyString(), any(Handler.class));
 
     variantServiceImpl.createProductVariant(
-        user,
-        request,
-        handler -> {
-          if (handler.succeeded()) {
-            assertEquals(ResponseUrn.SUCCESS_URN.getUrn(), handler.result().getString(TYPE));
-            assertEquals(ResponseUrn.SUCCESS_URN.getMessage(), handler.result().getString(TITLE));
-            assertEquals(
-                "someDummyValue",
-                handler
-                    .result()
-                    .getJsonArray(RESULTS)
-                    .getJsonObject(0)
-                    .getString(PRODUCT_VARIANT_ID));
-            assertEquals(
-                "someDummyValue",
-                handler.result().getJsonArray(RESULTS).getJsonObject(0).getString(PRODUCT_ID));
-            assertEquals(
-                "someDummyValue",
-                handler
-                    .result()
-                    .getJsonArray(RESULTS)
-                    .getJsonObject(0)
-                    .getString(PRODUCT_VARIANT_NAME));
-            vertxTestContext.completeNow();
-          } else {
-            vertxTestContext.failNow("product variant creation failed");
-          }
-        });
+            user,
+            request,
+            handler -> {
+              if (handler.succeeded()) {
+                assertEquals(ResponseUrn.SUCCESS_URN.getUrn(), handler.result().getString(TYPE));
+                assertEquals(ResponseUrn.SUCCESS_URN.getMessage(), handler.result().getString(TITLE));
+                assertEquals(
+                        "someDummyValue",
+                        handler
+                                .result()
+                                .getJsonArray(RESULTS)
+                                .getJsonObject(0)
+                                .getString(PRODUCT_VARIANT_ID));
+                assertEquals(
+                        "someProductId",
+                        handler.result().getJsonArray(RESULTS).getJsonObject(0).getString(PRODUCT_ID));
+                assertEquals(
+                        "someProductVariantName",
+                        handler
+                                .result()
+                                .getJsonArray(RESULTS)
+                                .getJsonObject(0)
+                                .getString(PRODUCT_VARIANT_NAME));
+                assertEquals("Product Variant created successfully", handler.result().getString("detail"));
+                vertxTestContext.completeNow();
+              } else {
+                vertxTestContext.failNow("product variant creation failed");
+              }
+            });
   }
 
   @Test
@@ -138,7 +149,18 @@ public class VariantServiceTest {
     doAnswer(Answer -> Future.succeededFuture(true)).when(variantServiceSpy).updateProductVariantStatus(anyString(),anyString());
     when(asyncResult.succeeded()).thenReturn(true);
     when(asyncResult.result()).thenReturn(jsonObjectMock);
+    when(jsonObjectMock.getJsonArray(anyString())).thenReturn(jsonArrayMock);
+    when(jsonArrayMock.isEmpty()).thenReturn(false);
     when(jsonObjectMock.getString(anyString())).thenReturn("someValue");
+
+    doAnswer(new Answer<AsyncResult<JsonObject>>() {
+      @Override
+      public AsyncResult<JsonObject> answer(InvocationOnMock invocationOnMock) throws Throwable {
+        ((Handler<AsyncResult<JsonObject>>) invocationOnMock.getArgument(1)).handle(asyncResult);
+        return null;
+      }
+    }).when(postgresService).executeQuery(any(),any());
+
     doAnswer(new Answer<AsyncResult<JsonObject>>() {
       @Override
       public AsyncResult<JsonObject> answer(InvocationOnMock invocationOnMock) throws Throwable {

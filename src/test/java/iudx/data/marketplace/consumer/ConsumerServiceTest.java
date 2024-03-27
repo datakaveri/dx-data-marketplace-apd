@@ -1,5 +1,6 @@
 package iudx.data.marketplace.consumer;
 
+import static iudx.data.marketplace.apiserver.util.Constants.DETAIL;
 import static iudx.data.marketplace.apiserver.util.Constants.PRODUCT_VARIANT_ID;
 import static iudx.data.marketplace.common.Constants.PROVIDER_ID;
 import static iudx.data.marketplace.common.Constants.RESOURCE_ID;
@@ -316,17 +317,21 @@ public class ConsumerServiceTest {
         .when(consumerServiceSpy)
         .getOrderRelatedInfo(anyString());
     doAnswer(Answer -> Future.succeededFuture()).when(razorPayService).createOrder(any());
-    doAnswer(Answer -> Future.succeededFuture())
+    doAnswer(Answer -> Future.succeededFuture(new JsonObject()))
         .when(consumerServiceSpy)
         .generateOrderEntry(any(), anyString(), anyString());
 
-    consumerServiceSpy.createOrder(request, consumer, handler -> {
-      if(handler.succeeded()) {
-        testContext.completeNow();
-      } else {
-        testContext.failNow(handler.cause());
-      }
-    });
+    consumerServiceSpy.createOrder(
+        request,
+        consumer,
+        handler -> {
+          if (handler.succeeded()) {
+            assertEquals(new JsonObject().put(DETAIL, "Order created successfully"), handler.result());
+            testContext.completeNow();
+          } else {
+            testContext.failNow(handler.cause());
+          }
+        });
   }
 
   @Test

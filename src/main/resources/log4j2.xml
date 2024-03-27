@@ -26,7 +26,7 @@
         </RollingFile> -->
     </Appenders>
     <Loggers>
-        <logger name="iudx.data.marketplace" level="${env:LOG_LEVEL:-DEBUG}"
+        <logger name="iudx.data.marketplace" level="${env:LOG_LEVEL:-INFO}"
                 additivity="false">
             <appender-ref ref="ConsoleAppender"/>
             <!-- <appender-ref ref="RollingFile" /> -->

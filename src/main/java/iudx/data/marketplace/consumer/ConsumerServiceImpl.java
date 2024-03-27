@@ -1,10 +1,12 @@
 package iudx.data.marketplace.consumer;
 
-import static iudx.data.marketplace.apiserver.util.Constants.PRODUCT_VARIANT_ID;
-import static iudx.data.marketplace.apiserver.util.Constants.TITLE;
+import static iudx.data.marketplace.apiserver.util.Constants.*;
 import static iudx.data.marketplace.consumer.util.Constants.*;
 import static iudx.data.marketplace.consumer.util.Constants.TABLES;
 import static iudx.data.marketplace.product.util.Constants.*;
+import static iudx.data.marketplace.product.util.Constants.RESULTS;
+import static iudx.data.marketplace.product.util.Constants.STATUS;
+import static iudx.data.marketplace.product.util.Constants.TYPE;
 
 import io.vertx.core.AsyncResult;
 import io.vertx.core.Future;
@@ -58,8 +60,8 @@ public class ConsumerServiceImpl implements ConsumerService {
   }
 
   @Override
-  public ConsumerService listResources( User consumer,
-      JsonObject request, Handler<AsyncResult<JsonObject>> handler) {
+  public ConsumerService listResources(
+      User consumer, JsonObject request, Handler<AsyncResult<JsonObject>> handler) {
 
     String resourceTable = config.getJsonArray(TABLES).getString(1);
     JsonObject params = new JsonObject();
@@ -92,8 +94,8 @@ public class ConsumerServiceImpl implements ConsumerService {
   }
 
   @Override
-  public ConsumerService listProviders(User consumer,
-      JsonObject request, Handler<AsyncResult<JsonObject>> handler) {
+  public ConsumerService listProviders(
+      User consumer, JsonObject request, Handler<AsyncResult<JsonObject>> handler) {
     JsonObject params = new JsonObject();
     String resourceServerUrl = consumer.getResourceServerUrl();
     params.put("resourceServerUrl", resourceServerUrl);
@@ -121,8 +123,8 @@ public class ConsumerServiceImpl implements ConsumerService {
   }
 
   @Override
-  public ConsumerService listProducts( User consumer,
-      JsonObject request, Handler<AsyncResult<JsonObject>> handler) {
+  public ConsumerService listProducts(
+      User consumer, JsonObject request, Handler<AsyncResult<JsonObject>> handler) {
     String productTable = config.getJsonArray(TABLES).getString(0);
     String resourceTable = config.getJsonArray(TABLES).getString(1);
     String productResourceRelationTable = config.getJsonArray(TABLES).getString(2);
@@ -183,7 +185,9 @@ public class ConsumerServiceImpl implements ConsumerService {
             completeHandler -> {
               if (completeHandler.succeeded()) {
                 LOGGER.info("order created");
-                handler.handle(Future.succeededFuture(completeHandler.result()));
+                handler.handle(
+                    Future.succeededFuture(
+                        completeHandler.result().put(DETAIL, "Order created successfully")));
               } else {
                 LOGGER.info("order creation failed");
                 handler.handle(Future.failedFuture(completeHandler.cause()));
@@ -231,8 +235,8 @@ public class ConsumerServiceImpl implements ConsumerService {
                   JsonObject response =
                       new JsonObject()
                           .put(TYPE, ResponseUrn.SUCCESS_URN.getUrn())
-                          .put(TITLE,ResponseUrn.SUCCESS_URN.getMessage())
-                          .put(RESULTS,pgHandler.result());
+                          .put(TITLE, ResponseUrn.SUCCESS_URN.getMessage())
+                          .put(RESULTS, pgHandler.result());
                   handler.handle(Future.succeededFuture(response));
 
                 } else {
@@ -254,63 +258,63 @@ public class ConsumerServiceImpl implements ConsumerService {
   }
 
   public Future<JsonArray> executePurchaseQuery(
-          String query, String resourceId, String productId, User user) {
+      String query, String resourceId, String productId, User user) {
     Promise<JsonArray> promise = Promise.promise();
     pgService.executeQuery(
-            query,
-            queryHandler -> {
-              if (queryHandler.succeeded()) {
-                LOGGER.debug("Fetched invoice related information from postgres successfully");
-                JsonArray result = queryHandler.result().getJsonArray(RESULTS);
-                if (!result.isEmpty()) {
-                  JsonArray userResponse = new JsonArray();
-                  for (Object row : result) {
-                    JsonObject rowEntry = JsonObject.mapFrom(row);
+        query,
+        queryHandler -> {
+          if (queryHandler.succeeded()) {
+            LOGGER.debug("Fetched invoice related information from postgres successfully");
+            JsonArray result = queryHandler.result().getJsonArray(RESULTS);
+            if (!result.isEmpty()) {
+              JsonArray userResponse = new JsonArray();
+              for (Object row : result) {
+                JsonObject rowEntry = JsonObject.mapFrom(row);
 
-                    // gets provider info, consumer info, product info
-                    rowEntry
-                            .mergeIn(util.getUserJsonFromRowEntry(rowEntry, Role.PROVIDER))
-                            .mergeIn(util.generateUserJson(user))
-                            .mergeIn(util.getProductInfo(rowEntry));
-                    userResponse.add(rowEntry);
-                  }
-                  promise.complete(userResponse);
-                } else {
-                  LOGGER.debug(
-                          "No invoice present for the given resource "
-                                  + ": {} or product : {}, for the consumer : {}",
-                          resourceId,
-                          productId,
-                          user.getUserId());
-
-                  boolean isAnyQueryParamSent =
-                          StringUtils.isNotBlank(resourceId) || StringUtils.isNotBlank(productId);
-
-                  String failureMessage =
-                          new RespBuilder()
-                                  .withType(HttpStatusCode.NO_CONTENT.getValue())
-                                  .withTitle(HttpStatusCode.NO_CONTENT.getUrn())
-                                  .getResponse();
-                  if (isAnyQueryParamSent) {
-                    failureMessage =
-                            new RespBuilder()
-                                    .withType(HttpStatusCode.NOT_FOUND.getValue())
-                                    .withTitle(ResponseUrn.RESOURCE_NOT_FOUND_URN.getUrn())
-                                    .withDetail("Purchase info not found")
-                                    .getResponse();
-                  }
-                  promise.fail(failureMessage);
-                }
-              } else {
-                String failureMessage =
-                        new RespBuilder()
-                                .withType(HttpStatusCode.INTERNAL_SERVER_ERROR.getValue())
-                                .withTitle(ResponseUrn.DB_ERROR_URN.getUrn())
-                                .withDetail(ResponseUrn.INTERNAL_SERVER_ERR_URN.getMessage())
-                                .getResponse();
-                promise.fail(failureMessage);
+                // gets provider info, consumer info, product info
+                rowEntry
+                    .mergeIn(util.getUserJsonFromRowEntry(rowEntry, Role.PROVIDER))
+                    .mergeIn(util.generateUserJson(user))
+                    .mergeIn(util.getProductInfo(rowEntry));
+                userResponse.add(rowEntry);
               }
-            });
+              promise.complete(userResponse);
+            } else {
+              LOGGER.debug(
+                  "No invoice present for the given resource "
+                      + ": {} or product : {}, for the consumer : {}",
+                  resourceId,
+                  productId,
+                  user.getUserId());
+
+              boolean isAnyQueryParamSent =
+                  StringUtils.isNotBlank(resourceId) || StringUtils.isNotBlank(productId);
+
+              String failureMessage =
+                  new RespBuilder()
+                      .withType(HttpStatusCode.NO_CONTENT.getValue())
+                      .withTitle(HttpStatusCode.NO_CONTENT.getUrn())
+                      .getResponse();
+              if (isAnyQueryParamSent) {
+                failureMessage =
+                    new RespBuilder()
+                        .withType(HttpStatusCode.NOT_FOUND.getValue())
+                        .withTitle(ResponseUrn.RESOURCE_NOT_FOUND_URN.getUrn())
+                        .withDetail("Purchase info not found")
+                        .getResponse();
+              }
+              promise.fail(failureMessage);
+            }
+          } else {
+            String failureMessage =
+                new RespBuilder()
+                    .withType(HttpStatusCode.INTERNAL_SERVER_ERROR.getValue())
+                    .withTitle(ResponseUrn.DB_ERROR_URN.getUrn())
+                    .withDetail(ResponseUrn.INTERNAL_SERVER_ERR_URN.getMessage())
+                    .getResponse();
+            promise.fail(failureMessage);
+          }
+        });
     return promise.future();
   }
 
@@ -320,12 +324,10 @@ public class ConsumerServiceImpl implements ConsumerService {
     String productId = request.getString("productId");
     String resourceServerUrl = user.getResourceServerUrl();
 
-    JsonObject params = new JsonObject()
-            .put("productId", productId)
-            .put("resourceServerUrl", resourceServerUrl);
+    JsonObject params =
+        new JsonObject().put("productId", productId).put("resourceServerUrl", resourceServerUrl);
 
-    String query =
-            FETCH_ACTIVE_PRODUCT_VARIANTS + " ORDER BY P.\"updatedAt\" DESC";
+    String query = FETCH_ACTIVE_PRODUCT_VARIANTS + " ORDER BY P.\"updatedAt\" DESC";
     LOGGER.debug("Query to list product variants : {}", query);
     pgService.executePreparedQuery(
         query,
@@ -454,9 +456,7 @@ public class ConsumerServiceImpl implements ConsumerService {
                 .replace("$9", merchantTable));
 
     JsonObject params =
-        new JsonObject()
-            .put("variant", variantId)
-            .put(STATUS, Status.ACTIVE.toString());
+        new JsonObject().put("variant", variantId).put(STATUS, Status.ACTIVE.toString());
 
     LOGGER.debug(params);
 
@@ -493,5 +493,4 @@ public class ConsumerServiceImpl implements ConsumerService {
       this.queries = queries;
     }
   }
-
 }

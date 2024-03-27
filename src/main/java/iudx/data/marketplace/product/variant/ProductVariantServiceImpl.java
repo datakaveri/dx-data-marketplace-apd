@@ -1,5 +1,6 @@
 package iudx.data.marketplace.product.variant;
 
+import static iudx.data.marketplace.apiserver.util.Constants.DETAIL;
 import static iudx.data.marketplace.apiserver.util.Constants.TITLE;
 import static iudx.data.marketplace.product.util.Constants.*;
 
@@ -19,34 +20,49 @@ import iudx.data.marketplace.consumer.util.PaymentStatus;
 import iudx.data.marketplace.policies.User;
 import iudx.data.marketplace.postgres.PostgresService;
 import iudx.data.marketplace.product.util.QueryBuilder;
-import iudx.data.marketplace.product.util.Status;
 import org.apache.commons.lang.StringUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 public class ProductVariantServiceImpl implements ProductVariantService {
 
-    public static final Logger LOGGER = LogManager.getLogger(ProductVariantServiceImpl.class);
-    private final PostgresService pgService;
-    private final Util util;
-    private final QueryBuilder queryBuilder;
+  public static final Logger LOGGER = LogManager.getLogger(ProductVariantServiceImpl.class);
+  private final PostgresService pgService;
+  private final Util util;
+  private final QueryBuilder queryBuilder;
 
-    public ProductVariantServiceImpl(JsonObject config, PostgresService postgresService, Util util) {
-        this.pgService = postgresService;
-        this.queryBuilder = new QueryBuilder(config.getJsonArray(TABLES));
-        this.util = util;
-    }
+  public ProductVariantServiceImpl(JsonObject config, PostgresService postgresService, Util util) {
+    this.pgService = postgresService;
+    this.queryBuilder = new QueryBuilder(config.getJsonArray(TABLES));
+    this.util = util;
+  }
 
-    @Override
-    public ProductVariantService createProductVariant(User user,
-                                                      JsonObject request, Handler<AsyncResult<JsonObject>> handler) {
-        String productID = request.getString(PRODUCT_ID);
-        String variantName = request.getString(PRODUCT_VARIANT_NAME);
-        Future<Boolean> checkForExistence = checkIfProductVariantExists(productID, variantName);
-        String providerId = user.getUserId();
-        Future<JsonObject> productDetailsFuture = getProductDetails(productID, providerId);
-        JsonArray resources = request.getJsonArray(RESOURCES_ARRAY);
+  @Override
+  public ProductVariantService createProductVariant(
+      User user, JsonObject request, Handler<AsyncResult<JsonObject>> handler) {
+    String productID = request.getString(PRODUCT_ID);
+    String variantName = request.getString(PRODUCT_VARIANT_NAME);
+    String providerId = user.getUserId();
+    Future<JsonObject> productDetailsFuture = getProductDetails(productID, providerId);
+    JsonArray resources = request.getJsonArray(RESOURCES_ARRAY);
+    Future<Boolean> checkIfProductExists = checkForExistenceOfProduct(productID, providerId);
 
+    Future<Boolean> checkForExistence =
+        checkIfProductExists.compose(
+            isProductFound -> {
+              if (isProductFound) {
+                return checkIfProductVariantExists(productID, variantName);
+              } else {
+                String failureMessage =
+                    new RespBuilder()
+                        .withType(ResponseUrn.BAD_REQUEST_URN.getUrn())
+                        .withTitle(ResponseUrn.BAD_REQUEST_URN.getMessage())
+                        .withDetail(
+                                "Product Variant cannot be created as product is in INACTIVE state or is not found")
+                        .getResponse();
+                return Future.failedFuture(failureMessage);
+              }
+            });
     checkForExistence
         .compose(
             existenceHandler -> {
@@ -114,7 +130,8 @@ public class ProductVariantServiceImpl implements ProductVariantService {
                                             new JsonObject()
                                                 .put("productVariantId", productVariantId)
                                                 .put("productId", productID)
-                                                .put(PRODUCT_VARIANT_NAME, variantName)));
+                                                .put(PRODUCT_VARIANT_NAME, variantName)))
+                                .withDetail("Product Variant created successfully");
                         handler.handle(Future.succeededFuture(respBuilder.getJsonResponse()));
                       } else {
                         handler.handle(Future.failedFuture(pgHandler.cause()));
@@ -124,191 +141,271 @@ public class ProductVariantServiceImpl implements ProductVariantService {
                 handler.handle(Future.failedFuture(pdfHandler.cause()));
               }
             });
-        return this;
-    }
+    return this;
+  }
 
-    private Future<Boolean> checkIfProductVariantExists(String productID, String variantName) {
-        Promise<Boolean> promise = Promise.promise();
-        String query = queryBuilder.selectProductVariant(productID, variantName);
-        pgService.executeCountQuery(
-                query,
-                handler -> {
-                    if (handler.succeeded()) {
-                        if (handler.result().getInteger("totalHits") != 0) promise.complete(true);
-                        else promise.complete(false);
-                    } else {
-                        promise.fail(handler.cause());
-                    }
-                });
-        return promise.future();
-    }
+  private Future<Boolean> checkIfProductVariantExists(String productID, String variantName) {
+    Promise<Boolean> promise = Promise.promise();
+    String query = queryBuilder.selectProductVariant(productID, variantName);
+    pgService.executeCountQuery(
+        query,
+        handler -> {
+          if (handler.succeeded()) {
+            if (handler.result().getInteger("totalHits") != 0) promise.complete(true);
+            else promise.complete(false);
+          } else {
+            promise.fail(handler.cause());
+          }
+        });
+    return promise.future();
+  }
 
-    Future<JsonObject> getProductDetails(String productID, String providerId) {
-        Promise<JsonObject> promise = Promise.promise();
+  Future<JsonObject> getProductDetails(String productID, String providerId) {
+    Promise<JsonObject> promise = Promise.promise();
 
-        String query = queryBuilder.buildProductDetailsQuery(productID, providerId);
-        LOGGER.debug(query);
-        pgService.executeQuery(
-                query,
-                pgHandler -> {
-                    if (pgHandler.succeeded()) {
-                        promise.complete(pgHandler.result());
-                    } else {
-                        promise.fail(pgHandler.cause());
-                    }
-                });
-        return promise.future();
-    }
+    String query = queryBuilder.buildProductDetailsQuery(productID, providerId);
+    LOGGER.debug(query);
+    pgService.executeQuery(
+        query,
+        pgHandler -> {
+          if (pgHandler.succeeded()) {
+            promise.complete(pgHandler.result());
+          } else {
+            promise.fail(pgHandler.cause());
+          }
+        });
+    return promise.future();
+  }
 
-    @Override
-    public ProductVariantService updateProductVariant(User user,
-                                                      JsonObject request, Handler<AsyncResult<JsonObject>> handler) {
-
-        String productID = request.getString(PRODUCT_ID);
-        String variant = request.getString(PRODUCT_VARIANT_NAME);
-
-        Future<Boolean> updateProductVariantFuture = updateProductVariantStatus(productID, variant);
-        updateProductVariantFuture.onComplete(
-                updateHandler -> {
-                    if (updateHandler.result()) {
-                        createProductVariant(
-                                user,
-                                request,
-                                insertHandler -> {
-                                    if (insertHandler.succeeded()) {
-                                        handler.handle(Future.succeededFuture(insertHandler.result()));
-                                    } else {
-                                        handler.handle(Future.failedFuture(insertHandler.cause()));
-                                    }
-                                });
-                    } else {
-                        throw new DxRuntimeException(
-                                500, ResponseUrn.DB_ERROR_URN, ResponseUrn.DB_ERROR_URN.getMessage());
-                    }
-                });
-
-        return this;
-    }
-
-    Future<Boolean> updateProductVariantStatus(String productID, String variant) {
-        Promise<Boolean> promise = Promise.promise();
-        String query = queryBuilder.updateProductVariantStatusQuery(productID, variant);
-
-        pgService.executeQuery(
-                query,
-                pgHandler -> {
-                    if (pgHandler.succeeded()) {
-                        LOGGER.debug(pgHandler.result());
-                        promise.complete(true);
-                    } else {
-                        promise.fail(pgHandler.cause());
-                    }
-                });
-
-        return promise.future();
-    }
-
-    Future<JsonObject> updateProductVariantStatus(String productVariantId) {
-        Promise<JsonObject> promise = Promise.promise();
-        String query = queryBuilder.updateProductVariantStatusQuery(productVariantId);
-
-        pgService.executeQuery(
-            query,
-            pgHandler -> {
-                if (pgHandler.succeeded()) {
-                    LOGGER.debug(pgHandler.result());
-                    boolean isResultsEmpty = pgHandler.result().getJsonArray(RESULTS).isEmpty();
-                    if(isResultsEmpty)
-                    {
-                        /* the product variant id that is to be deleted, does not exist or is already in inactive status*/
-                        RespBuilder respBuilder =
-                                new RespBuilder()
-                                        .withType(HttpStatusCode.NOT_FOUND.getValue())
-                                        .withTitle(ResponseUrn.RESOURCE_NOT_FOUND_URN.getUrn())
-                                        .withDetail("Product variant not found");
-                        promise.fail(respBuilder.getResponse());
-                    }
-                    else
-                    {
-                        RespBuilder respBuilder =
-                                new RespBuilder()
-                                        .withType(ResponseUrn.SUCCESS_URN.getUrn())
-                                        .withTitle(ResponseUrn.SUCCESS_URN.getMessage())
-                                        .withDetail("Successfully deleted");
-                        promise.complete(respBuilder.getJsonResponse());
-                    }
-                } else {
-                    promise.fail(pgHandler.cause());
-                    throw new DxRuntimeException(
-                            500, ResponseUrn.DB_ERROR_URN, ResponseUrn.DB_ERROR_URN.getMessage());
-                }
-            });
-
-        return promise.future();
-    }
-
-    @Override
-    public ProductVariantService deleteProductVariant(User user,
-                                                      JsonObject request, Handler<AsyncResult<JsonObject>> handler) {
-        String productVariantId = request.getString("productVariantId");
-
-      Future<JsonObject> updateProductVariantFuture = updateProductVariantStatus(productVariantId);
-        updateProductVariantFuture.onComplete(
-                updateHandler -> {
-                    if (updateHandler.succeeded()) {
-                        handler.handle(Future.succeededFuture(updateHandler.result()));
-                    } else {
-                        handler.handle(Future.failedFuture(updateHandler.cause().getMessage()));
-
-                    }
-                });
-        return this;
-    }
-
-    @Override
-    public ProductVariantService listProductVariants(User user, JsonObject request, Handler<AsyncResult<JsonObject>> handler) {
-
-        LOGGER.debug(request);
-        String resourceServerUrl = user.getResourceServerUrl();
-        String query = queryBuilder.listProductVariants(request);
-
-        JsonObject params = new JsonObject()
-                .put(PRODUCT_ID, request.getString(PRODUCT_ID))
-                .put("resourceServerUrl", resourceServerUrl);
-
-        if(request.containsKey(PRODUCT_VARIANT_NAME)) {
-            params.put(PRODUCT_VARIANT_NAME, request.getString(PRODUCT_VARIANT_NAME));
-        }
-
-        pgService.executePreparedQuery(query, params, pgHandler -> {
-
-            if (pgHandler.succeeded()) {
-                if(pgHandler.result().getJsonArray(RESULTS).isEmpty()) {
-                    String failureMessage =
-                            new RespBuilder()
-                                    .withType(HttpStatusCode.NOT_FOUND.getValue())
-                                    .withTitle(ResponseUrn.RESOURCE_NOT_FOUND_URN.getUrn())
-                                    .withDetail("Product variants not found")
-                                    .getResponse();
-                    handler.handle(Future.failedFuture(failureMessage));
-                } else {
-                    handler.handle(Future.succeededFuture(pgHandler.result()));
-                }
-            } else {
-                LOGGER.error("Failure : " + pgHandler.cause());
-
+  Future<Boolean> checkForExistenceOfProduct(String productId, String providerId) {
+    Promise<Boolean> promise = Promise.promise();
+    String query = queryBuilder.checkIfProductExists(productId, providerId);
+    pgService.executeQuery(
+        query,
+        handler -> {
+          if (handler.succeeded()) {
+            /* check if product is not found */
+            boolean isEmpty = handler.result().getJsonArray(RESULTS).isEmpty();
+            if (!isEmpty) {
+              LOGGER.debug("product is found");
+              JsonObject result = handler.result().getJsonArray(RESULTS).getJsonObject(0);
+              boolean isProductInactive = result.getString("status").equalsIgnoreCase("inactive");
+              boolean isProductBelongingToProvider =
+                  result.getString("provider_id").equals(providerId);
+              if (isProductInactive) {
+                LOGGER.error("product is already deleted");
+                promise.complete(false);
+              } else if (!isProductBelongingToProvider) {
+                LOGGER.error("ownership check failed");
                 String failureMessage =
-                        new RespBuilder()
-                                .withType(HttpStatusCode.INTERNAL_SERVER_ERROR.getValue())
-                                .withTitle(ResponseUrn.DB_ERROR_URN.getUrn())
-                                .withDetail(ResponseUrn.INTERNAL_SERVER_ERR_URN.getMessage())
-                                .getResponse();
-                handler.handle(Future.failedFuture(failureMessage));
+                    new RespBuilder()
+                        .withType(ResponseUrn.FORBIDDEN_URN.getUrn())
+                        .withTitle(ResponseUrn.FORBIDDEN_URN.getMessage())
+                        .withDetail(
+                            "Product variant cannot be created, as the provider does not own the product")
+                        .getResponse();
+                promise.fail(failureMessage);
+              } else {
+                LOGGER.debug("Product is found for creating product variant");
+                promise.complete(true);
+              }
+            } else {
+              LOGGER.error("Product is not found");
+              promise.complete(false);
             }
+          } else {
+            LOGGER.error("Failure while checking the existence of product : " + handler.cause());
+            String failureMessage =
+                new RespBuilder()
+                    .withType(ResponseUrn.DB_ERROR_URN.getUrn())
+                    .withTitle(ResponseUrn.INTERNAL_SERVER_ERR_URN.getMessage())
+                    .withDetail("Internal Server Error")
+                    .getResponse();
+            promise.fail(failureMessage);
+          }
         });
 
-        return this;
+    return promise.future();
+  }
+
+  @Override
+  public ProductVariantService updateProductVariant(
+      User user, JsonObject request, Handler<AsyncResult<JsonObject>> handler) {
+
+    String productID = request.getString(PRODUCT_ID);
+    String variant = request.getString(PRODUCT_VARIANT_NAME);
+    /* check if the product variant exists */
+    String query = queryBuilder.checkProductVariantExistence(productID, variant);
+    pgService.executeQuery(
+        query,
+        existenceHandler -> {
+          if (existenceHandler.succeeded()) {
+            boolean isEmpty = existenceHandler.result().getJsonArray(RESULTS).isEmpty();
+            if (!isEmpty) {
+
+              Future<Boolean> updateProductVariantFuture =
+                  updateProductVariantStatus(productID, variant);
+              updateProductVariantFuture.onComplete(
+                  updateHandler -> {
+                    if (updateHandler.result()) {
+                      createProductVariant(
+                          user,
+                          request,
+                          insertHandler -> {
+                            if (insertHandler.succeeded()) {
+                              handler.handle(
+                                  Future.succeededFuture(
+                                      insertHandler
+                                          .result()
+                                          .put(DETAIL, "Product Variant updated successfully")));
+                            } else {
+                              handler.handle(Future.failedFuture(insertHandler.cause()));
+                            }
+                          });
+                    } else {
+                      throw new DxRuntimeException(
+                          500, ResponseUrn.DB_ERROR_URN, ResponseUrn.DB_ERROR_URN.getMessage());
+                    }
+                  });
+            } else {
+              handler.handle(
+                  Future.failedFuture(
+                      new RespBuilder()
+                          .withType(ResponseUrn.RESOURCE_NOT_FOUND_URN.getUrn())
+                          .withTitle(ResponseUrn.RESOURCE_NOT_FOUND_URN.getMessage())
+                          .withDetail(
+                              "Product Variant cannot be updated as the product is in INACTIVE state or product is not found")
+                          .getResponse()));
+            }
+
+          } else {
+            throw new DxRuntimeException(
+                500, ResponseUrn.DB_ERROR_URN, ResponseUrn.DB_ERROR_URN.getMessage());
+          }
+        });
+
+    return this;
+  }
+
+  Future<Boolean> updateProductVariantStatus(String productID, String variant) {
+    Promise<Boolean> promise = Promise.promise();
+    String query = queryBuilder.updateProductVariantStatusQuery(productID, variant);
+
+    pgService.executeQuery(
+        query,
+        pgHandler -> {
+          if (pgHandler.succeeded()) {
+            LOGGER.debug(pgHandler.result());
+            promise.complete(true);
+          } else {
+            promise.fail(pgHandler.cause());
+          }
+        });
+
+    return promise.future();
+  }
+
+  Future<JsonObject> updateProductVariantStatus(String productVariantId) {
+    Promise<JsonObject> promise = Promise.promise();
+    String query = queryBuilder.updateProductVariantStatusQuery(productVariantId);
+
+    pgService.executeQuery(
+        query,
+        pgHandler -> {
+          if (pgHandler.succeeded()) {
+            LOGGER.debug(pgHandler.result());
+            boolean isResultsEmpty = pgHandler.result().getJsonArray(RESULTS).isEmpty();
+            if (isResultsEmpty) {
+              /* the product variant id that is to be deleted, does not exist or is already in inactive status*/
+              RespBuilder respBuilder =
+                  new RespBuilder()
+                      .withType(HttpStatusCode.NOT_FOUND.getValue())
+                      .withTitle(ResponseUrn.RESOURCE_NOT_FOUND_URN.getUrn())
+                      .withDetail("Product variant not found");
+              promise.fail(respBuilder.getResponse());
+            } else {
+              RespBuilder respBuilder =
+                  new RespBuilder()
+                      .withType(ResponseUrn.SUCCESS_URN.getUrn())
+                      .withTitle(ResponseUrn.SUCCESS_URN.getMessage())
+                      .withDetail("Successfully deleted");
+              promise.complete(respBuilder.getJsonResponse());
+            }
+          } else {
+            promise.fail(pgHandler.cause());
+            throw new DxRuntimeException(
+                500, ResponseUrn.DB_ERROR_URN, ResponseUrn.DB_ERROR_URN.getMessage());
+          }
+        });
+
+    return promise.future();
+  }
+
+  @Override
+  public ProductVariantService deleteProductVariant(
+      User user, JsonObject request, Handler<AsyncResult<JsonObject>> handler) {
+    String productVariantId = request.getString("productVariantId");
+
+    updateProductVariantStatus(productVariantId)
+        .onComplete(
+            updateHandler -> {
+              if (updateHandler.succeeded()) {
+                handler.handle(Future.succeededFuture(updateHandler.result()));
+              } else {
+                handler.handle(Future.failedFuture(updateHandler.cause().getMessage()));
+              }
+            });
+    return this;
+  }
+
+  @Override
+  public ProductVariantService listProductVariants(
+      User user, JsonObject request, Handler<AsyncResult<JsonObject>> handler) {
+
+    LOGGER.debug(request);
+    String resourceServerUrl = user.getResourceServerUrl();
+    String query = queryBuilder.listProductVariants(request);
+
+    JsonObject params =
+        new JsonObject()
+            .put(PRODUCT_ID, request.getString(PRODUCT_ID))
+            .put("resourceServerUrl", resourceServerUrl);
+
+    if (request.containsKey(PRODUCT_VARIANT_NAME)) {
+      params.put(PRODUCT_VARIANT_NAME, request.getString(PRODUCT_VARIANT_NAME));
     }
+
+    pgService.executePreparedQuery(
+        query,
+        params,
+        pgHandler -> {
+          if (pgHandler.succeeded()) {
+            if (pgHandler.result().getJsonArray(RESULTS).isEmpty()) {
+              String failureMessage =
+                  new RespBuilder()
+                      .withType(HttpStatusCode.NOT_FOUND.getValue())
+                      .withTitle(ResponseUrn.RESOURCE_NOT_FOUND_URN.getUrn())
+                      .withDetail("Product variants not found")
+                      .getResponse();
+              handler.handle(Future.failedFuture(failureMessage));
+            } else {
+              handler.handle(Future.succeededFuture(pgHandler.result()));
+            }
+          } else {
+            LOGGER.error("Failure : " + pgHandler.cause());
+
+            String failureMessage =
+                new RespBuilder()
+                    .withType(HttpStatusCode.INTERNAL_SERVER_ERROR.getValue())
+                    .withTitle(ResponseUrn.DB_ERROR_URN.getUrn())
+                    .withDetail(ResponseUrn.INTERNAL_SERVER_ERR_URN.getMessage())
+                    .getResponse();
+            handler.handle(Future.failedFuture(failureMessage));
+          }
+        });
+
+    return this;
+  }
 
   @Override
   public ProductVariantService listPurchase(
@@ -324,7 +421,8 @@ public class ProductVariantServiceImpl implements ProductVariantService {
 
       if (paymentStatus.equals(PaymentStatus.SUCCESSFUL)) {
         query =
-            queryBuilder.listSuccessfulPurchaseForProvider(user.getUserId(), resourceId, productId, resourceServerUrl);
+            queryBuilder.listSuccessfulPurchaseForProvider(
+                user.getUserId(), resourceId, productId, resourceServerUrl);
       } else if (paymentStatus.equals(PaymentStatus.FAILED)) {
         query =
             queryBuilder.listPurchaseForProviderDuringFailedPayment(
