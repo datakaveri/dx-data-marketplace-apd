@@ -3491,6 +3491,139 @@ paths:
       security:
 
         - authorization: []
+  /verify-payment:
+    post:
+      summary: Verify Payment
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                x-examples:
+                  Example 1:
+                    type: 'urn:dx:dmp:success'
+                    title: Success
+                    detail: Payment Verified for order id order_NoTOqKRmAl3jsl
+                required:
+                  - type
+                  - title
+                  - detail
+                properties:
+                  type:
+                    type: string
+                  title:
+                    type: string
+                  detail:
+                    type: string
+              examples:
+                Payment Validated:
+                  value:
+                    type: 'urn:dx:dmp:success'
+                    title: Success
+                    detail: Payment Verified for order id order_NoTOqKRmAl3jsl
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                type: object
+                x-examples:
+                  Example 1:
+                    type: 'urn:dx:dmp:invalidPayloadFormat'
+                    title: Bad Request
+                    detail: 'ECMA 262 regex "[A-Fa-f0-9]{64}" does not match input string "9d9111226feb8e169243145dc349a4ebc00d8ef9001e6514a0208a1a5f5aa7"'
+                required:
+                  - type
+                  - title
+                  - detail
+                properties:
+                  type:
+                    type: string
+                  title:
+                    type: string
+                  detail:
+                    type: string
+              examples:
+                Invalid Schema for Signature:
+                  value:
+                    type: 'urn:dx:dmp:invalidPayloadFormat'
+                    title: Bad Request
+                    detail: 'ECMA 262 regex "[A-Fa-f0-9]{64}" does not match input string "9d9111226feb8e169243145dc349a4ebc00d8ef9001e6514a0208a1a5f5aa7"'
+                Invalid Signature/Payment:
+                  value:
+                    type: 'urn:dx:dmp:RazorPay:InvalidPayment'
+                    title: RazorPay Error
+                    detail: Payment Signature verification failed
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                type: object
+                x-examples:
+                  Example 1:
+                    type: 'urn:dx:dmp:invalidAuthorizationToken'
+                    title: Not Authorized
+                    detail: Not Authorized
+                required:
+                  - type
+                  - title
+                  - detail
+                properties:
+                  type:
+                    type: string
+                  title:
+                    type: string
+                  detail:
+                    type: string
+              examples:
+                Unauthorized:
+                  value:
+                    type: 'urn:dx:dmp:invalidAuthorizationToken'
+                    title: Not Authorized
+                    detail: Not Authorized
+      operationId: post-verify-payment
+      x-stoplight:
+        id: u7kbvmrhky8ed
+      parameters:
+        - schema:
+            type: string
+          in: header
+          name: token
+          required: true
+          description: DX Auth token to process the request
+      requestBody:
+        description: 'Request expects a Order Id, Payment Id and a Payment Signature which will be verified from RazorPay'
+        content:
+          application/json:
+            schema:
+              type: object
+              x-examples:
+                Example 1:
+                  razorpay_order_id: order_NoTOqKRmAl3jsl
+                  razorpay_payment_id: pay_NoTQyACML59inM
+                  razorpay_signature: 9d9111226feb8e169243145dc349a4ebc00d8ef9001e6514a0208a1b4a5f5aa7
+              required:
+                - razorpay_order_id
+                - razorpay_payment_id
+                - razorpay_signature
+              properties:
+                razorpay_order_id:
+                  type: string
+                razorpay_payment_id:
+                  type: string
+                razorpay_signature:
+                  type: string
+            examples:
+              Valid Signature:
+                value:
+                  razorpay_order_id: order_NoTOqKRmAl3jsl
+                  razorpay_payment_id: pay_NoTQyACML59inM
+                  razorpay_signature: 9d9111226feb8e169243145dc349a4ebc00d8ef9001e6514a0208a1b4a5f5aa7
+      tags:
+        - Verify-Payment
 
 tags:
   - name: Product
@@ -3523,6 +3656,10 @@ tags:
     description: |
       List resources, providers, purchases, products, product variants
     x-displayName: Consumer list API
+  - name: Verify-Payment
+    description: |
+      Verify Payment made by consumer
+    x-displayName: Verify Payment
 
 x-tagGroups:
   - name: Consumer
@@ -3531,6 +3668,7 @@ x-tagGroups:
     tags:
       - Order
       - Consumer-List-APIs
+      - Verify-Payment
   - name: Provider
     description: |
       Data marketplace specific data provider APIs.
