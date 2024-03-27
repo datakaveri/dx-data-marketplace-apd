@@ -146,6 +146,25 @@ public class QueryBuilder {
     return query.toString();
   }
 
+  public String checkProductVariantExistence(String productId, String variantName)
+  {
+    StringBuilder query =
+            new StringBuilder(CHECK_IF_PV_EXISTS
+                    .replace("$1", productId)
+                    .replace("$2", variantName));
+    return query.toString();
+  }
+
+  public String checkIfProductExists(String productId, String providerId)
+  {
+    StringBuilder query = new StringBuilder(
+            CHECK_IF_PRODUCT_EXISTS
+                    .replace("$1", productId)
+                    .replace("$2", providerId)
+    );
+    return query.toString();
+  }
+
   public String updateProductVariantStatusQuery(String productVariantId) {
     StringBuilder query =
         new StringBuilder(

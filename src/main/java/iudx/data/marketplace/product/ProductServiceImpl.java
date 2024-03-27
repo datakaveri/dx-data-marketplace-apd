@@ -243,49 +243,57 @@ public class ProductServiceImpl implements ProductService {
                 LOGGER.error("deletion failed");
                 handler.handle(Future.failedFuture(ResponseUrn.RESOURCE_NOT_FOUND_URN.getUrn()));
               } else {
-//                  pgService.executePreparedQuery(DELETE_PV_QUERY,
-//                          deleteProductVariantParams, deleteProductVariantHandler -> {
-//                      if(deleteProductVariantHandler.succeeded())
-//                      {
-//                          LOGGER.info("Product variants deleted successfully : {}",
-//                                  deleteProductVariantHandler.result());
-//
-//                      }
-//                      else
-//                      {
-//                          LOGGER.error("Failed to delete product variants : "+ deleteProductVariantHandler.cause());
-//                          RespBuilder respBuilder = new RespBuilder()
-//                                  .withType(ResponseUrn.INTERNAL_SERVER_ERR_URN.getUrn())
-//                                  .withTitle(ResponseUrn.BAD_REQUEST_URN.getMessage())
-//                                  .withDetail("Product cannot be deleted, as it was deleted previously");
-//                      }
-//                          });
+
                 pgService.executePreparedQuery(
                     DELETE_PRODUCT_QUERY.replace("$0", productTableName),
                     params,
                     pgHandler -> {
                       if (pgHandler.succeeded()) {
-                          if(!pgHandler.result().getJsonArray(RESULTS).isEmpty())
-                          {
-                              LOGGER.debug("Success : {}", pgHandler.result().encodePrettily());
-                              RespBuilder respBuilder =
+                        if (!pgHandler.result().getJsonArray(RESULTS).isEmpty()) {
+                          LOGGER.debug(
+                              "Successfully deleted product : {}",
+                              pgHandler.result().encodePrettily());
+
+                          pgService.executePreparedQuery(
+                              DELETE_PV_QUERY,
+                              deleteProductVariantParams,
+                              deleteProductVariantHandler -> {
+                                if (deleteProductVariantHandler.succeeded()) {
+                                  LOGGER.info(
+                                      "Product variants deleted successfully : {}",
+                                      deleteProductVariantHandler.result());
+                                  RespBuilder respBuilder =
                                       new RespBuilder()
-                                              .withType(ResponseUrn.SUCCESS_URN.getUrn())
-                                              .withTitle(ResponseUrn.SUCCESS_URN.getMessage())
-                                              .withDetail("Successfully deleted");
-                              handler.handle(Future.succeededFuture(respBuilder.getJsonResponse()));
+                                          .withType(ResponseUrn.SUCCESS_URN.getUrn())
+                                          .withTitle(ResponseUrn.SUCCESS_URN.getMessage())
+                                          .withDetail("Successfully deleted");
+                                  handler.handle(
+                                      Future.succeededFuture(respBuilder.getJsonResponse()));
+                                } else {
+                                  LOGGER.error(
+                                      "Failed to delete product variants : "
+                                          + deleteProductVariantHandler.cause());
+                                  RespBuilder respBuilder =
+                                      new RespBuilder()
+                                          .withType(ResponseUrn.INTERNAL_SERVER_ERR_URN.getUrn())
+                                          .withTitle(
+                                              ResponseUrn.INTERNAL_SERVER_ERR_URN.getMessage())
+                                          .withDetail(
+                                              "Something went wrong while deleting the product variants");
+                                  handler.handle(Future.failedFuture(respBuilder.getResponse()));
+                                }
+                              });
 
-                          }
-                          else
-                          {
-                              /* product has been previously deleted */
-                              RespBuilder respBuilder = new RespBuilder()
-                                      .withType(ResponseUrn.BAD_REQUEST_URN.getUrn())
-                                      .withTitle(ResponseUrn.BAD_REQUEST_URN.getMessage())
-                                      .withDetail("Product cannot be deleted, as it was deleted previously");
-                              handler.handle(Future.failedFuture(respBuilder.getResponse()));
-                          }
-
+                        } else {
+                          /* product has been previously deleted */
+                          RespBuilder respBuilder =
+                              new RespBuilder()
+                                  .withType(ResponseUrn.BAD_REQUEST_URN.getUrn())
+                                  .withTitle(ResponseUrn.BAD_REQUEST_URN.getMessage())
+                                  .withDetail(
+                                      "Product cannot be deleted, as it was deleted previously");
+                          handler.handle(Future.failedFuture(respBuilder.getResponse()));
+                        }
 
                       } else {
                         LOGGER.error("deletion failed");

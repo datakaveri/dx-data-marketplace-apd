@@ -30,7 +30,7 @@ public class Constants {
       "insert into $0 (product_id, resource_id) values ('$1', '$2')";
 
   public static final String DELETE_PRODUCT_QUERY = "update $0 set status=$1 where product_id=$2 and status = 'ACTIVE' returning product_id";
-  public static final String DELETE_PV_QUERY = "UPDATE product_variant SET status = 'ACTIVE' WHERE \n " +
+  public static final String DELETE_PV_QUERY = "UPDATE product_variant SET status = 'INACTIVE' WHERE \n " +
           "product_id = $1 \n " +
           "AND provider_id = $2 \n " +
           "RETURNING _id";
@@ -63,6 +63,8 @@ public class Constants {
                   " values ('$1', '$2', '$3', '$4','$5'::JSON, '$6', $7, '$s') RETURNING _id";
 
   public static final String UPDATE_PV_STATUS = "update $0 set status='$4' where product_id='$1' and product_variant_name='$2' and status='$3'";
+  public static final String CHECK_IF_PV_EXISTS = "SELECT * FROM product_variant WHERE product_id = '$1' AND product_variant_name = '$2' AND status = 'ACTIVE'";
+  public static final String CHECK_IF_PRODUCT_EXISTS = "SELECT * FROM product WHERE product_id = '$1' AND provider_id = '$2' AND status = 'ACTIVE'";
   public static final String UPDATE_PV_STATUS_QUERY =
       "update $0 set status='$4' where _id='$1' and status='$3' RETURNING _id";
   public static final String SELECT_PV_QUERY =
