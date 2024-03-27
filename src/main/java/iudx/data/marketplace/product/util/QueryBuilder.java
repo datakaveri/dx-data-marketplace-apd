@@ -34,11 +34,6 @@ public class QueryBuilder {
     String productID = request.getString(PRODUCT_ID);
     String providerID = request.getString(PROVIDER_ID);
     String providerName = request.getString(PROVIDER_NAME);
-    boolean isProviderNameContainingApostrophe = providerName.contains("'");
-    if(isProviderNameContainingApostrophe)
-    {
-      providerName = providerName.replace("'", "''");
-    }
     List<String> queries = new ArrayList<String>();
 
     // Product Table entry
@@ -53,7 +48,6 @@ public class QueryBuilder {
                     .toString());
 
     // Resource Table entry
-    String finalProviderName = providerName;
     resourceDetails.forEach(
             resource -> {
               queries.add(
@@ -63,7 +57,7 @@ public class QueryBuilder {
                                       .replace("$1", ((JsonObject) resource).getString(RESOURCE_ID))
                                       .replace("$2", ((JsonObject) resource).getString(RESOURCE_NAME))
                                       .replace("$3", providerID)
-                                      .replace("$4", finalProviderName)
+                                      .replace("$4", providerName)
                                       .replace("$5", request.getString(RESOURCE_SERVER))
                                       .replace("$6", ((JsonObject) resource).getString("accessPolicy")))
                               .toString());
