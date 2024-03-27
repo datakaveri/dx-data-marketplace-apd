@@ -41,7 +41,7 @@ public class LinkedAccountVerticle extends AbstractVerticle {
     createLinkedAccount =
         new CreateLinkedAccount(postgresService, api, auditingService,razorPayService);
 
-    fetchLinkedAccount = new FetchLinkedAccount(postgresService, api, razorPayService, auditingService);
+    fetchLinkedAccount = new FetchLinkedAccount(postgresService, api, razorPayService);
     updateLinkedAccount = new UpdateLinkedAccount(postgresService, api, auditingService, razorPayService);
     linkedAccountService =
         new LinkedAccountServiceImpl(createLinkedAccount, fetchLinkedAccount, updateLinkedAccount);

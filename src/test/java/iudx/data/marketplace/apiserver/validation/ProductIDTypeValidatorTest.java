@@ -57,4 +57,30 @@ public class ProductIDTypeValidatorTest {
     });
     testContext.completeNow();
   }
+  public static Stream<Arguments> invalidInput() {
+    return Stream.of(
+            Arguments.of("", false),
+            Arguments.of("     ", false)
+
+    );
+  }
+  @ParameterizedTest
+  @MethodSource("invalidInput")
+  @DisplayName("failure Test ID validator")
+  public void testIsValidFailure(String value, boolean required, VertxTestContext testContext) {
+
+    productIDTypeValidator = new ProductIDTypeValidator(value, required);
+    Exception exception = assertThrows(DxRuntimeException.class, () ->productIDTypeValidator.isValid());
+    assertTrue(exception.getMessage().contains("Invalid id"));
+    testContext.completeNow();
+  }
+
+  @Test
+  @DisplayName("test is valid method : Success")
+  public void testIsValidFailure( VertxTestContext testContext) {
+
+    productIDTypeValidator = new ProductIDTypeValidator(null, false);
+    assertTrue(productIDTypeValidator.isValid());
+    testContext.completeNow();
+  }
 }

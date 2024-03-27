@@ -129,7 +129,7 @@ public class AuthHandler implements Handler<RoutingContext> {
     return promise.future();
   }
 
-  private Future<User> getUserInfo(JsonObject tokenIntrospectResult) {
+   Future<User> getUserInfo(JsonObject tokenIntrospectResult) {
     LOGGER.info("Getting user info..");
     Promise<User> promise = Promise.promise();
     UserContainer userContainer = new UserContainer();

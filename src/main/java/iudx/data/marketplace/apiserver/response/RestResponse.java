@@ -60,8 +60,13 @@ public class RestResponse {
             return this;
         }
 
+        public Builder withStatusCode(int statusCode) {
+            this.status = statusCode;
+            return this;
+        }
+
         public RestResponse build() {
-            return new RestResponse(this.type, this.title, this.detail);
+            return new RestResponse(this.type, this.title, this.detail, this.status);
         }
 
         public RestResponse build(int statusCode, String type, String title, String detail) {

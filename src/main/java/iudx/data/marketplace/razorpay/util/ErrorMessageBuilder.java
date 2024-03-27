@@ -54,7 +54,7 @@ public class ErrorMessageBuilder {
             "The api key/secret provided is invalid".toLowerCase(),
             FAILURE_MESSAGE + ResponseUrn.INTERNAL_SERVER_ERR_URN.getMessage()),
         Map.entry(
-            "Merchant activation form has been locked for editing by admin.".toLowerCase(),
+            "Merchant activation form has been locked for editing by admin".toLowerCase(),
             "Linked account updation failed as merchant activation form has been locked for editing by admin"));
   }
 }

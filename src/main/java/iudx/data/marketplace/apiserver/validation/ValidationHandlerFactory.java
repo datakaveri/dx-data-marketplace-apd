@@ -124,7 +124,7 @@ public class ValidationHandlerFactory {
 
   private List<Validator> getPolicyValidators(final JsonObject body) {
     List<Validator> validators = new ArrayList<>();
-    validators.add(new PolicyIdTypeValidator(body.getString(POLICY_ID), true));
+    validators.add(new UUIDTypeValidator(body.getString(POLICY_ID), true));
     return validators;
   }
 

@@ -286,7 +286,7 @@
                         <exclude>iudx/data/marketplace/apiserver/ConsumerApis.class</exclude>
 
                         <!-- service proxy interfaces -->
-                        <exclude>*Service.class</exclude>
+                        <exclude>**/*Service.class</exclude>
 
 
                         <!-- deployment helper classes -->

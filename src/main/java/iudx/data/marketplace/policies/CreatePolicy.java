@@ -182,7 +182,7 @@ public class CreatePolicy {
           } else {
             LOGGER.error("Failure while executing query : {} ", detail);
             LOGGER.error("Error : {}", pgHandler.cause().getMessage());
-            promise.fail("Error : {}" + pgHandler.cause().getMessage());
+            promise.fail("Error : " + pgHandler.cause().getMessage());
           }
         });
     return promise.future();
@@ -199,7 +199,7 @@ public class CreatePolicy {
           } else {
             LOGGER.error("Failure while inserting policy for order : {}", orderId);
             LOGGER.error("Error : {}", pgHandler.cause().getMessage());
-            promise.fail("Error : {}" + pgHandler.cause().getMessage());
+            promise.fail("Error : " + pgHandler.cause().getMessage());
           }
         });
     return promise.future();
