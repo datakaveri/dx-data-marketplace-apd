@@ -143,6 +143,7 @@ public class QueryBuilder {
                             .replace("$3", Status.ACTIVE.toString())
                             .replace("$4", Status.INACTIVE.toString()));
 
+    LOGGER.debug("Query to update pv status : {}", query);
     return query.toString();
   }
 
@@ -152,6 +153,7 @@ public class QueryBuilder {
             new StringBuilder(CHECK_IF_PV_EXISTS
                     .replace("$1", productId)
                     .replace("$2", variantName));
+    LOGGER.debug("Query to check pv existence : {}", query);
     return query.toString();
   }
 
@@ -160,8 +162,8 @@ public class QueryBuilder {
     StringBuilder query = new StringBuilder(
             CHECK_IF_PRODUCT_EXISTS
                     .replace("$1", productId)
-                    .replace("$2", providerId)
     );
+    LOGGER.debug("Query to check if product exists : {}", query);
     return query.toString();
   }
 

@@ -58,7 +58,7 @@ public class ProductVariantServiceImpl implements ProductVariantService {
                         .withType(ResponseUrn.BAD_REQUEST_URN.getUrn())
                         .withTitle(ResponseUrn.BAD_REQUEST_URN.getMessage())
                         .withDetail(
-                            "Product Variant cannot be created as product is not found or is in INACTIVE state")
+                                "Product Variant cannot be created as product is in INACTIVE state or is not found")
                         .getResponse();
                 return Future.failedFuture(failureMessage);
               }
@@ -186,12 +186,32 @@ public class ProductVariantServiceImpl implements ProductVariantService {
           if (handler.succeeded()) {
             /* check if product is not found */
             boolean isEmpty = handler.result().getJsonArray(RESULTS).isEmpty();
-            if (isEmpty) {
-              LOGGER.error("Product not found for creating product variant");
-              promise.complete(false);
+            if (!isEmpty) {
+              LOGGER.debug("product is found");
+              JsonObject result = handler.result().getJsonArray(RESULTS).getJsonObject(0);
+              boolean isProductInactive = result.getString("status").equalsIgnoreCase("inactive");
+              boolean isProductBelongingToProvider =
+                  result.getString("provider_id").equals(providerId);
+              if (isProductInactive) {
+                LOGGER.error("product is already deleted");
+                promise.complete(false);
+              } else if (!isProductBelongingToProvider) {
+                LOGGER.error("ownership check failed");
+                String failureMessage =
+                    new RespBuilder()
+                        .withType(ResponseUrn.FORBIDDEN_URN.getUrn())
+                        .withTitle(ResponseUrn.FORBIDDEN_URN.getMessage())
+                        .withDetail(
+                            "Product variant cannot be created, as the provider does not own the product")
+                        .getResponse();
+                promise.fail(failureMessage);
+              } else {
+                LOGGER.debug("Product is found for creating product variant");
+                promise.complete(true);
+              }
             } else {
-              LOGGER.debug("Product is found for creating product variant");
-              promise.complete(true);
+              LOGGER.error("Product is not found");
+              promise.complete(false);
             }
           } else {
             LOGGER.error("Failure while checking the existence of product : " + handler.cause());

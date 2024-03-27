@@ -64,7 +64,7 @@ public class Constants {
 
   public static final String UPDATE_PV_STATUS = "update $0 set status='$4' where product_id='$1' and product_variant_name='$2' and status='$3'";
   public static final String CHECK_IF_PV_EXISTS = "SELECT * FROM product_variant WHERE product_id = '$1' AND product_variant_name = '$2' AND status = 'ACTIVE'";
-  public static final String CHECK_IF_PRODUCT_EXISTS = "SELECT * FROM product WHERE product_id = '$1' AND provider_id = '$2' AND status = 'ACTIVE'";
+  public static final String CHECK_IF_PRODUCT_EXISTS = "SELECT * FROM product WHERE product_id = '$1' ";
   public static final String UPDATE_PV_STATUS_QUERY =
       "update $0 set status='$4' where _id='$1' and status='$3' RETURNING _id";
   public static final String SELECT_PV_QUERY =
