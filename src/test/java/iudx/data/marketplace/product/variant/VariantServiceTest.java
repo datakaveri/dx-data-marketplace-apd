@@ -138,7 +138,18 @@ public class VariantServiceTest {
     doAnswer(Answer -> Future.succeededFuture(true)).when(variantServiceSpy).updateProductVariantStatus(anyString(),anyString());
     when(asyncResult.succeeded()).thenReturn(true);
     when(asyncResult.result()).thenReturn(jsonObjectMock);
+    when(jsonObjectMock.getJsonArray(anyString())).thenReturn(jsonArrayMock);
+    when(jsonArrayMock.isEmpty()).thenReturn(false);
     when(jsonObjectMock.getString(anyString())).thenReturn("someValue");
+
+    doAnswer(new Answer<AsyncResult<JsonObject>>() {
+      @Override
+      public AsyncResult<JsonObject> answer(InvocationOnMock invocationOnMock) throws Throwable {
+        ((Handler<AsyncResult<JsonObject>>) invocationOnMock.getArgument(1)).handle(asyncResult);
+        return null;
+      }
+    }).when(postgresService).executeQuery(any(),any());
+
     doAnswer(new Answer<AsyncResult<JsonObject>>() {
       @Override
       public AsyncResult<JsonObject> answer(InvocationOnMock invocationOnMock) throws Throwable {
