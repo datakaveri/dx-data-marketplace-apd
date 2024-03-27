@@ -38,10 +38,8 @@ SNo    Software Name<groupID:artifactID>                                License 
 36     org.mockito:mockito-inline                                       MIT                                                 None
 37     org.mockito:mockito-junit-jupiter                                MIT                                                 None
 38     com.github.java-json-tools:json-schema-validator                 Apache 2.0, Lesser General Public License (LGPL)    None
-39     dev.failsafe:failsafe                                            Apache 2.0                                          None
-40     com.github.rholder:guava-retrying                                Apache 2.0                                          None
-41     com.razorpay:razorpay-java                                       MIT                                                 None
-42     org.flywaydb:flyway-maven-plugin                                 Apache 2.0                                          None
+39     com.razorpay:razorpay-java                                       MIT                                                 None
+40     org.flywaydb:flyway-maven-plugin                                 Apache 2.0                                          None
 
 External Servers:
 SNo     Software Name     License Information                                   Modification Description
