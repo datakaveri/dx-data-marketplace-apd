@@ -58,7 +58,7 @@ paths:
                     - e3e940d9-5743-4229-bd9b-d7c2c80264bf
                     - 9c2df357-4d3b-46fd-9d24-3248867eb77e
       responses:
-        '200':
+        '201':
           description: success
           content:
             application/json:
@@ -70,7 +70,8 @@ paths:
                     type: 'urn:dx:dmp:Sucess'
                     title: Success
                     results:
-                      - productId: 'urn:datakaveri.org:iisc.ac.in/123qwerty:zxcvb'
+                      - productId: 'urn:datakaveri.org:a4c27f3f-2524-4a84-816e-91f9ab23f837:testProduct'
+                    detail: Product created successfully
         '400':
           description: invalid document
           content:
@@ -869,7 +870,7 @@ paths:
                   price: 100
                   duration: 12
       responses:
-        '200':
+        '201':
           description: 'Success'
           content:
             application/json:
@@ -887,7 +888,8 @@ paths:
                           "productId": "urn:datakaveri.org:a3ec61uer-1677-4a84-816e-91f9ab23f832:testProduct",
                           "productVariantName": "variant1"
                         }
-                      ]
+                      ],
+                      "detail": "Product Variant created successfully"
                     }
         '400':
           description: 'Bad Request'
@@ -1341,7 +1343,8 @@ paths:
                           "productId": "urn:datakaveri.org:a3ec61uer-1677-4a84-816e-91f9ab23f832:testProduct",
                           "variant": "variant1"
                         }
-                      ]
+                      ],
+                      "detail": "Product Variant created successfully"
                     }
         '400':
           description: 'Bad Request'
@@ -3171,10 +3174,12 @@ paths:
                         amount: 15000
                         currency: INR
                         status: Created
+                    detail: Order created successfully
                 required:
                   - type
                   - title
                   - results
+                  - detail
                 properties:
                   type:
                     type: string
@@ -3205,6 +3210,8 @@ paths:
                         status:
                           type: string
                           minLength: 1
+                  detail:
+                    type: string
               examples:
                 Example of Order Created:
                   value:
@@ -3216,6 +3223,8 @@ paths:
                         amount: 15000
                         currency: INR
                         status: Created
+                    detail: Order created successfully
+
         '400':
           description: Bad Request
           content:
@@ -3590,10 +3599,13 @@ components:
                 minLength: 1
             required:
               - productId
+        detail:
+          description : Detail about the response
       required:
         - type
         - title
         - results
+        - detail
       example:
         type: 'urn:dx:dmp:Success'
         title: Success
@@ -3686,10 +3698,13 @@ components:
             required:
               - productId
               - productVariantName
+        detail:
+          description: Description about the API response
       required:
         - type
         - title
         - results
+        - detail
       example:
         {
           "type": "urn:dx:dmp:success",
