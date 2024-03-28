@@ -133,9 +133,15 @@ $ java $DMP_APD_JAVA_OPTS -jar target/iudx.data.marketplace-dev-0.0.1-SNAPSHOT-f
 ### Testing
 
 ### Unit tests
-
-1. Run the tests using `mvn clean test checkstyle:checkstyle pmd:pmd`
+1. Run the tests using `mvn clean test checkstyle:checkstyle pmd:pmd`  
 2. Reports are stored in `./target/`
+
+
+### Integration tests
+Integration tests are through Rest Assured 
+1. Run the server through either docker, maven or redeployer
+2. Run the integration tests `mvn test-compile failsafe:integration-test -DskipUnitTests=true -DintTestHost=localhost -DintTestPort=8080`
+3. Reports are stored in `./target/`
 
 ## Contributing
 
