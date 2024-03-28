@@ -5,6 +5,7 @@ import static iudx.data.marketplace.auditing.util.Constants.EPOCH_TIME;
 import static iudx.data.marketplace.auditing.util.Constants.ISO_TIME;
 import static iudx.data.marketplace.product.util.Constants.TABLES;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.mock;
@@ -14,6 +15,7 @@ import static org.mockito.Mockito.when;
 
 import io.vertx.core.Future;
 import io.vertx.core.Vertx;
+import io.vertx.core.http.HttpMethod;
 import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
 import io.vertx.junit5.VertxExtension;
@@ -23,6 +25,7 @@ import java.time.ZonedDateTime;
 import java.time.temporal.ChronoUnit;
 
 import iudx.data.marketplace.auditing.databroker.DataBrokerService;
+import iudx.data.marketplace.policies.User;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -41,6 +44,8 @@ class AuditingServiceImplTest {
      JsonObject config;
     @Mock
      JsonArray jsonArray;
+    @Mock
+    User user;
 
     @BeforeEach
     public void init(VertxTestContext vertxTestContext) {
@@ -102,5 +107,33 @@ class AuditingServiceImplTest {
                     assertEquals(f.getMessage(), "failed");
                     vertxTestContext.completeNow();
                 });
+    }
+
+    @Test
+    @DisplayName("Test handle audit logs method : Success")
+    public void testHandleAuditLogsSuccess(VertxTestContext vertxTestContext)
+    {
+
+        when(databroker.publishMessage(anyString(), anyString(), any()))
+                .thenReturn(Future.succeededFuture());
+        when(user.getUserId()).thenReturn("dummyUserId");
+    auditingService
+        .handleAuditLogs(
+            user,
+            new JsonObject().put("key", "dummyValue"),
+            "/policies",
+            HttpMethod.POST.toString())
+        .onComplete(
+            handler -> {
+              System.out.println(handler);
+              if (handler.succeeded()) {
+                  verify(databroker, times(1)).publishMessage(anyString(), anyString(), any());
+                  assertNull(handler.result());
+                  vertxTestContext.completeNow();
+              } else {
+
+                  vertxTestContext.failNow("Message could not be published to RMQ");
+              }
+            });
     }
 }

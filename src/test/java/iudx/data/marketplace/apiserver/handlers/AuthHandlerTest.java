@@ -6,6 +6,7 @@ import io.vertx.core.MultiMap;
 import io.vertx.core.http.HttpMethod;
 import io.vertx.core.http.HttpServerRequest;
 import io.vertx.core.http.HttpServerResponse;
+import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
 import io.vertx.core.Future;
 import io.vertx.ext.web.RequestBody;
@@ -64,6 +65,12 @@ public class AuthHandlerTest {
   AuthClient authClient;
   @Mock
   AuthenticationService authenticationService;
+  @Mock JsonObject jsonObjectMock;
+  String userId;
+  String email;
+  String firstName;
+  String lastName;
+
 
   @BeforeEach
   public void setup(VertxTestContext testContext) {
@@ -78,6 +85,11 @@ public class AuthHandlerTest {
     jsonObject = mock(JsonObject.class);
     requestBody = mock(RequestBody.class);
     throwable = mock(Throwable.class);
+    userId = Util.generateRandomUuid().toString();
+    email = Util.generateRandomEmailId();
+    firstName = Util.generateRandomString();
+    lastName = Util.generateRandomString();
+
     AuthHandler.authenticator = mock(AuthenticationService.class);
     testContext.completeNow();
   }
@@ -320,13 +332,157 @@ public class AuthHandlerTest {
   public User getUser() {
     JsonObject jsonObject =
             new JsonObject()
-                    .put("userId", Util.generateRandomUuid().toString())
+                    .put("userId", userId)
                     .put("userRole", "provider")
-                    .put("emailId", Util.generateRandomEmailId())
-                    .put("firstName", Util.generateRandomString())
+                    .put("emailId", email)
+                    .put("firstName", firstName)
                     .put("resourceServerUrl", "rs.iudx.io")
-                    .put("lastName", Util.generateRandomString());
+                    .put("lastName", lastName);
     return new User(jsonObject);
   }
 
+public void mockDbExecution()
+{
+  lenient()
+          .doAnswer(
+                  new Answer<AsyncResult<JsonObject>>() {
+                    @Override
+                    public AsyncResult<JsonObject> answer(InvocationOnMock arg2) throws Throwable {
+                      ((Handler<AsyncResult<JsonObject>>) arg2.getArgument(2)).handle(asyncResult);
+                      return null;
+                    }
+                  })
+          .when(postgresService)
+          .executePreparedQuery(anyString(), any(),any());
+}
+  @Test
+  @DisplayName("Test getUserInfo method when user is present in the DB: Success")
+  public void testGetUserInfoSuccess(VertxTestContext vertxTestContext)
+  {
+    mockDbExecution();
+    JsonObject json = new JsonObject()
+            .put(USERID, userId)
+                    .put("email_id", email)
+                            .put("first_name", firstName)
+                                    .put("last_name", lastName);
+    JsonArray jsonArray = new JsonArray()
+            .add(json);
+    when(asyncResult.succeeded()).thenReturn(true);
+    when(asyncResult.result()).thenReturn(jsonObjectMock);
+    when(jsonObjectMock.getJsonArray(RESULTS)).thenReturn(jsonArray);
+
+    JsonObject request = new JsonObject()
+            .put("userId", userId)
+            .put(ROLE, getUser().getUserRole().getRole())
+            .put(AUD, "rs.iudx.io");
+    authHandler
+        .getUserInfo(request)
+        .onComplete(
+            handler -> {
+              if (handler.succeeded()) {
+                assertNotNull(handler.result());
+                assertEquals(getUser(), handler.result());
+                vertxTestContext.completeNow();
+              } else {
+
+                vertxTestContext.failNow("Failed to fetch user info");
+              }
+            });
+
+  }
+
+  @Test
+  @DisplayName("Test getUserInfo method when user is not present in the DB: Success")
+  public void testGetUserInfoFromAuthSuccess(VertxTestContext vertxTestContext) {
+
+    mockDbExecution();
+    JsonArray jsonArray = new JsonArray();
+    when(authClient.fetchUserInfo(any())).thenReturn(Future.succeededFuture(getUser()));
+    when(asyncResult.succeeded()).thenReturn(true);
+    when(asyncResult.result()).thenReturn(jsonObjectMock);
+    when(jsonObjectMock.getJsonArray(RESULTS)).thenReturn(jsonArray);
+
+    JsonObject request =
+        new JsonObject()
+            .put("userId", userId)
+            .put(ROLE, getUser().getUserRole().getRole())
+            .put(AUD, "rs.iudx.io");
+    authHandler
+        .getUserInfo(request)
+        .onComplete(
+            handler -> {
+              if (handler.succeeded()) {
+                assertNotNull(handler.result());
+                assertEquals(getUser(), handler.result());
+                vertxTestContext.completeNow();
+              } else {
+
+                vertxTestContext.failNow("Failed to fetch user info");
+              }
+            });
+  }
+
+  @Test
+  @DisplayName("Test getUserInfo method when DB insertion fails: Failure")
+  public void testGetUserInfoDbInsertionFailure(VertxTestContext vertxTestContext) {
+
+    mockDbExecution();
+    JsonArray jsonArray = new JsonArray();
+    when(authClient.fetchUserInfo(any())).thenReturn(Future.succeededFuture(getUser()));
+    when(asyncResult.succeeded()).thenReturn(true, false);
+    when(asyncResult.result()).thenReturn(jsonObjectMock);
+    when(asyncResult.cause()).thenReturn(throwable);
+    when(throwable.getMessage()).thenReturn("Some failure message");
+    when(jsonObjectMock.getJsonArray(RESULTS)).thenReturn(jsonArray);
+
+    JsonObject request =
+            new JsonObject()
+                    .put("userId", userId)
+                    .put(ROLE, getUser().getUserRole().getRole())
+                    .put(AUD, "rs.iudx.io");
+    authHandler
+            .getUserInfo(request)
+            .onComplete(
+                    handler -> {
+                      if (handler.failed()) {
+                        assertEquals("Some failure message", handler.cause().getMessage());
+                        verify(postgresService, times(2)).executePreparedQuery(anyString(), any(),any());
+                        verify(authClient, times(1)).fetchUserInfo(any());
+                        vertxTestContext.completeNow();
+                      } else {
+
+                        vertxTestContext.failNow("Succeeded when insertion of user in DB failed");
+                      }
+                    });
+  }
+
+
+
+  @Test
+  @DisplayName("Test getUserInfo method when DB execution fails: Failure")
+  public void testGetUserInfoDbExecutionFailed(VertxTestContext vertxTestContext) {
+    mockDbExecution();
+    when(asyncResult.succeeded()).thenReturn(false);
+    when(asyncResult.cause()).thenReturn(throwable);
+    when(throwable.getMessage()).thenReturn("Some failure message");
+
+    JsonObject request =
+            new JsonObject()
+                    .put("userId", userId)
+                    .put(ROLE, getUser().getUserRole().getRole())
+                    .put(AUD, "rs.iudx.io");
+    authHandler
+            .getUserInfo(request)
+            .onComplete(
+                    handler -> {
+                      if (handler.failed()) {
+                        assertEquals("Some failure message", handler.cause().getMessage());
+                        verify(postgresService, times(1)).executePreparedQuery(anyString(), any(),any());
+                        vertxTestContext.completeNow();
+                      } else {
+
+                        vertxTestContext.failNow("Succeeded when insertion of user in DB failed");
+                      }
+                    });
+  }
 }
