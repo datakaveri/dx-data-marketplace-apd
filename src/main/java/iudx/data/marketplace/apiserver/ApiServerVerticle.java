@@ -157,7 +157,7 @@ public class ApiServerVerticle extends AbstractVerticle {
                                 .withType(code.getUrn())
                                 .withTitle(code.getDescription())
                                 .withDetail(code.getDescription())
-                                .toString());
+                                .getResponse());
                   });
             });
 
