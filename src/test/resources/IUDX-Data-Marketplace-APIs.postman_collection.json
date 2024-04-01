@@ -2953,69 +2953,6 @@
 							"response": []
 						},
 						{
-							"name": "200 - List purchases by orderId",
-							"event": [
-								{
-									"listen": "test",
-									"script": {
-										"exec": [
-											"",
-											"// Test the response code",
-											"pm.test(\"response is 200 (OK)\", function () {",
-											"    pm.response.to.have.status(200);",
-											"});",
-											"",
-											"// Test the response header",
-											"pm.test(\"Check response header\", function () {",
-											"    pm.response.to.have.header(\"Content-Type\",\"application/json\");",
-											"});",
-											"",
-											"// Test the response",
-											"pm.test(\"Check response body\", function () {    ",
-											"    const body = pm.response.json();",
-											"    pm.expect(body).to.have.property(\"type\", \"urn:dx:dmp:success\");",
-											"    pm.expect(body).to.have.property(\"title\", \"Success\");",
-											"    }",
-											");"
-										],
-										"type": "text/javascript"
-									}
-								}
-							],
-							"request": {
-								"method": "GET",
-								"header": [
-									{
-										"key": "token",
-										"value": "{{providerDelegateToken}}",
-										"type": "text"
-									}
-								],
-								"url": {
-									"raw": "{{baseUrl}}/provider/list/purchases?paymentStatus=pending&orderId=order_No4SmVypmMrw1M",
-									"host": [
-										"{{baseUrl}}"
-									],
-									"path": [
-										"provider",
-										"list",
-										"purchases"
-									],
-									"query": [
-										{
-											"key": "paymentStatus",
-											"value": "pending"
-										},
-										{
-											"key": "orderId",
-											"value": "order_No4SmVypmMrw1M"
-										}
-									]
-								}
-							},
-							"response": []
-						},
-						{
 							"name": "204 - No Content",
 							"event": [
 								{
