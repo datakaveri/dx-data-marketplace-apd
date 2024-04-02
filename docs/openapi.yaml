@@ -3306,7 +3306,7 @@ paths:
                     email: test@provider.com
                   item:
                     itemId: 2a0be315-4165-4c5b-a74e-116cc89272cb
-                    itemType: resource
+                    itemType: RESOURCE
       responses:
         '200':
           description: |-
