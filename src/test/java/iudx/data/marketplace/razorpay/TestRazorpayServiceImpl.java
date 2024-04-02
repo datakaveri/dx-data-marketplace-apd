@@ -336,14 +336,11 @@ public class TestRazorpayServiceImpl {
         .fetchProductConfiguration(request)
         .onComplete(
             handler -> {
-              LOGGER.info(handler);
               if (handler.failed()) {
-                JsonObject actual = new JsonObject(handler.cause().getMessage());
-                assertEquals(403, actual.getInteger(TYPE));
-                assertEquals(ResponseUrn.FORBIDDEN_URN.getUrn(), actual.getString(TITLE));
+                String actual = handler.cause().getMessage();
                 assertEquals(
                     "To activate linked account please complete the KYC, filling account information etc., in your Razorpay merchant dashboard",
-                    actual.getString(DETAIL));
+                    actual);
                 vertxTestContext.completeNow();
               } else {
                 vertxTestContext.failNow("Succeeded when account status is inactive");

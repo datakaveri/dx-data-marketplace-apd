@@ -360,19 +360,13 @@ public class ProductServiceImpl implements ProductService {
               json -> {
                 resultContainer.resultJson = json;
                 boolean isStatusActivated = json.getString("status").equalsIgnoreCase("ACTIVATED");
-                if(isStatusActivated)
-                {
-                    return Future.succeededFuture(true);
-                }
-                return Future.failedFuture("The linked account is not activated," +
-                        " please update the KYC, account information etc.," +
-                        " in your Razorpay merchant dashboard");
+                  return Future.succeededFuture(isStatusActivated);
               })
           .compose(
               isAccountStatusActive -> {
                 if (!isAccountStatusActive) {
                   /* check if account is activated in Razorpay */
-                  razorPayService.fetchProductConfiguration(
+                    return razorPayService.fetchProductConfiguration(
                       resultContainer.resultJson); /* update status in merchant_table */
                 }
                 /* account is activated */
