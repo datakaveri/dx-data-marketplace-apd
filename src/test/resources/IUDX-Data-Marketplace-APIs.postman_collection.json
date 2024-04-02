@@ -3534,7 +3534,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n  \"user\": {\n    \"id\": \"d67a19d5-9a26-5d7c-b0e7-58e7f3b222e2\",\n    \"name\": {\n    \"firstName\":\"demo\",\n    \"lastName\":\"name\"\n    },\n    \"email\": \"abc31111111221ac@xyz.com\"\n  },\n  \"owner\": {\n    \"id\": \"4e563a5f-35f0-4f32-92be-8830775a1c5e\",\n    \"name\": {\n    \"firstName\":\"Test\",\n    \"lastName\":\"provider\"\n    },\n    \"email\": \"testprovider@example.com\"\n  },\n   \"item\": {\n     \"itemId\": \"d67a19d5-9a26-5d7c-b0e7-58e7f3b222e2\",\n     \"itemType\": \"resource\"\n   }\n}",
+							"raw": "{\n  \"user\": {\n    \"id\": \"d67a19d5-9a26-5d7c-b0e7-58e7f3b222e2\",\n    \"name\": {\n    \"firstName\":\"demo\",\n    \"lastName\":\"name\"\n    },\n    \"email\": \"abc31111111221ac@xyz.com\"\n  },\n  \"owner\": {\n    \"id\": \"4e563a5f-35f0-4f32-92be-8830775a1c5e\",\n    \"name\": {\n    \"firstName\":\"Test\",\n    \"lastName\":\"provider\"\n    },\n    \"email\": \"testprovider@example.com\"\n  },\n   \"item\": {\n     \"itemId\": \"d67a19d5-9a26-5d7c-b0e7-58e7f3b222e2\",\n     \"itemType\": \"RESOURCE_GROUP\"\n   }\n}",
 							"options": {
 								"raw": {
 									"language": "json"
