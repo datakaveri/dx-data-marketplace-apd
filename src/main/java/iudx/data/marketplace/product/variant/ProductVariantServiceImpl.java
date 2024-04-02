@@ -92,9 +92,19 @@ public class ProductVariantServiceImpl implements ProductVariantService {
                 JsonObject res = pdfHandler.result().getJsonArray(RESULTS).getJsonObject(0);
                 JsonArray resResources = res.getJsonArray(RESOURCES_ARRAY);
                 if (resources.size() != resResources.size()) {
-                  handler.handle(
-                      Future.failedFuture(
-                          "Number of resources is incorrect, required : " + resResources.size()));
+                    /* if the number of resources listed while creating product variant !=
+                    * number of resources listed while creating product
+                    * then bad request is thrown and returned without creating product variant */
+                  String detail =
+                      "Number of resources is incorrect, required : " + resResources.size();
+                  String failureMessage =
+                      new RespBuilder()
+                          .withType(ResponseUrn.BAD_REQUEST_URN.getUrn())
+                          .withTitle(ResponseUrn.BAD_REQUEST_URN.getMessage())
+                          .withDetail(detail)
+                          .getResponse();
+                  handler.handle(Future.failedFuture(failureMessage));
+                  return;
                 }
                 int i, j;
                 for (i = 0; i < resources.size(); i++) {
