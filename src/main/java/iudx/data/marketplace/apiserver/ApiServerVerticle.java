@@ -286,7 +286,7 @@ public class ApiServerVerticle extends AbstractVerticle {
     ValidationHandler orderPaidRequestValidationHandler =
         new ValidationHandler(vertx, RequestType.ORDER_PAID_WEBHOOK);
     router
-        .post("/order-paid-webhook")
+        .post("/order-paid-webhooks")
         .handler(this::handleWebhookSignatureValidation)
         .handler(orderPaidRequestValidationHandler)
         .handler(this::orderPaidRequestHandler)
@@ -303,7 +303,7 @@ public class ApiServerVerticle extends AbstractVerticle {
     ValidationHandler paymentFailedRequestValidationHandler =
         new ValidationHandler(vertx, RequestType.PAYMENT_FAILED_WEBHOOK);
     router
-        .post("/payment-failed")
+        .post("/payments-failed")
         .handler(this::handleWebhookSignatureValidation)
         .handler(paymentFailedRequestValidationHandler)
         .handler(this::paymentFailedRequestHandler);
