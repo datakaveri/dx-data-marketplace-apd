@@ -9,8 +9,8 @@ services:
   integTest:
     image: ghcr.io/datakaveri/dmp-apd-server-depl:latest
     volumes:
-      - /home/ubuntu/configs/dmp-apd-server-config.json:/usr/share/app/configs/dmp-apd-server.json
-      - /home/ubuntu/configs/dmp-apd-server-keystore.jks:/usr/share/app/configs/keystore.jks
+      - /home/ubuntu/configs/5.5.0/dmp-apd-server-config.json:/usr/share/app/configs/5.5.0/dmp-apd-server.json
+      - /home/ubuntu/configs/5.5.0/dmp-apd-server-keystore.jks:/usr/share/app/configs/5.5.0/keystore.jks
       - dmp-apd-server-volume:/usr/share/app/storage/temp-dir
     depends_on:
       - zookeeper
@@ -24,7 +24,7 @@ services:
       options:
         max-file: "5"
         max-size: "100m"
-    command: bash -c "exec java $$DMP_JAVA_OPTS -Dvertx.logger-delegate-factory-class-name=io.vertx.core.logging.Log4j2LogDelegateFactory -jar ./fatjar.jar --host $$(hostname) -c configs/dmp-apd-server.json"
+    command: bash -c "exec java $$DMP_JAVA_OPTS -Dvertx.logger-delegate-factory-class-name=io.vertx.core.logging.Log4j2LogDelegateFactory -jar ./fatjar.jar --host $$(hostname) -c configs/5.5.0/dmp-apd-server.json"
 
   zookeeper:
     image: zookeeper:latest
