@@ -28,7 +28,7 @@ pipeline {
     stage('Unit Tests and Code Coverage Test'){
       steps{
         script{
-          sh 'cp /home/ubuntu/configs/5.5.0/dmp-apd-server-config-test.json ./secrets/all-verticles-configs/5.5.0/config-test.json'
+          sh 'cp /home/ubuntu/configs/5.5.0/dmp-apd-server-config-test.json ./secrets/all-verticles-configs/config-test.json'
            catchError(buildResult: 'SUCCESS', stageResult: 'UNSTABLE') {
               sh "mvn clean test checkstyle:checkstyle pmd:pmd"
             }  
