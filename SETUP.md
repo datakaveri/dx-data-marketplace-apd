@@ -26,400 +26,128 @@ The DX DMP APD also connects with various DX dependencies namely
 - Authorization Server : used to download the certificate for token decoding
 - Catalogue Server : used to download the list of resources, access policies and resource related information.
 - Auditing Server : used to store metering related data.
-## Setting up Data marketplace APD server with dependencies
+# Setting up Data marketplace APD server with dependencies
 
 **Note** : Access to HTTP APIs for search functionality should be configured with TLS and RBAC privileges
 
-In order to connect to the appropriate DB required information such as databaseIP,databasePort etc. should be updated in the PostgresVerticle modules available in [config-example.json](configs/config-example.json).
+## Setting up config
+- In order to setup PostgreSQL, RabbitMQ, Razorpay Service, connect with DX Catalogue Server, DX AAA Server, DX Auditing server, 
+appropriate information could be updated in configs available
+- Please refer [README.md](secrets/README.md) to update config options
 
 
-**ApiServerVerticle**
+## Prerequisites
+### Keycloak registration for DX DMP-APD as trustee and DMP
+- The trustee user must be registered on Keycloak as a user
+  - This can be done via the keycloak admin panel, or by using Data Exchange (DX) UI
+  - The trustee user need not have any roles beforehand
+- The COS admin user must call the create APD API : [Link to the API](https://authorization.iudx.org.in/apis#tag/Access-Policy-Domain-(APD)-APIs/operation/post-auth-v1-apd)
+  with the name as the name of the APD, owner as email address of trustee (same as whatever is registered on Keycloak)
+  and URL as the domain of the APD
+- Once the APD has been successfully registered, the trustee user will gain the trustee role
+  scoped to that particular APD.
+  - They can verify this by calling the list user roles API : [Link to the API](https://authorization.iudx.org.in/apis#tag/User-APIs/operation/get-auth-v1-user-roles)
+- The trustee can get client credentials to be used in APD Operations by calling the
+  get default client credentials API : [Link to the API](https://authorization.iudx.org.in/apis#tag/User-APIs/operation/get-auth-v1-user-clientcredentials)
+
+### Razorpay Registration
+- DMP APD Server could acts a sub-merchant to onboard providers (merchants) for creating-linked account by creating an account in Razorpay :
+ [Link to dashboard](https://dashboard.razorpay.com/?screen=sign_in)
+- The live account mode needs to be activated in Razorpay by completing the KYC, filling other details
+- Live account needs to be activated in order to allow the real-time transactions
+
+### Razorpay Registration
+Linked account creation at DMP involves :
+- Registration as provider at Data Exchange (DX) Platform 
+- Approval of provider
+  - Link to the get provider registration API : [here](https://authorization.iudx.org.in/apis#tag/Admin-APIs/operation/get-auth-v1-admin-provider-registrations)
+  - Link to the update provider registration API : [here](https://authorization.iudx.org.in/apis#tag/Admin-APIs/operation/put-auth-v1-admin-provider-registrations)
+- Registration as merchant at Razorpay
+  - Link to the dashboard : [here](https://dashboard.razorpay.com/)
+- Creation of resource items at Catalogue Server
+  - Link to create item : [here](https://cos.iudx.org.in/cat/apis#tag/Entity/operation/create%20item)
+- Creation of Linked account at Data Marketplace server
+- Creation of Product at Data Marketplace server
+
+
+### Webhook Creation at Razorpay
+- Two Webhooks are to be created on Razorpay dashboard to capture information about 2 events from Razorpay asynchronously
+  - Order-paid
+  - Payment failed
+- A secret should be added while creating the webhook and could be stored in config-dev with field name : webhook_secret
+
+| Name           | Endpoint on DMP                       | Event on Razorpay |
+|----------------|---------------------------------------|-------------------|
+| Order paid     | https://<baseUrl>/order-paid-webhooks | order-paid        |
+| Payment failed | https://<baseUrl>/payments-failed     | payment-failed    |
+
+### Testing Payment flow in Razorpay’s test mode
+- When the mode in Razorpay dashboard is test mode, the payment flow could be simulated by consumer 
+buying a product-variant from UI
+- When consumer clicks on check-out and buys a 
+product variant on UI, a payment page from Razorpay pops up
+- After the consumer selects options like netbanking 
+and clicks on pay now, the consumer could select Success or Failed button to simulate the success or failure flow
+- In Success flow, the consumer’s purchase is successful 
+and a policy is created for the resources listed under the given product variant
+- During failure flow, the consumer’s purchase fails and
+could be fetched in list failed purchase
+
+
+
+## Setting up RabbitMQ for DX DMP-APD Server
+- To setup RMQ refer the docker files available [here](https://github.com/datakaveri/iudx-deployment/blob/master/Docker-Swarm-deployment/single-node/databroker)
+
+### vHost table
+| vHost         |  
+|---------------|
+| IUDX-INTERNAL |
+
+### Exchange table
+| Exchange Name | Type of exchange | features |   
+|---------------|------------------|----------|
+| auditing      | direct           | durable  | 
+
+### Queue table
+| Exchange Name | Queue Name | vHost   | routing key |
+|---------------|------------|---------|-------------|
+| auditing      | direct     | durable | #           |
+
+### Permissions
+DMP-APD user could have write permission as it publishes audit data
 ```
-    {
-      "id": "iudx.data.marketplace.apiserver.ApiServerVerticle",
-      "verticleInstances": <number-of-verticle-instances>,
-      "isWorkerVerticle": false,
-      "keystore": "<path/to/keystore.jks>",
-      "keystorePassword": ",keystore-password>",
-      "ip": "localhost",
-      "httpPort": <port-number>,
-      "ssl": false
-    }
-```
-
-
-----
-
-## Setting up PostgreSQL for DX DMP APD Server
--  Refer to the docker files available [here](https://github.com/datakaveri/iudx-deployment/blob/master/Docker-Swarm-deployment/single-node/postgres) to setup PostgreSQL
-
-**Note** : PostgresQL database should be configured with a RBAC user having CRUD privileges
-
-In order to connect to the appropriate Postgres database, required information such as databaseIP,databasePort etc. should be updated in the PostgresVerticle module available in [config-example.json](secrets/all-verticles-configs/config-example.json).
-
-**PostgresVerticle**
-```
-{
-    "id": "iudx.resource.server.database.postgres.PostgresVerticle",
-    "isWorkerVerticle":false,
-    "verticleInstances": <num-of-verticle-instances>,
-    "databaseIp": "localhost",
-    "databasePort": <port-number>,
-    "databaseName": <database-name>,
-    "databaseUserName": <username-for-psql>,
-    "databasePassword": <password-for-psql>,
-    "poolSize": <pool-size>
-}
-```
-
-
-## Setting up RazorPayVerticle for DX DMP APD Server
-
-**RazorPayVerticle**
-```
-{
-      "id": "iudx.data.marketplace.razorpay.RazorPayVerticle",
-      "verticleInstances": <num-of-verticle-instances>,
-      "isWorkerVerticle": false,
-      "razorPayKey": "<razorpay-generated-key>",
-      "razorPaySecret": "<razorpay-generated-password>"
-    }
-```
-
-
-#### Schemas for PostgreSQL tables in DX DMP APD Server
-- Refer to Flyway Schemas [here](https://github.com/datakaveri/iudx-data-marketplace-apd/tree/main/src/main/resources/db/migration).
-1. User Table Schema to store user information
-```
-CREATE TABLE IF NOT EXISTS user_table
-(
- _id uuid NOT NULL,
-  email_id varchar NOT NULL,
-	first_name varchar NOT NULL,
-	last_name varchar NOT NULL,
-	created_at timestamp without time zone NOT NULL,
-	modified_at timestamp without time zone NOT NULL,
-	CONSTRAINT user_pk PRIMARY KEY (_id)
-
-);
-```
-
-2. Resource entity schema to store information fetch from DX Catalogue server
-```
-
-CREATE TABLE IF NOT EXISTS resource_entity
-(
-    _id uuid NOT NULL,
-    resource_name varchar UNIQUE NOT NULL,
-    provider_name varchar NOT NULL,
-	provider_id uuid NOT NULL,
-	resource_server varchar NOT NULL,
-	accessPolicy varchar NOT NULL,
-	created_at timestamp without time zone NOT NULL,
-	modified_at timestamp without time zone NOT NULL,
-	CONSTRAINT resource_pk PRIMARY KEY (_id),
-	CONSTRAINT provider_id_fk FOREIGN KEY (provider_id) REFERENCES user_table(_id)
-);
-```
-3. Product Table Schema 
-```
-CREATE TABLE IF NOT EXISTS product
-(
-    product_id varchar UNIQUE NOT NULL,
-    status status_type NOT NULL,
-    provider_id UUID NOT NULL,
-    provider_name varchar NOT NULL,
-    created_at timestamp without time zone NOT NULL,
-    modified_at timestamp without time zone NOT NULL,
-    CONSTRAINT product_pk PRIMARY KEY (product_id),
-    CONSTRAINT provider_id_fk FOREIGN KEY (provider_id)
-    REFERENCES user_table(_id)
-);
-```
-4. Product Resource Relation Table Schema
-```
-CREATE TABLE IF NOT EXISTS product_resource_relation
-(
-    product_id varchar REFERENCES product (product_id),
-    resource_id uuid REFERENCES resource_entity (_id),
-    _id uuid DEFAULT uuid_generate_v4 () NOT NULL,
-    CONSTRAINT _id_pkey PRIMARY KEY (_id)
-);
-```
-5. Merchant Table Schema to store information about provider during payment gateway onboarding
-```
-CREATE TABLE IF NOT EXISTS merchant_table
-	(
-		reference_id varchar(20) NOT NULL PRIMARY KEY,
-		phone_number numeric NOT NULL,
-		email varchar NOT NULL UNIQUE,
-		legal_business_name varchar NOT NULL,
-		customer_facing_business_name varchar NOT NULL,
-		account_id varchar NOT NULL UNIQUE,
-		provider_id UUID NOT NULL UNIQUE,
-		status linked_account_status_type NOT NULL,
-		rzp_account_product_id varchar NOT NULL UNIQUE,
-		created_at timestamp without time zone NOT NULL,
-		modified_at timestamp without time zone NOT NULL,
-		CONSTRAINT provider_id_fk FOREIGN KEY (provider_id) REFERENCES user_table(_id)
-	);
+ "permissions": [
+        {
+          "vhost": "IUDX-INTERNAL",
+          "permission": {
+            "configure": "^$",
+            "write": "^auditing$",
+            "read": "^$"
+          }
+        }
+]
 ```
 
-6. Product Variant Table Schema
-```
-CREATE TABLE IF NOT EXISTS product_variant
-(
-    _id uuid NOT NULL PRIMARY KEY,
-    product_variant_name varchar NOT NULL,
-    product_id varchar NOT NULL,
-    provider_id uuid NOT NULL,
-    resource_name varchar[] NOT NULL,
-    resource_ids_and_capabilities jsonb NOT NULL,
-    price numeric NOT NULL,
-    validity numeric NOT NULL,
-    status status_type NOT NULL,
-    created_at timestamp without time zone NOT NULL,
-    modified_at timestamp without time zone NOT NULL,
-    CONSTRAINT product_id_fk FOREIGN KEY (product_id)
-    REFERENCES product (product_id),
-    CONSTRAINT provider_id_fk FOREIGN KEY (provider_id)
-    REFERENCES user_table (_id)
-);
-```
+## Setting up Postgres for DX DMP-APD Server
+- To setup PostgreSQL refer the docker files available [here](https://github.com/datakaveri/iudx-deployment/blob/master/Docker-Swarm-deployment/single-node/postgres)
+- **Note** : PostgreSQL database should be configured with a RBAC user having CRUD privileges
+- Schemas for PostgreSQL tables are present here - [Flyway schema](src/main/resources/db/migration)
 
-7. Order table schema 
-```
-CREATE TABLE IF NOT EXISTS order_table (
-    order_id varchar NOT NULL,
-    amount integer NOT NULL,
-    currency currency NOT NULL,
-    account_id varchar NOT NULL,
-    notes json NOT NULL,
-    created_at timestamp without time zone NOT NULL,
-    CONSTRAINT order_id_pk PRIMARY KEY (order_id),
-	CONSTRAINT account_id_fk FOREIGN KEY (account_id)
-	REFERENCES merchant_table(account_id)
+| Table Name                | Purpose                                                                                                                              |
+|---------------------------|--------------------------------------------------------------------------------------------------------------------------------------|
+| user_table                | To store user related information like first name, last name, email etc, that is fetched from AAA Server                             |
+| resource_entity           | To store resource information fetched from catalogue                                                                                 |
+| policy                    | To store policy related information, resource info, consumer and provider info                                                       |
+| product                   | For storing provider, product related information                                                                                    |
+| merchant_table            | For storing linked account related information of the provider along with razorpay account_id, account product ID,  business details |
+| product_resource_relation | For mapping the product ID with resource ID(s)                                                                                       |
+| product_variant           | For storing product variants of a given product                                                                                      |
+| order_table               | For storing order ID from Razorpay, amount of the product variant, currency used etc.,                                               |
+| payment_table             | To store payment related information like paymentId, payment signature, orderId from Razorpay to verify a payment                    |
+| invoice                   | To store purchase related information                                                                                                |
 
-);
-```
-8. Payment Table Schema
-```
-CREATE TABLE IF NOT EXISTS payment_table (
-    order_id varchar NOT NULL,
-    payment_id varchar NOT NULL,
-    payment_signature varchar NOT NULL,
-    created_at timestamp without time zone NOT NULL,
-    CONSTRAINT payment_pk PRIMARY KEY (payment_id),
-    CONSTRAINT order_id_fk FOREIGN KEY (order_id)
-        REFERENCES order_table (order_id)
-);
-
-```
-9. Invoice Table schema to store information related to purchase
-```
-CREATE TABLE IF NOT EXISTS invoice
-(
-    _id uuid DEFAULT uuid_generate_v4 () NOT NULL,
-    consumer_id uuid NOT NULL,
-    order_id varchar NOT NULL,
-    product_variant_id uuid NOT NULL,
-    payment_status payment_status_type NOT NULL,
-    payment_time timestamp without time zone NOT NULL,
-    expiry numeric NOT NULL,
-    created_at timestamp without time zone NOT NULL,
-    modified_at timestamp without time zone NOT NULL,
-    CONSTRAINT invoice_id_pk PRIMARY KEY (_id),
-    CONSTRAINT consumer_id_fk FOREIGN KEY (consumer_id)
-    REFERENCES user_table (_id),
-    CONSTRAINT invoice_product_variant_id_fkey FOREIGN KEY (product_variant_id)
-    REFERENCES product_variant (_id),
-    CONSTRAINT fk_invoice_order FOREIGN KEY (order_id)
-    REFERENCES order_table (order_id)
-
-
-);
-```
-10. Policy Table schema 
-```
-CREATE TABLE IF NOT EXISTS policy
-(
-    _id uuid DEFAULT uuid_generate_v4 () NOT NULL,
-    resource_id uuid NOT NULL,
-    invoice_id uuid NOT NULL,
-    constraints json NOT NULL,
-    provider_id uuid NOT NULL,
-    consumer_email_id varchar NOT NULL,
-    expiry_at timestamp without time zone NOT NULL,
-    status policy_status NOT NULL,
-    product_variant_id uuid NOT NULL,
-    created_at timestamp without time zone NOT NULL,
-    modified_at timestamp without time zone NOT NULL,
-    CONSTRAINT resource_id_fk FOREIGN KEY(resource_id) REFERENCES resource_entity(_id),
-    CONSTRAINT provider_id_fk FOREIGN KEY (provider_id) REFERENCES user_table (_id),
-    CONSTRAINT policy_product_variant_id_fkey FOREIGN KEY (product_variant_id) REFERENCES product_variant (_id),
-    CONSTRAINT policy_invoice_id_fkey FOREIGN KEY (invoice_id) REFERENCES invoice (_id)
-);
-```
-11. Auditing Server Auditing Table for DMP
-```
-CREATE TABLE IF NOT EXISTS auditing_dmp
-(
-   _id uuid DEFAULT uuid_generate_v4 () NOT NULL PRIMARY KEY,
-   user_id uuid NOT NULL,
-   api varchar NOT NULL,
-   method varchar NOT NULL,
-   info JSON NOT NULL,
-   time timestamp without time zone NOT NULL,
-   created_at timestamp without time zone NOT NULL,
-   modified_at timestamp without time zone NOT NULL
-);
-```
-
-----
-
-## Setting up RabbitMQ for DX DMP APD Server
-- Refer to the docker files available [here](https://github.com/datakaveri/iudx-deployment/blob/master/Docker-Swarm-deployment/single-node/databroker) to setup RMQ.
-
-
-In order to connect to the appropriate RabbitMQ instance, required information such as dataBrokerIP,dataBrokerPort etc. should be updated in the AuditingVerticle module available in [config-example.json](configs/config-example.json).
-
-**AuditingVerticle**
-```
-    {
-      "id": "iudx.data.marketplace.auditing.AuditingVerticle",
-      "isWorkerVerticle": false,
-      "verticleInstances": <num-of-verticle-instances>,
-      "dataBrokerIP": "localhost",
-      "dataBrokerPort": <port-number>,
-      "dataBrokerVhost": "<vHost-name>",
-      "dataBrokerUserName": "<username-for-rmq>",
-      "dataBrokerPassword": "<password-for-rmq>",
-      "dataBrokerManagementPort": <management-port-number>,
-      "connectionTimeout": <time-in-milliseconds>,
-      "requestedHeartbeat": <time-in-seconds>,
-      "handshakeTimeout": <time-in-milliseconds>,
-      "requestedChannelMax": <num-of-max-channels>,
-      "networkRecoveryInterval": <time-in-milliseconds>,
-      "automaticRecoveryEnabled": "true",
-      "prodVhost": "<vHost-name-for-production-server>",
-      "internalVhost": "<VHost-name>",
-      "externalVhost": "<vHost-name>"
-    }
-```
-
-----
-
-## Setting up all the other verticles
-
-
-In order to use the consumer and provider APIs in DMP, we need to input required information in PolicyVerticle, ProductVerticle, ProductVariantVerticle, ConsumerVerticle, LinkedAccountVerticle modules available in [config-example.json](configs/config-example.json).
-
-**ProductVerticle**
-```
-    {
-      "id": "iudx.data.marketplace.product.ProductVerticle",
-      "verticleInstances": <num-of-verticle-instances>,
-      "isWorkerVerticle": false,
-      "isAccountActivationCheckBeingDone" : <true|false>
-    }
-```
-
-**ProductVariantVerticle**
-```
-    {
-      "id": "iudx.data.marketplace.product.variant.ProductVariantVerticle",
-      "verticleInstances": <num-of-verticle-instances>,
-      "isWorkerVerticle": false
-    }
-```
-**ConsumerVerticle**
-```
-    {
-      "id": "iudx.data.marketplace.consumer.ConsumerVerticle",
-      "verticleInstances": <num-of-verticle-instances>,
-      "isWorkerVerticle": false
-    }
-```
-**LinkedAccountVerticle**
-```
-    {
-      "id": "iudx.data.marketplace.apiserver.provider.linkedAccount.LinkedAccountVerticle",
-      "verticleInstances": <num-of-verticle-instances>,
-      "isWorkerVerticle": false
-    }
-```
-
-**PolicyVerticle**
-```
-    {
-      "id": "iudx.data.marketplace.policies.PolicyVerticle",
-      "isWorkerVerticle": false,
-      "verticleInstances": <num-of-verticle-instances>
-    }
-
-```
-
-**WebhookVerticle**
-``` 
-  {
-      "id": "iudx.data.marketplace.webhook.WebhookVerticle",
-      "verticleInstances": <num-of-verticle-instances>,
-      "isWorkerVerticle": false
-    }
-```
-
-## Connecting with DX Catalogue Server and having base path
-
-In order to connect to the DX catalogue server, required information such as catServerHost,catServerPort ,server specific base path should be updated in the common config module availabe in [config-example.json](configs/config-example.json).
-
-**CommonConfig**
-```
-  "commonConfig": {
-    "dxApiBasePath": "<dmp-apd-api-base-path>",
-    "dxCatalogueBasePath": "<base-path-for-catalogue-server>",
-    "dxAuthBasePath": "<base-path-for-authentication-server>",
-    "catServerPort":<catalogue-server-port-number>,
-    "catServerHost": "<catalogue-server-host>",
-    "catItemPath": "<catalogue-item-api-path>",
-    "catRelPath": "<catalgoue-relationship-api-path>",
-    "tables": [
-      "product",
-      "resource_entity",
-      "product_resource_relation",
-      "product_variant",
-      "user_table",
-      "policy",
-      "invoice",
-      "order_table",
-      "merchant_table",
-      "payment_table"
-    ],
-    "authPort": <auth-server-port-number>,
-    "authHost": "<authentication-server-host>",
-    "clientId": "<dmp-apd-client-id>",
-    "clientSecret": "<dmp-apd-client-secret>",
-    "enableLogging": false
-  }
-
-```
-
--------
-
-
-## Connecting with DX Authorization Server
-
-In order to connect to the DX authentication server, required information such as issuer, auth server host, DMP APD URL should be updated in the AuthenticationVerticle module availabe in [config-example.json](configs/config-example.json).
-
-**AuthenticationVerticle**
-```
-    {
-      "id": "iudx.data.marketplace.authenticator.AuthenticationVerticle",
-      "verticleInstances": <number-of-verticle-instances>,
-      "isWorkerVerticle": false,
-      "authServerHost": "<auth-host-url>",
-      "jwtIgnoreExpiry": <true | false>,
-      "issuer": "<token-issuer-url>",
-      "apdURL": "<dmp-apd-url>"
-    }
-```
-
+## Setting up Auditing for DX DMP-APD Server
+- Auditing is done using Immudb and Postgres DB
+- To Setup immuclient for immudb please refere [here](link-to-iudx-deployment-repo-to-setup-immuclient) #TODO
+- Schema for PostgreSQL table is present [here](https://github.com/datakaveri/iudx-resource-server/blob/master/src/main/resources/db/migration/V5_2__create-auditing-acl-apd-table.sql)
+- Schema for Immudb table, index for the table is present [here](link-to-iudx-auditing-server-repo-immudb-schema-sql-file) #TODO
