@@ -192,12 +192,14 @@ public class QueryBuilder {
     return query.toString();
   }
 
-  public String listProductVariants(JsonObject request) {
+  public String listProductVariants(JsonObject request, String providerId) {
 
     StringBuilder query = new StringBuilder(
             FETCH_ACTIVE_PRODUCT_VARIANTS);
+    query.append(" AND P.\"providerId\"=$3");
+
     if(request.containsKey(Constants.PRODUCT_VARIANT_NAME)) {
-      query.append(" AND P.\"productVariantName\"=$3");
+      query.append(" AND P.\"productVariantName\"=$4");
     }
     query.append(" ORDER BY P.\"updatedAt\" DESC");
     LOGGER.debug(query);
