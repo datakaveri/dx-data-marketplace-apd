@@ -374,12 +374,14 @@ public class ProductVariantServiceImpl implements ProductVariantService {
 
     LOGGER.debug(request);
     String resourceServerUrl = user.getResourceServerUrl();
-    String query = queryBuilder.listProductVariants(request);
+    String providerId = user.getUserId();
+    String query = queryBuilder.listProductVariants(request, providerId);
 
     JsonObject params =
         new JsonObject()
             .put(PRODUCT_ID, request.getString(PRODUCT_ID))
-            .put("resourceServerUrl", resourceServerUrl);
+            .put("resourceServerUrl", resourceServerUrl)
+            .put("providerId", providerId);
 
     if (request.containsKey(PRODUCT_VARIANT_NAME)) {
       params.put(PRODUCT_VARIANT_NAME, request.getString(PRODUCT_VARIANT_NAME));
