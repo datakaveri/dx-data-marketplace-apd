@@ -11,8 +11,9 @@
 by populated to generate respective token : [`providerClientID`, `providerClientSecret`, `consumerClientId`,
 `consumerClientSecret`, `providerDelegateClientId`, `providerDelegateClientSecret`, 
 `consumerDelegateClientId`, `consumerDelegateClientSecret`, `providerDelegateId`,
-`consumerDelegateId`]
+`consumerDelegateId` ....]
 - The `resourceId` could be changed to required resourceId based on which products could be fetched 
 - `POST /verify` endpoint uses a bearer authToken which could be added in `authToken`
 - The base url is set to `https://dmp-apd.iudx.io` in a variable named `baseUrl` for the DX DMP APD server and the value could be changed accordingly
 - The base url is set to `https://authvertx.iudx.io` in a variable named `authEndpoint` for the DX AAA server [link to the server](https://github.com/datakaveri/iudx-aaa-server) and the value could be changed accordingly
+- `resourceId1`, `resourceId2` could be added according to the resources in a dataset / resource group of a given provider
