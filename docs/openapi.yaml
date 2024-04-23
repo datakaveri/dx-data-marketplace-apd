@@ -1463,6 +1463,10 @@ paths:
         their dashboard.
         <br>
         <br>
+        While creating registering with Razorpay, and Keycloak registration (registration as provider with DX platform), 
+        <b>same email ID</b> needs to be used 
+        <br>
+        <br>
         `Note`: By creating a linked account, the provider is accepting the terms and conditions of the respective payment gateway
       operationId: post-linked-account-v1
       parameters:

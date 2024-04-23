@@ -39,8 +39,8 @@
       "enabled": true
     },
     {
-      "key": "notRegisteredProviderToken",
-      "value": "",
+      "key": "authEndpoint",
+      "value": "https://authvertx.iudx.io",
       "type": "default",
       "enabled": true
     },
@@ -93,12 +93,6 @@
       "enabled": true
     },
     {
-      "key": "authEndpoint",
-      "value": "https://authvertx.iudx.io",
-      "type": "default",
-      "enabled": true
-    },
-    {
       "key": "resourceId",
       "value": "",
       "type": "default",
@@ -115,8 +109,85 @@
       "value": "",
       "type": "default",
       "enabled": true
+    },
+    {
+      "key": "itemIdForToken",
+      "value": "rs.iudx.io",
+      "type": "default",
+      "enabled": true
+    },
+    {
+      "key": "providerRole",
+      "value": "provider",
+      "type": "default",
+      "enabled": true
+    },
+    {
+      "key": "consumerRole",
+      "value": "consumer",
+      "type": "default",
+      "enabled": true
+    },
+    {
+      "key": "delegateRole",
+      "value": "delegate",
+      "type": "default",
+      "enabled": true
+    },
+    {
+      "key": "forbiddenConsumerDelegationId",
+      "value": "",
+      "type": "default",
+      "enabled": true
+    },
+    {
+      "key": "forbiddenProviderDelegationId",
+      "value": "",
+      "type": "default",
+      "enabled": true
+    },
+    {
+      "key": "rsUrlForForbiddenResponse",
+      "value": "",
+      "type": "default",
+      "enabled": true
+    },
+    {
+      "key": "resourceId1",
+      "value": "",
+      "type": "default",
+      "enabled": true
+    },
+    {
+      "key": "resourceId2",
+      "value": "",
+      "type": "default",
+      "enabled": true
+    },
+    {
+      "key": "rsForForbiddenConsumer",
+      "value": "",
+      "type": "default",
+      "enabled": true
+    },
+    {
+      "key": "notRegisteredProviderClientId",
+      "value": "",
+      "type": "default",
+      "enabled": true
+    },
+    {
+      "key": "notRegisteredProviderClientSecret",
+      "value": "",
+      "type": "default",
+      "enabled": true
+    },
+    {
+      "key": "isIntegrationTestsBeingRunInDevPipeline",
+      "value": "true",
+      "type": "default",
+      "enabled": true
     }
-
   ],
   "_postman_variable_scope": "environment",
   "_postman_exported_at": "2024-03-26T06:58:12.776Z",
