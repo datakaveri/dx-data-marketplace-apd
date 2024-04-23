@@ -44,7 +44,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"itemId\": \"rs.iudx.io\",\n    \"itemType\": \"resource_server\",\n    \"role\": \"provider\"\n}",
+							"raw": "{\n    \"itemId\": \"{{itemIdForToken}}\",\n    \"itemType\": \"resource_server\",\n    \"role\": \"{{providerRole}}\"\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -52,7 +52,7 @@
 							}
 						},
 						"url": {
-							"raw": "{{authEndpoint}{{dxAuthBasePath}}/token",
+							"raw": "{{authEndpoint}}/{{dxAuthBasePath}}/token",
 							"host": [
 								"{{authEndpoint}}"
 							],
@@ -62,6 +62,62 @@
 							]
 						},
 						"description": "This API supplies the provider token."
+					},
+					"response": []
+				},
+				{
+					"name": "Get unregistered provider token",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"var jsonData = JSON.parse(responseBody);",
+									"postman.setEnvironmentVariable(\"notRegisteredProviderToken\", jsonData.results.accessToken);"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "clientId",
+								"value": "{{notRegisteredProviderClientId}}",
+								"type": "text",
+								"description": "Client ID (UUID)"
+							},
+							{
+								"key": "clientSecret",
+								"value": "{{notRegisteredProviderClientSecret}}",
+								"type": "text",
+								"description": "Client secret (40 chars in hexadecimal)"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"itemId\": \"{{rsUrlForForbiddenResponse}}\",\n    \"itemType\": \"resource_server\",\n    \"role\": \"{{providerRole}}\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{authEndpoint}}/{{dxAuthBasePath}}/token",
+							"host": [
+								"{{authEndpoint}}"
+							],
+							"path": [
+								"{{dxAuthBasePath}}",
+								"token"
+							]
+						},
+						"description": "This API supplies the provider delegate token."
 					},
 					"response": []
 				},
@@ -100,7 +156,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"itemId\": \"rs.iudx.io\",\n    \"itemType\": \"resource_server\",\n    \"role\": \"consumer\"\n}",
+							"raw": "{\n    \"itemId\": \"{{itemIdForToken}}\",\n    \"itemType\": \"resource_server\",\n    \"role\": \"{{consumerRole}}\"\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -108,7 +164,7 @@
 							}
 						},
 						"url": {
-							"raw": "{{authEndpoint}}{{dxAuthBasePath}}/token",
+							"raw": "{{authEndpoint}}/{{dxAuthBasePath}}/token",
 							"host": [
 								"{{authEndpoint}}"
 							],
@@ -161,7 +217,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"itemId\": \"rs.iudx.io\",\n    \"itemType\": \"resource_server\",\n    \"role\": \"delegate\"\n}",
+							"raw": "{\n    \"itemId\": \"{{itemIdForToken}}\",\n    \"itemType\": \"resource_server\",\n    \"role\": \"{{delegateRole}}\"\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -169,7 +225,69 @@
 							}
 						},
 						"url": {
-							"raw": "{{authEndpoint}}{{dxAuthBasePath}}/token",
+							"raw": "{{authEndpoint}}/{{dxAuthBasePath}}/token",
+							"host": [
+								"{{authEndpoint}}"
+							],
+							"path": [
+								"{{dxAuthBasePath}}",
+								"token"
+							]
+						},
+						"description": "This API supplies the provider delegate token."
+					},
+					"response": []
+				},
+				{
+					"name": "Get Provider Delegate token (For Forbidden condition)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"var jsonData = JSON.parse(responseBody);",
+									"postman.setEnvironmentVariable(\"providerDelegateTokenForbidden\", jsonData.results.accessToken);"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "clientId",
+								"value": "{{providerDelegateClientId}}",
+								"type": "text",
+								"description": "Client ID (UUID)"
+							},
+							{
+								"key": "clientSecret",
+								"value": "{{providerDelegateClientSecret}}",
+								"type": "text",
+								"description": "Client secret (40 chars in hexadecimal)"
+							},
+							{
+								"key": "delegationId",
+								"value": "{{forbiddenProviderDelegationId}}",
+								"description": "The delegation ID determines which user + role + resource server the token request is being made on behalf by the delegate.It's the ID of the delegation that you can get using the GET delegates API on the auth server.",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"itemId\": \"{{rsUrlForForbiddenResponse}}\",\n    \"itemType\": \"resource_server\",\n    \"role\": \"{{delegateRole}}\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{authEndpoint}}/{{dxAuthBasePath}}/token",
 							"host": [
 								"{{authEndpoint}}"
 							],
@@ -222,7 +340,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"itemId\": \"rs.iudx.io\",\n    \"itemType\": \"resource_server\",\n    \"role\": \"delegate\"\n}",
+							"raw": "{\n    \"itemId\": \"{{itemIdForToken}}\",\n    \"itemType\": \"resource_server\",\n    \"role\": \"{{delegateRole}}\"\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -230,7 +348,69 @@
 							}
 						},
 						"url": {
-							"raw": "{{authEndpoint}}{{dxAuthBasePath}}/token",
+							"raw": "{{authEndpoint}}/{{dxAuthBasePath}}/token",
+							"host": [
+								"{{authEndpoint}}"
+							],
+							"path": [
+								"{{dxAuthBasePath}}",
+								"token"
+							]
+						},
+						"description": "This API supplies the consumer delegate token."
+					},
+					"response": []
+				},
+				{
+					"name": "Get Consumer Delegate token (For Forbidden response)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"var jsonData = JSON.parse(responseBody);",
+									"postman.setEnvironmentVariable(\"consumerDelegateTokenForbidden\", jsonData.results.accessToken);"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "clientId",
+								"value": "{{consumerDelegateClientId}}",
+								"type": "text",
+								"description": "Client ID (UUID)"
+							},
+							{
+								"key": "clientSecret",
+								"value": "{{consumerDelegateClientSecret}}",
+								"type": "text",
+								"description": "Client secret (40 chars in hexadecimal)"
+							},
+							{
+								"key": "delegationId",
+								"value": "{{forbiddenConsumerDelegationId}}",
+								"description": "The delegation ID determines which user + role + resource server the token request is being made on behalf by the delegate.It's the ID of the delegation that you can get using the GET delegates API on the auth server.",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"itemId\": \"{{rsForForbiddenConsumer}}\",\n    \"itemType\": \"resource_server\",\n    \"role\": \"{{delegateRole}}\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{authEndpoint}}/{{dxAuthBasePath}}/token",
 							"host": [
 								"{{authEndpoint}}"
 							],
@@ -653,18 +833,20 @@
 							"listen": "test",
 							"script": {
 								"exec": [
+									"const isPipeline = pm.environment.get('isIntegrationTestsBeingRunInPipeline') == 'true';",
+									"",
 									"// Test the response code",
-									"pm.test(\"response is 200 (OK)\", function () {",
+									"(isPipeline ? pm.test.skip : pm.test)(\"response is 200 (OK)\", function () {",
 									"    pm.response.to.have.status(200);",
 									"});",
 									"",
 									"// Test the response header",
-									"pm.test(\"Check response header\", function () {",
+									"(isPipeline ? pm.test.skip : pm.test)(\"Check response header\", function () {",
 									"    pm.response.to.have.header(\"Content-Type\",\"application/json\");",
 									"});",
 									"",
 									"// Test the response",
-									"pm.test(\"Check response body\", function () {    ",
+									"(isPipeline ? pm.test.skip : pm.test)(\"Check response body\", function () {    ",
 									"    const body = pm.response.json();",
 									"    pm.expect(body).to.have.property(\"type\", \"urn:dx:dmp:success\");",
 									"    pm.expect(body).to.have.property(\"title\", \"Success\");",
@@ -978,13 +1160,13 @@
 						"header": [
 							{
 								"key": "token",
-								"value": "{{providerDelegateToken}}",
+								"value": "{{providerToken}}",
 								"type": "text"
 							}
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"productId\": \"{{idForCreatingProduct}}\",\n    \"resourceIds\": [\n        \"83c2e5c2-3574-4e11-9530-2b1fbdfce832\",\n        \"695e222b-3fae-4325-8db0-3e29d01c4fc0\"\n    ]\n}",
+							"raw": "{\n    \"productId\": \"{{idForCreatingProduct}}\",\n    \"resourceIds\": [\n        \"{{resourceId1}}\",\n        \"{{resourceId2}}\"\n    ]\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -1264,7 +1446,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"productId\": \"testProduct\",\n    \"resourceIds\": [\n        \"83c2e5c2-3574-4e11-9530-2b1fbdfce832\",\n        \"695e222b-3fae-4325-8db0-3e29d01c4fc0\"\n    ]\n}",
+							"raw": "{\n    \"productId\": \"testProduct\",\n    \"resourceIds\": [\n        \"{{resourceId1}}\",\n        \"{{resourceId2}}\"\n    ]\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -1345,7 +1527,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"productId\": \"{{productId}}\",\n    \"productVariantName\": \"variant2\",\n    \"resources\": [\n        {\n          \"id\": \"83c2e5c2-3574-4e11-9530-2b1fbdfce832\",\n          \"capabilities\": [\n            \"api\"\n          ]\n        },\n        {\n          \"id\": \"695e222b-3fae-4325-8db0-3e29d01c4fc0\",\n          \"capabilities\": [\n            \"sub\", \"file\"\n          ]\n        }\n      ],\n      \"price\": 150,\n      \"duration\": 12\n}",
+							"raw": "{\n    \"productId\": \"{{productId}}\",\n    \"productVariantName\": \"variant2\",\n    \"resources\": [\n        {\n          \"id\": \"{{resourceId1}}\",\n          \"capabilities\": [\n            \"api\"\n          ]\n        },\n        {\n          \"id\": \"{{resourceId2}}\",\n          \"capabilities\": [\n            \"sub\", \"file\"\n          ]\n        }\n      ],\n      \"price\": 150,\n      \"duration\": 12\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -1625,7 +1807,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"productId\": \"{{productId}}\",\n    \"productVariantName\": \"variant2\",\n    \"resources\": [\n        {\n          \"id\": \"83c2e5c2-3574-4e11-9530-2b1fbdfce832\",\n          \"capabilities\": [\n            \"api\", \"sub\"\n          ]\n        },\n        {\n          \"id\": \"695e222b-3fae-4325-8db0-3e29d01c4fc0\",\n          \"capabilities\": [\n            \"sub\", \"file\"\n          ]\n        }\n      ],\n      \"price\": 150,\n      \"duration\": 12\n}",
+							"raw": "{\n    \"productId\": \"{{productId}}\",\n    \"productVariantName\": \"variant2\",\n    \"resources\": [\n        {\n          \"id\": \"{{resourceId1}}\",\n          \"capabilities\": [\n            \"api\", \"sub\"\n          ]\n        },\n        {\n          \"id\": \"{{resourceId2}}\",\n          \"capabilities\": [\n            \"sub\", \"file\"\n          ]\n        }\n      ],\n      \"price\": 150,\n      \"duration\": 12\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -1704,7 +1886,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"productId\": \"{{productId}}\",\n    \"productVariantName\": \"variant2\",\n    \"resources\": [\n        {\n          \"id\": \"83c2e5c2-3574-4e11-9530-2b1fbdfce832\",\n          \"capabilities\": [\n            \"api\", \"sub\"\n          ]\n        },\n        {\n          \"id\": \"695e222b-3fae-4325-8db0-3e29d01c4fc0\",\n          \"capabilities\": [\n            \"sub\", \"file\"\n          ]\n        }\n      ],\n      \"price\": 200,\n      \"duration\": 24\n}",
+							"raw": "{\n    \"productId\": \"{{productId}}\",\n    \"productVariantName\": \"variant2\",\n    \"resources\": [\n        {\n          \"id\": \"{{resourceId1}}\",\n          \"capabilities\": [\n            \"api\", \"sub\"\n          ]\n        },\n        {\n          \"id\": \"{{resourceId2}}\",\n          \"capabilities\": [\n            \"sub\", \"file\"\n          ]\n        }\n      ],\n      \"price\": 200,\n      \"duration\": 24\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -2154,7 +2336,7 @@
 									}
 								],
 								"url": {
-									"raw": "{{baseUrl}}/provider/list/products?resourceId={{resourceId}}",
+									"raw": "{{baseUrl}}/provider/list/products?resourceId={{resourceId1}}",
 									"host": [
 										"{{baseUrl}}"
 									],
@@ -2166,7 +2348,7 @@
 									"query": [
 										{
 											"key": "resourceId",
-											"value": "{{resourceId}}"
+											"value": "{{resourceId1}}"
 										}
 									]
 								}
@@ -2439,7 +2621,7 @@
 									}
 								],
 								"url": {
-									"raw": "{{baseUrl}}/provider/product-variant?productId=urn:datakaveri.org:b2c27f3f-2524-4a84-816e-91f9ab23f837:testProduct&productVariantName=variant213",
+									"raw": "{{baseUrl}}/provider/product-variant?productId={{productId}}&productVariantName=variant2",
 									"host": [
 										"{{baseUrl}}"
 									],
@@ -2450,12 +2632,12 @@
 									"query": [
 										{
 											"key": "productId",
-											"value": "urn:datakaveri.org:b2c27f3f-2524-4a84-816e-91f9ab23f837:testProduct",
+											"value": "{{productId}}",
 											"description": "product ID for which variants need to be fetched"
 										},
 										{
 											"key": "productVariantName",
-											"value": "variant213"
+											"value": "variant2"
 										}
 									]
 								}
@@ -2650,7 +2832,7 @@
 					"name": "List Purchase",
 					"item": [
 						{
-							"name": "200 - List all purchases",
+							"name": "200 - List all succeeded purchases",
 							"event": [
 								{
 									"listen": "test",
@@ -2866,7 +3048,7 @@
 									}
 								],
 								"url": {
-									"raw": "{{baseUrl}}/provider/list/purchases?paymentStatus=pending&resourceId=83c2e5c2-3574-4e11-9530-2b1fbdfce832",
+									"raw": "{{baseUrl}}/provider/list/purchases?paymentStatus=pending&resourceId={{resourceId1}}",
 									"host": [
 										"{{baseUrl}}"
 									],
@@ -2882,7 +3064,7 @@
 										},
 										{
 											"key": "resourceId",
-											"value": "83c2e5c2-3574-4e11-9530-2b1fbdfce832"
+											"value": "{{resourceId1}}"
 										}
 									]
 								}
@@ -2929,7 +3111,7 @@
 									}
 								],
 								"url": {
-									"raw": "{{baseUrl}}/provider/list/purchases?paymentStatus=pending&productId=urn:datakaveri.org:b2c27f3f-2524-4a84-816e-91f9ab23f837:testProduct",
+									"raw": "{{baseUrl}}/provider/list/purchases?paymentStatus=failed&productId={{productIdForPurchase}}",
 									"host": [
 										"{{baseUrl}}"
 									],
@@ -2941,11 +3123,13 @@
 									"query": [
 										{
 											"key": "paymentStatus",
-											"value": "pending"
+											"value": "failed",
+											"description": "(failed, succeeded, pending) purchases could be added according to purchase done from DMP UI"
 										},
 										{
 											"key": "productId",
-											"value": "urn:datakaveri.org:b2c27f3f-2524-4a84-816e-91f9ab23f837:testProduct"
+											"value": "{{productIdForPurchase}}",
+											"description": "productId mentioned here needs to have  purchase done against it from DMP UI"
 										}
 									]
 								}
@@ -3377,24 +3561,100 @@
 			"name": "policy",
 			"item": [
 				{
+					"name": "200  Verify Policy Check",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"const isPipelineForDevInstance = pm.environment.get('isIntegrationTestsBeingRunInDevPipeline') == 'true';",
+									"",
+									"// Test the response code",
+									"(isPipelineForDevInstance ? pm.test.skip : pm.test)(\"response is 200 (OK)\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"",
+									"// Test the response header",
+									"(isPipelineForDevInstance ? pm.test.skip : pm.test)(\"Check response header\", function () {",
+									"    pm.response.to.have.header(\"Content-Type\",\"application/json\");",
+									"});",
+									"",
+									"// Test the response",
+									"(isPipelineForDevInstance ? pm.test.skip : pm.test)(\"Check response body\", function () {    ",
+									"    const body = pm.response.json();",
+									"    pm.expect(body).to.have.property(\"type\", \"urn:dx:as:Success\");",
+									"        pm.expect(body).to.have.property(\"title\", \"Token created\");",
+									"    }",
+									");"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "clientId",
+								"value": "{{consumerClientId}}",
+								"type": "text",
+								"description": "Client ID (UUID)"
+							},
+							{
+								"key": "clientSecret",
+								"value": "{{consumerClientSecret}}",
+								"type": "text",
+								"description": "Client secret (40 chars in hexadecimal)"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"itemId\": \"a50be82a-b2fd-49eb-8f50-38dd8a39355b\",\n    \"itemType\": \"resource\",\n    \"role\": \"{{consumerRole}}\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{authEndpoint}}/{{dxAuthBasePath}}/token",
+							"host": [
+								"{{authEndpoint}}"
+							],
+							"path": [
+								"{{dxAuthBasePath}}",
+								"token"
+							]
+						},
+						"description": "This API supplies the consumer token."
+					},
+					"response": []
+				},
+				{
 					"name": "200 Verify Policy: Success",
 					"event": [
 						{
 							"listen": "test",
 							"script": {
 								"exec": [
+									"const isPipeline = pm.environment.get('isIntegrationTestsBeingRunInPipeline') == 'true';",
+									"",
 									"// Test the response code",
-									"pm.test(\"response is 200 (OK)\", function () {",
+									"(isPipeline ? pm.test.skip : pm.test)(\"response is 200 (OK)\", function () {",
 									"    pm.response.to.have.status(200);",
 									"});",
 									"",
 									"// Test the response header",
-									"pm.test(\"Check response header\", function () {",
+									"(isPipeline ? pm.test.skip : pm.test)(\"Check response header\", function () {",
 									"    pm.response.to.have.header(\"Content-Type\",\"application/json\");",
 									"});",
 									"",
 									"// Test the response",
-									"pm.test(\"Check response body\", function () {    ",
+									"(isPipeline ? pm.test.skip : pm.test)(\"Check response body\", function () {    ",
 									"    const body = pm.response.json();",
 									"    pm.expect(body).to.have.property(\"type\", \"urn:apd:Allow\");",
 									"    }",
@@ -3441,18 +3701,20 @@
 							"listen": "test",
 							"script": {
 								"exec": [
+									"const isPipeline = pm.environment.get('isIntegrationTestsBeingRunInPipeline') == 'true';",
+									"",
 									"// Test the response code",
-									"pm.test(\"response is 403 (Forbidden)\", function () {",
+									"(isPipeline ? pm.test.skip : pm.test)(\"response is 403 (Forbidden)\", function () {",
 									"    pm.response.to.have.status(403);",
 									"});",
 									"",
 									"// Test the response header",
-									"pm.test(\"Check response header\", function () {",
+									"(isPipeline ? pm.test.skip : pm.test)(\"Check response header\", function () {",
 									"    pm.response.to.have.header(\"Content-Type\",\"application/json\");",
 									"});",
 									"",
 									"// Test the response",
-									"pm.test(\"Check response body\", function () {    ",
+									"(isPipeline ? pm.test.skip : pm.test)(\"Check response body\", function () {    ",
 									"    const body = pm.response.json();",
 									"    pm.expect(body).to.have.property(\"type\", \"urn:apd:Deny\");",
 									"    pm.expect(body).to.have.property(\"title\", \"Forbidden\");",
@@ -3780,7 +4042,7 @@
 									"    const body = pm.response.json();",
 									"    pm.expect(body).to.have.property(\"type\", \"urn:dx:dmp:forbidden\");",
 									"    pm.expect(body).to.have.property(\"title\", \"Forbidden\");",
-									"    pm.expect(body).to.have.property(\"detail\", \"Policy could not be deleted, as policy doesn't belong to the user\");",
+									"    pm.expect(body).to.have.property(\"detail\", \"Access Denied: You do not have ownership rights for this policy.\");",
 									"    }",
 									");"
 								],
@@ -3951,13 +4213,13 @@
 							{
 								"key": "token",
 								"value": "{{providerDelegateToken}}",
-								"type": "text"
+								"type": "text",
+								"disabled": true
 							},
 							{
 								"key": "token",
 								"value": "{{consumerDelegateToken}}",
-								"type": "text",
-								"disabled": true
+								"type": "text"
 							}
 						],
 						"url": {
@@ -4224,7 +4486,7 @@
 									}
 								],
 								"url": {
-									"raw": "{{baseUrl}}/consumer/list/resources?resourceId=83c2e5c2-3574-4e11-9530-2b1fbdfce832",
+									"raw": "{{baseUrl}}/consumer/list/resources?resourceId={{resourceId1}}",
 									"host": [
 										"{{baseUrl}}"
 									],
@@ -4236,7 +4498,7 @@
 									"query": [
 										{
 											"key": "resourceId",
-											"value": "83c2e5c2-3574-4e11-9530-2b1fbdfce832"
+											"value": "{{resourceId1}}"
 										}
 									]
 								}
@@ -5608,7 +5870,7 @@
 									}
 								],
 								"url": {
-									"raw": "{{baseUrl}}/consumer/product-variant?productId=urn:datakaveri.org:b2c27f3f-2524-4a84-816e-91f9ab23f837:testProduct",
+									"raw": "{{baseUrl}}/consumer/product-variant?productId={{productId}}",
 									"host": [
 										"{{baseUrl}}"
 									],
@@ -5619,7 +5881,7 @@
 									"query": [
 										{
 											"key": "productId",
-											"value": "urn:datakaveri.org:b2c27f3f-2524-4a84-816e-91f9ab23f837:testProduct",
+											"value": "{{productId}}",
 											"description": "product ID for which variants need to be fetched"
 										}
 									]

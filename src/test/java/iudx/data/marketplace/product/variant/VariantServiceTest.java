@@ -529,6 +529,43 @@ public class VariantServiceTest {
   }
 
   @Test
+  @DisplayName("Test list product variants when the product doesn't belong to the provider : Failure")
+  public void testListProductVariantsOfDifferentProvider(VertxTestContext vertxTestContext) {
+    when(provider.getResourceServerUrl()).thenReturn("dummyRsUrl");
+    when(provider.getUserId()).thenReturn("someUserId");
+
+    JsonArray jsonArray = new JsonArray().add("abcd");
+    request.put("productId", "someDummyProductId")
+            .put("resourceServerUrl", "abcd")
+            .put(PRODUCT_VARIANT_NAME, "variant2");
+    when(asyncResult.succeeded()).thenReturn(true);
+    when(asyncResult.result()).thenReturn(jsonMock);
+    when(jsonMock.getJsonArray(RESULTS)).thenReturn(new JsonArray());
+
+    variantServiceImpl.listProductVariants(
+        provider,
+        request,
+        handler -> {
+          if (handler.failed()) {
+            String expectedFailureMessage = new RespBuilder()
+                    .withType(HttpStatusCode.NOT_FOUND.getValue())
+                    .withTitle(ResponseUrn.RESOURCE_NOT_FOUND_URN.getUrn())
+                    .withDetail("Product variants not found")
+                    .getResponse();
+            assertEquals(expectedFailureMessage, handler.cause().getMessage());
+            verify(postgresService, times(1)).executePreparedQuery(anyString(), any(), any());
+            verify(provider, times(1)).getResourceServerUrl();
+            vertxTestContext.completeNow();
+
+          } else {
+
+            vertxTestContext.failNow(
+                "Succeeded to fetch product variants for a different provider : Ownership error");
+          }
+        });
+  }
+
+  @Test
   @DisplayName("Test list product variants when DB response is Empty : Failure")
   public void testListProductVariantsWithEmptyResponse(VertxTestContext vertxTestContext) {
     when(provider.getResourceServerUrl()).thenReturn("dummyRsUrl");
