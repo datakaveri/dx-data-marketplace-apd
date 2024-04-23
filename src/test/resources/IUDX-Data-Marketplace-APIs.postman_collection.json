@@ -3111,7 +3111,7 @@
 									}
 								],
 								"url": {
-									"raw": "{{baseUrl}}/provider/list/purchases?paymentStatus=failed&productId=urn:datakaveri.org:9024aff2-fe77-4ac9-bc00-a89da65bed6d:testProduct",
+									"raw": "{{baseUrl}}/provider/list/purchases?paymentStatus=failed&productId={{productIdForPurchase}}",
 									"host": [
 										"{{baseUrl}}"
 									],
@@ -3128,7 +3128,7 @@
 										},
 										{
 											"key": "productId",
-											"value": "urn:datakaveri.org:9024aff2-fe77-4ac9-bc00-a89da65bed6d:testProduct",
+											"value": "{{productIdForPurchase}}",
 											"description": "productId mentioned here needs to have  purchase done against it from DMP UI"
 										}
 									]
