@@ -114,14 +114,15 @@ public class CreatePolicy {
               List<String> listOfQueries = new ArrayList<>();
               for (String resourceItem : resourceIds) {
                 String policyId = UUID.randomUUID().toString();
+                LOGGER.info("policy ID is : {}", policyId);
                 JsonArray list = listOfConstraints.get(index++);
                 constraint.put("access", list);
-                createPolicyFinalQuery =
+                String updatedQuery =
                     createPolicyFinalQuery
                         .replace("$1", policyId)
                         .replace("$2", resourceItem)
                         .replace("$4", constraint + "");
-                listOfQueries.add(createPolicyFinalQuery);
+                listOfQueries.add(updatedQuery);
                 futureList.add(
                     initiateAuditing(provider, orderId, policyId, resourceItem, constraint));
               }
@@ -190,6 +191,7 @@ public class CreatePolicy {
 
   public Future<Boolean> executeTransaction(List<String> queries, String orderId) {
     Promise<Boolean> promise = Promise.promise();
+    LOGGER.debug("Queries : {}", queries);
     postgresService.executeTransaction(
         queries,
         pgHandler -> {
