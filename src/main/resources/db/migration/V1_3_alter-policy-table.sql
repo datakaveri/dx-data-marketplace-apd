@@ -1,0 +1,2 @@
+ALTER TABLE policy
+ADD PRIMARY KEY (_id);
