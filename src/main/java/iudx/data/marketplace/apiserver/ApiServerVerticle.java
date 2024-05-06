@@ -231,14 +231,7 @@ public class ApiServerVerticle extends AbstractVerticle {
         .handler(AuthHandler.create(authenticationService, api, postgresService, authClient))
         .handler(this::getPoliciesHandler)
         .failureHandler(exceptionHandler);
-    router.post(api.getPoliciesUrl()).handler(this::createPolicy).failureHandler(exceptionHandler);
 
-    router
-        .delete(api.getPoliciesUrl())
-        .handler(policyValidationHandler)
-        .handler(AuthHandler.create(authenticationService, api, postgresService, authClient))
-        .handler(this::deletePoliciesHandler)
-        .failureHandler(exceptionHandler);
 
     router
         .post(api.getProductUserMapsPath())
@@ -434,21 +427,6 @@ public class ApiServerVerticle extends AbstractVerticle {
             });
   }
 
-  private void createPolicy(RoutingContext routingContext) {
-    JsonObject order = routingContext.body().asJsonObject();
-    String orderId = order.getString("orderId");
-    policyService
-        .createPolicy(orderId)
-        .onComplete(
-            handler -> {
-              if (handler.succeeded()) {
-                LOGGER.info("Insertion Success");
-              } else {
-                handler.cause().printStackTrace();
-                LOGGER.error("Failure : " + handler.cause().getMessage());
-              }
-            });
-  }
 
   private void printDeployedEndpoints(Router router) {
     for (Route route : router.getRoutes()) {
@@ -458,30 +436,6 @@ public class ApiServerVerticle extends AbstractVerticle {
     }
   }
 
-  private void deletePoliciesHandler(RoutingContext routingContext) {
-    JsonObject policy = routingContext.body().asJsonObject();
-    HttpServerResponse response = routingContext.response();
-
-    User user = routingContext.get("user");
-    policyService
-        .deletePolicy(policy, user)
-        .onComplete(
-            handler -> {
-              if (handler.succeeded()) {
-                LOGGER.info("Delete policy succeeded : {} ", handler.result().encode());
-                JsonObject responseJson =
-                    new JsonObject()
-                        .put(TYPE, handler.result().getString(TYPE))
-                        .put(TITLE, handler.result().getString(TITLE))
-                        .put(DETAIL, handler.result().getValue(DETAIL));
-                handleSuccessResponse(
-                    response, handler.result().getInteger(STATUS_CODE), responseJson.toString());
-              } else {
-                LOGGER.error("Delete policy failed : {} ", handler.cause().getMessage());
-                handleFailureResponse(routingContext, handler.cause().getMessage());
-              }
-            });
-  }
 
   private void getPoliciesHandler(RoutingContext routingContext) {
     HttpServerResponse response = routingContext.response();
