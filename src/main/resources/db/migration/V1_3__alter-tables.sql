@@ -19,5 +19,16 @@ CREATE TABLE IF NOT EXISTS policy
     CONSTRAINT policy_invoice_id_fkey FOREIGN KEY (invoice_id) REFERENCES invoice (_id)
 );
 
+---
+--   grant privileges, trigger, add owner
+---
+GRANT INSERT, SELECT, UPDATE, DELETE, REFERENCES, TRIGGER ON TABLE policy TO dmp_user;
+
+CREATE TRIGGER update_policy_created BEFORE INSERT ON policy FOR EACH ROW EXECUTE PROCEDURE update_created();
+CREATE TRIGGER update_policy_modified BEFORE INSERT OR UPDATE ON policy FOR EACH ROW EXECUTE PROCEDURE update_modified();
+
+ALTER TABLE policy OWNER TO dmp_user;
+
+
 ALTER TABLE resource_entity
 DROP CONSTRAINT resource_entity_resource_name_key;
