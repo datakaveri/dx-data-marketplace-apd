@@ -19,6 +19,7 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.Mock;
 import org.mockito.invocation.InvocationOnMock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.mockito.stubbing.Answer;
@@ -35,12 +36,14 @@ public class WebhookServiceTest {
   private static WebhookServiceImpl webhookServiceSpy;
   private static int expectedInvocationsPostgresService;
   private static int expectedInvocationsPolicyService;
+  private static JsonObject mockResult;
 
   @BeforeAll
   static void setup(VertxTestContext testContext) {
     asyncResult = mock(AsyncResult.class);
     policyService = mock(PolicyService.class);
     postgresService = mock(PostgresService.class);
+    mockResult = mock(JsonObject.class);
     expectedInvocationsPostgresService = 0;
     expectedInvocationsPolicyService = 0;
     webhookService = new WebhookServiceImpl(postgresService, policyService, "dummyInvoiceTable");
@@ -57,6 +60,9 @@ public class WebhookServiceTest {
             })
         .when(postgresService)
         .executePreparedQuery(anyString(), any(), any());
+    lenient().when(asyncResult.result()).thenReturn(mockResult);
+    lenient().when(mockResult.encodePrettily()).thenReturn("Some result from database");
+
     testContext.completeNow();
   }
 
