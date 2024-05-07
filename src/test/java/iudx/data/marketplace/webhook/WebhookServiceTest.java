@@ -27,133 +27,134 @@ import org.mockito.stubbing.Answer;
 @ExtendWith({MockitoExtension.class, VertxExtension.class})
 public class WebhookServiceTest {
 
-  private static final Logger LOGGER = LogManager.getLogger(WebhookServiceTest.class);
+    private static final Logger LOGGER = LogManager.getLogger(WebhookServiceTest.class);
 
-  private static AsyncResult<JsonObject> asyncResult;
-  private static PolicyService policyService;
-  private static PostgresService postgresService;
-  private static WebhookService webhookService;
-  private static WebhookServiceImpl webhookServiceSpy;
-  private static int expectedInvocationsPostgresService;
-  private static int expectedInvocationsPolicyService;
-  private static JsonObject mockResult;
+    private static AsyncResult<JsonObject> asyncResult;
+    private static PolicyService policyService;
+    private static PostgresService postgresService;
+    private static WebhookService webhookService;
+    private static WebhookServiceImpl webhookServiceSpy;
+    private static int expectedInvocationsPostgresService;
+    private static int expectedInvocationsPolicyService;
+    private static JsonObject mockResult;
 
-  @BeforeAll
-  static void setup(VertxTestContext testContext) {
-    asyncResult = mock(AsyncResult.class);
-    policyService = mock(PolicyService.class);
-    postgresService = mock(PostgresService.class);
-    mockResult = mock(JsonObject.class);
-    expectedInvocationsPostgresService = 0;
-    expectedInvocationsPolicyService = 0;
-    webhookService = new WebhookServiceImpl(postgresService, policyService, "dummyInvoiceTable");
-    webhookServiceSpy = (WebhookServiceImpl) spy(webhookService);
-    doAnswer(
-            new Answer<AsyncResult<JsonObject>>() {
-              @Override
-              public AsyncResult<JsonObject> answer(InvocationOnMock invocationOnMock)
-                  throws Throwable {
-                ((Handler<AsyncResult<JsonObject>>) invocationOnMock.getArgument(2))
-                    .handle(asyncResult);
-                return null;
-              }
-            })
-        .when(postgresService)
-        .executePreparedQuery(anyString(), any(), any());
-      lenient().when(asyncResult.result()).thenReturn(mockResult);
-      lenient().when(mockResult.encode()).thenReturn("Some result from database");
-    testContext.completeNow();
-  }
+    @BeforeAll
+    static void setup(VertxTestContext testContext) {
+        asyncResult = mock(AsyncResult.class);
+        policyService = mock(PolicyService.class);
+        postgresService = mock(PostgresService.class);
+        mockResult = mock(JsonObject.class);
+        expectedInvocationsPostgresService = 0;
+        expectedInvocationsPolicyService = 0;
+        webhookService = new WebhookServiceImpl(postgresService, policyService, "dummyInvoiceTable");
+        webhookServiceSpy = (WebhookServiceImpl) spy(webhookService);
+        doAnswer(
+                new Answer<AsyncResult<JsonObject>>() {
+                    @Override
+                    public AsyncResult<JsonObject> answer(InvocationOnMock invocationOnMock)
+                            throws Throwable {
+                        ((Handler<AsyncResult<JsonObject>>) invocationOnMock.getArgument(2))
+                                .handle(asyncResult);
+                        return null;
+                    }
+                })
+                .when(postgresService)
+                .executePreparedQuery(anyString(), any(), any());
+        lenient().when(asyncResult.result()).thenReturn(mockResult);
+        lenient().when(mockResult.encode()).thenReturn("Some result from database");
 
-  @Test
-  @DisplayName("Test record order paid - Success")
-  public void testOrderPaidSuccess(VertxTestContext testContext) {
+        testContext.completeNow();
+    }
 
-    when(asyncResult.succeeded()).thenReturn(true);
-    doAnswer(Answer -> Future.succeededFuture()).when(policyService).createPolicy(anyString());
+    @Test
+    @DisplayName("Test record order paid - Success")
+    public void testOrderPaidSuccess(VertxTestContext testContext) {
 
-    webhookService
-        .recordOrderPaid("dummyOrderId")
-        .onSuccess(
-            ar -> {
-              verify(postgresService, times(++expectedInvocationsPostgresService))
-                  .executePreparedQuery(anyString(), any(), any());
-              verify(policyService, times(++expectedInvocationsPolicyService))
-                  .createPolicy(anyString());
-              testContext.completeNow();
-            })
-        .onFailure(testContext::failNow);
-  }
+        when(asyncResult.succeeded()).thenReturn(true);
+        doAnswer(Answer -> Future.succeededFuture()).when(policyService).createPolicy(anyString());
 
-  @Test
-  @DisplayName("Test record order paid - update payment status failed")
-  public void testOrderPaidFailureUpdateStatus(VertxTestContext testContext) {
+        webhookService
+                .recordOrderPaid("dummyOrderId")
+                .onSuccess(
+                        ar -> {
+                            verify(postgresService, times(++expectedInvocationsPostgresService))
+                                    .executePreparedQuery(anyString(), any(), any());
+                            verify(policyService, times(++expectedInvocationsPolicyService))
+                                    .createPolicy(anyString());
+                            testContext.completeNow();
+                        })
+                .onFailure(testContext::failNow);
+    }
 
-    when(asyncResult.succeeded()).thenReturn(false);
-    webhookService
-        .recordOrderPaid("dummyOrderId")
-        .onSuccess(ar -> testContext.failNow("Unexpected behaviour"))
-        .onFailure(
-            ar -> {
-              verify(postgresService, times(++expectedInvocationsPostgresService))
-                  .executePreparedQuery(anyString(), any(), any());
-              verify(policyService, times(expectedInvocationsPolicyService))
-                  .createPolicy(anyString());
-              testContext.completeNow();
-            });
-  }
+    @Test
+    @DisplayName("Test record order paid - update payment status failed")
+    public void testOrderPaidFailureUpdateStatus(VertxTestContext testContext) {
 
-  @Test
-  @DisplayName("Test record order paid - create policy failed")
-  public void testOrderPaidFailureCreatePolicy(VertxTestContext testContext) {
+        when(asyncResult.succeeded()).thenReturn(false);
+        webhookService
+                .recordOrderPaid("dummyOrderId")
+                .onSuccess(ar -> testContext.failNow("Unexpected behaviour"))
+                .onFailure(
+                        ar -> {
+                            verify(postgresService, times(++expectedInvocationsPostgresService))
+                                    .executePreparedQuery(anyString(), any(), any());
+                            verify(policyService, times(expectedInvocationsPolicyService))
+                                    .createPolicy(anyString());
+                            testContext.completeNow();
+                        });
+    }
 
-    when(asyncResult.succeeded()).thenReturn(true);
-    doAnswer(Answer -> Future.failedFuture("Policy Creation failed"))
-        .when(policyService)
-        .createPolicy(anyString());
-    webhookService
-        .recordOrderPaid("dummyOrderId")
-        .onSuccess(ar -> testContext.failNow("Unexpected behaviour"))
-        .onFailure(
-            ar -> {
-              verify(postgresService, times(++expectedInvocationsPostgresService))
-                  .executePreparedQuery(anyString(), any(), any());
-              verify(policyService, times(++expectedInvocationsPolicyService))
-                  .createPolicy(anyString());
-              testContext.completeNow();
-            });
-  }
+    @Test
+    @DisplayName("Test record order paid - create policy failed")
+    public void testOrderPaidFailureCreatePolicy(VertxTestContext testContext) {
 
-  @Test
-  @DisplayName("Test record payment failure - success")
-  public void testPaymentFailureSuccess(VertxTestContext testContext) {
+        when(asyncResult.succeeded()).thenReturn(true);
+        doAnswer(Answer -> Future.failedFuture("Policy Creation failed"))
+                .when(policyService)
+                .createPolicy(anyString());
+        webhookService
+                .recordOrderPaid("dummyOrderId")
+                .onSuccess(ar -> testContext.failNow("Unexpected behaviour"))
+                .onFailure(
+                        ar -> {
+                            verify(postgresService, times(++expectedInvocationsPostgresService))
+                                    .executePreparedQuery(anyString(), any(), any());
+                            verify(policyService, times(++expectedInvocationsPolicyService))
+                                    .createPolicy(anyString());
+                            testContext.completeNow();
+                        });
+    }
 
-    when(asyncResult.succeeded()).thenReturn(true);
-    webhookService
-        .recordPaymentFailure("dummyOrderId")
-        .onSuccess(ar -> {
-          verify(postgresService, times(++expectedInvocationsPostgresService))
-              .executePreparedQuery(anyString(), any(), any());
-          verify(policyService, times(expectedInvocationsPolicyService))
-              .createPolicy(anyString());
-          testContext.completeNow();
-        })
-        .onFailure(testContext::failNow);
-  }
+    @Test
+    @DisplayName("Test record payment failure - success")
+    public void testPaymentFailureSuccess(VertxTestContext testContext) {
 
-  @Test
-  @DisplayName("Test update payment status for invoice - success")
-  public void testUpdatePaymentStatus(VertxTestContext testContext) {
+        when(asyncResult.succeeded()).thenReturn(true);
+        webhookService
+                .recordPaymentFailure("dummyOrderId")
+                .onSuccess(ar -> {
+                    verify(postgresService, times(++expectedInvocationsPostgresService))
+                            .executePreparedQuery(anyString(), any(), any());
+                    verify(policyService, times(expectedInvocationsPolicyService))
+                            .createPolicy(anyString());
+                    testContext.completeNow();
+                })
+                .onFailure(testContext::failNow);
+    }
 
-    when(asyncResult.succeeded()).thenReturn(true);
-    webhookServiceSpy.updatePaymentStatusForInvoice("dummyOrderId", PaymentStatus.SUCCESSFUL)
-        .onSuccess(ar -> {
-          verify(postgresService, times(++expectedInvocationsPostgresService))
-              .executePreparedQuery(anyString(), any(), any());
-          verify(policyService, times(expectedInvocationsPolicyService))
-              .createPolicy(anyString());
-          testContext.completeNow();
-        })
-        .onFailure(testContext::failNow);
-  }
+    @Test
+    @DisplayName("Test update payment status for invoice - success")
+    public void testUpdatePaymentStatus(VertxTestContext testContext) {
+
+        when(asyncResult.succeeded()).thenReturn(true);
+        webhookServiceSpy.updatePaymentStatusForInvoice("dummyOrderId", PaymentStatus.SUCCESSFUL)
+                .onSuccess(ar -> {
+                    verify(postgresService, times(++expectedInvocationsPostgresService))
+                            .executePreparedQuery(anyString(), any(), any());
+                    verify(policyService, times(expectedInvocationsPolicyService))
+                            .createPolicy(anyString());
+                    testContext.completeNow();
+                })
+                .onFailure(testContext::failNow);
+    }
 }
