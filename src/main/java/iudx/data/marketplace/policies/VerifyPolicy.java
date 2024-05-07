@@ -12,6 +12,7 @@ import iudx.data.marketplace.common.ResponseUrn;
 import iudx.data.marketplace.policies.util.Status;
 import iudx.data.marketplace.postgres.PostgresService;
 import iudx.data.marketplace.postgres.PostgresServiceImpl;
+import org.apache.commons.lang.StringUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -22,12 +23,12 @@ import java.util.UUID;
 import static iudx.data.marketplace.apiserver.util.Constants.*;
 import static iudx.data.marketplace.common.HttpStatusCode.INTERNAL_SERVER_ERROR;
 import static iudx.data.marketplace.common.HttpStatusCode.VERIFY_FORBIDDEN;
-import static iudx.data.marketplace.policies.util.Constants.CHECK_EXISTING_POLICY;
-import static iudx.data.marketplace.policies.util.Constants.CHECK_IF_POLICY_PRESENT_QUERY;
+import static iudx.data.marketplace.policies.util.Constants.*;
 
 public class VerifyPolicy {
   private static final Logger LOGGER = LogManager.getLogger(VerifyPolicy.class);
   private final PostgresService postgresService;
+  private String orderId;
 
   public VerifyPolicy(PostgresService postgresService) {
     this.postgresService = postgresService;
@@ -39,9 +40,17 @@ public class VerifyPolicy {
     UUID ownerId = UUID.fromString(request.getJsonObject("owner").getString("id"));
     String userEmail = request.getJsonObject("user").getString("email");
     UUID itemId = UUID.fromString(request.getJsonObject("item").getString("itemId"));
-    //        TODO: Item type resource group from the payload is removed and item type in the table
+
+      /*check if the orderId is present in the context object*/
+      if(request.containsKey("context"))
+      {
+          String orderId = request.getJsonObject("context").getString("orderId");
+          setOrderId(orderId);
+      }
+
     Future<JsonObject> checkForExistingPolicy =
         checkExistingPoliciesForId(itemId, ownerId, userEmail);
+
 
     Future<JsonObject> getPolicyDetail =
         checkForExistingPolicy.compose(
@@ -71,15 +80,25 @@ public class VerifyPolicy {
   private Future<JsonObject> checkExistingPoliciesForId(
       UUID itemId, UUID ownerId, String userEmailId) {
     Tuple selectTuples = Tuple.of(itemId, ownerId, Status.ACTIVE, userEmailId);
+    String query;
+
     JsonObject params = new JsonObject()
             .put("itemId", itemId.toString())
             .put("ownerId", ownerId.toString())
             .put("status", Status.ACTIVE)
             .put("userEmailId", userEmailId);
 
-    Promise<JsonObject> promise = Promise.promise();
+      if(StringUtils.isNotBlank(getOrderId()))
+      {
+          query = CHECK_POLICY_FROM_ORDER_ID;
+          params.put("orderId", getOrderId());
+      } else {
+          query = CHECK_EXISTING_POLICY;
+      }
+
+      Promise<JsonObject> promise = Promise.promise();
     postgresService
-        .executePreparedQuery(CHECK_EXISTING_POLICY, params, handler -> {
+        .executePreparedQuery(query, params, handler -> {
             if(handler.failed()){
                 LOGGER.error(
                         "isPolicyForIdExist fail, DB execution failed :: {}",
@@ -97,6 +116,14 @@ public class VerifyPolicy {
                     promise.complete(new JsonObject());
                 } else {
                     LOGGER.debug("policy exists : {} ", handler.result().encode());
+                    if(handler.result().getJsonArray(RESULT).size() > 1 && query.equals(CHECK_POLICY_FROM_ORDER_ID))
+                    {
+                        LOGGER.fatal("Fetched more than 1 policy for a single" +
+                                " resource with a single orderId : {}",orderId);
+                        promise.fail(
+                                generateErrorResponse(
+                                        INTERNAL_SERVER_ERROR, INTERNAL_SERVER_ERROR.getDescription()));
+                    }
                     JsonObject result = handler.result().getJsonArray(RESULT).getJsonObject(0);
                     JsonObject constraints = result.getJsonObject("constraints");
                     String policyId = result.getString("_id");
@@ -117,4 +144,14 @@ public class VerifyPolicy {
         .put(DETAIL, errorMessage)
         .encode();
   }
+
+    private String getOrderId() {
+        return this.orderId;
+    }
+    private void setOrderId(String orderId)
+    {
+        this.orderId = orderId;
+    }
+
+
 }
