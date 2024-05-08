@@ -61,7 +61,7 @@ public class WebhookServiceImpl implements WebhookService {
         params,
         pgHandler -> {
           if (pgHandler.succeeded()) {
-              LOGGER.debug("Result after updating : {}", pgHandler.result().encodePrettily());
+              LOGGER.debug("Result after updating : {}", pgHandler.result().encode());
             promise.complete();
           } else {
             promise.fail(pgHandler.cause());

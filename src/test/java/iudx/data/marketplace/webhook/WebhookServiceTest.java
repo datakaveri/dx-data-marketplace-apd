@@ -61,7 +61,7 @@ public class WebhookServiceTest {
         .when(postgresService)
         .executePreparedQuery(anyString(), any(), any());
     lenient().when(asyncResult.result()).thenReturn(mockResult);
-    lenient().when(mockResult.encodePrettily()).thenReturn("Some result from database");
+    lenient().when(mockResult.encode()).thenReturn("Some result from database");
 
     testContext.completeNow();
   }
