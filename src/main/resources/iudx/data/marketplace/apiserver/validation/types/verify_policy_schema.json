@@ -24,6 +24,9 @@
       "item": {
         "itemId": "b58da193-23d9-43eb-b98a-a103d4b6103c",
         "itemType": "RESOURCE"
+      },
+      "context": {
+        "orderId": "order_O5Zc1Citm6s8c0"
       }
     }
   ],
@@ -178,6 +181,21 @@
           "type": "string",
           "enum": ["RESOURCE","resource"],
           "minLength": 1
+        }
+      }
+    },
+    "context": {
+      "$id": "#root/context",
+      "title": "context",
+      "type": "object",
+      "required": ["orderId"],
+      "properties": {
+        "orderId": {
+          "$id": "#root/context/orderId",
+          "title": "orderId",
+          "type": "string",
+          "minLength": 6,
+          "pattern": "order_[a-zA-Z0-9]+"
         }
       }
     }
