@@ -3277,6 +3277,10 @@ paths:
         a token. 
 
         DMP Data Marketplace APD Server creates policy for a given item with type `resource`
+        
+        `Note`: When a specific policy, constraint information with respect to an orderId (Obtained from GET `/provider/list/purchases`
+        or GET `/consumer/list/purchases`) is required, a request body with `context` containing `orderId` could be used
+        in verify policy API.
       operationId: post-verify-policy
       parameters:
         - name: Authorization
@@ -3292,7 +3296,9 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/exampleVerifyRequestBody'
+              oneOf:
+                - $ref: '#/components/schemas/exampleVerifyRequestBody'
+                - $ref: '#/components/schemas/exampleVerifyRequestBodyWithContext'
             examples:
               Request body for verify policy:
                 value:
@@ -3311,6 +3317,29 @@ paths:
                   item:
                     itemId: 2a0be315-4165-4c5b-a74e-116cc89272cb
                     itemType: RESOURCE
+
+              Request body for verify with context:
+                value:
+                  user:
+                    id: a109807f-6b06-4d8a-ab64-a3a19b04a3b4
+                    name:
+                      firstName: test
+                      lastName: consumer
+                    email: consumer@gmail.com
+                  owner:
+                    id: 114077a3-6411-4b6e-bc97-c7e81b87685d
+                    name:
+                      firstName: test
+                      lastName: provider
+                    email: test@provider.com
+                  item:
+                    itemId: 2a0be315-4165-4c5b-a74e-116cc89272cb
+                    itemType: RESOURCE
+                  context:
+                    orderId: 'order_O7Ac1Bitm6s8d5'
+
+
+
       responses:
         '200':
           description: |-
@@ -3828,6 +3857,37 @@ components:
         - user
         - owner
         - item
+
+    exampleVerifyRequestBodyWithContext:
+      type: object
+      title: Verify Policy with context
+      description: 'example request for verifying if consumer has purchased product, and if the purchase is expired or not'
+      properties:
+        user:
+          $ref: '#/components/schemas/user'
+        owner:
+          $ref: '#/components/schemas/owner'
+        item:
+          $ref: '#/components/schemas/item'
+        context:
+          $ref: '#/components/schemas/context'
+      required:
+        - user
+        - owner
+        - item
+
+
+    context:
+      type: object
+      title: contextObject
+      description: purchase information
+      properties:
+        orderId:
+          type: string
+          pattern: 'order_[a-zA-Z0-9]+'
+          minLength: 6
+      required:
+        - orderId
     user:
       type: object
       title: schemaUser

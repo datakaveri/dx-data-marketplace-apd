@@ -6,6 +6,14 @@ public class Constants {
                     + "WHERE resource_id =$1::UUID AND provider_id = $2::UUID  AND status = $3::policy_status"
                     + " AND consumer_email_id = $4::text AND expiry_at > now()";
 
+    public static final String CHECK_POLICY_FROM_ORDER_ID =
+            " SELECT _id,constraints FROM policy  " +
+                    " WHERE resource_id =$1::UUID  " +
+                    " AND provider_id = $2::UUID  AND status = $3::policy_status  " +
+                    " AND consumer_email_id = $4::text  " +
+                    " AND expiry_at > now() " +
+                    " AND invoice_id = ( SELECT I._id FROM invoice AS I WHERE I.order_id = $5::text)";
+
     public static final String CREATE_POLICY_QUERY =
             "INSERT INTO public.policy( " +
                     " _id, resource_id, invoice_id, constraints, provider_id, consumer_email_id, expiry_at, " +
