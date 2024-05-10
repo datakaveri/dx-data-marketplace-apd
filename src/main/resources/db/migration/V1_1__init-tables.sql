@@ -47,7 +47,7 @@ CREATE TABLE IF NOT EXISTS user_table
 CREATE TABLE IF NOT EXISTS resource_entity
 (
     _id uuid NOT NULL,
-    resource_name varchar UNIQUE NOT NULL,
+    resource_name varchar NOT NULL,
     provider_name varchar NOT NULL,
 	provider_id uuid NOT NULL,
 	resource_server varchar NOT NULL,
@@ -164,7 +164,7 @@ CREATE TABLE IF NOT EXISTS invoice
 
 CREATE TABLE IF NOT EXISTS policy
 (
-    _id uuid DEFAULT uuid_generate_v4 () NOT NULL,
+    _id uuid DEFAULT uuid_generate_v4 () NOT NULL PRIMARY KEY,
     resource_id uuid NOT NULL,
     invoice_id uuid NOT NULL,
     constraints json NOT NULL,
