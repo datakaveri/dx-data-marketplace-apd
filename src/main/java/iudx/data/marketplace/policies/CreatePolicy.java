@@ -86,16 +86,15 @@ public class CreatePolicy {
               consumerEmailId = jsonObject.getString("consumerEmailId");
               JsonArray resourceIdsAndCapabilities = jsonObject.getJsonArray("resourceInfo");
 
-                List<String> resourceIds =
+              List<String> resourceIds =
                   resourceIdsAndCapabilities.stream()
                       .map(e -> JsonObject.mapFrom(e).getString("id"))
                       .collect(Collectors.toList());
 
-                List<JsonArray> listOfConstraints =
-                        resourceIdsAndCapabilities.stream()
-                                .map(e -> JsonObject.mapFrom(e).getJsonArray("capabilities"))
-                                .collect(Collectors.toList());
-
+              List<JsonArray> listOfConstraints =
+                  resourceIdsAndCapabilities.stream()
+                      .map(e -> JsonObject.mapFrom(e).getJsonArray("capabilities"))
+                      .collect(Collectors.toList());
 
               LocalDateTime presentTime = LocalDateTime.now();
               expiryAt = presentTime.plusMonths(expiryInMonths).toString();
@@ -129,12 +128,20 @@ public class CreatePolicy {
               Future<Boolean> policyCreationFuture = executeTransaction(listOfQueries, orderId);
 
               /* send data for auditing after policy is created*/
-              CompositeFuture.all(futureList)
-                  .onComplete(
-                      map -> {
-                        LOGGER.info("audit completed");
-                      });
+
+              policyCreationFuture.compose(
+                  isPolicyCreated -> {
+                    if (isPolicyCreated) {
+                      CompositeFuture.all(futureList)
+                          .onComplete(
+                              map -> {
+                                LOGGER.info("audit completed");
+                              });
+                    }
+                    return policyCreationFuture;
+                  });
               return policyCreationFuture;
+
             });
 
     return future;
