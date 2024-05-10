@@ -123,6 +123,7 @@ public class VerifyPolicy {
                         promise.fail(
                                 generateErrorResponse(
                                         INTERNAL_SERVER_ERROR, INTERNAL_SERVER_ERROR.getDescription()));
+                        return;
                     }
                     JsonObject result = handler.result().getJsonArray(RESULT).getJsonObject(0);
                     JsonObject constraints = result.getJsonObject("constraints");
