@@ -152,7 +152,7 @@ public class CreatePolicy {
             .put("expiryInMonths", this.expiryInMonths)
             .put("consumerEmailId", this.consumerEmailId)
             .put("resourceId", resourceId)
-            .put("constraint", constraint.encode())
+            .put("constraint", constraint)
             .put("expiryAt", this.expiryAt)
             .put("policyStatus", POLICY_STATUS);
 
