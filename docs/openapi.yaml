@@ -1,7 +1,4 @@
 openapi: 3.0.2
-contact:
-  email: support@iudx.org.in
-  name: For support contact IUDX team at
 schemes:
   - "http"
   - "https"
@@ -23,6 +20,8 @@ info:
     name: For support contact IUDX Team at
     email: support@iudx.org.in
     url: https://iudx.org.in/
+  license:
+    name: Apache 2.0
 paths:
   /provider/product:
     post:
