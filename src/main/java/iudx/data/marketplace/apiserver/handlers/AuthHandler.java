@@ -250,6 +250,8 @@ public class AuthHandler implements Handler<RoutingContext> {
       return api.getConsumerProductVariantPath();
     } else if(url.matches(api.getVerifyPaymentApi())) {
       return api.getVerifyPaymentApi();
+    } else if (url.matches(api.getCheckPolicyPath())) {
+      return api.getCheckPolicyPath();
     }
     return null;
   }

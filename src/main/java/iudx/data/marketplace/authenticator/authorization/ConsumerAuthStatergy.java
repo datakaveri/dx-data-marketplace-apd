@@ -44,6 +44,7 @@ public class ConsumerAuthStatergy implements AuthorizationStatergy {
     apiAccessList.add(new AuthorizationRequest(GET, apis.getConsumerListResourcePath()));
     apiAccessList.add(new AuthorizationRequest(GET, apis.getConsumerProductVariantPath()));
     apiAccessList.add(new AuthorizationRequest(POST, apis.getVerifyPaymentApi()));
+    apiAccessList.add(new AuthorizationRequest(GET, apis.getCheckPolicyPath()));
 
     // policy
     apiAccessList.add(new AuthorizationRequest(GET, apis.getPoliciesUrl()));

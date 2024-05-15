@@ -67,10 +67,18 @@ public class ValidationHandlerFactory {
       case CONSUMER_PRODUCT_VARIANT:
         validator = getConsumerProductVariantValidator(parameters);
         break;
+      case CHECK_POLICY:
+        validator = getCheckPolicyValidator(parameters);
+        break;
     }
     return validator;
   }
 
+  private List<Validator> getCheckPolicyValidator(MultiMap parameters) {
+    List<Validator> validators = new ArrayList<>();
+    validators.add(new UUIDTypeValidator(parameters.get(PRODUCT_VARIANT_ID), true));
+    return validators;
+  }
   private List<Validator> getPaymentWebhookValidator(JsonObject body) {
     List<Validator> validators = new ArrayList<>();
     validators.add(new JsonSchemaTypeValidator(body, RequestType.ORDER_PAID_WEBHOOK));
