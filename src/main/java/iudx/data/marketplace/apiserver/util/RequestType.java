@@ -20,7 +20,6 @@ public enum RequestType {
   PAYMENT_AUTHORIZED_WEBHOOK("payment_authorized_webhook"),
   PAYMENT_CAPTURED_WEBHOOK("payment_captured_webhook"),
   PAYMENT_FAILED_WEBHOOK("payment_failed_webhook"),
-  CHECK_POLICY("check_policy"),
   TRANSFER_PROCESSEC_WEBHOOK("transfer_processed_webhook");
 
   private String filename;

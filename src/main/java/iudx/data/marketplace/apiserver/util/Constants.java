@@ -77,7 +77,6 @@ public class Constants {
   public static final String POLICIES_API = "/policies";
   public static final String VERIFY_PAYMENTS_PATH = "/verify-payment";
   public static final String ACCOUNTS_API = "/account";
-  public static final String CHECK_POLICY_PATH = "/check";
 
   // query parameters | request body
 

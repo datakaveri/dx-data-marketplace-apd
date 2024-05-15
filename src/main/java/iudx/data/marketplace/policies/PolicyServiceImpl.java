@@ -12,7 +12,6 @@ public class PolicyServiceImpl implements PolicyService{
     private final GetPolicy getPolicy;
     private final CreatePolicy createPolicy;
     private final VerifyPolicy verifyPolicy;
-    private final FetchPolicyUsingPvId fetchPolicy;
 
     JsonObject config;
 
@@ -21,12 +20,12 @@ public class PolicyServiceImpl implements PolicyService{
             CreatePolicy createPolicy,
             GetPolicy getPolicy,
             VerifyPolicy verifyPolicy,
-            FetchPolicyUsingPvId fetchPolicyUsingPvId) {
+            JsonObject config) {
         this.deletePolicy = deletePolicy;
         this.createPolicy = createPolicy;
         this.getPolicy = getPolicy;
         this.verifyPolicy = verifyPolicy;
-        this.fetchPolicy = fetchPolicyUsingPvId;
+        this.config = config;
     }
 
     @Override
@@ -87,24 +86,6 @@ public class PolicyServiceImpl implements PolicyService{
 
         this.verifyPolicy
                 .initiateVerifyPolicy(jsonObject)
-                .onComplete(
-                        handler -> {
-                            if (handler.succeeded()) {
-                                promise.complete(handler.result());
-                            } else {
-                                LOG.error("Failed to verify policy");
-                                promise.fail(handler.cause().getMessage());
-                            }
-                        });
-        return promise.future();
-    }
-
-    @Override
-    public Future<JsonObject> checkPolicy(String productVariantId, User user) {
-        Promise<JsonObject> promise = Promise.promise();
-
-        this.fetchPolicy
-                .checkIfPolicyExists(productVariantId, user)
                 .onComplete(
                         handler -> {
                             if (handler.succeeded()) {
