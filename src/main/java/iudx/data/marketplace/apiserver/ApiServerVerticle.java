@@ -219,7 +219,7 @@ public class ApiServerVerticle extends AbstractVerticle {
                 .init());
 
     ExceptionHandler exceptionHandler = new ExceptionHandler();
-    ValidationHandler policyValidationHandler = new ValidationHandler(vertx, RequestType.POLICY);
+    ValidationHandler checkPolicyValidationHandler = new ValidationHandler(vertx, RequestType.CHECK_POLICY);
     ValidationHandler verifyValidationHandler = new ValidationHandler(vertx, RequestType.VERIFY);
     ValidationHandler postLinkedAccountHandler =
         new ValidationHandler(vertx, RequestType.POST_ACCOUNT);
@@ -274,6 +274,13 @@ public class ApiServerVerticle extends AbstractVerticle {
         .handler(this::handleFetchLinkedAccount)
         .failureHandler(exceptionHandler);
 
+      router
+              .get(api.getCheckPolicyPath())
+              .handler(checkPolicyValidationHandler)
+              .handler(AuthHandler.create(authenticationService, api, postgresService, authClient))
+              .handler(this::checkPolicyHandler)
+              .failureHandler(exceptionHandler);
+
     /*Webhook routes */
 
     ValidationHandler orderPaidRequestValidationHandler =
@@ -327,6 +334,25 @@ public class ApiServerVerticle extends AbstractVerticle {
     /* Print the deployed endpoints */
     LOGGER.info("API server deployed on: " + port);
   }
+
+    private void checkPolicyHandler(RoutingContext routingContext) {
+        HttpServerResponse response = routingContext.response();
+
+        User user = routingContext.get("user");
+        String productVariantId = routingContext.request().getParam("productVariantId");
+        policyService
+                .checkPolicy(productVariantId, user)
+                .onComplete(
+                        handler -> {
+                            if (handler.succeeded()) {
+                                int statusCode = handler.result().getInteger(STATUS_CODE);
+                                 String result = handler.result().getJsonObject(RESULTS).encode();
+                                handleSuccessResponse(response, statusCode, result);
+                            } else {
+                                handleFailureResponse(routingContext, handler.cause().getMessage());
+                            }
+                        });
+    }
 
   private void handleWebhookSignatureValidation(RoutingContext routingContext) {
 

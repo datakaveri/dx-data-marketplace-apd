@@ -187,6 +187,30 @@
       "value": "true",
       "type": "default",
       "enabled": true
+    },
+    {
+      "key": "productIdForPurchase",
+      "value": "",
+      "type": "default",
+      "enabled": true
+    },
+    {
+      "key": "pvIdForPolicyExistence",
+      "value": "",
+      "type": "default",
+      "enabled": true
+    },
+    {
+      "key": "pvIdForNoPolicy",
+      "value": "",
+      "type": "default",
+      "enabled": true
+    },
+    {
+      "key": "pvForExpiredPolicy",
+      "value": "",
+      "type": "default",
+      "enabled": true
     }
   ],
   "_postman_variable_scope": "environment",
