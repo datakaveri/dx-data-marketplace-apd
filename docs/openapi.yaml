@@ -3451,6 +3451,16 @@ paths:
             pattern: '^[a-zA-Z0-9_*\-*\.\/]+$'
             minLength: 1
             maxLength: 512
+        - name: productVariantId
+          in: query
+          description: Id of the resource for its details
+          required: true
+          schema:
+            type: string
+            pattern: uuid
+            minLength: 36
+            maxLength: 36
+
       responses:
         '200':
           description: Policies have been successfully listed
