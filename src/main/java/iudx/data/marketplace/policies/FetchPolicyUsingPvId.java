@@ -20,7 +20,7 @@ public class FetchPolicyUsingPvId {
   private static final Logger LOG = LoggerFactory.getLogger(FetchPolicyUsingPvId.class);
   private PostgresService postgresService;
 
-  FetchPolicyUsingPvId(PostgresService postgresService) {
+  public FetchPolicyUsingPvId(PostgresService postgresService) {
     this.postgresService = postgresService;
   }
 
@@ -46,9 +46,9 @@ public class FetchPolicyUsingPvId {
                       .withDetail("Product variant not found")
                       .getResponse());
             } else {
-              LOG.debug(
+              LOG.info(
                   "response from db : {}",
-                  pvExistenceHandler.result().getJsonArray(RESULTS).encodePrettily());
+                  pvExistenceHandler.result().getJsonArray(RESULTS).encode());
               JsonObject result =
                   pvExistenceHandler.result().getJsonArray(RESULTS).getJsonObject(0);
 
