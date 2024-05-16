@@ -221,9 +221,7 @@ public class PostgresServiceImpl implements PostgresService {
     JsonArray resourceIds = queryParams.getJsonArray("$1");
     String consumerEmailId = queryParams.getString("$2");
 
-    LOGGER.debug("resourceIds : " + resourceIds);
-    LOGGER.debug("queryparams : " + queryParams.encodePrettily());
-    LOGGER.debug("list of string : " + queryParams.getValue("resources"));
+    LOGGER.debug("query params : " + queryParams.encode());
 
     //    Tuple tuple = Tuple.of(resourceIds,consumerEmailId);
       UUID[] ids = resourceIds.stream().map(e -> UUID.fromString(e.toString())).toArray(UUID[]::new);
