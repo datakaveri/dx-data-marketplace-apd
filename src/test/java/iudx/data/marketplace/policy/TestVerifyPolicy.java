@@ -11,6 +11,7 @@ import iudx.data.marketplace.Util;
 import iudx.data.marketplace.auditing.AuditingService;
 import iudx.data.marketplace.common.Api;
 import iudx.data.marketplace.common.HttpStatusCode;
+import iudx.data.marketplace.common.RespBuilder;
 import iudx.data.marketplace.common.ResponseUrn;
 import iudx.data.marketplace.policies.CreatePolicy;
 import iudx.data.marketplace.policies.DeletePolicy;
@@ -115,7 +116,9 @@ public class TestVerifyPolicy {
               if (handler.succeeded()) {
                 assertEquals(
                     ResponseUrn.VERIFY_SUCCESS_URN.getUrn(), handler.result().getString(TYPE));
-                assertEquals(constraints.getJsonObject("constraints"), handler.result().getJsonObject("apdConstraints"));
+                assertEquals(
+                    constraints.getJsonObject("constraints"),
+                    handler.result().getJsonObject("apdConstraints"));
                 vertxTestContext.completeNow();
 
               } else {
@@ -124,58 +127,124 @@ public class TestVerifyPolicy {
             });
   }
 
-
   @Test
   @DisplayName("Test when no policy exists : Failure")
-  public void testWhenNoPolicyExists(VertxTestContext vertxTestContext)
-  {
+  public void testWhenNoPolicyExists(VertxTestContext vertxTestContext) {
     when(asyncResult.result()).thenReturn(jsonObjectMock);
     when(jsonObjectMock.getJsonArray(RESULT)).thenReturn(jsonArrayMock);
     when(jsonArrayMock.isEmpty()).thenReturn(true);
 
     policy
-            .initiateVerifyPolicy(request)
-            .onComplete(
-                    handler -> {
-                      LOGGER.info(handler);
-                      if (handler.failed()) {
-                        JsonObject actual = new JsonObject(handler.cause().getMessage());
-                        assertEquals(
-                                HttpStatusCode.FORBIDDEN.getValue(), actual.getInteger(TYPE));
-                        assertEquals(ResponseUrn.VERIFY_FORBIDDEN_URN.getUrn(), actual.getString(TITLE));
-                        assertEquals("No policy exists for the given resource", actual.getString(DETAIL));
-                        vertxTestContext.completeNow();
+        .initiateVerifyPolicy(request)
+        .onComplete(
+            handler -> {
+              LOGGER.info(handler);
+              if (handler.failed()) {
+                JsonObject actual = new JsonObject(handler.cause().getMessage());
+                assertEquals(HttpStatusCode.FORBIDDEN.getValue(), actual.getInteger(TYPE));
+                assertEquals(ResponseUrn.VERIFY_FORBIDDEN_URN.getUrn(), actual.getString(TITLE));
+                assertEquals("No policy exists for the given resource", actual.getString(DETAIL));
+                vertxTestContext.completeNow();
 
-                      } else {
-                        vertxTestContext.failNow("Succeeded when there was no policy");
-                      }
-                    });
+              } else {
+                vertxTestContext.failNow("Succeeded when there was no policy");
+              }
+            });
   }
 
   @Test
   @DisplayName("Test when DB Execution failed : Failure")
-  public void testWhenDbExecutionFailed(VertxTestContext vertxTestContext)
-  {
+  public void testWhenDbExecutionFailed(VertxTestContext vertxTestContext) {
     when(asyncResult.failed()).thenReturn(true);
     when(asyncResult.cause()).thenReturn(throwable);
     when(throwable.getMessage()).thenReturn("Some error message");
 
     policy
-            .initiateVerifyPolicy(request)
-            .onComplete(
-                    handler -> {
-                      LOGGER.info(handler);
-                      if (handler.failed()) {
-                        JsonObject actual = new JsonObject(handler.cause().getMessage());
-                        assertEquals(
-                                HttpStatusCode.INTERNAL_SERVER_ERROR.getValue(), actual.getInteger(TYPE));
-                        assertEquals(ResponseUrn.INTERNAL_SERVER_ERR_URN.getUrn(), actual.getString(TITLE));
-                        assertEquals("Internal Server Error", actual.getString(DETAIL));
-                        vertxTestContext.completeNow();
+        .initiateVerifyPolicy(request)
+        .onComplete(
+            handler -> {
+              LOGGER.info(handler);
+              if (handler.failed()) {
+                JsonObject actual = new JsonObject(handler.cause().getMessage());
+                assertEquals(
+                    HttpStatusCode.INTERNAL_SERVER_ERROR.getValue(), actual.getInteger(TYPE));
+                assertEquals(ResponseUrn.INTERNAL_SERVER_ERR_URN.getUrn(), actual.getString(TITLE));
+                assertEquals("Internal Server Error", actual.getString(DETAIL));
+                vertxTestContext.completeNow();
 
-                      } else {
-                        vertxTestContext.failNow("Succeeded when DB execution failed");
-                      }
-                    });
+              } else {
+                vertxTestContext.failNow("Succeeded when DB execution failed");
+              }
+            });
+  }
+
+  @Test
+  @DisplayName("Test initiateVerifyPolicy with orderId in context object of request body: Success")
+  public void testInitiateVerifyPolicyWithOrderIdSuccess(VertxTestContext vertxTestContext) {
+    String policyId = Util.generateRandomUuid().toString();
+    JsonObject constraints =
+        new JsonObject()
+            .put(
+                "constraints",
+                new JsonObject().put("access", new JsonArray().add("sub").add("200 APIs")));
+    when(asyncResult.result()).thenReturn(jsonObjectMock);
+    when(jsonObjectMock.getJsonArray(RESULT)).thenReturn(jsonArrayMock);
+    when(jsonArrayMock.isEmpty()).thenReturn(false);
+    when(jsonArrayMock.getJsonObject(anyInt())).thenReturn(constraints.put("_id", policyId));
+
+    this.request.put("context", new JsonObject().put("orderId", "someOrderId"));
+    policy
+        .initiateVerifyPolicy(request)
+        .onComplete(
+            handler -> {
+              if (handler.succeeded()) {
+                assertEquals(
+                    ResponseUrn.VERIFY_SUCCESS_URN.getUrn(), handler.result().getString(TYPE));
+                assertEquals(
+                    constraints.getJsonObject("constraints"),
+                    handler.result().getJsonObject("apdConstraints"));
+                vertxTestContext.completeNow();
+
+              } else {
+                vertxTestContext.failNow("Failed to verify policy");
+              }
+            });
+  }
+
+  @Test
+  @DisplayName(
+      "Test initiateVerifyPolicy with orderId in context object of request body with more than 1 policy for a given orderId and resource: Failure")
+  public void testInitiateVerifyPolicyWithOrderIdFailure(VertxTestContext vertxTestContext) {
+    String policyId = Util.generateRandomUuid().toString();
+    JsonObject constraints =
+        new JsonObject()
+            .put(
+                "constraints",
+                new JsonObject().put("access", new JsonArray().add("sub").add("200 APIs")));
+    when(asyncResult.result()).thenReturn(jsonObjectMock);
+    when(jsonObjectMock.getJsonArray(RESULT)).thenReturn(jsonArrayMock);
+    when(jsonArrayMock.isEmpty()).thenReturn(false);
+    when(jsonArrayMock.size()).thenReturn(2);
+
+    this.request.put("context", new JsonObject().put("orderId", "someOrderId"));
+    policy
+        .initiateVerifyPolicy(request)
+        .onComplete(
+            handler -> {
+              if (handler.failed()) {
+                String expected =
+                    new RespBuilder()
+                        .withType(HttpStatusCode.INTERNAL_SERVER_ERROR.getValue())
+                        .withTitle(ResponseUrn.INTERNAL_SERVER_ERR_URN.getUrn())
+                        .withDetail(ResponseUrn.INTERNAL_SERVER_ERR_URN.getMessage())
+                        .getResponse();
+                assertEquals(expected, handler.cause().getMessage());
+                vertxTestContext.completeNow();
+
+              } else {
+                vertxTestContext.failNow(
+                    "Succeeded when there are more than a single policy present for a given consumer, orderId and resource");
+              }
+            });
   }
 }
