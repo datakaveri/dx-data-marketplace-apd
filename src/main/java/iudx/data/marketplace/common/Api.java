@@ -22,6 +22,7 @@ public class Api {
   private StringBuilder verifyPaymentApi;
   private StringBuilder consumerProductVariantPath;
   private StringBuilder consumerListResourcePath;
+  private StringBuilder checkPolicyPath;
 
   private Api(String dxApiBasePath) {
     this.dxApiBasePath = dxApiBasePath;
@@ -56,6 +57,7 @@ public class Api {
     verifyPaymentApi = new StringBuilder(VERIFY_PAYMENTS_PATH);
     consumerProductVariantPath = new StringBuilder(CONSUMER_PATH + PRODUCT_VARIANT_PATH);
     consumerListResourcePath = new StringBuilder(CONSUMER_PATH + LIST_RESOURCES_PATH);
+    checkPolicyPath = new StringBuilder( dxApiBasePath).append(CHECK_POLICY_PATH + POLICIES_API);
   }
 
   public String getPoliciesUrl() {
@@ -104,7 +106,7 @@ public class Api {
 
   public String getLinkedAccountService() {
     return linkedAccountService.toString();
-}
+  }
   public String getConsumerOrderApi() {
     return consumerOrdersApi.toString();
   }
@@ -120,5 +122,8 @@ public class Api {
   public String getConsumerListResourcePath()
   {
     return consumerListResourcePath.toString();
+  }
+  public String getCheckPolicyPath(){
+    return checkPolicyPath.toString();
   }
 }
