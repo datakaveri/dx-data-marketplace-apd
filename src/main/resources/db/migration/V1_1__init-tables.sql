@@ -1,5 +1,5 @@
 CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
-alter SCHEMA ${flyway:defaultSchema} OWNER TO dmp_user;
+alter SCHEMA ${flyway:defaultSchema} OWNER TO ${flyway:user};
 
 CREATE TYPE policy_status AS ENUM
 (
@@ -204,17 +204,17 @@ $$ language 'plpgsql';
 ---
 -- add owner
 ---
-ALTER TABLE user_table OWNER TO dmp_user;
-ALTER TABLE resource_entity OWNER TO dmp_user;
-ALTER TABLE product OWNER TO dmp_user;
-ALTER TABLE merchant_table OWNER TO dmp_user;
-ALTER TABLE order_table OWNER TO dmp_user;
-ALTER TABLE product_resource_relation OWNER TO dmp_user;
-ALTER TABLE product_variant OWNER TO dmp_user;
-ALTER TABLE invoice OWNER TO dmp_user;
-ALTER TABLE policy OWNER TO dmp_user;
+ALTER TABLE user_table OWNER TO ${flyway:user};
+ALTER TABLE resource_entity OWNER TO ${flyway:user};
+ALTER TABLE product OWNER TO ${flyway:user};
+ALTER TABLE merchant_table OWNER TO ${flyway:user};
+ALTER TABLE order_table OWNER TO ${flyway:user};
+ALTER TABLE product_resource_relation OWNER TO ${flyway:user};
+ALTER TABLE product_variant OWNER TO ${flyway:user};
+ALTER TABLE invoice OWNER TO ${flyway:user};
+ALTER TABLE policy OWNER TO ${flyway:user};
 
-GRANT USAGE ON SCHEMA ${flyway:defaultSchema} TO dmp_user;
+GRANT USAGE ON SCHEMA ${flyway:defaultSchema} TO ${dmp_user};
 
 
 ---
@@ -267,15 +267,15 @@ CREATE TRIGGER update_payment_table_created BEFORE INSERT ON payment_table FOR E
 --   grant privileges
 ---
 
-GRANT INSERT, SELECT, UPDATE, DELETE, REFERENCES, TRIGGER ON TABLE policy TO dmp_user;
-GRANT INSERT, SELECT, UPDATE, DELETE, REFERENCES, TRIGGER ON TABLE product TO dmp_user;
-GRANT INSERT, SELECT, UPDATE, DELETE, REFERENCES, TRIGGER ON TABLE resource_entity TO dmp_user;
-GRANT INSERT, SELECT, UPDATE, DELETE, REFERENCES, TRIGGER ON TABLE user_table TO dmp_user;
-GRANT INSERT, SELECT, UPDATE, DELETE, REFERENCES, TRIGGER ON TABLE invoice TO dmp_user;
-GRANT INSERT, SELECT, UPDATE, DELETE, REFERENCES, TRIGGER ON TABLE product_resource_relation TO dmp_user;
-GRANT INSERT, SELECT, UPDATE, DELETE, REFERENCES, TRIGGER ON TABLE product_variant TO dmp_user;
-GRANT INSERT, SELECT, UPDATE, DELETE, REFERENCES, TRIGGER ON TABLE merchant_table TO dmp_user;
-GRANT INSERT, SELECT, UPDATE, DELETE, REFERENCES, TRIGGER ON TABLE order_table TO dmp_user;
+GRANT INSERT, SELECT, UPDATE, DELETE, REFERENCES, TRIGGER ON TABLE policy TO ${dmp_user};
+GRANT INSERT, SELECT, UPDATE, DELETE, REFERENCES, TRIGGER ON TABLE product TO ${dmp_user};
+GRANT INSERT, SELECT, UPDATE, DELETE, REFERENCES, TRIGGER ON TABLE resource_entity TO ${dmp_user};
+GRANT INSERT, SELECT, UPDATE, DELETE, REFERENCES, TRIGGER ON TABLE user_table TO ${dmp_user};
+GRANT INSERT, SELECT, UPDATE, DELETE, REFERENCES, TRIGGER ON TABLE invoice TO ${dmp_user};
+GRANT INSERT, SELECT, UPDATE, DELETE, REFERENCES, TRIGGER ON TABLE product_resource_relation TO ${dmp_user};
+GRANT INSERT, SELECT, UPDATE, DELETE, REFERENCES, TRIGGER ON TABLE product_variant TO ${dmp_user};
+GRANT INSERT, SELECT, UPDATE, DELETE, REFERENCES, TRIGGER ON TABLE merchant_table TO ${dmp_user};
+GRANT INSERT, SELECT, UPDATE, DELETE, REFERENCES, TRIGGER ON TABLE order_table TO ${dmp_user};
 
 ---
 --   constraint
