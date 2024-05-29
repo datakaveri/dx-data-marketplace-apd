@@ -18,9 +18,9 @@ INNER JOIN resource_entity
 ON resource_entity._id::uuid = R.resource_id::uuid
 );
 
-ALTER VIEW product_variant_view OWNER TO dmp_user;
-ALTER VIEW resource_from_product_variant OWNER TO dmp_user;
+ALTER VIEW product_variant_view OWNER TO ${dmp_user};
+ALTER VIEW resource_from_product_variant OWNER TO ${dmp_user};
 
 
-GRANT INSERT, SELECT, UPDATE, DELETE, REFERENCES, TRIGGER ON product_variant_view TO dmp_user;
-GRANT INSERT, SELECT, UPDATE, DELETE, REFERENCES, TRIGGER ON resource_from_product_variant TO dmp_user;
+GRANT INSERT, SELECT, UPDATE, DELETE, REFERENCES, TRIGGER ON product_variant_view TO ${dmp_user};
+GRANT INSERT, SELECT, UPDATE, DELETE, REFERENCES, TRIGGER ON resource_from_product_variant TO ${dmp_user};

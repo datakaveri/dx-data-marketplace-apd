@@ -3425,7 +3425,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"razorpay_order_id\": \"order_NmTravDc9v3NhH\",\n    \"razorpay_payment_id\": \"pay_NmTsQw5sn1GRQD\",\n    \"razorpay_signature\": \"afecace3d9969229b4c76a08c3c38fa771b6ed5430e5eebd4d7cf794da62b9ea\"\n}"
+							"raw": "{\n    \"razorpay_order_id\": \"{{orderIfForVerifyPayment}}\",\n    \"razorpay_payment_id\": \"{{paymentIdForVerifyPayment}}\",\n    \"razorpay_signature\": \"{{signaureForVerifyPayment}}\"\n}"
 						},
 						"url": {
 							"raw": "{{baseUrl}}/verify-payment",
@@ -3675,7 +3675,67 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n  \"user\": {\n    \"id\": \"fd47486b-3497-4248-ac1e-082e4d37a66c\",\n    \"name\": {\n    \"firstName\":\"Vasanth\",\n    \"lastName\":\"Rajaraman\"\n    },\n    \"email\": \"vasanth.rajaraman@datakaveri.org\"\n  },\n  \"owner\": {\n    \"id\": \"b2c27f3f-2524-4a84-816e-91f9ab23f837\",\n    \"name\": {\n    \"firstName\":\"B\",\n    \"lastName\":\"Robert A B C D\"\n    },\n    \"email\": \"bryanrobert@iisc.ac.in\"\n  },\n   \"item\": {\n     \"itemId\": \"83c2e5c2-3574-4e11-9530-2b1fbdfce832\",\n     \"itemType\": \"RESOURCE\"\n   }\n}",
+							"raw": "{\n  \"user\": {\n    \"id\": \"1bc2d3f5-dd5a-4b39-a2d2-66b9fb07f6e6\",\n    \"name\": {\n    \"firstName\":\"ACL-APD\",\n    \"lastName\":\"Integration Consumer\"\n    },\n    \"email\": \"acl-apd.integration-consumer@datakaveri.org\"\n  },\n  \"owner\": {\n    \"id\": \"b2c27f3f-2524-4a84-816e-91f9ab23f837\",\n    \"name\": {\n    \"firstName\":\"B\",\n    \"lastName\":\"Robert A B C D\"\n    },\n    \"email\": \"bryanrobert@iisc.ac.in\"\n  },\n   \"item\": {\n     \"itemId\": \"83c2e5c2-3574-4e11-9530-2b1fbdfce832\",\n     \"itemType\": \"RESOURCE\"\n   }\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/verify",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"verify"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "200 Verify Policy with orderId in context: Success",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"const isPipeline = pm.environment.get('isIntegrationTestsBeingRunInPipeline') == 'true';",
+									"",
+									"// Test the response code",
+									"(isPipeline ? pm.test.skip : pm.test)(\"response is 200 (OK)\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"// Test the response header",
+									"(isPipeline ? pm.test.skip : pm.test)(\"Check response header\", function () {",
+									"    pm.response.to.have.header(\"Content-Type\",\"application/json\");",
+									"});",
+									"",
+									"// Test the response",
+									"(isPipeline ? pm.test.skip : pm.test)(\"Check response body\", function () {    ",
+									"    const body = pm.response.json();",
+									"    pm.expect(body).to.have.property(\"type\", \"urn:apd:Allow\");",
+									"    }",
+									");"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "{{authToken}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"user\": {\n    \"id\": \"fd47486b-3497-4248-ac1e-082e4d37a66c\",\n    \"name\": {\n    \"firstName\":\"ACL-APD\",\n    \"lastName\":\"Integration Consumer\"\n    },\n    \"email\": \"acl-apd.integration-consumer@datakaveri.org\"\n  },\n  \"owner\": {\n    \"id\": \"b2c27f3f-2524-4a84-816e-91f9ab23f837\",\n    \"name\": {\n    \"firstName\":\"B\",\n    \"lastName\":\"Robert A B C D\"\n    },\n    \"email\": \"bryanrobert@iisc.ac.in\"\n  },\n   \"item\": {\n     \"itemId\": \"695e222b-3fae-4325-8db0-3e29d01c4fc0\",\n     \"itemType\": \"RESOURCE\"\n   }\n   ,\n   \"context\":{\n       \"orderId\": \"order_ODPmynEY6aA0M2\"\n   }\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -4131,7 +4191,7 @@
 							}
 						],
 						"url": {
-							"raw": "{{baseUrl}}{{basePath}}/check/policies?productVariantId=07b88496-f541-408b-bed8-eccaeae44c93",
+							"raw": "{{baseUrl}}{{basePath}}/check/policies?productVariantId={{pvIdForPolicyExistence}}",
 							"host": [
 								"{{baseUrl}}{{basePath}}"
 							],
@@ -4142,7 +4202,7 @@
 							"query": [
 								{
 									"key": "productVariantId",
-									"value": "07b88496-f541-408b-bed8-eccaeae44c93"
+									"value": "{{pvIdForPolicyExistence}}"
 								}
 							]
 						}
@@ -4598,7 +4658,7 @@
 									}
 								],
 								"url": {
-									"raw": "{{baseUrl}}/consumer/list/resources?providerId=b2c27f3f-2524-4a84-816e-91f9ab23f837",
+									"raw": "{{baseUrl}}/consumer/list/resources?providerId={{providerId}}",
 									"host": [
 										"{{baseUrl}}"
 									],
@@ -4610,7 +4670,7 @@
 									"query": [
 										{
 											"key": "providerId",
-											"value": "b2c27f3f-2524-4a84-816e-91f9ab23f837"
+											"value": "{{providerId}}"
 										}
 									]
 								}
@@ -4863,7 +4923,7 @@
 									}
 								],
 								"url": {
-									"raw": "{{baseUrl}}/consumer/list/providers?providerId=b2c27f3f-2524-4a84-816e-91f9ab23f837",
+									"raw": "{{baseUrl}}/consumer/list/providers?providerId={{providerId}}",
 									"host": [
 										"{{baseUrl}}"
 									],
@@ -4875,7 +4935,7 @@
 									"query": [
 										{
 											"key": "providerId",
-											"value": "b2c27f3f-2524-4a84-816e-91f9ab23f837"
+											"value": "{{providerId}}"
 										}
 									]
 								}
@@ -5243,7 +5303,7 @@
 									}
 								],
 								"url": {
-									"raw": "{{baseUrl}}/consumer/list/purchases?resourceId=695e222b-3fae-4325-8db0-3e29d01c4fc0&paymentStatus=pending",
+									"raw": "{{baseUrl}}/consumer/list/purchases?resourceId={{resourceId1}}&paymentStatus=pending",
 									"host": [
 										"{{baseUrl}}"
 									],
@@ -5255,7 +5315,7 @@
 									"query": [
 										{
 											"key": "resourceId",
-											"value": "695e222b-3fae-4325-8db0-3e29d01c4fc0"
+											"value": "{{resourceId1}}"
 										},
 										{
 											"key": "paymentStatus",
@@ -5306,7 +5366,7 @@
 									}
 								],
 								"url": {
-									"raw": "{{baseUrl}}/consumer/list/purchases?productId=urn:datakaveri.org:b2c27f3f-2524-4a84-816e-91f9ab23f837:testProduct6f870e3e521c4fd495248c09895ceeae&paymentStatus=succeeded",
+									"raw": "{{baseUrl}}/consumer/list/purchases?productId=urn:datakaveri.org:{{providerId}}:testProduct&paymentStatus=succeeded",
 									"host": [
 										"{{baseUrl}}"
 									],
@@ -5318,7 +5378,7 @@
 									"query": [
 										{
 											"key": "productId",
-											"value": "urn:datakaveri.org:b2c27f3f-2524-4a84-816e-91f9ab23f837:testProduct6f870e3e521c4fd495248c09895ceeae"
+											"value": "urn:datakaveri.org:{{providerId}}:testProduct"
 										},
 										{
 											"key": "paymentStatus",
@@ -5369,7 +5429,7 @@
 									}
 								],
 								"url": {
-									"raw": "{{baseUrl}}/consumer/list/purchases?orderId=order_NmTravDc9v3NhH&paymentStatus=pending",
+									"raw": "{{baseUrl}}/consumer/list/purchases?orderId={{orderId}}&paymentStatus=pending",
 									"host": [
 										"{{baseUrl}}"
 									],
@@ -5381,7 +5441,7 @@
 									"query": [
 										{
 											"key": "orderId",
-											"value": "order_NmTravDc9v3NhH"
+											"value": "{{orderId}}"
 										},
 										{
 											"key": "paymentStatus",
@@ -5679,7 +5739,7 @@
 									}
 								],
 								"url": {
-									"raw": "{{baseUrl}}/consumer/list/products?resourceId=83c2e5c2-3574-4e11-9530-2b1fbdfce832",
+									"raw": "{{baseUrl}}/consumer/list/products?resourceId={{resourceId1}}",
 									"host": [
 										"{{baseUrl}}"
 									],
@@ -5691,7 +5751,7 @@
 									"query": [
 										{
 											"key": "resourceId",
-											"value": "83c2e5c2-3574-4e11-9530-2b1fbdfce832"
+											"value": "{{resourceId1}}"
 										}
 									]
 								}
@@ -5738,7 +5798,7 @@
 									}
 								],
 								"url": {
-									"raw": "{{baseUrl}}/consumer/list/products?providerId=b2c27f3f-2524-4a84-816e-91f9ab23f837",
+									"raw": "{{baseUrl}}/consumer/list/products?providerId={{providerId}}",
 									"host": [
 										"{{baseUrl}}"
 									],
@@ -5750,7 +5810,7 @@
 									"query": [
 										{
 											"key": "providerId",
-											"value": "b2c27f3f-2524-4a84-816e-91f9ab23f837"
+											"value": "{{providerId}}"
 										}
 									]
 								}
