@@ -80,4 +80,7 @@ public interface PostgresService {
   static PostgresService createProxy(Vertx vertx, String address) {
     return new PostgresServiceVertxEBProxy(vertx, address);
   }
+
+  @Fluent
+  PostgresService checkPolicy(final String query,final JsonObject param, Handler<AsyncResult<JsonObject>> handler);
 }

@@ -87,4 +87,18 @@ public class Constants {
           + " ON PV.provider_id = R.provider_id "
           + " WHERE payment_status = 'SUCCEEDED' "
           + " AND order_id = '$1';";
+
+    public static final String FETCH_PRODUCT_VARIANT =
+            " SELECT \"resourceServerUrl\", \"resources\" "
+                    + "FROM product_variant_view "
+                    + "WHERE \"productVariantId\" = '$1'  "
+                    + "AND \"productVariantStatus\" = 'ACTIVE'";
+
+
+    public static final String FETCH_POLICY =
+            " SELECT DISTINCT resource_id AS \"resources\" FROM policy "
+                    + "WHERE resource_id = ANY($1) "
+                    + "AND status = 'ACTIVE'  "
+                    + " AND consumer_email_id = $2"
+                    + " AND expiry_at > NOW(); ";
 }

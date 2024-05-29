@@ -32,6 +32,7 @@ public class PolicyVerticle extends AbstractVerticle {
   private CatalogueService catalogueService;
   private AuditingService auditingService;
   private Api api;
+  private FetchPolicyUsingPvId fetchPolicyUsingPvId;
 
   @Override
   public void start() {
@@ -43,8 +44,9 @@ public class PolicyVerticle extends AbstractVerticle {
     getPolicy = new GetPolicy(postgresServiceImpl);
     createPolicy = new CreatePolicy(postgresServiceImpl, auditingService, api);
     verifyPolicy = new VerifyPolicy(postgresServiceImpl);
+    fetchPolicyUsingPvId = new FetchPolicyUsingPvId(postgresServiceImpl);
     policyService =
-        new PolicyServiceImpl(deletePolicy, createPolicy, getPolicy, verifyPolicy, config());
+            new PolicyServiceImpl(deletePolicy, createPolicy, getPolicy, verifyPolicy,fetchPolicyUsingPvId);
 
     new ServiceBinder(vertx)
         .setAddress(POLICY_SERVICE_ADDRESS)
