@@ -188,7 +188,6 @@
       "$id": "#root/context",
       "title": "context",
       "type": "object",
-      "required": ["orderId"],
       "properties": {
         "orderId": {
           "$id": "#root/context/orderId",
