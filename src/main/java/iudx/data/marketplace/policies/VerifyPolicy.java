@@ -42,7 +42,7 @@ public class VerifyPolicy {
     UUID itemId = UUID.fromString(request.getJsonObject("item").getString("itemId"));
 
       /*check if the orderId is present in the context object*/
-      if(request.containsKey("context"))
+      if(request.containsKey("context") && StringUtils.isNotBlank(request.getJsonObject("context").getString("orderId")))
       {
           String orderId = request.getJsonObject("context").getString("orderId");
           setOrderId(orderId);
