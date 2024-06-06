@@ -61,6 +61,7 @@ public class CatalogueService {
         .addQueryParam("id", itemID)
         .send(
             catItemHandler -> {
+              LOGGER.debug("response for itemId : {} is  : {}", itemID,catItemHandler.result().bodyAsJsonObject().encodePrettily());
               if (catItemHandler.succeeded()) {
                 JsonArray response =
                     catItemHandler.result().bodyAsJsonObject().getJsonArray("results");
@@ -79,7 +80,8 @@ public class CatalogueService {
                         .put(RESOURCE_NAME, result.getString("label", ""))
                         .put(RESOURCE_SERVER, result.getValue(RESOURCE_SERVER))
                         .put(PROVIDER, result.getValue(PROVIDER))
-                        .put("accessPolicy", result.getString("accessPolicy", ""));
+                        .put("accessPolicy", result.getString("accessPolicy", ""))
+                        .put("apdURL", result.getString("apdURL"));
                   }
                   promise.complete(itemDetails);
                 } else {
