@@ -61,7 +61,6 @@ public class CatalogueService {
         .addQueryParam("id", itemID)
         .send(
             catItemHandler -> {
-              LOGGER.debug("response for itemId : {} is  : {}", itemID,catItemHandler.result().bodyAsJsonObject().encodePrettily());
               if (catItemHandler.succeeded()) {
                 JsonArray response =
                     catItemHandler.result().bodyAsJsonObject().getJsonArray("results");
