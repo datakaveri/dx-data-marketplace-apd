@@ -20,6 +20,7 @@ import static iudx.data.marketplace.apiserver.util.Constants.API_ENDPOINT;
 import static iudx.data.marketplace.apiserver.util.Constants.METHOD;
 import static iudx.data.marketplace.authenticator.authorization.IudxRole.DELEGATE;
 import static iudx.data.marketplace.authenticator.util.Constants.*;
+import static iudx.data.marketplace.common.Constants.APD_URL;
 
 public class AuthenticationServiceImpl implements AuthenticationService {
 
@@ -33,7 +34,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
   public AuthenticationServiceImpl(Vertx vertx, final JWTAuth jwtAuth, final JsonObject config, final Api apis) {
     this.jwtAuth = jwtAuth;
     this.issuer = config.getString("issuer");
-    this.apdUrl = config.getString("apdURL");
+    this.apdUrl = config.getString(APD_URL);
     this.audience = config.getString("host");
     this.apis = apis;
   }

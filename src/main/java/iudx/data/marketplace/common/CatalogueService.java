@@ -80,7 +80,7 @@ public class CatalogueService {
                         .put(RESOURCE_SERVER, result.getValue(RESOURCE_SERVER))
                         .put(PROVIDER, result.getValue(PROVIDER))
                         .put("accessPolicy", result.getString("accessPolicy", ""))
-                        .put("apdURL", result.getString("apdURL"));
+                        .put(APD_URL, result.getString(APD_URL));
                   }
                   promise.complete(itemDetails);
                 } else {

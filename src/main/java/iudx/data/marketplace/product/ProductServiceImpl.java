@@ -45,7 +45,7 @@ public class ProductServiceImpl implements ProductService {
     this.productTableName = config.getJsonArray(TABLES).getString(0);
     this.razorPayService = razorPayService;
     this.isAccountActivationCheckBeingDone = isAccountActivationCheckBeingDone;
-    this.apdUrl = config.getString("apdURL");
+    this.apdUrl = config.getString(APD_URL);
   }
 
   private static boolean isSameProviderForAll(JsonArray resourceDetails) {
@@ -82,7 +82,7 @@ public class ProductServiceImpl implements ProductService {
             })
             .compose(isApdUrlValid -> {
                 LOGGER.info("apdURL for the resource is : {} and " +
-                        "apdURL of the current APD is {}", resourceDetails.getJsonObject(0).getString("apdURL"),apdUrl);
+                        "apdURL of the current APD is {}", resourceDetails.getJsonObject(0).getString(APD_URL),apdUrl);
                 boolean isApdUrlSame = resourceDetails.getJsonObject(0).getString("apdURL").equals(apdUrl);
                 if(isApdUrlSame)
                 {
