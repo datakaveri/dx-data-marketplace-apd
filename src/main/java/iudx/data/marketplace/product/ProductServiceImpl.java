@@ -31,6 +31,7 @@ public class ProductServiceImpl implements ProductService {
   private QueryBuilder queryBuilder;
   private RazorPayService razorPayService;
   private boolean isAccountActivationCheckBeingDone;
+  private String apdUrl;
 
   public ProductServiceImpl(
       JsonObject config,
@@ -44,6 +45,7 @@ public class ProductServiceImpl implements ProductService {
     this.productTableName = config.getJsonArray(TABLES).getString(0);
     this.razorPayService = razorPayService;
     this.isAccountActivationCheckBeingDone = isAccountActivationCheckBeingDone;
+    this.apdUrl = config.getString("apdURL");
   }
 
   private static boolean isSameProviderForAll(JsonArray resourceDetails) {
@@ -77,6 +79,16 @@ public class ProductServiceImpl implements ProductService {
                   fetchItemDetailsFromCat(request, providerID, productID, resourceDetails);
 
               return CompositeFuture.all(itemFutures);
+            })
+            .compose(isApdUrlValid -> {
+                LOGGER.info("apdURL for the resource is : {} and " +
+                        "apdURL of the current APD is {}", resourceDetails.getJsonObject(0).getString("apdURL"),apdUrl);
+                boolean isApdUrlSame = resourceDetails.getJsonObject(0).getString("apdURL").equals(apdUrl);
+                if(isApdUrlSame)
+                {
+                    return isApdUrlValid;
+                }
+                return Future.failedFuture("The resource is forbidden to access as the resource belongs to a different APD");
             })
         /* Check if all resources belong to the same provider */
         .compose(
