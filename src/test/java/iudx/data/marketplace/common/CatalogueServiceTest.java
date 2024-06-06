@@ -112,6 +112,7 @@ public class CatalogueServiceTest {
     when(jsonObjectMock.getString("accessPolicy", "")).thenReturn("OPEN");
     when(jsonObjectMock.getValue("resourceServer")).thenReturn("someResourceServer");
     when(jsonObjectMock.getValue("provider")).thenReturn("dummyProviderId");
+    when(jsonObjectMock.getString(APD_URL)).thenReturn("dummyApdUrl");
 
     catalogueService
         .getItemDetails("new-item-id")
@@ -129,6 +130,7 @@ public class CatalogueServiceTest {
                             .put("resourceServer","someResourceServer")
                             .put("provider","dummyProviderId")
                         .put("accessPolicy", "OPEN")
+                            .put(APD_URL, "dummyApdUrl")
                             ,
                     handler.result());
                 testContext.completeNow();

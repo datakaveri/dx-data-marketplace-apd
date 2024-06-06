@@ -1,6 +1,7 @@
 package iudx.data.marketplace.authenticator;
 
 import static iudx.data.marketplace.authenticator.util.Constants.TOKEN;
+import static iudx.data.marketplace.common.Constants.APD_URL;
 import static iudx.data.marketplace.common.Constants.PROVIDER_ID;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
@@ -48,7 +49,7 @@ public class AuthServiceTest {
     config.put("catServerPort", 1234);
     config.put("catItemPath", "/item");
     config.put("issuer", "cos.iudx.io");
-    config.put("apdURL", "rs-test-pm.iudx.io");
+    config.put(APD_URL, "rs-test-pm.iudx.io");
     config.put("catRelPath", "/relationship");
     JWTAuthOptions jwtAuthOptions =
         new JWTAuthOptions()
@@ -165,7 +166,7 @@ public class AuthServiceTest {
         config.put("catServerPort", 1234);
         config.put("catItemPath", "/item");
         config.put("issuer", "cos.iudx.io");
-        config.put("apdURL", "rs.iudx.io");
+        config.put(APD_URL, "rs.iudx.io");
         config.put("catRelPath", "/relationship");
         JWTAuthOptions jwtAuthOptions =
                 new JWTAuthOptions()
