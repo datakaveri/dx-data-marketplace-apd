@@ -75,11 +75,12 @@ Linked account creation at DMP involves :
   - Order-paid
   - Payment failed
 - A secret should be added while creating the webhook and could be stored in config-dev with field name : webhook_secret
+- baseUrl could be replaced with appropriate Data Marketplace APD URL 
 
-| Name           | Endpoint on DMP                       | Event on Razorpay |
-|----------------|---------------------------------------|-------------------|
-| Order paid     | https://<baseUrl>/order-paid-webhooks | order-paid        |
-| Payment failed | https://<baseUrl>/payments-failed     | payment-failed    |
+| Name           | Endpoint on DMP                   | Event on Razorpay |
+|----------------|-----------------------------------|-------------------|
+| Order paid     | https://baseUrl/order-paid-webhooks | order-paid        |
+| Payment failed | https://baseUrl/payments-failed   | payment-failed    |
 
 ### Testing Payment flow in Razorpay’s test mode
 - When the mode in Razorpay dashboard is test mode, the payment flow could be simulated by consumer 
