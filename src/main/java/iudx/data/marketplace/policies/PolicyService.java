@@ -29,4 +29,3 @@ public interface PolicyService {
   Future<JsonObject> checkPolicy(String productVariantId, User user);
   Future<PolicyDetails> fetchPolicyWithPolicyId(User user, String policyId);
 }
-//add getPolicy with policy ID here

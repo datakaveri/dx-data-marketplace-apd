@@ -11,33 +11,30 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 public class ConsentAgreementHtml {
-    private static final Logger LOGGER = LogManager.getLogger(ConsentAgreementHtml.class);
-    private final Object policyDetails;
-    private final Assets assets;
-    public ConsentAgreementHtml(Object object, Assets assets)
-    {
+  private static final Logger LOGGER = LogManager.getLogger(ConsentAgreementHtml.class);
+  private final Object policyDetails;
+  private final Assets assets;
 
-        policyDetails = object;
-        this.assets = assets;
-    }
+  public ConsentAgreementHtml(Object object, Assets assets) {
 
+    policyDetails = object;
+    this.assets = assets;
+  }
 
-    public String toString()
-    {
+  public String toString() {
 
-        TemplateLoader classPathTemplateLoader = new FileTemplateLoader(assets.getAbsolutePath(), FILE_EXTENSION);
+    TemplateLoader classPathTemplateLoader =
+        new FileTemplateLoader(assets.getAbsolutePath(), FILE_EXTENSION);
 
     Handlebars handlebars = new Handlebars(classPathTemplateLoader);
-        String htmlString = null;
-        try {
-            Template template = handlebars.compile(HTML_FILE_NAME);
-            htmlString = template.apply(policyDetails);
-        } catch (IOException e) {
-            e.printStackTrace();
-            throw new RuntimeException(e);
-        }
-        return htmlString;
+    String htmlString = null;
+    try {
+      Template template = handlebars.compile(HTML_FILE_NAME);
+      htmlString = template.apply(policyDetails);
+    } catch (IOException e) {
+      e.printStackTrace();
+      throw new RuntimeException(e);
     }
-
-
+    return htmlString;
+  }
 }

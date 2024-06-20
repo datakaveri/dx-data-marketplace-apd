@@ -4,13 +4,12 @@ import com.github.jhonnymertz.wkhtmltopdf.wrapper.Pdf;
 import com.github.jhonnymertz.wkhtmltopdf.wrapper.configurations.WrapperConfig;
 import com.github.jhonnymertz.wkhtmltopdf.wrapper.objects.Page;
 import com.github.jhonnymertz.wkhtmltopdf.wrapper.params.Param;
-
 import java.io.IOException;
 import java.util.List;
 
 public class HtmlStringToPdf {
-    private List<Param> pageParams;
     private final String htmlString;
+    private List<Param> pageParams;
     public HtmlStringToPdf(String updatedHtml)
     {
         this.htmlString = updatedHtml;
@@ -36,9 +35,6 @@ public class HtmlStringToPdf {
 
         byte[] buffer = null;
         try {
-            //TODO: Remove saveAs
-//            pdf.saveAs("output.pdf");
-//            buffer = Buffer.buffer(pdf.getPDF());
             buffer =  pdf.getPDF();
         } catch (IOException e) {
             throw new RuntimeException(e);

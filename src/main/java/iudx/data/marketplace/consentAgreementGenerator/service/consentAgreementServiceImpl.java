@@ -4,12 +4,12 @@ import io.vertx.core.Future;
 import io.vertx.core.Promise;
 import io.vertx.core.buffer.Buffer;
 import iudx.data.marketplace.common.HtmlStringToPdf;
-import iudx.data.marketplace.policies.User;
 import iudx.data.marketplace.consentAgreementGenerator.controller.ConsentAgreementService;
 import iudx.data.marketplace.consentAgreementGenerator.controller.PolicyDetails;
 import iudx.data.marketplace.consentAgreementGenerator.util.Assets;
 import iudx.data.marketplace.consentAgreementGenerator.util.ConsentAgreementHtml;
 import iudx.data.marketplace.policies.PolicyService;
+import iudx.data.marketplace.policies.User;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 

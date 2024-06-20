@@ -1,21 +1,20 @@
 package iudx.data.marketplace.consentAgreementGenerator.controller;
 
+import static iudx.data.marketplace.consentAgreementGenerator.util.Assets.FILE_EXTENSION;
+import static iudx.data.marketplace.consentAgreementGenerator.util.Assets.HTML_FILE_NAME;
+
 import io.vertx.codegen.annotations.DataObject;
 import io.vertx.core.json.JsonObject;
 import iudx.data.marketplace.consentAgreementGenerator.util.Assets;
-
 import java.nio.file.Path;
 import java.nio.file.Paths;
-
-import static iudx.data.marketplace.consentAgreementGenerator.util.Assets.FILE_EXTENSION;
-import static iudx.data.marketplace.consentAgreementGenerator.util.Assets.HTML_FILE_NAME;
 
 // model class = db table
 @DataObject(generateConverter = true)
 public final class PolicyDetails {
   private static final String CUSTOMER_FACING_BUSINESS_NAME = "Dummy Corp";
-  private String policyId;
   Assets assets;
+  private String policyId;
   private String resourceId;
   private String invoiceId;
   private JsonObject constraints;

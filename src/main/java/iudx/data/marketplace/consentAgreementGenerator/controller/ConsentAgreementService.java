@@ -11,23 +11,20 @@ import iudx.data.marketplace.policies.User;
 @VertxGen
 @ProxyGen
 public interface ConsentAgreementService {
-    /* factory method */
-    @GenIgnore
-    static ConsentAgreementService createProxy(Vertx vertx, String address) {
-        return new ConsentAgreementServiceVertxEBProxy(vertx, address);
-    }
+  /* factory method */
+  @GenIgnore
+  static ConsentAgreementService createProxy(Vertx vertx, String address) {
+    return new ConsentAgreementServiceVertxEBProxy(vertx, address);
+  }
 
-    /*service operation*/
+  /*service operation*/
 
-    /**
-     * ToDo :
-     * @param user
-     * @param policyId
-     * @return todo
-     */
-    public Future<Buffer> initiatePdfGeneration(User user, String policyId);
-
-
-
-
+  /**
+   * ToDo :
+   *
+   * @param user
+   * @param policyId
+   * @return todo
+   */
+  public Future<Buffer> initiatePdfGeneration(User user, String policyId);
 }

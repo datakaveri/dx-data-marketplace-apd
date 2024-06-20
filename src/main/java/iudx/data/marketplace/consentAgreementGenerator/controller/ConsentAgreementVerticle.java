@@ -12,21 +12,22 @@ import iudx.data.marketplace.policies.PolicyService;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
-public class ConsentAgreementVerticle extends AbstractVerticle {;
-    private consentAgreementServiceImpl pdfGeneratorService;
-    private Assets assets;
+public class ConsentAgreementVerticle extends AbstractVerticle {
+  ;
+  private consentAgreementServiceImpl pdfGeneratorService;
+  private Assets assets;
 
-    @Override
-    public void start() throws Exception {
-        super.start();
-        Path path = Paths.get(HTML_FILE_NAME+FILE_EXTENSION);
-        assets = new Assets(path);
+  @Override
+  public void start() throws Exception {
+    super.start();
+    Path path = Paths.get(HTML_FILE_NAME + FILE_EXTENSION);
+    assets = new Assets(path);
 
-        PolicyService fetchPolicyDetailsWithPolicyId = PolicyService.createProxy(vertx, POLICY_SERVICE_ADDRESS);
-        pdfGeneratorService = new consentAgreementServiceImpl(fetchPolicyDetailsWithPolicyId, assets);
-        new ServiceBinder(vertx)
-                .setAddress(CONSENT_AGREEMENT_SERVICE)
-                .register(ConsentAgreementService.class, pdfGeneratorService);
-
-    }
+    PolicyService fetchPolicyDetailsWithPolicyId =
+        PolicyService.createProxy(vertx, POLICY_SERVICE_ADDRESS);
+    pdfGeneratorService = new consentAgreementServiceImpl(fetchPolicyDetailsWithPolicyId, assets);
+    new ServiceBinder(vertx)
+        .setAddress(CONSENT_AGREEMENT_SERVICE)
+        .register(ConsentAgreementService.class, pdfGeneratorService);
+  }
 }
