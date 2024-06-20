@@ -5,8 +5,8 @@ import java.nio.file.Path;
 public class Assets {
     public static final String FILE_EXTENSION = ".html";
     public static final String HTML_FILE_NAME = "consentAgreement";
-    private String absolutePath;
-    private Path path;
+    private final String absolutePath;
+    private final Path path;
 
     public Assets(Path path)
     {
@@ -16,7 +16,6 @@ public class Assets {
 
     }
     public String getAbsolutePath() {
-    System.out.println(this.absolutePath);
         return this.absolutePath;
     }
 

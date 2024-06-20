@@ -85,7 +85,7 @@ public class FetchPolicyDetailsWithPolicyId {
                         .put("expiryAt", result.getString("expiry_at"));
 
                 PolicyDetails policyDetails = new PolicyDetails(policyDetailsJson);
-                LOGGER.info("policy details is : " + policyDetails);
+                LOGGER.info("policy info : {}", policyDetails);
 
                 promise.complete(policyDetails);
 
