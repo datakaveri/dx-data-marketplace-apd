@@ -5,6 +5,7 @@ import io.vertx.codegen.annotations.GenIgnore;
 import io.vertx.codegen.annotations.ProxyGen;
 import io.vertx.codegen.annotations.VertxGen;
 import io.vertx.core.AsyncResult;
+import io.vertx.core.Future;
 import io.vertx.core.Handler;
 import io.vertx.core.Vertx;
 import io.vertx.core.json.JsonObject;
@@ -59,6 +60,8 @@ public interface PostgresService {
   @Fluent
   PostgresService executePreparedQuery(
       final String query, final JsonObject queryparams, Handler<AsyncResult<JsonObject>> handler);
+
+
 
   /**
    * The executeTransaction implements a transaction operation(with multiple queries) on the database.

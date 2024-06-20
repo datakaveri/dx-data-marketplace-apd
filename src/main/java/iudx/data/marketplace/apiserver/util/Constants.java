@@ -32,6 +32,8 @@ public class Constants {
   // request/response params
   public static final String CONTENT_TYPE = "content-type";
   public static final String APPLICATION_JSON = "application/json";
+  public static final String APPLICATION_PDF = "application/pdf";
+
   // json fields
   public static final String JSON_TYPE = "type";
   public static final String JSON_TITLE = "title";
@@ -78,6 +80,7 @@ public class Constants {
   public static final String VERIFY_PAYMENTS_PATH = "/verify-payment";
   public static final String ACCOUNTS_API = "/account";
   public static final String CHECK_POLICY_PATH = "/check";
+  public static final String PDF_GEN_PATH = "/policy-document";
 
   // query parameters | request body
 

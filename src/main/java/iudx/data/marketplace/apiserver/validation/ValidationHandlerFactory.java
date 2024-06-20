@@ -70,8 +70,18 @@ public class ValidationHandlerFactory {
       case CHECK_POLICY:
         validator = getCheckPolicyValidator(parameters);
         break;
+
+      case CONSENT_AGREEMENT:
+        validator = getConsentAgreementValidator(parameters);
+        break;
     }
     return validator;
+  }
+
+  private List<Validator> getConsentAgreementValidator(MultiMap parameters) {
+    List<Validator> validators = new ArrayList<>();
+    validators.add(new UUIDTypeValidator(parameters.get(POLICY_ID), true));
+    return validators;
   }
 
   private List<Validator> getCheckPolicyValidator(MultiMap parameters) {

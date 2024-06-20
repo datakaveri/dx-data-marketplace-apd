@@ -21,7 +21,8 @@ public enum RequestType {
   PAYMENT_CAPTURED_WEBHOOK("payment_captured_webhook"),
   PAYMENT_FAILED_WEBHOOK("payment_failed_webhook"),
   CHECK_POLICY("check_policy"),
-  TRANSFER_PROCESSEC_WEBHOOK("transfer_processed_webhook");
+  TRANSFER_PROCESSEC_WEBHOOK("transfer_processed_webhook"),
+  CONSENT_AGREEMENT("pdf_gen");
 
   private String filename;
 
