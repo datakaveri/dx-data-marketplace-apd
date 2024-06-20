@@ -72,6 +72,7 @@ public class CreatePolicy {
     Future<Boolean> future =
         fetchResourceInfoFuture.compose(
             jsonObject -> {
+                /*TODO : Split it into multiple compose */
               LOGGER.debug("Json object : {}", jsonObject.encodePrettily());
               invoiceId = jsonObject.getString("invoiceId");
               productVariantId = jsonObject.getString("productVariantId");

@@ -28,7 +28,7 @@ import iudx.data.marketplace.auditing.AuditingService;
 import iudx.data.marketplace.authenticator.AuthClient;
 import iudx.data.marketplace.authenticator.AuthenticationService;
 import iudx.data.marketplace.common.*;
-import iudx.data.marketplace.consentAgreementGenerator.ConsentAgreementService;
+import iudx.data.marketplace.consentAgreementGenerator.controller.ConsentAgreementService;
 import iudx.data.marketplace.policies.PolicyService;
 import iudx.data.marketplace.policies.User;
 import iudx.data.marketplace.postgres.PostgresService;

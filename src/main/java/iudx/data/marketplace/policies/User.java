@@ -3,6 +3,7 @@ package iudx.data.marketplace.policies;
 import io.vertx.codegen.annotations.DataObject;
 import io.vertx.core.json.JsonObject;
 import iudx.data.marketplace.apiserver.util.Role;
+import iudx.data.marketplace.policies.UserConverter;
 
 import java.util.Objects;
 

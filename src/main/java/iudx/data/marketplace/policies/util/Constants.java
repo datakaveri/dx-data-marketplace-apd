@@ -101,4 +101,10 @@ public class Constants {
                     + "AND status = 'ACTIVE'  "
                     + " AND consumer_email_id = $2"
                     + " AND expiry_at > NOW(); ";
+
+    public static final String GET_POLICY_WITH_POLICY_ID_QUERY =
+            "SELECT P.*, R.resource_server, now() >= P.expiry_at AS is_policy_expired FROM policy AS P "
+            + "INNER JOIN resource_entity AS R "
+            + "ON R._id = P.resource_id "
+            + "WHERE P._id = $1 ";
 }

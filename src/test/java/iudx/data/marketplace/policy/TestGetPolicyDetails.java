@@ -7,14 +7,12 @@ import io.vertx.core.json.JsonObject;
 import io.vertx.junit5.VertxExtension;
 import io.vertx.junit5.VertxTestContext;
 import iudx.data.marketplace.apiserver.util.Role;
-import iudx.data.marketplace.auditing.AuditingService;
 import iudx.data.marketplace.common.Api;
 import iudx.data.marketplace.common.HttpStatusCode;
 import iudx.data.marketplace.common.ResponseUrn;
-import iudx.data.marketplace.policies.GetPolicy;
+import iudx.data.marketplace.policies.GetPolicyDetails;
 import iudx.data.marketplace.policies.User;
 import iudx.data.marketplace.postgres.PostgresService;
-import iudx.data.marketplace.razorpay.RazorPayService;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.junit.jupiter.api.BeforeEach;
@@ -33,7 +31,7 @@ import java.util.stream.Stream;
 
 import static iudx.data.marketplace.apiserver.util.Constants.*;
 import static iudx.data.marketplace.apiserver.util.Constants.RESULTS;
-import static iudx.data.marketplace.policies.GetPolicy.FAILURE_MESSAGE;
+import static iudx.data.marketplace.policies.GetPolicyDetails.FAILURE_MESSAGE;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
@@ -42,8 +40,8 @@ import static org.mockito.Mockito.*;
 
 @ExtendWith({MockitoExtension.class, VertxExtension.class})
 
-public class TestGetPolicy {
-    private static final Logger LOGGER = LogManager.getLogger(TestGetPolicy.class);
+public class TestGetPolicyDetails {
+    private static final Logger LOGGER = LogManager.getLogger(TestGetPolicyDetails.class);
     @Mock
     User provider;
     @Mock
@@ -57,7 +55,7 @@ public class TestGetPolicy {
     JsonObject jsonObjectMock;
     @Mock
     JsonArray jsonArrayMock;
-    private GetPolicy policy;
+    private GetPolicyDetails policy;
 
     private static JsonObject getProviderResult()
     {
@@ -135,7 +133,7 @@ public class TestGetPolicy {
 
     @BeforeEach
     public void setUp(VertxTestContext vertxTestContext) {
-        policy = new GetPolicy(postgresService);
+        policy = new GetPolicyDetails(postgresService);
         lenient().doAnswer(
                         new Answer<AsyncResult<JsonObject>>() {
                             @Override

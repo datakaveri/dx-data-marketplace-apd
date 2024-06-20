@@ -6,6 +6,7 @@ import io.vertx.codegen.annotations.VertxGen;
 import io.vertx.core.Future;
 import io.vertx.core.Vertx;
 import io.vertx.core.json.JsonObject;
+import iudx.data.marketplace.consentAgreementGenerator.controller.PolicyDetails;
 
 @VertxGen
 @ProxyGen
@@ -26,5 +27,6 @@ public interface PolicyService {
 
   Future<JsonObject> verifyPolicy(JsonObject jsonObject);
   Future<JsonObject> checkPolicy(String productVariantId, User user);
+  Future<PolicyDetails> fetchPolicyWithPolicyId(User user, String policyId);
 }
 //add getPolicy with policy ID here

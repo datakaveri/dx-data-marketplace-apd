@@ -11,7 +11,6 @@ import iudx.data.marketplace.apiserver.util.Role;
 import iudx.data.marketplace.common.HttpStatusCode;
 import iudx.data.marketplace.common.RespBuilder;
 import iudx.data.marketplace.common.ResponseUrn;
-import iudx.data.marketplace.policies.CreatePolicy;
 import iudx.data.marketplace.policies.FetchPolicyUsingPvId;
 import iudx.data.marketplace.policies.User;
 import iudx.data.marketplace.postgres.PostgresService;

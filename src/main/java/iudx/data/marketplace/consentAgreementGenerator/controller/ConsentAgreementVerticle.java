@@ -1,4 +1,4 @@
-package iudx.data.marketplace.consentAgreementGenerator;
+package iudx.data.marketplace.consentAgreementGenerator.controller;
 
 import com.github.jhonnymertz.wkhtmltopdf.wrapper.Pdf;
 import com.github.jhonnymertz.wkhtmltopdf.wrapper.configurations.WrapperConfig;
@@ -9,13 +9,17 @@ import io.vertx.core.AbstractVerticle;
 import io.vertx.serviceproxy.ServiceBinder;
 import iudx.data.marketplace.auditing.AuditingService;
 import iudx.data.marketplace.common.Api;
+import iudx.data.marketplace.consentAgreementGenerator.util.Assets;
+import iudx.data.marketplace.consentAgreementGenerator.service.consentAgreementServiceImpl;
+import iudx.data.marketplace.policies.FetchPolicyDetailsWithPolicyId;
+import iudx.data.marketplace.policies.PolicyService;
 import iudx.data.marketplace.postgres.PostgresService;
 
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
 import static iudx.data.marketplace.common.Constants.*;
-import static iudx.data.marketplace.consentAgreementGenerator.Assets.FILE_EXTENSION;
+import static iudx.data.marketplace.consentAgreementGenerator.util.Assets.FILE_EXTENSION;
 
 public class ConsentAgreementVerticle extends AbstractVerticle {
     private Api api;
@@ -25,7 +29,7 @@ public class ConsentAgreementVerticle extends AbstractVerticle {
     private static final String ASSETS_PATH = "/home/shreelakshmi/Documents/Project_Workspace/Data-Market-place/DMP-4-PR/iudx-data-marketplace-apd/src/main/java/iudx/data/marketplace/pdfGenerator/assets/";
     private static final String HTML_FILE_NAME = "consentAgreement";
     private PostgresService postgresService;
-
+    private FetchPolicyDetailsWithPolicyId fetchPolicyDetailsWithPolicyId;
 
     @Override
     public void start() throws Exception {
@@ -47,10 +51,11 @@ public class ConsentAgreementVerticle extends AbstractVerticle {
 
         Path path = Paths.get(HTML_FILE_NAME+FILE_EXTENSION);
         Path absolutePath = path.toAbsolutePath();
-        String absPath = absolutePath.toString().replace(HTML_FILE_NAME + FILE_EXTENSION, "src/main/java/iudx/data/marketplace/pdfGenerator");
+        String absPath = absolutePath.toString().replace(HTML_FILE_NAME + FILE_EXTENSION, "src/main/java/iudx/data/marketplace/consentAgreementGenerator/assets");
         assets = new Assets(path);
-//        assets.setAbsolutePath(absPath);
-        pdfGeneratorService = new consentAgreementServiceImpl( pdf, api, auditingService, assets, postgresService);
+
+        PolicyService fetchPolicyDetailsWithPolicyId = PolicyService.createProxy(vertx, POLICY_SERVICE_ADDRESS);
+        pdfGeneratorService = new consentAgreementServiceImpl(fetchPolicyDetailsWithPolicyId, assets);
         new ServiceBinder(vertx)
                 .setAddress(CONSENT_AGREEMENT_SERVICE)
                 .register(ConsentAgreementService.class, pdfGeneratorService);

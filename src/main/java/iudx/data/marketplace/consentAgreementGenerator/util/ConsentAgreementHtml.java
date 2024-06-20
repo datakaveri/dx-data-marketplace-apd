@@ -1,8 +1,5 @@
-package iudx.data.marketplace.consentAgreementGenerator;
+package iudx.data.marketplace.consentAgreementGenerator.util;
 
-import com.github.jhonnymertz.wkhtmltopdf.wrapper.Pdf;
-import com.github.jhonnymertz.wkhtmltopdf.wrapper.configurations.WrapperConfig;
-import com.github.jhonnymertz.wkhtmltopdf.wrapper.objects.Page;
 import com.github.jhonnymertz.wkhtmltopdf.wrapper.params.Param;
 import com.github.jknack.handlebars.Handlebars;
 import com.github.jknack.handlebars.Template;
@@ -15,15 +12,15 @@ import org.apache.logging.log4j.Logger;
 import java.io.IOException;
 import java.util.List;
 
-import static iudx.data.marketplace.consentAgreementGenerator.Assets.*;
+import static iudx.data.marketplace.consentAgreementGenerator.util.Assets.*;
 
-public class HtmlTemplateToPdf {
-    private static final Logger LOGGER = LogManager.getLogger(HtmlTemplateToPdf.class);
+public class ConsentAgreementHtml {
+    private static final Logger LOGGER = LogManager.getLogger(ConsentAgreementHtml.class);
     private final Object policyDetails;
     private final Assets assets;
     private boolean isParamSet;
     private List<Param> pageParams;
-    public HtmlTemplateToPdf(Object object, Assets assets)
+    public ConsentAgreementHtml(Object object, Assets assets)
     {
 
         policyDetails = object;
@@ -31,7 +28,7 @@ public class HtmlTemplateToPdf {
     }
 
 
-    public String generateHtmlString()
+    public String toString()
     {
 //        assets.setAbsolutePath(ASSETS);
 //        try {
@@ -53,9 +50,9 @@ public class HtmlTemplateToPdf {
 //        } catch (IOException e) {
 //            throw new RuntimeException(e);
 //        }
-        TemplateLoader classPathTemplateLoader = new FileTemplateLoader("/home/shreelakshmi/Documents/Project_Workspace/Data_Market_place/DMP_4_PR/iudx_data_marketplace_apd/src/main/java/iudx/data/marketplace/consentAgreementGenerator", FILE_EXTENSION);
+        TemplateLoader classPathTemplateLoader = new FileTemplateLoader("/home/shreelakshmi/Documents/Project_Workspace/Data_Market_place/DMP_4_PR/iudx_data_marketplace_apd/src/main/java/iudx/data/marketplace/consentAgreementGenerator/assets", FILE_EXTENSION);
         ClassPathTemplateLoader classPathTemplateLoader1 = new ClassPathTemplateLoader("", FILE_EXTENSION);
-        TemplateLoader classPathTemplateLoader2 = new ClassPathTemplateLoader("/home/shreelakshmi/Documents/Project_Workspace/Data_Market_place/DMP_4_PR/iudx_data_marketplace_apd/src/main/java/iudx/data/marketplace/consentAgreementGenerator", FILE_EXTENSION);
+        TemplateLoader classPathTemplateLoader2 = new ClassPathTemplateLoader("/home/shreelakshmi/Documents/Project_Workspace/Data_Market_place/DMP_4_PR/iudx_data_marketplace_apd/src/main/java/iudx/data/marketplace/consentAgreementGenerator/assets", FILE_EXTENSION);
       TemplateLoader loader = new ClassPathTemplateLoader();
       loader. setPrefix("/pdfGenerator");
       loader. setSuffix(".html");
@@ -80,48 +77,5 @@ public class HtmlTemplateToPdf {
         return htmlString;
     }
 
-    //
-    public byte[] generatePdf(String htmlString)
-    {
-        String executable = WrapperConfig.findExecutable();
-        Pdf pdf = new Pdf(new WrapperConfig(executable));
-        Page page = pdf.addPageFromString(htmlString);
-        // TODO: Make params configurable
-        pdf.addParam(new Param("--enable-local-file-access"));
-
-        if(this.pageParams == null || getPageParams().isEmpty())
-        {
-            page.addParam(new Param("--footer-center", "here is the footer"));
-            page.addParam(new Param("--header-center", "this is a header"));
-        }
-        else {
-        for(int i = 0; i < getPageParams().size(); i++) {
-            page.addParam(this.pageParams.get(i));
-        }
-        }
-
-        byte[] buffer = null;
-        try {
-            //TODO: Remove saveAs
-//            pdf.saveAs("output.pdf");
-//            buffer = Buffer.buffer(pdf.getPDF());
-            buffer =  pdf.getPDF();
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        } catch (InterruptedException e) {
-            throw new RuntimeException(e);
-        }
-        return buffer;
-    }
-
-    public List<Param> getPageParams()
-    {
-        return this.pageParams;
-    }
-
-    public void setPageParams(List<Param> params)
-    {
-        this.pageParams = params;
-    }
 
 }

@@ -1,24 +1,19 @@
 package iudx.data.marketplace.policy;
 
 import io.vertx.core.AsyncResult;
-import io.vertx.core.Future;
 import io.vertx.core.Handler;
 import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
 import io.vertx.junit5.VertxExtension;
 import io.vertx.junit5.VertxTestContext;
 import iudx.data.marketplace.Util;
-import iudx.data.marketplace.auditing.AuditingService;
 import iudx.data.marketplace.common.Api;
 import iudx.data.marketplace.common.HttpStatusCode;
 import iudx.data.marketplace.common.RespBuilder;
 import iudx.data.marketplace.common.ResponseUrn;
-import iudx.data.marketplace.policies.CreatePolicy;
-import iudx.data.marketplace.policies.DeletePolicy;
 import iudx.data.marketplace.policies.User;
 import iudx.data.marketplace.policies.VerifyPolicy;
 import iudx.data.marketplace.postgres.PostgresService;
-import iudx.data.marketplace.razorpay.RazorPayService;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.junit.jupiter.api.BeforeEach;
@@ -29,8 +24,6 @@ import org.mockito.Mock;
 import org.mockito.invocation.InvocationOnMock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.mockito.stubbing.Answer;
-
-import java.util.UUID;
 
 import static iudx.data.marketplace.apiserver.util.Constants.*;
 import static org.junit.jupiter.api.Assertions.assertEquals;

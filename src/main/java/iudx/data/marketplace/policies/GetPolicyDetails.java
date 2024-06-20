@@ -2,15 +2,12 @@ package iudx.data.marketplace.policies;
 
 import io.vertx.core.Future;
 import io.vertx.core.Promise;
-import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
-import io.vertx.sqlclient.Tuple;
 import iudx.data.marketplace.apiserver.util.Role;
 
 import iudx.data.marketplace.common.HttpStatusCode;
 import iudx.data.marketplace.common.ResponseUrn;
 import iudx.data.marketplace.postgres.PostgresService;
-import iudx.data.marketplace.postgres.PostgresServiceImpl;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -20,17 +17,18 @@ import static iudx.data.marketplace.common.HttpStatusCode.BAD_REQUEST;
 import static iudx.data.marketplace.policies.util.Constants.GET_POLICY_4_CONSUMER_QUERY;
 import static iudx.data.marketplace.policies.util.Constants.GET_POLICY_4_PROVIDER_QUERY;
 
-public class GetPolicy {
-    private static final Logger LOG = LoggerFactory.getLogger(GetPolicy.class);
+public class GetPolicyDetails {
+    private static final Logger LOG = LoggerFactory.getLogger(GetPolicyDetails.class);
     public static final String FAILURE_MESSAGE = "Policy could not be fetched";
 
     private final PostgresService postgresService;
 
-  public GetPolicy(PostgresService postgresService) {
+  public GetPolicyDetails(PostgresService postgresService) {
     this.postgresService = postgresService;
 }
 
-
+//TODO: Use new PostgresVerticle with Future return type and model classes(table schema) to generate the result
+  //TODO: Split the inner join queries into multiple ones
   public Future<JsonObject> initiateGetPolicy(User user) {
     Role role = user.getUserRole();
     switch (role) {

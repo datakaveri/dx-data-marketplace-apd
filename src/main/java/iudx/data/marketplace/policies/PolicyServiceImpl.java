@@ -3,30 +3,33 @@ package iudx.data.marketplace.policies;
 import io.vertx.core.Future;
 import io.vertx.core.Promise;
 import io.vertx.core.json.JsonObject;
+import iudx.data.marketplace.consentAgreementGenerator.controller.PolicyDetails;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class PolicyServiceImpl implements PolicyService{
     private static final Logger LOG = LoggerFactory.getLogger(PolicyServiceImpl.class);
     private final DeletePolicy deletePolicy;
-    private final GetPolicy getPolicy;
+    private final GetPolicyDetails getPolicyDetails;
     private final CreatePolicy createPolicy;
     private final VerifyPolicy verifyPolicy;
     private final FetchPolicyUsingPvId fetchPolicy;
-
+    private final FetchPolicyDetailsWithPolicyId fetchPolicyDetailsWithPolicyId;
     JsonObject config;
 
     public PolicyServiceImpl(
             DeletePolicy deletePolicy,
             CreatePolicy createPolicy,
-            GetPolicy getPolicy,
+            GetPolicyDetails getPolicyDetails,
             VerifyPolicy verifyPolicy,
-            FetchPolicyUsingPvId fetchPolicyUsingPvId) {
+            FetchPolicyUsingPvId fetchPolicyUsingPvId,
+            FetchPolicyDetailsWithPolicyId fetchPolicyDetailsWithPolicyId) {
         this.deletePolicy = deletePolicy;
         this.createPolicy = createPolicy;
-        this.getPolicy = getPolicy;
+        this.getPolicyDetails = getPolicyDetails;
         this.verifyPolicy = verifyPolicy;
         this.fetchPolicy = fetchPolicyUsingPvId;
+        this.fetchPolicyDetailsWithPolicyId = fetchPolicyDetailsWithPolicyId;
     }
 
     @Override
@@ -66,7 +69,7 @@ public class PolicyServiceImpl implements PolicyService{
     @Override
     public Future<JsonObject> getPolicies(User user) {
         Promise<JsonObject> promise = Promise.promise();
-        this.getPolicy
+        this.getPolicyDetails
                 .initiateGetPolicy(user)
                 .onComplete(
                         handler -> {
@@ -111,6 +114,24 @@ public class PolicyServiceImpl implements PolicyService{
                                 promise.complete(handler.result());
                             } else {
                                 LOG.error("Failed to verify policy");
+                                promise.fail(handler.cause().getMessage());
+                            }
+                        });
+        return promise.future();
+    }
+
+    @Override
+    public Future<PolicyDetails> fetchPolicyWithPolicyId(User user, String policyId) {
+        Promise<PolicyDetails> promise = Promise.promise();
+
+        this.fetchPolicyDetailsWithPolicyId
+                .getPolicyDetails(user, policyId)
+                .onComplete(
+                        handler -> {
+                            if (handler.succeeded()) {
+                                promise.complete(handler.result());
+                            } else {
+                                LOG.error("Failed to fetch policy with the given policy ID");
                                 promise.fail(handler.cause().getMessage());
                             }
                         });

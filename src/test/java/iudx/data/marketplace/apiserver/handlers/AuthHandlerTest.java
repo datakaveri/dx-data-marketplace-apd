@@ -20,7 +20,6 @@ import iudx.data.marketplace.common.Api;
 import iudx.data.marketplace.policies.User;
 import iudx.data.marketplace.postgres.PostgresServiceImpl;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -32,7 +31,6 @@ import org.mockito.invocation.InvocationOnMock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.mockito.stubbing.Answer;
 
-import java.util.HashMap;
 import java.util.Map;
 import java.util.stream.Stream;
 

@@ -1,25 +1,19 @@
 package iudx.data.marketplace.policies;
 
 import io.vertx.core.AbstractVerticle;
-import io.vertx.core.Vertx;
-import io.vertx.pgclient.PgConnectOptions;
-import io.vertx.pgclient.PgPool;
 import io.vertx.serviceproxy.ServiceBinder;
-import io.vertx.sqlclient.PoolOptions;
-import iudx.data.marketplace.apiserver.ApiServerVerticle;
 import iudx.data.marketplace.auditing.AuditingService;
 import iudx.data.marketplace.common.Api;
 import iudx.data.marketplace.common.CatalogueService;
+import iudx.data.marketplace.consentAgreementGenerator.util.Assets;
 import iudx.data.marketplace.postgres.PostgresService;
-import iudx.data.marketplace.postgres.PostgresServiceImpl;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
-import iudx.data.marketplace.common.CatalogueService;
-import iudx.data.marketplace.postgres.PostgresServiceImpl;
 
-import java.util.Map;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 
 import static iudx.data.marketplace.common.Constants.*;
+import static iudx.data.marketplace.consentAgreementGenerator.util.Assets.FILE_EXTENSION;
+import static iudx.data.marketplace.consentAgreementGenerator.util.Assets.HTML_FILE_NAME;
 
 public class PolicyVerticle extends AbstractVerticle {
 
@@ -28,11 +22,13 @@ public class PolicyVerticle extends AbstractVerticle {
   private DeletePolicy deletePolicy;
   private CreatePolicy createPolicy;
   private VerifyPolicy verifyPolicy;
-  private GetPolicy getPolicy;
+  private GetPolicyDetails getPolicyDetails;
   private CatalogueService catalogueService;
   private AuditingService auditingService;
   private Api api;
   private FetchPolicyUsingPvId fetchPolicyUsingPvId;
+  private FetchPolicyDetailsWithPolicyId fetchPolicyDetailsWithPolicyId;
+  private Assets assets;
 
   @Override
   public void start() {
@@ -41,12 +37,18 @@ public class PolicyVerticle extends AbstractVerticle {
     auditingService = AuditingService.createProxy(vertx, AUDITING_SERVICE_ADDRESS);
     api = Api.getInstance(config().getString("dxApiBasePath"));
     deletePolicy = new DeletePolicy(postgresServiceImpl, auditingService, api);
-    getPolicy = new GetPolicy(postgresServiceImpl);
+    getPolicyDetails = new GetPolicyDetails(postgresServiceImpl);
     createPolicy = new CreatePolicy(postgresServiceImpl, auditingService, api);
     verifyPolicy = new VerifyPolicy(postgresServiceImpl);
     fetchPolicyUsingPvId = new FetchPolicyUsingPvId(postgresServiceImpl);
+
+    Path path = Paths.get(HTML_FILE_NAME+FILE_EXTENSION);
+    Path absolutePath = path.toAbsolutePath();
+    String absPath = absolutePath.toString().replace(HTML_FILE_NAME + FILE_EXTENSION, "src/main/java/iudx/data/marketplace/consentAgreement/assets");
+    assets = new Assets(path);
+    fetchPolicyDetailsWithPolicyId = new FetchPolicyDetailsWithPolicyId(postgresServiceImpl, assets);
     policyService =
-            new PolicyServiceImpl(deletePolicy, createPolicy, getPolicy, verifyPolicy,fetchPolicyUsingPvId);
+            new PolicyServiceImpl(deletePolicy, createPolicy, getPolicyDetails, verifyPolicy,fetchPolicyUsingPvId, fetchPolicyDetailsWithPolicyId);
 
     new ServiceBinder(vertx)
         .setAddress(POLICY_SERVICE_ADDRESS)

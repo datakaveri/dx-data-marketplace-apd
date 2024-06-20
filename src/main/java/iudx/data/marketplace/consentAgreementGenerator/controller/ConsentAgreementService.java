@@ -1,4 +1,4 @@
-package iudx.data.marketplace.consentAgreementGenerator;
+package iudx.data.marketplace.consentAgreementGenerator.controller;
 
 import io.vertx.codegen.annotations.GenIgnore;
 import io.vertx.codegen.annotations.ProxyGen;
@@ -20,7 +20,7 @@ public interface ConsentAgreementService {
     /*service operation*/
 
     /**
-     * ToDo
+     * ToDo :
      * @param user
      * @param policyId
      * @return todo

@@ -1,4 +1,4 @@
-package iudx.data.marketplace.consentAgreementGenerator;
+package iudx.data.marketplace.consentAgreementGenerator.util;
 
 import java.nio.file.Path;
 
@@ -11,12 +11,12 @@ public class Assets {
     private Path path;
  //
 
-    Assets(Path path)
+    public Assets(Path path)
     {
         this.path = path;
 //        this.path = Paths.get(HTML_FILE_NAME+FILE_EXTENSION);
         Path absolutePath = path.toAbsolutePath();
-        this.absolutePath = absolutePath.toString().replace(HTML_FILE_NAME + FILE_EXTENSION, "src/main/java/iudx/data/marketplace/consentAgreementGenerator");
+        this.absolutePath = absolutePath.toString().replace(HTML_FILE_NAME + FILE_EXTENSION, "src/main/java/iudx/data/marketplace/consentAgreementGenerator/assets");
 
     }
 //    public void setAbsolutePath(String path)
@@ -31,5 +31,13 @@ public class Assets {
     public String getAbsolutePath() {
     System.out.println(this.absolutePath);
         return this.absolutePath;
+    }
+
+    @Override
+    public String toString() {
+        return "Assets{" +
+                "absolutePath='" + absolutePath + '\'' +
+                ", path=" + path +
+                '}';
     }
 }

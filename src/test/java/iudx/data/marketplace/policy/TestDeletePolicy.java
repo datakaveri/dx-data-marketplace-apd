@@ -12,7 +12,6 @@ import iudx.data.marketplace.common.Api;
 import iudx.data.marketplace.common.HttpStatusCode;
 import iudx.data.marketplace.common.ResponseUrn;
 import iudx.data.marketplace.policies.DeletePolicy;
-import iudx.data.marketplace.policies.GetPolicy;
 import iudx.data.marketplace.policies.User;
 import iudx.data.marketplace.postgres.PostgresService;
 import org.junit.jupiter.api.BeforeEach;
