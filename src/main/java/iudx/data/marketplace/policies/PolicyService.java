@@ -27,3 +27,4 @@ public interface PolicyService {
   Future<JsonObject> verifyPolicy(JsonObject jsonObject);
   Future<JsonObject> checkPolicy(String productVariantId, User user);
 }
+//add getPolicy with policy ID here

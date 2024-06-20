@@ -23,6 +23,7 @@ public class Api {
   private StringBuilder consumerProductVariantPath;
   private StringBuilder consumerListResourcePath;
   private StringBuilder checkPolicyPath;
+  private StringBuilder consentAgreementPath;
 
   private Api(String dxApiBasePath) {
     this.dxApiBasePath = dxApiBasePath;
@@ -58,6 +59,7 @@ public class Api {
     consumerProductVariantPath = new StringBuilder(CONSUMER_PATH + PRODUCT_VARIANT_PATH);
     consumerListResourcePath = new StringBuilder(CONSUMER_PATH + LIST_RESOURCES_PATH);
     checkPolicyPath = new StringBuilder( dxApiBasePath).append(CHECK_POLICY_PATH + POLICIES_API);
+    consentAgreementPath = new StringBuilder(dxApiBasePath).append(PDF_GEN_PATH);
   }
 
   public String getPoliciesUrl() {
@@ -125,5 +127,9 @@ public class Api {
   }
   public String getCheckPolicyPath(){
     return checkPolicyPath.toString();
+  }
+
+  public String getConsentAgreementPath() {
+    return consentAgreementPath.toString();
   }
 }

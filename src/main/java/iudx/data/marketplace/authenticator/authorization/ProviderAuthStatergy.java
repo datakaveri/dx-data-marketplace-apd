@@ -1,6 +1,5 @@
 package iudx.data.marketplace.authenticator.authorization;
 
-import io.vertx.core.json.JsonArray;
 import iudx.data.marketplace.authenticator.model.JwtData;
 import iudx.data.marketplace.common.Api;
 import org.apache.logging.log4j.LogManager;
@@ -57,6 +56,10 @@ public class ProviderAuthStatergy implements AuthorizationStatergy {
     //    policies
     apiAccessList.add(new AuthorizationRequest(GET, api.getPoliciesUrl()));
     apiAccessList.add(new AuthorizationRequest(DELETE, api.getPoliciesUrl()));
+
+    // consent agreement and pdf generation
+    apiAccessList.add(new AuthorizationRequest(GET, api.getConsentAgreementPath()));
+
     providerAuthorizationRequest.put("api", apiAccessList);
   }
 

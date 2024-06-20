@@ -1,4 +1,4 @@
-package iudx.data.marketplace.common;
+package iudx.data.marketplace.policies.util;
 
 import io.vertx.core.json.JsonObject;
 import iudx.data.marketplace.apiserver.util.Role;

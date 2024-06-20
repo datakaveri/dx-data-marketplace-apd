@@ -1,6 +1,5 @@
 package iudx.data.marketplace.authenticator.authorization;
 
-import io.vertx.core.json.JsonArray;
 import iudx.data.marketplace.authenticator.model.JwtData;
 import iudx.data.marketplace.common.Api;
 import org.apache.logging.log4j.LogManager;
@@ -48,6 +47,10 @@ public class ConsumerAuthStatergy implements AuthorizationStatergy {
 
     // policy
     apiAccessList.add(new AuthorizationRequest(GET, apis.getPoliciesUrl()));
+
+    // consent agreement and pdf generation
+    apiAccessList.add(new AuthorizationRequest(GET, apis.getConsentAgreementPath()));
+
     consumerAuthorizationRules.put("api", apiAccessList);
   }
   @Override

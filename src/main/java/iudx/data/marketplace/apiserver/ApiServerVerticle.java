@@ -6,6 +6,7 @@ import static iudx.data.marketplace.common.Constants.*;
 import static iudx.data.marketplace.common.HttpStatusCode.BAD_REQUEST;
 
 import io.vertx.core.AbstractVerticle;
+import io.vertx.core.buffer.Buffer;
 import io.vertx.core.http.*;
 import io.vertx.core.json.DecodeException;
 import io.vertx.core.json.JsonObject;
@@ -27,11 +28,13 @@ import iudx.data.marketplace.auditing.AuditingService;
 import iudx.data.marketplace.authenticator.AuthClient;
 import iudx.data.marketplace.authenticator.AuthenticationService;
 import iudx.data.marketplace.common.*;
+import iudx.data.marketplace.consentAgreementGenerator.ConsentAgreementService;
 import iudx.data.marketplace.policies.PolicyService;
 import iudx.data.marketplace.policies.User;
 import iudx.data.marketplace.postgres.PostgresService;
 import iudx.data.marketplace.razorpay.RazorPayService;
 import iudx.data.marketplace.webhook.WebhookService;
+
 import java.util.HashSet;
 import java.util.Set;
 import java.util.stream.Stream;
@@ -69,6 +72,7 @@ public class ApiServerVerticle extends AbstractVerticle {
   private LinkedAccountService linkedAccountService;
   private AuditingService auditingService;
   private WebhookService webhookService;
+  private ConsentAgreementService pdfGenService;
 
   /**
    * This method is used to start the Verticle. It deploys a verticle in a cluster, reads the
@@ -107,6 +111,7 @@ public class ApiServerVerticle extends AbstractVerticle {
     policyService = PolicyService.createProxy(vertx, POLICY_SERVICE_ADDRESS);
     postgresService = PostgresService.createProxy(vertx, POSTGRES_SERVICE_ADDRESS);
     razorPayService = RazorPayService.createProxy(vertx, RAZORPAY_SERVICE_ADDRESS);
+    pdfGenService = ConsentAgreementService.createProxy(vertx, CONSENT_AGREEMENT_SERVICE);
 
     authClient = new AuthClient(config(), webClient);
     authenticationService = AuthenticationService.createProxy(vertx, AUTH_SERVICE_ADDRESS);
@@ -225,6 +230,7 @@ public class ApiServerVerticle extends AbstractVerticle {
         new ValidationHandler(vertx, RequestType.POST_ACCOUNT);
     ValidationHandler putLinkedAccountHandler =
         new ValidationHandler(vertx, RequestType.PUT_ACCOUNT);
+    ValidationHandler consentAgreementHandler = new ValidationHandler(vertx, RequestType.CONSENT_AGREEMENT);
 
     router
         .get(api.getPoliciesUrl())
@@ -280,6 +286,12 @@ public class ApiServerVerticle extends AbstractVerticle {
               .handler(AuthHandler.create(authenticationService, api, postgresService, authClient))
               .handler(this::checkPolicyHandler)
               .failureHandler(exceptionHandler);
+
+  router.get(api.getConsentAgreementPath())
+          .handler(consentAgreementHandler)
+          .handler(AuthHandler.create(authenticationService, api, postgresService, authClient))
+          .handler(this::getConsentAgreementHandler) //
+          .failureHandler(exceptionHandler);
 
     /*Webhook routes */
 
@@ -480,6 +492,30 @@ public class ApiServerVerticle extends AbstractVerticle {
             });
   }
 
+
+    private void getConsentAgreementHandler(RoutingContext routingContext) {
+        HttpServerResponse response = routingContext.response();
+
+        User user = routingContext.get("user");
+        String policyId = routingContext.request().getParam(POLICY_ID);
+//        PolicyDetails policyDetails = new PolicyDetails();
+//        String updatedHtmlContent = pdfGenService.generateHtmlString(policyInfoInPdf, policyId);
+//        var updatedHtmlContent = pdfGenService.initiatePdfGeneration(user, policyId);
+
+//        PdfGeneratorServiceImpl.convertHtmlToPdfWithImages();
+        pdfGenService.initiatePdfGeneration(user, policyId)
+                .onComplete(
+                        handler -> {
+                            if (handler.succeeded()) {
+                                Buffer pdfResponse = handler.result();
+                                handleSuccessResponse(response, HttpStatusCode.SUCCESS.getValue(), pdfResponse, APPLICATION_PDF);
+                            } else {
+                                handleFailureResponse(routingContext, handler.cause().getMessage());
+                            }
+                        });
+    }
+
+
   private void mapUserToProduct(RoutingContext routingContext) {}
 
   private void handlePostLinkedAccount(RoutingContext routingContext) {
@@ -568,6 +604,9 @@ public class ApiServerVerticle extends AbstractVerticle {
    * @param statusCode statusCode to respond with
    * @param result respective result returned from the service
    */
+  private void handleSuccessResponse(HttpServerResponse response, int statusCode, Buffer result, String contentType) {
+      response.putHeader(CONTENT_TYPE, contentType).setStatusCode(statusCode).end(result);
+  }
   private void handleSuccessResponse(HttpServerResponse response, int statusCode, String result) {
     response.putHeader(CONTENT_TYPE, APPLICATION_JSON).setStatusCode(statusCode).end(result);
   }
