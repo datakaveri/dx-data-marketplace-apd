@@ -20,11 +20,9 @@ public interface ConsentAgreementService {
   /*service operation*/
 
   /**
-   * ToDo :
-   *
-   * @param user
-   * @param policyId
-   * @return todo
+   * @param user info about the user requesting the consent agreement
+   * @param policyId based on which consent agreement needs to be fetched
+   * @return Pdf buffer as end-user response
    */
   public Future<Buffer> initiatePdfGeneration(User user, String policyId);
 }

@@ -24,11 +24,6 @@ public class consentAgreementServiceImpl implements ConsentAgreementService {
     this.assets = assets;
   }
 
-  // object (Person) that is sent here should have to string method implemented so that
-  // the information that is inserted into the pdf can be sent for auditing
-
-  // adding setters and getters in PolicyInfoInPdf and also get policy
-
   @Override
   public Future<Buffer> initiatePdfGeneration(User user, String policyId) {
     Promise<Buffer> promise = Promise.promise();
