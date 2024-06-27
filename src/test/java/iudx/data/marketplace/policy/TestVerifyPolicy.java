@@ -1,7 +1,13 @@
 package iudx.data.marketplace.policy;
 
+import static iudx.data.marketplace.apiserver.util.Constants.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.*;
+
 import io.vertx.core.AsyncResult;
-import io.vertx.core.Handler;
+import io.vertx.core.Future;
 import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
 import io.vertx.junit5.VertxExtension;
@@ -13,7 +19,7 @@ import iudx.data.marketplace.common.RespBuilder;
 import iudx.data.marketplace.common.ResponseUrn;
 import iudx.data.marketplace.policies.User;
 import iudx.data.marketplace.policies.VerifyPolicy;
-import iudx.data.marketplace.postgres.PostgresService;
+import iudx.data.marketplace.postgresql.PostgresqlService;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.junit.jupiter.api.BeforeEach;
@@ -21,21 +27,14 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
-import org.mockito.invocation.InvocationOnMock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.mockito.stubbing.Answer;
-
-import static iudx.data.marketplace.apiserver.util.Constants.*;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.Mockito.*;
 
 @ExtendWith({MockitoExtension.class, VertxExtension.class})
 public class TestVerifyPolicy {
   private static final Logger LOGGER = LogManager.getLogger(TestCreatePolicy.class);
 
-  @Mock PostgresService postgresService;
+  @Mock
+  PostgresqlService postgresService;
   @Mock Api api;
   @Mock User provider;
   @Mock AsyncResult<JsonObject> asyncResult;
@@ -74,17 +73,6 @@ public class TestVerifyPolicy {
         new JsonObject().put("itemId", Util.generateRandomUuid()).put("itemType", "RESOURCE");
     request =
         new JsonObject().put("user", userJson).put("owner", ownerJson).put("item", resourceJson);
-    lenient()
-        .doAnswer(
-            new Answer<AsyncResult<JsonObject>>() {
-              @Override
-              public AsyncResult<JsonObject> answer(InvocationOnMock arg2) throws Throwable {
-                ((Handler<AsyncResult<JsonObject>>) arg2.getArgument(2)).handle(asyncResult);
-                return null;
-              }
-            })
-        .when(postgresService)
-        .executePreparedQuery(anyString(), any(), any());
     vertxTestContext.completeNow();
   }
 
@@ -97,7 +85,9 @@ public class TestVerifyPolicy {
             .put(
                 "constraints",
                 new JsonObject().put("access", new JsonArray().add("sub").add("200 APIs")));
-    when(asyncResult.result()).thenReturn(jsonObjectMock);
+      when(postgresService.executePreparedQuery(anyString(),any())).thenReturn(Future.succeededFuture(jsonObjectMock));
+
+//      when(asyncResult.result()).thenReturn(jsonObjectMock);
     when(jsonObjectMock.getJsonArray(RESULT)).thenReturn(jsonArrayMock);
     when(jsonArrayMock.isEmpty()).thenReturn(false);
     when(jsonArrayMock.getJsonObject(anyInt())).thenReturn(constraints.put("_id", policyId));
@@ -123,7 +113,7 @@ public class TestVerifyPolicy {
   @Test
   @DisplayName("Test when no policy exists : Failure")
   public void testWhenNoPolicyExists(VertxTestContext vertxTestContext) {
-    when(asyncResult.result()).thenReturn(jsonObjectMock);
+      when(postgresService.executePreparedQuery(anyString(),any())).thenReturn(Future.succeededFuture(jsonObjectMock));
     when(jsonObjectMock.getJsonArray(RESULT)).thenReturn(jsonArrayMock);
     when(jsonArrayMock.isEmpty()).thenReturn(true);
 
@@ -148,9 +138,7 @@ public class TestVerifyPolicy {
   @Test
   @DisplayName("Test when DB Execution failed : Failure")
   public void testWhenDbExecutionFailed(VertxTestContext vertxTestContext) {
-    when(asyncResult.failed()).thenReturn(true);
-    when(asyncResult.cause()).thenReturn(throwable);
-    when(throwable.getMessage()).thenReturn("Some error message");
+      when(postgresService.executePreparedQuery(anyString(),any())).thenReturn(Future.failedFuture("Some error message"));
 
     policy
         .initiateVerifyPolicy(request)
@@ -180,7 +168,7 @@ public class TestVerifyPolicy {
             .put(
                 "constraints",
                 new JsonObject().put("access", new JsonArray().add("sub").add("200 APIs")));
-    when(asyncResult.result()).thenReturn(jsonObjectMock);
+      when(postgresService.executePreparedQuery(anyString(),any())).thenReturn(Future.succeededFuture(jsonObjectMock));
     when(jsonObjectMock.getJsonArray(RESULT)).thenReturn(jsonArrayMock);
     when(jsonArrayMock.isEmpty()).thenReturn(false);
     when(jsonArrayMock.getJsonObject(anyInt())).thenReturn(constraints.put("_id", policyId));
@@ -214,7 +202,7 @@ public class TestVerifyPolicy {
             .put(
                 "constraints",
                 new JsonObject().put("access", new JsonArray().add("sub").add("200 APIs")));
-    when(asyncResult.result()).thenReturn(jsonObjectMock);
+      when(postgresService.executePreparedQuery(anyString(),any())).thenReturn(Future.succeededFuture(jsonObjectMock));
     when(jsonObjectMock.getJsonArray(RESULT)).thenReturn(jsonArrayMock);
     when(jsonArrayMock.isEmpty()).thenReturn(false);
     when(jsonArrayMock.size()).thenReturn(2);

@@ -14,7 +14,7 @@ import java.nio.file.Paths;
 
 public class ConsentAgreementVerticle extends AbstractVerticle {
   ;
-  private consentAgreementServiceImpl pdfGeneratorService;
+  private consentAgreementServiceImpl consentAgreementService;
   private Assets assets;
 
   @Override
@@ -25,9 +25,9 @@ public class ConsentAgreementVerticle extends AbstractVerticle {
 
     PolicyService fetchPolicyDetailsWithPolicyId =
         PolicyService.createProxy(vertx, POLICY_SERVICE_ADDRESS);
-    pdfGeneratorService = new consentAgreementServiceImpl(fetchPolicyDetailsWithPolicyId, assets);
+    consentAgreementService = new consentAgreementServiceImpl(fetchPolicyDetailsWithPolicyId, assets);
     new ServiceBinder(vertx)
         .setAddress(CONSENT_AGREEMENT_SERVICE)
-        .register(ConsentAgreementService.class, pdfGeneratorService);
+        .register(ConsentAgreementService.class, consentAgreementService);
   }
 }

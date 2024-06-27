@@ -32,6 +32,7 @@ import iudx.data.marketplace.consentAgreementGenerator.controller.ConsentAgreeme
 import iudx.data.marketplace.policies.PolicyService;
 import iudx.data.marketplace.policies.User;
 import iudx.data.marketplace.postgres.PostgresService;
+import iudx.data.marketplace.postgresql.PostgresqlService;
 import iudx.data.marketplace.razorpay.RazorPayService;
 import iudx.data.marketplace.webhook.WebhookService;
 
@@ -72,7 +73,8 @@ public class ApiServerVerticle extends AbstractVerticle {
   private LinkedAccountService linkedAccountService;
   private AuditingService auditingService;
   private WebhookService webhookService;
-  private ConsentAgreementService pdfGenService;
+  private ConsentAgreementService consentAgreementService;
+  private PostgresqlService postgresqlService;
 
   /**
    * This method is used to start the Verticle. It deploys a verticle in a cluster, reads the
@@ -111,7 +113,8 @@ public class ApiServerVerticle extends AbstractVerticle {
     policyService = PolicyService.createProxy(vertx, POLICY_SERVICE_ADDRESS);
     postgresService = PostgresService.createProxy(vertx, POSTGRES_SERVICE_ADDRESS);
     razorPayService = RazorPayService.createProxy(vertx, RAZORPAY_SERVICE_ADDRESS);
-    pdfGenService = ConsentAgreementService.createProxy(vertx, CONSENT_AGREEMENT_SERVICE);
+    consentAgreementService = ConsentAgreementService.createProxy(vertx, CONSENT_AGREEMENT_SERVICE);
+    postgresqlService = PostgresqlService.createProxy(vertx, POSTGRESQL_SERVICE_ADDRESS);
 
     authClient = new AuthClient(config(), webClient);
     authenticationService = AuthenticationService.createProxy(vertx, AUTH_SERVICE_ADDRESS);
@@ -498,12 +501,7 @@ public class ApiServerVerticle extends AbstractVerticle {
 
         User user = routingContext.get("user");
         String policyId = routingContext.request().getParam(POLICY_ID);
-//        PolicyDetails policyDetails = new PolicyDetails();
-//        String updatedHtmlContent = pdfGenService.generateHtmlString(policyInfoInPdf, policyId);
-//        var updatedHtmlContent = pdfGenService.initiatePdfGeneration(user, policyId);
-
-//        PdfGeneratorServiceImpl.convertHtmlToPdfWithImages();
-        pdfGenService.initiatePdfGeneration(user, policyId)
+        consentAgreementService.initiatePdfGeneration(user, policyId)
                 .onComplete(
                         handler -> {
                             if (handler.succeeded()) {

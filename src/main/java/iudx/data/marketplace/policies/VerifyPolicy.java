@@ -1,36 +1,30 @@
 package iudx.data.marketplace.policies;
 
-import io.vertx.core.Future;
-import io.vertx.core.Promise;
-import io.vertx.core.json.JsonArray;
-import io.vertx.core.json.JsonObject;
-import io.vertx.sqlclient.Row;
-import io.vertx.sqlclient.Tuple;
-import iudx.data.marketplace.common.CatalogueService;
-import iudx.data.marketplace.common.HttpStatusCode;
-import iudx.data.marketplace.common.ResponseUrn;
-import iudx.data.marketplace.policies.util.Status;
-import iudx.data.marketplace.postgres.PostgresService;
-import iudx.data.marketplace.postgres.PostgresServiceImpl;
-import org.apache.commons.lang.StringUtils;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
-
-import java.util.HashSet;
-import java.util.Set;
-import java.util.UUID;
-
 import static iudx.data.marketplace.apiserver.util.Constants.*;
 import static iudx.data.marketplace.common.HttpStatusCode.INTERNAL_SERVER_ERROR;
 import static iudx.data.marketplace.common.HttpStatusCode.VERIFY_FORBIDDEN;
 import static iudx.data.marketplace.policies.util.Constants.*;
 
+import io.vertx.core.Future;
+import io.vertx.core.Promise;
+import io.vertx.core.json.JsonArray;
+import io.vertx.core.json.JsonObject;
+import io.vertx.sqlclient.Tuple;
+import iudx.data.marketplace.common.HttpStatusCode;
+import iudx.data.marketplace.common.ResponseUrn;
+import iudx.data.marketplace.policies.util.Status;
+import iudx.data.marketplace.postgresql.PostgresqlService;
+import java.util.UUID;
+import org.apache.commons.lang.StringUtils;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 public class VerifyPolicy {
   private static final Logger LOGGER = LogManager.getLogger(VerifyPolicy.class);
-  private final PostgresService postgresService;
+  private final PostgresqlService postgresService;
   private String orderId;
 
-  public VerifyPolicy(PostgresService postgresService) {
+  public VerifyPolicy(PostgresqlService postgresService) {
     this.postgresService = postgresService;
   }
 
@@ -41,16 +35,15 @@ public class VerifyPolicy {
     String userEmail = request.getJsonObject("user").getString("email");
     UUID itemId = UUID.fromString(request.getJsonObject("item").getString("itemId"));
 
-      /*check if the orderId is present in the context object*/
-      if(request.containsKey("context") && StringUtils.isNotBlank(request.getJsonObject("context").getString("orderId")))
-      {
-          String orderId = request.getJsonObject("context").getString("orderId");
-          setOrderId(orderId);
-      }
+    /*check if the orderId is present in the context object*/
+    if (request.containsKey("context")
+        && StringUtils.isNotBlank(request.getJsonObject("context").getString("orderId"))) {
+      String orderId = request.getJsonObject("context").getString("orderId");
+      setOrderId(orderId);
+    }
 
     Future<JsonObject> checkForExistingPolicy =
         checkExistingPoliciesForId(itemId, ownerId, userEmail);
-
 
     Future<JsonObject> getPolicyDetail =
         checkForExistingPolicy.compose(
@@ -82,60 +75,59 @@ public class VerifyPolicy {
     Tuple selectTuples = Tuple.of(itemId, ownerId, Status.ACTIVE, userEmailId);
     String query;
 
-    JsonObject params = new JsonObject()
+    JsonObject params =
+        new JsonObject()
             .put("itemId", itemId.toString())
             .put("ownerId", ownerId.toString())
             .put("status", Status.ACTIVE)
             .put("userEmailId", userEmailId);
 
-      if(StringUtils.isNotBlank(getOrderId()))
-      {
-          query = CHECK_POLICY_FROM_ORDER_ID;
-          params.put("orderId", getOrderId());
-      } else {
-          query = CHECK_EXISTING_POLICY;
-      }
+    if (StringUtils.isNotBlank(getOrderId())) {
+      query = CHECK_POLICY_FROM_ORDER_ID;
+      params.put("orderId", getOrderId());
+    } else {
+      query = CHECK_EXISTING_POLICY;
+    }
 
-      Promise<JsonObject> promise = Promise.promise();
-    postgresService
-        .executePreparedQuery(query, params, handler -> {
-            if(handler.failed()){
-                LOGGER.error(
-                        "isPolicyForIdExist fail, DB execution failed :: {}",
-                        handler.cause().getMessage());
-                promise.fail(
-                        generateErrorResponse(
-                                INTERNAL_SERVER_ERROR, INTERNAL_SERVER_ERROR.getDescription()));
-            }
-            else
-            {
-                JsonArray policy = handler.result().getJsonArray(RESULT);
-                boolean isPolicyNotPresent = policy.isEmpty();
-                if (isPolicyNotPresent) {
+    Future<JsonObject> future =
+        postgresService
+            .executePreparedQuery(query, params)
+            .compose(
+                dbResult -> {
+                  JsonArray policy = dbResult.getJsonArray(RESULT);
+                  boolean isPolicyNotPresent = policy.isEmpty();
+                  if (isPolicyNotPresent) {
                     LOGGER.error("No matching policy");
-                    promise.complete(new JsonObject());
-                } else {
-                    LOGGER.debug("policy exists : {} ", handler.result().encode());
-                    if(handler.result().getJsonArray(RESULT).size() > 1 && query.equals(CHECK_POLICY_FROM_ORDER_ID))
-                    {
-                        LOGGER.fatal("Fetched more than 1 policy for a single" +
-                                " resource with a single orderId : {}",orderId);
-                        promise.fail(
-                                generateErrorResponse(
-                                        INTERNAL_SERVER_ERROR, INTERNAL_SERVER_ERROR.getDescription()));
-                        return;
+                    return Future.succeededFuture(new JsonObject());
+                  } else {
+                    LOGGER.debug("policy exists : {} ", dbResult.encode());
+                    if (dbResult.getJsonArray(RESULT).size() > 1
+                        && query.equals(CHECK_POLICY_FROM_ORDER_ID)) {
+                      LOGGER.fatal(
+                          "Fetched more than 1 policy for a single"
+                              + " resource with a single orderId : {}",
+                          orderId);
+                      return Future.failedFuture(
+                          generateErrorResponse(
+                              INTERNAL_SERVER_ERROR, INTERNAL_SERVER_ERROR.getDescription()));
                     }
-                    JsonObject result = handler.result().getJsonArray(RESULT).getJsonObject(0);
+                    JsonObject result = dbResult.getJsonArray(RESULT).getJsonObject(0);
                     JsonObject constraints = result.getJsonObject("constraints");
                     String policyId = result.getString("_id");
                     JsonObject response =
-                            new JsonObject().put("constraints", constraints).put("id", policyId);
-                    promise.complete(response);
-                }
-            }
-        });
+                        new JsonObject().put("constraints", constraints).put("id", policyId);
+                    return Future.succeededFuture(response);
+                  }
+                });
 
-    return promise.future();
+    if (future.failed()) {
+      LOGGER.error(
+          "isPolicyForIdExist fail, DB execution failed :: {}", future.cause().getMessage());
+      future =
+          Future.failedFuture(
+              generateErrorResponse(INTERNAL_SERVER_ERROR, INTERNAL_SERVER_ERROR.getDescription()));
+    }
+    return future;
   }
 
   public String generateErrorResponse(HttpStatusCode httpStatusCode, String errorMessage) {
@@ -146,13 +138,11 @@ public class VerifyPolicy {
         .encode();
   }
 
-    private String getOrderId() {
-        return this.orderId;
-    }
-    private void setOrderId(String orderId)
-    {
-        this.orderId = orderId;
-    }
+  private String getOrderId() {
+    return this.orderId;
+  }
 
-
+  private void setOrderId(String orderId) {
+    this.orderId = orderId;
+  }
 }

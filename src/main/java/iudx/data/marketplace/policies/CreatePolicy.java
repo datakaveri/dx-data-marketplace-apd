@@ -5,14 +5,13 @@ import static iudx.data.marketplace.policies.util.Constants.*;
 
 import io.vertx.core.CompositeFuture;
 import io.vertx.core.Future;
-import io.vertx.core.Promise;
 import io.vertx.core.http.HttpMethod;
 import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
 import iudx.data.marketplace.apiserver.util.Role;
 import iudx.data.marketplace.auditing.AuditingService;
 import iudx.data.marketplace.common.Api;
-import iudx.data.marketplace.postgres.PostgresService;
+import iudx.data.marketplace.postgresql.PostgresqlService;
 import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -22,7 +21,7 @@ import org.apache.logging.log4j.Logger;
 public class CreatePolicy {
   private static final Logger LOGGER = LogManager.getLogger(CreatePolicy.class);
   private static final String POLICY_STATUS = "ACTIVE";
-  private final PostgresService postgresService;
+  private final PostgresqlService postgresService;
   private AuditingService auditingService;
   private Api api;
   private String providerId;
@@ -33,8 +32,9 @@ public class CreatePolicy {
   private String expiryAt;
   private User provider;
 
-  public CreatePolicy(PostgresService postgresService, AuditingService auditingService, Api api) {
-    this.postgresService = postgresService;
+  public CreatePolicy(
+      PostgresqlService postgresqlService, AuditingService auditingService, Api api) {
+    this.postgresService = postgresqlService;
     this.auditingService = auditingService;
     this.api = api;
   }
@@ -72,15 +72,17 @@ public class CreatePolicy {
     Future<Boolean> future =
         fetchResourceInfoFuture.compose(
             jsonObject -> {
-                /*TODO : Split it into multiple compose */
+              /*TODO : Split it into multiple compose */
               LOGGER.debug("Json object : {}", jsonObject.encodePrettily());
               invoiceId = jsonObject.getString("invoiceId");
+
               productVariantId = jsonObject.getString("productVariantId");
               expiryInMonths = jsonObject.getInteger("expiry");
               providerId = jsonObject.getString("providerId");
 
               JsonObject providerUser =
                   new JsonObject().put(USERID, providerId).put(USER_ROLE, Role.PROVIDER.getRole());
+
               providerUser.mergeIn(jsonObject);
               User provider = new User(providerUser);
 
@@ -126,6 +128,7 @@ public class CreatePolicy {
                 futureList.add(
                     initiateAuditing(provider, orderId, policyId, resourceItem, constraint));
               }
+
               Future<Boolean> policyCreationFuture = executeTransaction(listOfQueries, orderId);
 
               /* send data for auditing after policy is created*/
@@ -142,7 +145,6 @@ public class CreatePolicy {
                     return policyCreationFuture;
                   });
               return policyCreationFuture;
-
             });
 
     return future;
@@ -169,49 +171,47 @@ public class CreatePolicy {
   }
 
   public Future<JsonObject> executePostgresQuery(String query, String detail) {
-    Promise<JsonObject> promise = Promise.promise();
     LOGGER.debug("Query : {}", query);
-    postgresService.executeQuery(
-        query,
-        pgHandler -> {
-          if (pgHandler.succeeded()) {
-            LOGGER.debug("success response : " + pgHandler.result().encodePrettily());
-            LOGGER.info("Query execution successfully done : {}", detail);
-            if (pgHandler.result().getJsonArray(RESULTS).size() == 1) {
-              JsonObject result = pgHandler.result().getJsonArray(RESULTS).getJsonObject(0);
-              promise.complete(result);
-            } else {
-              /* there are multiple invoices for the same order Id */
-              /* OR multiple policies are created at the same time and not one after the other */
-              LOGGER.error("Failure while fetching the results : {} ", detail);
-              LOGGER.error("Error : {}", pgHandler.result().getJsonArray(RESULTS));
-              promise.fail("Error : No payment found for the given order");
-            }
-
-          } else {
-            LOGGER.error("Failure while executing query : {} ", detail);
-            LOGGER.error("Error : {}", pgHandler.cause().getMessage());
-            promise.fail("Error : " + pgHandler.cause().getMessage());
-          }
-        });
-    return promise.future();
+    String failureMessage = "Error : No payment found for the given order";
+    Future<JsonObject> future =
+        postgresService
+            .executeQuery(query)
+            .compose(
+                dbResult -> {
+                  LOGGER.info("Query execution successfully done: {}", detail);
+                  if (dbResult.getJsonArray(RESULTS).size() == 1) {
+                    JsonObject result = dbResult.getJsonArray(RESULTS).getJsonObject(0);
+                    return Future.succeededFuture(result);
+                  }
+                  /* there are multiple invoices for the same order Id */
+                  /* OR multiple policies are created at the same time and not one after the other */
+                  LOGGER.error("Failure while fetching the results : {} ", detail);
+                  LOGGER.error("Error : {}", dbResult.getJsonArray(RESULTS));
+                  return Future.failedFuture(failureMessage);
+                });
+    if (future.failed() && !future.cause().getMessage().contains(failureMessage)) {
+      LOGGER.error("Failure while executing query : {} ", detail);
+      LOGGER.error("Error : {}", future.cause().getMessage());
+      future = Future.failedFuture("Error : " + future.cause().getMessage());
+    }
+    return future;
   }
 
   public Future<Boolean> executeTransaction(List<String> queries, String orderId) {
-    Promise<Boolean> promise = Promise.promise();
     LOGGER.debug("Queries : {}", queries);
-    postgresService.executeTransaction(
-        queries,
-        pgHandler -> {
-          if (pgHandler.succeeded()) {
-            LOGGER.info("Policies inserted successfully for order : {}", orderId);
-            promise.complete(true);
-          } else {
-            LOGGER.error("Failure while inserting policy for order : {}", orderId);
-            LOGGER.error("Error : {}", pgHandler.cause().getMessage());
-            promise.fail("Error : " + pgHandler.cause().getMessage());
-          }
-        });
-    return promise.future();
+    Future<Boolean> future =
+        postgresService
+            .executeTransaction(queries)
+            .compose(
+                dbResult -> {
+                  LOGGER.info("Policies inserted successfully for order : {}", orderId);
+                  return Future.succeededFuture(true);
+                });
+    if (future.failed()) {
+      LOGGER.error("Failure while inserting policy for order : {}", orderId);
+      LOGGER.error("Error : {}", future.cause().getMessage());
+      future = Future.failedFuture("Error : " + future.cause().getMessage());
+    }
+    return future;
   }
 }

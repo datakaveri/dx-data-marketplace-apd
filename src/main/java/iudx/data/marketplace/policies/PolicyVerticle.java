@@ -7,6 +7,8 @@ import iudx.data.marketplace.common.Api;
 import iudx.data.marketplace.common.CatalogueService;
 import iudx.data.marketplace.consentAgreementGenerator.util.Assets;
 import iudx.data.marketplace.postgres.PostgresService;
+import iudx.data.marketplace.postgresql.PostgresqlService;
+import iudx.data.marketplace.postgresql.PostgresqlServiceImpl;
 
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -17,7 +19,6 @@ import static iudx.data.marketplace.consentAgreementGenerator.util.Assets.HTML_F
 
 public class PolicyVerticle extends AbstractVerticle {
 
-  private PostgresService postgresServiceImpl;
   private PolicyServiceImpl policyService;
   private DeletePolicy deletePolicy;
   private CreatePolicy createPolicy;
@@ -29,24 +30,25 @@ public class PolicyVerticle extends AbstractVerticle {
   private FetchPolicyUsingPvId fetchPolicyUsingPvId;
   private FetchPolicyDetailsWithPolicyId fetchPolicyDetailsWithPolicyId;
   private Assets assets;
+  private PostgresqlService postgresqlService;
 
   @Override
   public void start() {
     catalogueService = new CatalogueService(vertx, config());
-    postgresServiceImpl = PostgresService.createProxy(vertx, POSTGRES_SERVICE_ADDRESS);
+    postgresqlService = PostgresqlService.createProxy(vertx, POSTGRESQL_SERVICE_ADDRESS);
     auditingService = AuditingService.createProxy(vertx, AUDITING_SERVICE_ADDRESS);
     api = Api.getInstance(config().getString("dxApiBasePath"));
-    deletePolicy = new DeletePolicy(postgresServiceImpl, auditingService, api);
-    getPolicyDetails = new GetPolicyDetails(postgresServiceImpl);
-    createPolicy = new CreatePolicy(postgresServiceImpl, auditingService, api);
-    verifyPolicy = new VerifyPolicy(postgresServiceImpl);
-    fetchPolicyUsingPvId = new FetchPolicyUsingPvId(postgresServiceImpl);
+    deletePolicy = new DeletePolicy(postgresqlService, auditingService, api);
+    getPolicyDetails = new GetPolicyDetails(postgresqlService);
+    createPolicy = new CreatePolicy(postgresqlService, auditingService, api);
+    verifyPolicy = new VerifyPolicy(postgresqlService);
+    fetchPolicyUsingPvId = new FetchPolicyUsingPvId(postgresqlService);
 
     Path path = Paths.get(HTML_FILE_NAME+FILE_EXTENSION);
     Path absolutePath = path.toAbsolutePath();
     String absPath = absolutePath.toString().replace(HTML_FILE_NAME + FILE_EXTENSION, "src/main/java/iudx/data/marketplace/consentAgreement/assets");
     assets = new Assets(path);
-    fetchPolicyDetailsWithPolicyId = new FetchPolicyDetailsWithPolicyId(postgresServiceImpl, assets);
+    fetchPolicyDetailsWithPolicyId = new FetchPolicyDetailsWithPolicyId(postgresqlService, assets);
     policyService =
             new PolicyServiceImpl(deletePolicy, createPolicy, getPolicyDetails, verifyPolicy,fetchPolicyUsingPvId, fetchPolicyDetailsWithPolicyId);
 

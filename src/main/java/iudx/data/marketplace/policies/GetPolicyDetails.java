@@ -1,34 +1,32 @@
 package iudx.data.marketplace.policies;
 
-import io.vertx.core.Future;
-import io.vertx.core.Promise;
-import io.vertx.core.json.JsonObject;
-import iudx.data.marketplace.apiserver.util.Role;
-
-import iudx.data.marketplace.common.HttpStatusCode;
-import iudx.data.marketplace.common.ResponseUrn;
-import iudx.data.marketplace.postgres.PostgresService;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-
 import static iudx.data.marketplace.apiserver.util.Constants.*;
 import static iudx.data.marketplace.common.HttpStatusCode.BAD_REQUEST;
 import static iudx.data.marketplace.policies.util.Constants.GET_POLICY_4_CONSUMER_QUERY;
 import static iudx.data.marketplace.policies.util.Constants.GET_POLICY_4_PROVIDER_QUERY;
 
+import io.vertx.core.Future;
+import io.vertx.core.Promise;
+import io.vertx.core.json.JsonObject;
+import iudx.data.marketplace.apiserver.util.Role;
+import iudx.data.marketplace.common.HttpStatusCode;
+import iudx.data.marketplace.common.ResponseUrn;
+import iudx.data.marketplace.postgresql.PostgresqlService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 public class GetPolicyDetails {
-    private static final Logger LOG = LoggerFactory.getLogger(GetPolicyDetails.class);
-    public static final String FAILURE_MESSAGE = "Policy could not be fetched";
+  public static final String FAILURE_MESSAGE = "Policy could not be fetched";
+  private static final Logger LOG = LoggerFactory.getLogger(GetPolicyDetails.class);
+  private final PostgresqlService postgresService;
 
-    private final PostgresService postgresService;
-
-  public GetPolicyDetails(PostgresService postgresService) {
+  public GetPolicyDetails(PostgresqlService postgresService) {
     this.postgresService = postgresService;
-}
+  }
 
-//TODO: Use new PostgresVerticle with Future return type and model classes(table schema) to generate the result
-  //TODO: Split the inner join queries into multiple ones
+  // TODO: Use new PostgresVerticle with Future return type and model classes(table schema) to
+  // generate the result
+  // TODO: Split the inner join queries into multiple ones
   public Future<JsonObject> initiateGetPolicy(User user) {
     Role role = user.getUserRole();
     switch (role) {
@@ -62,9 +60,9 @@ public class GetPolicyDetails {
     String resourceServerUrl = provider.getResourceServerUrl();
 
     LOG.trace(provider.toString());
-    String finalQuery = query.replace("$1", "'" + ownerIdValue + "'")
-            .replace("$2", "'" + resourceServerUrl + "'");
-//    Tuple tuple = Tuple.of(ownerIdValue, resourceServerUrl);
+    String finalQuery =
+        query.replace("$1", "'" + ownerIdValue + "'").replace("$2", "'" + resourceServerUrl + "'");
+    //    Tuple tuple = Tuple.of(ownerIdValue, resourceServerUrl);
     JsonObject jsonObject =
         new JsonObject()
             .put("email", provider.getEmailId())
@@ -103,7 +101,7 @@ public class GetPolicyDetails {
     String emailId = consumer.getEmailId();
     String resourceServerUrl = consumer.getResourceServerUrl();
     LOG.trace(consumer.toString());
-//    Tuple tuple = Tuple.of("consumer@gmail.com", resourceServerUrl);
+    //    Tuple tuple = Tuple.of("consumer@gmail.com", resourceServerUrl);
     JsonObject jsonObject =
         new JsonObject()
             .put("email", emailId)
@@ -115,7 +113,8 @@ public class GetPolicyDetails {
             .put("id", consumer.getUserId());
     JsonObject consumerInfo = new JsonObject().put("consumer", jsonObject);
 
-    String finalQuery = query
+    String finalQuery =
+        query
             .replace("$1", "'" + consumer.getEmailId() + "'")
             .replace("$2", "'" + resourceServerUrl + "'");
     this.executeGetPolicy(finalQuery, consumerInfo, Role.CONSUMER)
@@ -139,52 +138,48 @@ public class GetPolicyDetails {
    * @param information Information to be added in the response
    * @return the response as Future JsonObject type
    */
-  private Future<JsonObject> executeGetPolicy(
-      String query, JsonObject information, Role role) {
-    Promise<JsonObject> promise = Promise.promise();
-    postgresService
-        .executeQuery(query, handler -> {
-          if(handler.succeeded())
-          {
-            boolean isResultFromDbEmpty = handler.result().getJsonArray(RESULTS).isEmpty();
-            if (!isResultFromDbEmpty) {
-              for(int i = 0; i < handler.result().getJsonArray(RESULTS).size() ; i++)
-              {
-                JsonObject jsonObject = handler.result().getJsonArray(RESULTS).getJsonObject(i);
-                jsonObject.mergeIn(information).mergeIn(getInformation(jsonObject, role));
-              }
+  private Future<JsonObject> executeGetPolicy(String query, JsonObject information, Role role) {
+    Future<JsonObject> future =
+        postgresService
+            .executeQuery(query)
+            .compose(
+                dbResult -> {
+                  boolean isResultFromDbEmpty = dbResult.getJsonArray(RESULTS).isEmpty();
+                  if (!isResultFromDbEmpty) {
+                    for (int i = 0; i < dbResult.getJsonArray(RESULTS).size(); i++) {
+                      JsonObject jsonObject = dbResult.getJsonArray(RESULTS).getJsonObject(i);
+                      jsonObject.mergeIn(information).mergeIn(getInformation(jsonObject, role));
+                    }
 
-              JsonObject response =
-                      new JsonObject()
-                              .put(TYPE, ResponseUrn.SUCCESS_URN.getUrn())
-                              .put(TITLE, ResponseUrn.SUCCESS_URN.getMessage())
-                              .put(RESULT, handler.result().getJsonArray(RESULTS));
-              promise.complete(
-                      new JsonObject()
-                              .put(RESULT, response)
-                              .put(STATUS_CODE, HttpStatusCode.SUCCESS.getValue()));
-            } else {
-              JsonObject response =
-                      new JsonObject()
-                              .put(TYPE, HttpStatusCode.NOT_FOUND.getValue())
-                              .put(TITLE, ResponseUrn.RESOURCE_NOT_FOUND_URN.getUrn())
-                              .put(DETAIL, "Policy Not found");
-              LOG.error("No policy found!");
-              promise.fail(response.encode());
-            }
-          }else
-          {
-            LOG.error("Failed : " + handler.cause());
-            JsonObject failureMessage =
-                    new JsonObject()
-                            .put(TYPE, HttpStatusCode.INTERNAL_SERVER_ERROR.getValue())
-                            .put(TITLE, ResponseUrn.DB_ERROR_URN.getUrn())
-                            .put(DETAIL, FAILURE_MESSAGE + ", Failure while executing query");
-            promise.fail(failureMessage.encode());
-          }
-        });
-
-    return promise.future();
+                    JsonObject response =
+                        new JsonObject()
+                            .put(TYPE, ResponseUrn.SUCCESS_URN.getUrn())
+                            .put(TITLE, ResponseUrn.SUCCESS_URN.getMessage())
+                            .put(RESULT, dbResult.getJsonArray(RESULTS));
+                    return Future.succeededFuture(
+                        new JsonObject()
+                            .put(RESULT, response)
+                            .put(STATUS_CODE, HttpStatusCode.SUCCESS.getValue()));
+                  } else {
+                    JsonObject response =
+                        new JsonObject()
+                            .put(TYPE, HttpStatusCode.NOT_FOUND.getValue())
+                            .put(TITLE, ResponseUrn.RESOURCE_NOT_FOUND_URN.getUrn())
+                            .put(DETAIL, "Policy Not found");
+                    LOG.error("No policy found!");
+                    return Future.failedFuture(response.encode());
+                  }
+                });
+    if (future.failed() && !future.cause().getMessage().contains(TYPE)) {
+      LOG.error("Failed : " + future.cause());
+      JsonObject failureMessage =
+          new JsonObject()
+              .put(TYPE, HttpStatusCode.INTERNAL_SERVER_ERROR.getValue())
+              .put(TITLE, ResponseUrn.DB_ERROR_URN.getUrn())
+              .put(DETAIL, FAILURE_MESSAGE + ", Failure while executing query");
+      future = Future.failedFuture(failureMessage.encode());
+    }
+    return future;
   }
 
   public JsonObject getInformation(JsonObject jsonObject, Role role) {
