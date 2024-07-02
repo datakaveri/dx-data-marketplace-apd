@@ -16,6 +16,7 @@ public class Constants {
   public static final String RESOURCE_NAME = "resourceName";
   public static final String RESOURCE_SERVER = "resourceServer";
   public static final String PROVIDER = "provider";
+  public static final String APD_URL = "apdURL";
   public static final String PRODUCT_VARIANT_NAME = "productVariantName";
 
   public static final String EXPIRY = "expiry";
