@@ -31,6 +31,7 @@ public class ProductServiceImpl implements ProductService {
   private QueryBuilder queryBuilder;
   private RazorPayService razorPayService;
   private boolean isAccountActivationCheckBeingDone;
+  private String apdUrl;
 
   public ProductServiceImpl(
       JsonObject config,
@@ -44,6 +45,7 @@ public class ProductServiceImpl implements ProductService {
     this.productTableName = config.getJsonArray(TABLES).getString(0);
     this.razorPayService = razorPayService;
     this.isAccountActivationCheckBeingDone = isAccountActivationCheckBeingDone;
+    this.apdUrl = config.getString(APD_URL);
   }
 
   private static boolean isSameProviderForAll(JsonArray resourceDetails) {
@@ -59,6 +61,19 @@ public class ProductServiceImpl implements ProductService {
     }
     return sameProviderForAll;
   }
+
+    private boolean isSameApdUrlForAll(JsonArray resourceDetails) {
+        LOGGER.debug("current APD URL is : {}",  this.apdUrl);
+        String currentApdUrl = this.apdUrl;
+        boolean sameApdUrl = true;
+        for (int i = 0; i < resourceDetails.size() && sameApdUrl; i++) {
+            String apdUrlOfResource = resourceDetails.getJsonObject(i).getString(APD_URL);
+            LOGGER.debug("APD URL of the current resource is : {}", apdUrlOfResource);
+            sameApdUrl =
+                    apdUrlOfResource.equals(currentApdUrl);
+        }
+        return sameApdUrl;
+    }
 
   @Override
   public ProductService createProduct(
@@ -77,6 +92,15 @@ public class ProductServiceImpl implements ProductService {
                   fetchItemDetailsFromCat(request, providerID, productID, resourceDetails);
 
               return CompositeFuture.all(itemFutures);
+            })
+        .compose(
+            isApdUrlValid -> {
+              boolean isApdUrlSame = isSameApdUrlForAll(resourceDetails);
+              if (isApdUrlSame) {
+                return isApdUrlValid;
+              }
+              return Future.failedFuture(
+                  "The resource is forbidden to access as the resource belongs to a different APD");
             })
         /* Check if all resources belong to the same provider */
         .compose(
@@ -206,14 +230,11 @@ public class ProductServiceImpl implements ProductService {
     pgService.executeCountQuery(
         query.toString(),
         handler -> {
-            if (handler.succeeded()) {
-            if (handler.result().getInteger("totalHits") != 0)
-            {
-                promise.complete(true);
-            }
-            else
-            {
-                promise.complete(false);
+          if (handler.succeeded()) {
+            if (handler.result().getInteger("totalHits") != 0) {
+              promise.complete(true);
+            } else {
+              promise.complete(false);
             }
           } else {
             throw new DxRuntimeException(
@@ -312,8 +333,10 @@ public class ProductServiceImpl implements ProductService {
     String providerID = user.getUserId();
     String resourceServerUrl = user.getResourceServerUrl();
     JsonObject params =
-        new JsonObject().put(STATUS, Status.ACTIVE.toString()).put(PROVIDER_ID, providerID)
-                .put("resourceServerUrl", resourceServerUrl);
+        new JsonObject()
+            .put(STATUS, Status.ACTIVE.toString())
+            .put(PROVIDER_ID, providerID)
+            .put("resourceServerUrl", resourceServerUrl);
 
     if (request.containsKey("resourceId")) {
       params.put("resourceId", request.getString("resourceId"));
@@ -360,13 +383,13 @@ public class ProductServiceImpl implements ProductService {
               json -> {
                 resultContainer.resultJson = json;
                 boolean isStatusActivated = json.getString("status").equalsIgnoreCase("ACTIVATED");
-                  return Future.succeededFuture(isStatusActivated);
+                return Future.succeededFuture(isStatusActivated);
               })
           .compose(
               isAccountStatusActive -> {
                 if (!isAccountStatusActive) {
                   /* check if account is activated in Razorpay */
-                    return razorPayService.fetchProductConfiguration(
+                  return razorPayService.fetchProductConfiguration(
                       resultContainer.resultJson); /* update status in merchant_table */
                 }
                 /* account is activated */
@@ -383,7 +406,6 @@ public class ProductServiceImpl implements ProductService {
                   promise.fail(updateStatusHandler.cause().getMessage());
                 }
               });
-
 
     } else {
       promise.complete();

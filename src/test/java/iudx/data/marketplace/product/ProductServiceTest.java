@@ -123,7 +123,8 @@ public class ProductServiceTest {
                         .put("providerName", "dummyName")
                         .put(RESOURCE_ID, "dummyResourceId")
                         .put(RESOURCE_NAME, "dummyResourceName")
-                        .put("accessPolicy", "SECURE")))
+                        .put("accessPolicy", "SECURE")
+                         .put(APD_URL, "dmp-apd.iudx.io")))
         .when(catService)
         .getItemDetails(anyString());
 
