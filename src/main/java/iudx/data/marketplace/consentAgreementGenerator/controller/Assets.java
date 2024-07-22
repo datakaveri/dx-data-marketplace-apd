@@ -1,4 +1,4 @@
-package iudx.data.marketplace.consentAgreementGenerator;
+package iudx.data.marketplace.consentAgreementGenerator.controller;
 
 import java.nio.file.Path;
 

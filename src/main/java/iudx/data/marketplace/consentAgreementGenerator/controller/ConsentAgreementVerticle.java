@@ -1,4 +1,4 @@
-package iudx.data.marketplace.consentAgreementGenerator;
+package iudx.data.marketplace.consentAgreementGenerator.controller;
 
 import com.github.jhonnymertz.wkhtmltopdf.wrapper.Pdf;
 import com.github.jhonnymertz.wkhtmltopdf.wrapper.configurations.WrapperConfig;
@@ -15,7 +15,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 
 import static iudx.data.marketplace.common.Constants.*;
-import static iudx.data.marketplace.consentAgreementGenerator.Assets.FILE_EXTENSION;
+import static iudx.data.marketplace.consentAgreementGenerator.controller.Assets.FILE_EXTENSION;
 
 public class ConsentAgreementVerticle extends AbstractVerticle {
     private Api api;

@@ -9,13 +9,14 @@ import com.github.jknack.handlebars.Template;
 import com.github.jknack.handlebars.io.ClassPathTemplateLoader;
 import com.github.jknack.handlebars.io.FileTemplateLoader;
 import com.github.jknack.handlebars.io.TemplateLoader;
+import iudx.data.marketplace.consentAgreementGenerator.controller.Assets;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import java.io.IOException;
 import java.util.List;
 
-import static iudx.data.marketplace.consentAgreementGenerator.Assets.*;
+import static iudx.data.marketplace.consentAgreementGenerator.controller.Assets.*;
 
 public class HtmlTemplateToPdf {
     private static final Logger LOGGER = LogManager.getLogger(HtmlTemplateToPdf.class);

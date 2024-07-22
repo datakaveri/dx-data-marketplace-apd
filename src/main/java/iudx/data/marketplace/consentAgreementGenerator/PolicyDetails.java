@@ -1,11 +1,12 @@
 package iudx.data.marketplace.consentAgreementGenerator;
 
 import io.vertx.core.json.JsonObject;
+import iudx.data.marketplace.consentAgreementGenerator.controller.Assets;
 
 public final class PolicyDetails {
     private static final String CUSTOMER_FACING_BUSINESS_NAME = "Dummy Corp";
     private   String policyId;
-    private   Assets assets;
+    private Assets assets;
     private   String resourceId;
     private   String invoiceId;
     private   JsonObject constraints;

@@ -1,8 +1,6 @@
-package iudx.data.marketplace.consentAgreementGenerator;
+package iudx.data.marketplace.consentAgreementGenerator.controller;
 
 import com.github.jhonnymertz.wkhtmltopdf.wrapper.Pdf;
-import com.github.jknack.handlebars.Handlebars;
-import com.github.jknack.handlebars.io.ClassPathTemplateLoader;
 import io.vertx.core.Future;
 import io.vertx.core.Promise;
 import io.vertx.core.buffer.Buffer;
@@ -13,6 +11,8 @@ import iudx.data.marketplace.common.Api;
 import iudx.data.marketplace.common.HttpStatusCode;
 import iudx.data.marketplace.common.RespBuilder;
 import iudx.data.marketplace.common.ResponseUrn;
+import iudx.data.marketplace.consentAgreementGenerator.HtmlTemplateToPdf;
+import iudx.data.marketplace.consentAgreementGenerator.PolicyDetails;
 import iudx.data.marketplace.policies.User;
 import iudx.data.marketplace.postgres.PostgresService;
 import org.apache.logging.log4j.LogManager;
