@@ -32,7 +32,7 @@ jobs:
         export newtag1_0_0=`(head -n 1 <(curl -H "Accept: application/vnd.github+json" -H "Authorization: Bearer ${{ secrets.GITHUB_TOKEN }}" https://api.github.com/orgs/datakaveri/packages/container/dmp-apd-server-depl/versions | jq ' .[].metadata.container.tags[0]'  | grep 1.0.0 | grep -v alpha | sed -e 's/^"//' -e 's/"$//'))`
         
         # Get the old tags from the YAML files
-        export oldtag1_0_0=`yq -r .services.apd.image Docker-Swarm-deployment/single-node/marketplace-apd/dmp-apd-stack.yaml | cut -d : -f 2`
+        export oldtag1_0_0=`yq -r .services.dmp-apd.image Docker-Swarm-deployment/single-node/marketplace-apd/dmp-apd-stack.yaml | cut -d : -f 2`
 
         # Set Git user
         git config --global user.name 'jenkins-datakaveri'
