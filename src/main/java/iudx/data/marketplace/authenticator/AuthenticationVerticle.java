@@ -19,6 +19,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import static iudx.data.marketplace.common.Constants.AUTH_SERVICE_ADDRESS;
+import static iudx.data.marketplace.common.Constants.JWT_LEEWAY_TIME;
 
 public class AuthenticationVerticle extends AbstractVerticle {
   private static final Logger LOGGER = LogManager.getLogger(AuthenticationVerticle.class);
@@ -59,6 +60,7 @@ public class AuthenticationVerticle extends AbstractVerticle {
               binder = new ServiceBinder(vertx);
 
               JWTAuthOptions jwtAuthOptions = new JWTAuthOptions();
+              jwtAuthOptions.getJWTOptions().setLeeway(JWT_LEEWAY_TIME);
               jwtAuthOptions.addPubSecKey(
                   new PubSecKeyOptions().setAlgorithm("ES256").setBuffer(cert));
               /*
@@ -68,7 +70,7 @@ public class AuthenticationVerticle extends AbstractVerticle {
                   config().getBoolean("jwtIgnoreExpiry") != null
                       && config().getBoolean("jwtIgnoreExpiry");
               if (jwtIgnoreExpiry) {
-                jwtAuthOptions.getJWTOptions().setIgnoreExpiration(true);
+                jwtAuthOptions.getJWTOptions().setIgnoreExpiration(true).setLeeway(JWT_LEEWAY_TIME);
                 LOGGER.warn(
                     "JWT ignore expiration set to true, do not set IgnoreExpiration in production!!");
               }
