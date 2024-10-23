@@ -3,7 +3,7 @@ package iudx.data.marketplace.apiserver.validation;
 import io.vertx.junit5.VertxExtension;
 import io.vertx.junit5.VertxTestContext;
 import iudx.data.marketplace.apiserver.exceptions.DxRuntimeException;
-import iudx.data.marketplace.apiserver.validation.types.UUIDTypeValidator;
+import iudx.data.marketplace.apiserver.validation.types.UuidTypeValidator;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -18,7 +18,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 @ExtendWith(MockitoExtension.class)
 public class ResourceIDTypeValidatorTest {
 
-    UUIDTypeValidator resourceIDTypeValidator;
+    UuidTypeValidator resourceIDTypeValidator;
     String value;
     boolean required;
 
@@ -38,7 +38,7 @@ public class ResourceIDTypeValidatorTest {
     public void failureTestIDValidator(String id, VertxTestContext testContext) {
         value = id;
 
-        resourceIDTypeValidator = new UUIDTypeValidator(value, true);
+        resourceIDTypeValidator = new UuidTypeValidator(value, true);
         Exception exception = assertThrows(DxRuntimeException.class, () -> {
             resourceIDTypeValidator.isValid();
         });
