@@ -1,0 +1,44 @@
+name: Move Docs
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  update-wiki:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v3
+
+      - name: Set up Git
+        run: |
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+          git config --global user.name "github-actions[bot]"
+
+      - name: Clone Target Repository
+        env:
+          TARGET_REPO_TOKEN: ${{ secrets.TARGET_REPO_TOKEN }} 
+        run: |
+          git clone https://x-access-token:${{ secrets.TARGET_REPO_TOKEN }}@github.com/datakaveri/iudx-developer-docs.git target-repo
+          cd target-repo
+          git checkout dev
+
+      - name: Copy Files from docs to Target Repository
+        run: |
+          cp -r docs/* target-repo/acl-docs/
+          ls -la target-repo/acl-docs
+
+      - name: Commit and Push Changes to Target Repository
+        env:
+          TARGET_REPO_TOKEN: ${{ secrets.TARGET_REPO_TOKEN }} 
+        run: |
+          cd target-repo
+          git add .
+          git commit -m "Update docs folder with new content from main branch" || echo "No changes to commit"
+          echo "Pushing changes to the repository..."
+          git push https://x-access-token:${{ secrets.TARGET_REPO_TOKEN }}@github.com/datakaveri/iudx-developer-docs.git dev
+
+      - name: List files in target-repo/acl-docs directory after push
+        run: ls -la target-repo/acl-docs
