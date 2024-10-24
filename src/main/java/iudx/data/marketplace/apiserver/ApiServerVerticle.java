@@ -57,9 +57,6 @@ public class ApiServerVerticle extends AbstractVerticle {
   private Router router;
   private String detail;
   private int port;
-  private boolean isSSL;
-  private String keystore;
-  private String keystorePassword;
   private PostgresService postgresService;
   private RazorPayService razorPayService;
   private AuthClient authClient;
@@ -163,49 +160,13 @@ public class ApiServerVerticle extends AbstractVerticle {
 
     router.route().handler(BodyHandler.create().setHandleFileUploads(false));
     router.route().handler(TimeoutHandler.create(30000, 408));
-    isSSL = config().getBoolean("ssl");
 
     HttpServerOptions serverOptions = new HttpServerOptions();
-    if (isSSL) {
-      port = config().getInteger("httpPort") == null ? 8443 : config().getInteger("httpPort");
-      keystore = config().getString("keystore");
-      keystorePassword = config().getString("keystorePassword");
-
-      serverOptions
-          .setSsl(true)
-          .setKeyStoreOptions(new JksOptions().setPath(keystore).setPassword(keystorePassword));
-      LOGGER.info("Info: Starting HTTPs server at port " + port);
-    } else {
-      serverOptions.setSsl(false);
-      port = config().getInteger("httpPort") == null ? 8080 : config().getInteger("httpPort");
-      LOGGER.info("Info: Starting HTTP server at port " + port);
-    }
-
+    setServerOptions(serverOptions);
     serverOptions.setCompressionSupported(true).setCompressionLevel(5);
     server = vertx.createHttpServer(serverOptions);
     server.requestHandler(router).listen(port);
 
-    //  Documentation routes
-
-    /* Static Resource Handler */
-    /* Get openapiv3 spec */
-    router
-        .get(ROUTE_STATIC_SPEC)
-        .produces(APPLICATION_JSON)
-        .handler(
-            routingContext -> {
-              HttpServerResponse response = routingContext.response();
-              response.sendFile("docs/openapi.yaml");
-            });
-    /* Get redoc */
-    router
-        .get(ROUTE_DOC)
-        .produces(MIME_TEXT_HTML)
-        .handler(
-            routingContext -> {
-              HttpServerResponse response = routingContext.response();
-              response.sendFile("docs/apidoc.html");
-            });
 
     router
         .route(PROVIDER_PATH + "/*")
@@ -335,7 +296,20 @@ public class ApiServerVerticle extends AbstractVerticle {
     LOGGER.info("API server deployed on: " + port);
   }
 
-    private void checkPolicyHandler(RoutingContext routingContext) {
+  /**
+   * starts an HTTP server with the specified HTTP port. If the HTTP port is not specified in the
+   * configuration, default ports (8080 for HTTP) will be used.
+   *
+   * @param serverOptions The server options to be configured.
+   */
+  private void setServerOptions(HttpServerOptions serverOptions) {
+    LOGGER.debug("Info: Starting HTTP server");
+    serverOptions.setSsl(false);
+    port = config().getInteger("httpPort") == null ? 8080 : config().getInteger("httpPort");
+  }
+
+
+  private void checkPolicyHandler(RoutingContext routingContext) {
         HttpServerResponse response = routingContext.response();
 
         User user = routingContext.get("user");
