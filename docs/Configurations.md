@@ -4,8 +4,8 @@
 
 # Modules
 This document contains the information of the configurations to setup various services and dependencies in order to bring up the DX DMP APD Server. 
-Please find the example configuration file [here](https://github.com/datakaveri/dx-dmp-apd/blob/main/example-config/config.json). While running the server, config.json file could
-be added [secrets](https://github.com/datakaveri/dx-dmp-apd/tree/main/secrets/all-verticles-configs).
+Please find the example configuration file [here](https://github.com/datakaveri/iudx-data-marketplace-apd/blob/main/example-config/config.json). While running the server, config.json file could
+be added [secrets](https://github.com/datakaveri/iudx-data-marketplace-apd/tree/main/secrets/all-verticles-configs).
 
 
 ## Api Server Verticle

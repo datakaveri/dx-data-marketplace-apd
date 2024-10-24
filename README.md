@@ -18,6 +18,10 @@ is implemented as the payment gateway.
 All users can interact with the data marketplace API server using HTTPs requests.
 
 
+<p align="center">
+<img src="./docs/dmp-apd-overview.png">
+</p>
+
 
 ## Features
 
@@ -45,7 +49,7 @@ All users can interact with the data marketplace API server using HTTPs requests
 
 # How To Guide
 ## Setup and Installation
-Setup and Installation guide is available [here](./docs/SETUP-and-Installation.md)
+Setup and Installation guide is available [here](./docs/Setup-and-Installation)
 
 # Reference
 ## API Docs

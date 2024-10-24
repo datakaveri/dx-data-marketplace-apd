@@ -5,7 +5,7 @@
 # Frequently Asked Questions (FAQs)
 
 1. How do I request for a new feature to be added or change in an existing feature?
-- Please create an issue [here](https://github.com/datakaveri/dx-dmp-apd/issues)
+- Please create an issue [here](https://github.com/datakaveri/iudx-data-marketplace-apd/issues)
 2. What do we do when there is any error during flyway migration?
 - We could run this command `mvn flyway:repair` and do the flyway migration again
 -If the error persists, it needs to be resolved manually and a backup of the database could be taken from postgres if the table needs to be changed
@@ -18,7 +18,7 @@
 - Yes, the constraints given to access the resource is defined by DX Resource server and provider could follow the same json structure to add different type of user specific constraints
 
 5. Are there any access restrictions for delegates of the provider or consumer?
-- No, delegates can access all the specific provider or consumer related APIs. Please refer [users and roles](https://github.com/datakaveri/dx-acl-apd/blob/main/docs/Explanation.md)
+- No, delegates can access all the specific provider or consumer related APIs. Please refer [users and roles](https://github.com/datakaveri/iudx-data-marketplace-apd/blob/main/docs/Explanation.md)
 
 6. Can the products, product variants be created on resource group level?
 - No creation of product, product variants, policies are restricted to be created on resource item level
