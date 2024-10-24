@@ -20,23 +20,24 @@ be added [secrets](https://github.com/datakaveri/dx-dmp-apd/tree/main/secrets/al
 
 ## Other Configuration
 
-| Key Name                                 | Value Datatype  | Value Example                        | Description                                                                                                             |
-|:-----------------------------------------|:---------------:|:-------------------------------------|:------------------------------------------------------------------------------------------------------------------------|
-| version                                  |      Float      | 1.0                                  | config version                                                                                                          |
-| clusterId                                |     String      | iudx-marketplace-cluster             | cluster id to deploy clustered vert.x instance                                                                          |
-| commonConfig.dxApiBasePath               |     String      | /dx/apd/dmp/v1                       | API base path for DX DMP-APD. Reference : [link](https://swagger.io/docs/specification/2-0/api-host-and-base-path/)     |
-| commonConfig.dxAuthBasePath              |     String      | /auth/v1                             | API base path for DX Auth server. Reference : [link](https://swagger.io/docs/specification/2-0/api-host-and-base-path/) |
-| commonConfig.catServerHost               |     String      | api.cat-test.iudx.io                 | Host name of DX Catalogue server for fetching the information of resources, resource groups                             |
-| commonConfig.catServerPort               |     integer     | 443                                  | Port number to access HTTPS APIs of Catalogue Server                                                                    |
-| commonConfig.authHost                    |     String      | authvertx.iudx.io                    | Host name of Auth Server for fetching information about user, delegate, authentication of user                          |
-| commonConfig.authPort                    |     integer     | 443                                  | Port number to access HTTPS APIs of DX AAA server Default                                                               |
-| commonConfig.clientId                    |      UUID       | b806432c-e510-4233-a4ff-316af67b6df8 | APD trustee client ID                                                                                                   |
-| commonConfig.clientSecret                |      UUID       | 87d05695-1911-44f6-a1bc-d04422df6209 | APD trustee client secret                                                                                               |
-| commonConfig.apdURL                      |     String      | dmp-apd.iudx.io                      | DX DMP-APD URL to validate audience field                                                                               |
-| commonConfig.enableLogging               |     boolean     | false                                | To enable logs from Razorpay                                                                                            |
-| commonConfig.catItemPath                 |     String      | /iudx/cat/v1/item                    | DX Catalogue Server's item API path                                                                                     |
-| commonConfig.catRelPath                  |     String      | /iudx/cat/v1/relationship            | DX Catalogue Server's relationship API path                                                                             |
-| commonConfig.tables                      | Array of String | [product, invoice]                   | Database tables used in DX DMP-APD Server                                                                               |
+| Key Name                         | Value Datatype  | Value Example                        | Description                                                                                                                    |
+|:---------------------------------|:---------------:|:-------------------------------------|:-------------------------------------------------------------------------------------------------------------------------------|
+| version                          |      Float      | 1.0                                  | config version                                                                                                                 |
+| clusterId                        |     String      | iudx-marketplace-cluster             | cluster id to deploy clustered vert.x instance                                                                                 |
+| zookeepers                       |      Array      | zookeeper                            | zookeeper configuration to deploy clustered vert.x instance                                                                    |
+| commonConfig.dxApiBasePath       |     String      | /dx/apd/dmp/v1                       | API base path for DX DMP-APD. Reference : [link](https://swagger.io/docs/specification/2-0/api-host-and-base-path/)            |
+| commonConfig.dxAuthBasePath      |     String      | /auth/v1                             | API base path for DX Auth server. Reference : [link](https://swagger.io/docs/specification/2-0/api-host-and-base-path/)        |
+| commonConfig.catServerHost       |     String      | api.cat-test.iudx.io                 | Host name of DX Catalogue server for fetching the information of resources, resource groups                                    |
+| commonConfig.catServerPort       |     integer     | 443                                  | Port number to access HTTPS APIs of Catalogue Server                                                                           |
+| commonConfig.authHost            |     String      | authvertx.iudx.io                    | Host name of Auth Server for fetching information about user, delegate, authentication of user                                 |
+| commonConfig.authPort            |     integer     | 443                                  | Port number to access HTTPS APIs of DX AAA server Default                                                                      |
+| commonConfig.clientId            |      UUID       | b806432c-e510-4233-a4ff-316af67b6df8 | APD trustee client ID                                                                                                          |
+| commonConfig.clientSecret        |      UUID       | 87d05695-1911-44f6-a1bc-d04422df6209 | APD trustee client secret                                                                                                      |
+| commonConfig.apdURL              |     String      | dmp-apd.iudx.io                      | DX DMP-APD URL to validate audience field                                                                                      |
+| commonConfig.enableLogging       |     boolean     | false                                | To enable logs from Razorpay                                                                                                   |
+| commonConfig.catItemPath         |     String      | /iudx/cat/v1/item                    | DX Catalogue Server's item API path                                                                                            |
+| commonConfig.catRelPath          |     String      | /iudx/cat/v1/relationship            | DX Catalogue Server's relationship API path                                                                                    |
+| commonConfig.tables              | Array of String | [product, invoice]                   | Database tables used in DX DMP-APD Server                                                                                      |
 
 ## Policy Verticle
 

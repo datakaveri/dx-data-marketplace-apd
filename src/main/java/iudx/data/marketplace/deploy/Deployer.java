@@ -52,6 +52,8 @@ import org.apache.logging.log4j.core.LoggerContext;
  *   <li>--host/-i : the hostname for clustering or localhost for non-clustered mode
  *   <li>--modules/-m : comma separated list of module names to deploy, by default all is used to deploy every verticle
  * </ul>
+ * Replace the fatjar file with respective path to fat jar for clustered or non-clustered mode
+ * Replace the configs with the respective path to config.json
  *
  * <p>e.g. <i>java -jar ./fatjar.jar -c configs/config.json -C false -i localhost -m
  * iudx.data.marketplace.product.variant.ProductVariantVerticle
