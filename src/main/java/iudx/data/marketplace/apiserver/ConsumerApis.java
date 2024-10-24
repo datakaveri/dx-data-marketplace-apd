@@ -109,7 +109,7 @@ public class ConsumerApis {
   }
 
   private void createOrder(RoutingContext routingContext) {
-    LOGGER.info("hre");
+    LOGGER.info("inside create order method");
     Map<String, String> pathParams = routingContext.pathParams();
     String variantId = pathParams.get(PRODUCT_VARIANT_ID);
 
