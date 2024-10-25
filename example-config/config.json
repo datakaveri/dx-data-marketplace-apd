@@ -1,0 +1,105 @@
+{
+  "version": "1.0",
+  "clusterId": "iudx-marketplace-cluster",
+  "commonConfig": {
+    "dxApiBasePath": "<dmp-apd-api-base-path>",
+    "dxAuthBasePath": "<base-path-for-authentication-server>",
+    "catServerPort":443,
+    "catServerHost": "<catalogue-server-host>",
+    "catItemPath": "<catalogue-item-api-path>",
+    "catRelPath": "<catalogue-relationship-api-path>",
+    "tables": [
+      "example_table"
+    ],
+    "authPort": 443,
+    "authHost": "<authentication-server-host>",
+    "clientId": "<dmp-apd-client-id>",
+    "clientSecret": "<dmp-apd-client-secret>",
+    "enableLogging": false,
+    "apdURL": "<dmp-apd-url>"
+  },
+  "modules":[
+    {
+      "id": "iudx.data.marketplace.apiserver.ApiServerVerticle",
+      "verticleInstances": 1,
+      "isWorkerVerticle": false,
+      "keystore": "secrets/all-verticles-configs/keystore.jks",
+      "keystorePassword": "<keystore-password>",
+      "httpPort": 8443
+    },
+    {
+      "id": "iudx.data.marketplace.authenticator.AuthenticationVerticle",
+      "verticleInstances": 1,
+      "isWorkerVerticle": false,
+      "jwtIgnoreExpiry": true,
+      "issuer": "<token-issuer-url>"
+    },
+    {
+      "id": "iudx.data.marketplace.policies.PolicyVerticle",
+      "isWorkerVerticle": false,
+      "verticleInstances": 1
+    },
+    {
+      "id": "iudx.data.marketplace.postgres.PostgresVerticle",
+      "verticleInstances": 1,
+      "databaseIP": "localhost",
+      "databasePort": 5433,
+      "databaseName": "<database-name>",
+      "databaseUserName": "<username-for-psql>",
+      "databasePassword": "<password-for-psql>",
+      "poolSize": 25,
+      "isWorkerVerticle" : false
+    },
+    {
+      "id": "iudx.data.marketplace.product.ProductVerticle",
+      "verticleInstances": 1,
+      "isWorkerVerticle": false,
+      "isAccountActivationCheckBeingDone" : true
+    },
+    {
+      "id": "iudx.data.marketplace.product.variant.ProductVariantVerticle",
+      "verticleInstances": 1,
+      "isWorkerVerticle": false
+    },
+    {
+      "id": "iudx.data.marketplace.consumer.ConsumerVerticle",
+      "verticleInstances": 1,
+      "isWorkerVerticle": false
+    },
+    {
+      "id": "iudx.data.marketplace.auditing.AuditingVerticle",
+      "isWorkerVerticle": false,
+      "verticleInstances": 1,
+      "dataBrokerIP": "<rmq-ip-address>",
+      "dataBrokerPort": 24568,
+      "dataBrokerVhost": "<vHost-name>",
+      "dataBrokerUserName": "<username-for-rmq>",
+      "dataBrokerPassword": "<password-for-rmq>",
+      "dataBrokerManagementPort": 28041,
+      "connectionTimeout": 6000,
+      "requestedHeartbeat": 60,
+      "handshakeTimeout": 6000,
+      "requestedChannelMax": 5,
+      "networkRecoveryInterval": 500
+    },
+    {
+      "id": "iudx.data.marketplace.apiserver.provider.linkedAccount.LinkedAccountVerticle",
+      "verticleInstances": 1,
+      "isWorkerVerticle": false
+    },
+    {
+      "id": "iudx.data.marketplace.razorpay.RazorPayVerticle",
+      "verticleInstances": 1,
+      "isWorkerVerticle": false,
+      "razorPayKey": "<razorpay-generated-key>",
+      "razorPaySecret": "<razorpay-generated-password>",
+      "webhook_secret": "<razorpay-webhook-secret>"
+    }
+  ,
+    {
+      "id": "iudx.data.marketplace.webhook.WebhookVerticle",
+      "verticleInstances": 2,
+      "isWorkerVerticle": false
+    }
+  ]
+}
