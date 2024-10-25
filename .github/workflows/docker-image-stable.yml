@@ -1,6 +1,6 @@
-# This github workflow will automatically update docker image tags of acl-apd-depl in the datakaveri/iudx-deployment repository files, whenever docker image is pushed to ghcr.io/datakaveri/acl-apd-depl  .Based on tag it will update the 1.0.1 stable branch (if its 1.0.1-)
+# This github workflow will automatically update docker image tags of dmp-apd-depl in the datakaveri/iudx-deployment repository files, whenever docker image is pushed to ghcr.io/datakaveri/dmp-apd-server-depl  .Based on tag it will update the 1.0.0 stable branch (if its 1.0.0-)
 
-name: Update ACL APD docker image tags (release)
+name: Update DMP APD docker image tags (release)
 
 # This trigger will run the workflow whenever a new package is published to the registry
 on:
