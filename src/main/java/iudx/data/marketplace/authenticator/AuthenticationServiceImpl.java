@@ -27,7 +27,6 @@ public class AuthenticationServiceImpl implements AuthenticationService {
   private static final Logger LOGGER = LogManager.getLogger(AuthenticationServiceImpl.class);
 
   final JWTAuth jwtAuth;
-  final String audience;
   final String apdUrl;
   final String issuer;
   final Api apis;
@@ -35,7 +34,6 @@ public class AuthenticationServiceImpl implements AuthenticationService {
     this.jwtAuth = jwtAuth;
     this.issuer = config.getString("issuer");
     this.apdUrl = config.getString(APD_URL);
-    this.audience = config.getString("host");
     this.apis = apis;
   }
 

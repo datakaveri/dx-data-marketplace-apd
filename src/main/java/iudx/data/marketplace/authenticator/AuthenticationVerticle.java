@@ -104,7 +104,7 @@ public class AuthenticationVerticle extends AbstractVerticle {
     Promise<String> promise = Promise.promise();
     webClient = createWebClient(vertx, config);
     webClient
-        .get(443, config.getString("authServerHost"), "/auth/v1/cert")
+        .get(443, config.getString("authHost"), "/auth/v1/cert")
         .send(
             handler -> {
               if (handler.succeeded()) {

@@ -1,26 +1,15 @@
 {
   "version": "1.0",
   "clusterId": "iudx-marketplace-cluster",
-  "host": "rs.iudx.io",
   "commonConfig": {
     "dxApiBasePath": "<dmp-apd-api-base-path>",
-    "dxCatalogueBasePath": "<base-path-for-catalogue-server>",
     "dxAuthBasePath": "<base-path-for-authentication-server>",
     "catServerPort":443,
     "catServerHost": "<catalogue-server-host>",
     "catItemPath": "<catalogue-item-api-path>",
-    "catRelPath": "<catalgoue-relationship-api-path>",
+    "catRelPath": "<catalogue-relationship-api-path>",
     "tables": [
-      "product",
-      "resource_entity",
-      "product_resource_relation",
-      "product_variant",
-      "user_table",
-      "policy",
-      "invoice",
-      "order_table",
-      "merchant_table",
-      "payment_table"
+      "example_table"
     ],
     "authPort": 443,
     "authHost": "<authentication-server-host>",
@@ -36,15 +25,12 @@
       "isWorkerVerticle": false,
       "keystore": "secrets/all-verticles-configs/keystore.jks",
       "keystorePassword": "<keystore-password>",
-      "ip": "localhost",
-      "httpPort": 8443,
-      "ssl": false
+      "httpPort": 8443
     },
     {
       "id": "iudx.data.marketplace.authenticator.AuthenticationVerticle",
       "verticleInstances": 1,
       "isWorkerVerticle": false,
-      "authServerHost": "<auth-server-host>",
       "jwtIgnoreExpiry": true,
       "issuer": "<token-issuer-url>"
     },
@@ -94,11 +80,7 @@
       "requestedHeartbeat": 60,
       "handshakeTimeout": 6000,
       "requestedChannelMax": 5,
-      "networkRecoveryInterval": 500,
-      "automaticRecoveryEnabled": "true",
-      "prodVhost": "<vHost-name>",
-      "internalVhost": "<VHost-name>",
-      "externalVhost": "<VHost-name>"
+      "networkRecoveryInterval": 500
     },
     {
       "id": "iudx.data.marketplace.apiserver.provider.linkedAccount.LinkedAccountVerticle",
@@ -112,10 +94,11 @@
       "razorPayKey": "<razorpay-generated-key>",
       "razorPaySecret": "<razorpay-generated-password>",
       "webhook_secret": "<razorpay-webhook-secret>"
-    },
+    }
+  ,
     {
       "id": "iudx.data.marketplace.webhook.WebhookVerticle",
-      "verticleInstances": 1,
+      "verticleInstances": 2,
       "isWorkerVerticle": false
     }
   ]

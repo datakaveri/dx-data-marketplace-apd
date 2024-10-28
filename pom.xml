@@ -23,10 +23,13 @@
         <junit-jupiter.params>5.10.2</junit-jupiter.params>
         <testcontainer.params>1.19.7</testcontainer.params>
         <testcontainer-postgres.version>1.19.7</testcontainer-postgres.version>
+        <lmax-disruptor.version>4.0.0</lmax-disruptor.version>
+        <micrometer.version>1.12.3</micrometer.version>
+        <hazelcast.version>4.0.2</hazelcast.version>
+        <curator.version>5.6.0</curator.version>
 
         <exec.mainClass>iudx.data.marketplace.deploy.Deployer</exec.mainClass>
-        <exec.mainClassDev>iudx.data.marketplace.deploy.DeployerDev</exec.mainClassDev>
-        <config-dev.file>config-dev.json</config-dev.file>
+        <config.file>config.json</config.file>
     </properties>
 
     <dependencyManagement>
@@ -164,12 +167,47 @@
             <artifactId>junit-jupiter-engine</artifactId>
             <version>${junit-jupiter-engine.version}</version>
         </dependency>
+        <!--LMAX Disruptor for enabling Asynchronous log4j2 Logging  -->
+        <dependency>
+            <groupId>com.lmax</groupId>
+            <artifactId>disruptor</artifactId>
+            <version>${lmax-disruptor.version}</version>
+        </dependency>
         <!--RabbitMq dependency -->
         <dependency>
             <groupId>io.vertx</groupId>
             <artifactId>vertx-rabbitmq-client</artifactId>
         </dependency>
-
+        <dependency>
+            <groupId>io.vertx</groupId>
+            <artifactId>vertx-micrometer-metrics</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>io.micrometer</groupId>
+            <artifactId>micrometer-core</artifactId>
+            <version>${micrometer.version}</version>
+        </dependency>
+        <!-- Packages for Hazelcast clustering based on Zookeeper discovery -->
+        <dependency>
+            <groupId>io.vertx</groupId>
+            <artifactId>vertx-hazelcast</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.hazelcast</groupId>
+            <artifactId>hazelcast-zookeeper</artifactId>
+            <version>${hazelcast.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.curator</groupId>
+            <artifactId>curator-x-discovery</artifactId>
+            <version>${curator.version}</version>
+        </dependency>
+        <!-- -->
+        <dependency>
+            <groupId>io.micrometer</groupId>
+            <artifactId>micrometer-registry-prometheus</artifactId>
+            <version>${micrometer.version}</version>
+        </dependency>
         <dependency>
             <groupId>io.vertx</groupId>
             <artifactId>vertx-junit5</artifactId>
@@ -344,7 +382,7 @@
                                 <transformer
                                         implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
                                     <manifestEntries>
-                                        <Main-Class>${exec.mainClassDev}</Main-Class>
+                                        <Main-Class>${exec.mainClass}</Main-Class>
                                     </manifestEntries>
                                 </transformer>
                                 <transformer
@@ -382,7 +420,7 @@
                                 <transformer
                                         implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
                                     <manifestEntries>
-                                        <Main-Class>${exec.mainClassDev}</Main-Class>
+                                        <Main-Class>${exec.mainClass}</Main-Class>
                                     </manifestEntries>
                                 </transformer>
                                 <transformer
@@ -418,13 +456,13 @@
                     <execution>
                         <id>rs-apd-server</id>
                         <configuration>
-                            <mainClass>${exec.mainClassDev}</mainClass>
+                            <mainClass>${exec.mainClass}</mainClass>
                             <arguments>
                                 <argument>-jar</argument>
                                 <argument>{project.build.directory}/${project.artifactId}-dev-${project.version}-fat.jar
                                 </argument>
                                 <argument>-c</argument>
-                                <argument>./secrets/all-verticles-configs/${config-dev.file}</argument>
+                                <argument>./secrets/all-verticles-configs/${config.file}</argument>
                             </arguments>
                         </configuration>
                     </execution>

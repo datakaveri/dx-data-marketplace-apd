@@ -1,22 +1,22 @@
 package iudx.data.marketplace.apiserver.validation.types;
 
+import static iudx.data.marketplace.apiserver.util.Constants.*;
+import static iudx.data.marketplace.common.ResponseUrn.INVALID_ID_VALUE_URN;
+
 import iudx.data.marketplace.apiserver.exceptions.DxRuntimeException;
 import iudx.data.marketplace.common.HttpStatusCode;
 import org.apache.commons.lang.StringUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import static iudx.data.marketplace.apiserver.util.Constants.*;
-import static iudx.data.marketplace.common.ResponseUrn.INVALID_ID_VALUE_URN;
+public class ProductIdTypeValidator implements Validator {
 
-public class ProductIDTypeValidator implements Validator {
-
-  private static final Logger LOGGER = LogManager.getLogger(ProductIDTypeValidator.class);
+  private static final Logger LOGGER = LogManager.getLogger(ProductIdTypeValidator.class);
 
   private final String value;
   private final boolean required;
 
-  public ProductIDTypeValidator(final String value, final boolean required) {
+  public ProductIdTypeValidator(final String value, final boolean required) {
     this.value = value;
     this.required = required;
   }
@@ -24,12 +24,10 @@ public class ProductIDTypeValidator implements Validator {
   public boolean isValidID(final String value) {
     String[] variable = value.split(":");
     try {
-      boolean isValidUrn =
-          StringUtils.isNotBlank(variable[0]) && variable[0].equals(STRING_URN);
-      boolean isValidDomain =
-              StringUtils.isNotBlank(variable[1]) && variable[1].equals(DOMAIN);
+      boolean isValidUrn = StringUtils.isNotBlank(variable[0]) && variable[0].equals(STRING_URN);
+      boolean isValidDomain = StringUtils.isNotBlank(variable[1]) && variable[1].equals(DOMAIN);
       boolean isValidProvider =
-          StringUtils.isNotBlank(variable[2]) && new UUIDTypeValidator(variable[2], true).isValid();
+          StringUtils.isNotBlank(variable[2]) && new UuidTypeValidator(variable[2], true).isValid();
       boolean isValidProductName =
           StringUtils.isNotBlank(variable[3])
               && VALIDATION_PRODUCT_ID_REGEX.matcher(variable[3]).matches();
