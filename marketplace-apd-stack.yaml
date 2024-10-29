@@ -37,4 +37,4 @@ services:
 
 secrets:
   config:
-    file: ./secrets/all-verticles-configs/config-dev.json
+    file: ./secrets/all-verticles-configs/config.json
