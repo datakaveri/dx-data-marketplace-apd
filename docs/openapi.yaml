@@ -151,6 +151,17 @@ paths:
                     type: 'urn:dx:dmp:forbidden'
                     title: Product creation is forbidden
                     detail: To activate linked account please complete the KYC, filling account information etc., in your Razorpay merchant dashboard
+      security:
+        - authorization: [ ]
+
+      x-codeSamples:
+          - lang: 'cURL'
+            label: 'Create product'
+            source: |
+              curl --location --request POST 'http://example-dmp-apd.com/provider/product' \
+              --header 'token: <tokenValue>' \
+              --header 'Content-Type: application/json' \
+              --data-raw '<payload>'
 
     delete:
       tags:
@@ -226,6 +237,15 @@ paths:
                     type: 'urn:dx:dmp:resourceNotFound'
                     title: Not Found
                     detail: Document of given id does not exist
+      security:
+        - authorization: [ ]
+
+      x-codeSamples:
+        - lang: 'cURL'
+          label: 'Delete product'
+          source: |
+            curl --location --request DELETE 'http://example-dmp-apd.com/provider/product?productId=urn:datakaveri.org:b2c27f3f-2524-4a84-816e-91f9ab23f837:testProductef6b27d2e9634e8ea24e53621c86c2ba' \
+             --header 'Authorization: <tokenValue>'
   /provider/list/products:
     get:
       tags:
@@ -386,6 +406,15 @@ paths:
                     type: 'urn:dx:dmp:invalidAuthorizationToken'
                     title: Not Authorized
                     detail: Not Authorized
+      security:
+        - authorization: [ ]
+
+      x-codeSamples:
+        - lang: 'cURL'
+          label: 'Get product'
+          source: |
+            curl --location --request GET 'http://example-dmp-apd.com/provider/list/products' \
+            --header 'Authorization: <tokenValue>'
   /provider/list/purchases:
     get:
       tags:
@@ -816,6 +845,15 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/notFoundExampleResponseListPurchases'
+      security:
+        - authorization: [ ]
+
+      x-codeSamples:
+        - lang: 'cURL'
+          label: 'List successful purchases'
+          source: |
+            curl --location --request GET 'http://example-dmp-apd.com/provider/list/purchases?paymentStatus=succeeded' \ 
+              --header 'Authorization: <tokenValue>'
   /provider/product-variant:
     post:
       tags:
@@ -974,6 +1012,18 @@ paths:
                       "title": "Resource is forbidden to access",
                       "detail": "Product Variant is only created after product is created"
                     }
+      security:
+        - authorization: [ ]
+
+      x-codeSamples:
+          - lang: 'cURL'
+            label: 'Create product variant'
+            source: |
+              curl --location --request POST 'http://example-dmp-apd.com/provider/product-variant' \
+              --header 'token: <tokenValue>' \
+              --header 'Content-Type: application/json' \
+              --data-raw '<payload>'            
+      
 
     get:
       tags:
@@ -1271,6 +1321,15 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Unauthorized'
+      security:
+        - authorization: [ ]
+
+      x-codeSamples:
+        - lang: 'cURL'
+          label: 'List product variants'
+          source: |
+            curl --location --request GET 'http://example-dmp-apd.com/provider/product-variant?productId=urn:datakaveri.org:b2c27f3f-2524-4a84-816e-91f9ab23f837:testProductef6b27d2e9634e8ea24e53621c86c2ba' \
+            --header 'Authorization: <tokenValue>'
 
     put:
       tags:
@@ -1401,6 +1460,15 @@ paths:
                       "title": "Not Authorized",
                       "detail": "Not Authorized"
                     }
+      security:
+        - authorization: [ ]
+
+      x-codeSamples:
+        - lang: 'cURL'
+          label: 'Update product variants'
+          source: |
+            curl --location --request PUT 'http://example-dmp-apd.com/provider/product-variant' \
+            --header 'Authorization: <tokenValue>'
     delete:
       tags:
         - Product-Variant
@@ -1476,6 +1544,15 @@ paths:
                       "title": "Document of given id does not exist",
                       "detail": "Product variant not found"
                     }
+      security:
+        - authorization: [ ]
+
+      x-codeSamples:
+        - lang: 'cURL'
+          label: 'Delete product variants'
+          source: |
+            curl --location --request DELETE 'http://example-dmp-apd.com/provider/product-variant?productVariantId=7a1b781c-e7d5-405c-8881-22c9a95515eb' \
+            --header 'Authorization: <tokenValue>'
 
   /dx/apd/dmp/v1/account:
     post:
@@ -1692,6 +1769,16 @@ paths:
               description: application/json
       security:
         - authorization: [ ]
+
+      x-codeSamples:
+        - lang: 'cURL'
+          label: 'Create linked account'
+          source: |
+            curl --location --request POST 'http://example-dmp-apd.com/dx/apd/dmp/v1/account' \
+            --header 'token: <tokenValue>' \
+            --header 'Content-Type: application/json' \
+            --data-raw '<payload>'
+
     put:
       tags:
         - Linked-Account
@@ -1908,6 +1995,17 @@ paths:
               description: application/json
       security:
         - authorization: [ ]
+
+      x-codeSamples:
+        - lang: 'cURL'
+          label: 'Update linked account'
+          source: |
+            curl --location --request PUT 'http://example-dmp-apd.com/dx/apd/dmp/v1/account' \
+            --header 'token: <tokenValue>' \
+            --header 'Content-Type: application/json' \
+            --data-raw '<payload>'
+
+
     get:
       tags:
         - Linked-Account
@@ -1975,6 +2073,13 @@ paths:
               description: application/json
       security:
         - authorization: [ ]
+
+      x-codeSamples:
+        - lang: 'cURL'
+          label: 'Get linked account'
+          source: |
+            curl --location --request GET 'http://example-dmp-apd.com/dx/apd/dmp/v1/account' \
+            --header 'Authorization: <tokenValue>'
 
   /consumer/list/resources:
     get:
@@ -2203,6 +2308,16 @@ paths:
                       "title": "Not Authorized",
                       "detail": "Not Authorized"
                     }
+      security:
+        - authorization: [ ]
+
+      x-codeSamples:
+        - lang: 'cURL'
+          label: 'Get all resources'
+          source: |
+            curl --location --request GET 'http://example-dmp-apd.com/consumer/list/resources' \
+            --header 'Authorization: <tokenValue>'
+
   /consumer/list/providers:
     get:
       tags:
@@ -2363,6 +2478,15 @@ paths:
                       "title": "Bad Request",
                       "detail": "Given ID is invalid [ datakaveri.org/b8bd3e3f39615c8ec96722131ae95056b5938f2f/invalid ] "
                     }
+      security:
+        - authorization: [ ]
+
+      x-codeSamples:
+        - lang: 'cURL'
+          label: 'Get providers'
+          source: |
+            curl --location --request GET 'http://example-dmp-apd.com/consumer/list/providers' \
+             --header 'Authorization: <tokenValue>'
   /consumer/list/purchases:
     get:
       tags:
@@ -2799,6 +2923,15 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/notFoundExampleResponseListPurchases'
+      security:
+        - authorization: [ ]
+
+      x-codeSamples:
+        - lang: 'cURL'
+          label: 'Get successful purchases'
+          source: |
+            curl --location --request GET 'http://example-dmp-apd.com/consumer/list/purchases?paymentStatus=succeeded' \
+             --header 'Authorization: <tokenValue>'
 
   /consumer/list/products:
     get:
@@ -2999,6 +3132,15 @@ paths:
                       "title": "Not Authorized",
                       "detail": "Not Authorized"
                     }
+      security:
+        - authorization: [ ]
+
+      x-codeSamples:
+        - lang: 'cURL'
+          label: 'Get products'
+          source: |
+            curl --location --request GET 'http://example-dmp-apd.com/consumer/list/products' \
+             --header 'Authorization: <tokenValue>'
   /consumer/product-variants:
     get:
       tags:
@@ -3181,6 +3323,16 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Unauthorized'
+      security:
+        - authorization: [ ]
+
+      x-codeSamples:
+        - lang: 'cURL'
+          label: 'Get products'
+          source: |
+            curl --location --request GET 'http://example-dmp-apd.com/consumer/product-variant?productId=urn:datakaveri.org:d3c27f3f-5524-4a84-816e-91f9ab23f837:testProductef6b27d2e9634e8ea24e53621c86c2ba' \
+             --header 'Authorization: <tokenValue>'
+
   /consumer/order/{variantId}:
     post:
       summary: Order
@@ -3275,6 +3427,18 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Unauthorized'
+      security:
+        - authorization: [ ]
+
+      x-codeSamples:
+        - lang: 'cURL'
+          label: 'Create Order'
+          source: |
+            curl --location --request POST 'http://example-dmp-apd.com/consumer/order/5a1b781c-e7d5-305c-8881-22c9a95515eb' \
+            --header 'Authorization: <tokenValue>'
+      
+      
+
       operationId: post-consumer-order
       parameters:
         - name: token
@@ -3394,6 +3558,15 @@ paths:
                 $ref: '#/components/schemas/verifyPolicyForbiddenResponse'
       security:
         - authorization: [ ]
+      x-codeSamples:
+        - lang: 'cURL'
+          label: 'Verify policy'
+          source: |
+            curl --location --request POST 'http://example-dmp-apd.com/verify' \
+            --header 'token: bearer <tokenValue>' \
+            --header 'Content-Type: application/json' \
+              --data-raw '<payload>'
+
       x-internal: false
   /dx/apd/dmp/v1/policies:
     get:
@@ -3457,6 +3630,13 @@ paths:
               description: application/json
       security:
         - authorization: [ ]
+      x-codeSamples:
+        - lang: 'cURL'
+          label: 'Get policy'
+          source: |
+            curl --location --request GET 'http://example-dmp-apd.com/dx/apd/dmp/v1/policies' \
+            --header 'Authorization: <tokenValue>'
+
   /dx/apd/dmp/v1/check/policies:
     get:
       tags:
@@ -3555,6 +3735,13 @@ paths:
               description: application/json
       security:
         - authorization: [ ]
+      x-codeSamples:
+        - lang: 'cURL'
+          label: 'Check policy'
+          source: |
+            curl --location --request GET 'http://example-dmp-apd.com/dx/apd/dmp/v1/check/policies?productVariantId=1ce23c02-f9d0-4af2-bdfb-79b77812de82' \
+             --header 'Authorization: <tokenValue>'
+
   /verify-payment:
     post:
       summary: Verify Payment
@@ -3648,9 +3835,19 @@ paths:
                     type: 'urn:dx:dmp:invalidAuthorizationToken'
                     title: Not Authorized
                     detail: Not Authorized
+      security:
+        - authorization: [ ]
+
+      x-codeSamples:
+        - lang: 'cURL'
+          label: 'Verify payment'
+          source: |
+            curl --location --request POST 'http://example-dmp-apd.com/verify-payment' \
+            --header 'token: <tokenValue>' \
+            --header 'Content-Type: application/json' \
+            --data-raw '<payload>'
       operationId: post-verify-payment
-      x-stoplight:
-        id: u7kbvmrhky8ed
+
       parameters:
         - schema:
             type: string
