@@ -15,9 +15,9 @@
 
 * **Checklist for the current PR** :page_with_curl:
 - [ ] I have made corresponding changes to the documentation
-- [ ] I have added the respective changes in the [example-config](../example-config/config.json) if the changes are made in [config](../secrets/all-verticles-configs/config.json)
+- [ ] I have added the respective changes in the [example-config](https://github.com/datakaveri/iudx-data-marketplace-apd/blob/main/example-config/config.json) if the changes are made in [config.json](https://github.com/datakaveri/iudx-data-marketplace-apd/tree/main/secrets/all-verticles-configs)
 - [ ] For the changes made in example-config, backend components (elasticsearch, flyway files for postgres, immudb schema, rabbitmq) I have notified DX DevOps team by mentioning [at-sign]datakaveri/devops as a PR comment to help facilitate the further necessary changes
-- [ ] I have mentioned the DX Catalogue items required in [resources-used](../src/test/resources/DX-Catalogue-Items/RESOURCES_USED.md)
+- [ ] I have mentioned the DX Catalogue items required in [resources-used](https://github.com/datakaveri/iudx-data-marketplace-apd/tree/main/src/test/resources/DX-Catalogue-Items/RESOURCES_USED.md)
 - [ ] I have commented on my code, particularly in hard-to-understand areas
 - [ ] My changes generate no new warnings
 - [ ] I have added tests that prove my fix is effective or that my feature works
