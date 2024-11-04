@@ -53,7 +53,7 @@ Setup and Installation guide is available [here](./docs/Setup-and-Installation)
 
 # Reference
 ## API Docs
-API docs are available [here](https://redocly.github.io/redoc/?url=https://raw.githubusercontent.com/datakaveri/iudx-data-marketplace-apd/refs/heads/main/docs/openapi.yaml?token=GHSAT0AAAAAAB3O7EVV5ENYK2K7PWW4ZAVUZY2EZUA#tag/Tickets/operation/getTicketCode)
+API docs are available [here](https://redocly.github.io/redoc/?url=https://raw.githubusercontent.com/datakaveri/iudx-data-marketplace-apd/refs/heads/main/docs/openapi.yaml)
 
 ## FAQ
 FAQs are available [here](./docs/FAQ.md)
