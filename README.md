@@ -43,7 +43,7 @@ All users can interact with the data marketplace API server using HTTPs requests
 
 # Explanation
 ## Understanding DMP APD
-- The section available [here](./docs/Solution_Architecture.md) explains the components/services used in implementing the ACL-APD server
+- The section available [here](./docs/Solution_Architecture.md) explains the components/services used in implementing the DMP-APD server
 - To try out the APIs, import the API collection, postman environment files in postman
 - Reference : [postman-collection](src/test/resources/DX-Data-Marketplace-APIs.postman_collection.json), [postman-environment](src/test/resources/postman-environment.json)
 
@@ -53,7 +53,7 @@ Setup and Installation guide is available [here](./docs/Setup-and-Installation)
 
 # Reference
 ## API Docs
-API docs are available [here](https://redocly.github.io/redoc/?url=https://raw.githubusercontent.com/datakaveri/iudx-data-marketplace-apd/refs/heads/main/docs/openapi.yaml?token=GHSAT0AAAAAAB3O7EVV5ENYK2K7PWW4ZAVUZY2EZUA#tag/Tickets/operation/getTicketCode)
+API docs are available [here](https://redocly.github.io/redoc/?url=https://raw.githubusercontent.com/datakaveri/iudx-data-marketplace-apd/refs/heads/main/docs/openapi.yaml)
 
 ## FAQ
 FAQs are available [here](./docs/FAQ.md)

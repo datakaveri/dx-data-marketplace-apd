@@ -35,7 +35,7 @@
 10. I have purchased the same resource that was present in different product variants. How can I get an access token for the resource with a specific capability or constraint?
 - The consumers can get access token from DX Auth Server for a specific resource with a specific constraint by providing `context` object with `orderId` in the request body
   - Reference to [requesting resource with context object in body](https://authorization.iudx.org.in/apis#tag/Token-APIs/operation/post-auth-v1-token) 
-  - To get order ID consumer could use list purchase API by specifying the resourceId. [Reference to the API](https://dmp-apd.adex.iudx.io/apis#tag/Consumer-List-APIs/paths/~1consumer~1list~1purchases/get)
+  - To get order ID consumer could use list purchase API by specifying the resourceId. [Reference to the API](https://redocly.github.io/redoc/?url=https://raw.githubusercontent.com/datakaveri/iudx-data-marketplace-apd/refs/heads/main/docs/openapi.yaml#tag/Consumer-List-APIs/paths/~1consumer~1list~1purchases/get)
 
 11. "Merchant account has been locked by the admin" while creating, updating linked account
 - The account might be locked by the Razorpay admin and might be under review. Please contact [Razorpay support](https://razorpay.com/support/#request) to get further help to resolve the issue. 
