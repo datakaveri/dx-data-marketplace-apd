@@ -49,10 +49,10 @@ jobs:
               -e 's|./Setup-and-Installation.md|./05-Setup-and-Installation|g' \
               -e 's|./example-tutorials|./06-Tutorials|g' \
               -e 's|./FAQ.md|07-FAQ|g' \
-              -e 's|./mai./|d/main/docs/|g'  README.md > wiki/Home.md | sed -i -e 's/.razorpay.co./razorpay.com\/docs\/#home-payments' | 
-          sed -i -e 's/.wiki\/src\/test\/resources\/DX-Data-Marketplace-APIs.postman_collection.json/blob\/main\/src\/test\/resources\/DX-Data-Marketplace-APIs.postman_collection.json' |
-          sed -i -e 's/.wiki\/src\/test\/resources\/postman-environment.json/blob\/main\/src\/test\/resources\/postman-environment.json' | 
-          sed -i -e 's/.wiki/Setup-and-Installation/wiki\/05-SETUP-and-Installation' | 
+              -e 's|./mai./|d/main/docs/|g'  README.md > wiki/Home.md | sed -i -e 's/.\/razorpay.co./razorpay.com\/docs\/#home-payments' | 
+          sed -i -e 's/.\/wiki\/src\/test\/resources\/DX-Data-Marketplace-APIs.postman_collection.json/blob\/main\/src\/test\/resources\/DX-Data-Marketplace-APIs.postman_collection.json' |
+          sed -i -e 's/.\/wiki\/src\/test\/resources\/postman-environment.json/blob\/main\/src\/test\/resources\/postman-environment.json' | 
+          sed -i -e 's/.\/wiki/Setup-and-Installation/wiki\/05-SETUP-and-Installation' | 
           ls -la wiki  # Verify the file creation
 
       - name: Copy Files to Wiki
@@ -67,7 +67,7 @@ jobs:
           mv wiki/Solution_Architecture.md wiki/02-Solution-Architecture.md
           mv wiki/Configurations.md wiki/03-Configurations.md
           mv wiki/Explanation.md wiki/04-Explanation.md
-          mv wiki/Setup-and-Installation.md wiki/05-Setup-and-Installation.md | sed -i -e 's/.wiki\/Configurations.md/wiki\/03-Configurations'
+          mv wiki/Setup-and-Installation.md wiki/05-Setup-and-Installation.md | sed -i -e 's/.\/wiki\/Configurations.md/wiki\/03-Configurations'
           mv wiki/Tutorials.md wiki/06-Tutorials.md
           mv wiki/FAQ.md wiki/07-FAQ.md
           mv wiki/LICENSE.md wiki/08-License.md
