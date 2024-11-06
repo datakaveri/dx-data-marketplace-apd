@@ -67,7 +67,7 @@ jobs:
           mv wiki/Solution_Architecture.md wiki/02-Solution-Architecture.md
           mv wiki/Configurations.md wiki/03-Configurations.md
           mv wiki/Explanation.md wiki/04-Explanation.md
-          mv wiki/Setup-and-Installation.md wiki/05-Setup-and-Installation.md | sed -i -e '.\/wiki\/Configurations.md/wiki\/03-Configurations'
+          mv wiki/Setup-and-Installation.md wiki/05-Setup-and-Installation.md | sed -i -e '\/wiki\/Configurations.md/wiki\/03-Configurations'
           mv wiki/Tutorials.md wiki/06-Tutorials.md
           mv wiki/FAQ.md wiki/07-FAQ.md
           mv wiki/LICENSE.md wiki/08-License.md
