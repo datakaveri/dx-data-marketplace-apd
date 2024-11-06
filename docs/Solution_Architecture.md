@@ -35,6 +35,8 @@ The authentication service interacts with the DX Authentication server to valida
 
 ### Consumer Service
 The Consumer Service fetches some or all resources, providers, products, active product variants available to the consumer on DX Data Marketplace. It also helps in creating an order for the consumer against a product variant. After the purchase is made, based on whether the purchase is pending, successful and failed, invoice related information could be fetched using consumer service.
+Whenever the consumer wants to buy a product-variant, an order is created against the product variant using the create order API. Then using the Razorpay key, this order ID a checkout form is created to integrate
+with Razorpay to allow consumers to use various methods to make the payment.
 
 
 ### Provider Module
