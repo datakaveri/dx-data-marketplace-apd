@@ -49,7 +49,7 @@ All users can interact with the data marketplace API server using HTTPs requests
 
 # How To Guide
 ## Setup and Installation
-Setup and Installation guide is available [here](./docs/Setup-and-Installation)
+Setup and Installation guide is available [here](./docs/Setup-and-Installation.md)
 
 # Reference
 ## API Docs
