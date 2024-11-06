@@ -45,7 +45,7 @@ All users can interact with the data marketplace API server using HTTPs requests
 ## Understanding DMP APD
 - The section available [here](./docs/Solution_Architecture.md) explains the components/services used in implementing the DMP-APD server
 - To try out the APIs, import the API collection, postman environment files in postman
-- Reference : [postman-collection](src/test/resources/DX-Data-Marketplace-APIs.postman_collection.json), [postman-environment](src/test/resources/postman-environment.json)
+- Reference : [postman-collection](https://github.com/datakaveri/iudx-data-marketplace-apd/blob/main/src/test/resources/DX-Data-Marketplace-APIs.postman_collection.json), [postman-environment](https://github.com/datakaveri/iudx-data-marketplace-apd/blob/main/src/test/resources/postman-environment.json)
 
 # How To Guide
 ## Setup and Installation
