@@ -52,7 +52,7 @@ jobs:
               -e 's|./mai./|d/main/docs/|g'  README.md > wiki/Home.md | sed -i -e 's/.\/razorpay.co./razorpay.com\/docs\/#home-payments' | 
           sed -i -e 's/.\/wiki\/src\/test\/resources\/DX-Data-Marketplace-APIs.postman_collection.json/blob\/main\/src\/test\/resources\/DX-Data-Marketplace-APIs.postman_collection.json' |
           sed -i -e 's/.\/wiki\/src\/test\/resources\/postman-environment.json/blob\/main\/src\/test\/resources\/postman-environment.json' | 
-          sed -i -e 's/.\/wiki/Setup-and-Installation/wiki\/05-SETUP-and-Installation' | 
+          sed -i -e 's/.\/wiki/Setup-and-Installation/.wiki\/05-SETUP-and-Installation' | 
           ls -la wiki  # Verify the file creation
 
       - name: Copy Files to Wiki
