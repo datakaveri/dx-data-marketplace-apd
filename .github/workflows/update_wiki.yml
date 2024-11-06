@@ -43,13 +43,14 @@ jobs:
         run: |
           echo "Copying and modifying README.md to wiki/Home.md..."
           sed -e 's|./docs/|./|g' \
+              -e 's|.razorpay.co./razorpay.com\/docs\/#home-payments|g' \
               -e 's|./Solution_Architecture.md|./02-Solution-Architecture|g' \
               -e 's|./Configurations.md|./03-Configurations|g' \
               -e 's|./Explanation.md|./04-Explanation|g' \
               -e 's|./Setup-and-Installation.md|./05-Setup-and-Installation|g' \
               -e 's|./example-tutorials|./06-Tutorials|g' \
               -e 's|./FAQ.md|07-FAQ|g' \
-              -e 's|./mai./|d/main/docs/|g'  README.md > wiki/Home.md | sed -i -e 's|/.\/razorpay.co./razorpay.com\/docs\/#home-payments|g' wiki/Home.md | 
+              -e 's|./mai./|d/main/docs/|g'  README.md > wiki/Home.md | 
           sed -i -e 's|./\/blod\/main\/docs\/src\/test\/resources\/DX-Data-Marketplace-APIs.postman_collection.json/blob\/main\/src\/test\/resources\/DX-Data-Marketplace-APIs.postman_collection.json ' wiki/Home.md |
           sed -i -e 's|./\/blod\/main\/docs\/src\/test\/resources\/DX-Data-Marketplace-APIs.postman-environment.json/blob\/main\/src\/test\/resources\/DX-Data-Marketplace-APIs.postman-environment.json ' wiki/Home.md |
           sed -i -e 's|./\/wiki/Setup-and-Installation/.\/wiki\/05-SETUP-and-Installation ' wiki/Home.md| 
