@@ -6,7 +6,7 @@
 This document contains the installation and configuration information required to deploy the Data Exchange (DX) DMP APD Server.
 
 ## Configuration
-In order to connect the DX DMP APD Server with PostgreSQL, RabbitMQ, Razorpay Service, DX Catalogue Server, DX Auth Server, etc please refer [Configurations](./Configurations.md). It contains appropriate information which shall be updated as per the deployment.
+In order to connect the DX DMP APD Server with PostgreSQL, RabbitMQ, Razorpay Service, DX Catalogue Server, DX Auth Server, etc please refer [Configurations](https://github.com/datakaveri/iudx-data-marketplace-apd/blob/main/docs/Configurations.md). It contains appropriate information which shall be updated as per the deployment.
 
 ## Dependencies
 In this section we explain about the dependencies and their scope. It is expected that the dependencies are met before starting the deployment of DX DMP APD Server.
