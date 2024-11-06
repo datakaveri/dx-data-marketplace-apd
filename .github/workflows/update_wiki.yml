@@ -50,8 +50,8 @@ jobs:
               -e 's|./example-tutorials|./06-Tutorials|g' \
               -e 's|./FAQ.md|07-FAQ|g' \
               -e 's|./mai./|d/main/docs/|g'  README.md > wiki/Home.md | sed -i -e 's|/.\/razorpay.co./razorpay.com\/docs\/#home-payments|g' wiki/Home.md | 
-          sed -i -e 's|/.\/wiki\/src\/test\/resources\/DX-Data-Marketplace-APIs.postman_collection.json/blob\/main\/src\/test\/resources\/DX-Data-Marketplace-APIs.postman_collection.json ' wiki/Home.md |
-          sed -i -e 's|/.\/wiki\/src\/test\/resources\/postman-environment.json/blob\/main\/src\/test\/resources\/postman-environment.json ' wiki/Home.md | 
+          sed -i -e 's|/.\/blod\/main\/docs\/src\/test\/resources\/DX-Data-Marketplace-APIs.postman_collection.json/blob\/main\/src\/test\/resources\/DX-Data-Marketplace-APIs.postman_collection.json ' wiki/Home.md |
+          sed -i -e 's|/.\/blod\/main\/docs\/src\/test\/resources\/DX-Data-Marketplace-APIs.postman-environment.json/blob\/main\/src\/test\/resources\/DX-Data-Marketplace-APIs.postman-environment.json ' wiki/Home.md |
           sed -i -e 's|/.\/wiki/Setup-and-Installation/.\/wiki\/05-SETUP-and-Installation ' wiki/Home.md| 
           ls -la wiki  # Verify the file creation
 
