@@ -55,10 +55,15 @@ Setup and Installation guide is available [here](./docs/Setup-and-Installation.m
 ## Tutorials and Explanation
 The following video depicts the steps to publish the product, variant on Data Marketplace
 
-<video src="https://github.com/user-attachments/assets/7e08b319-adf0-482d-83e8-3b4ec56845eb" controls="controls" style="max-width: 730px;"></video>
-<video src="https://github.com/user-attachments/assets/7e08b319-adf0-482d-83e8-3b4ec56845eb" controls="controls" style="max-width: 730px;">
-</video>
-[![YouTube](http://i.ytimg.com/vi/P0HsnOmAPn8/hqdefault.jpg)](https://www.youtube.com/watch?v=P0HsnOmAPn8)
+  <video src="https://github.com/user-attachments/assets/7e08b319-adf0-482d-83e8-3b4ec56845eb" controls="controls" style="max-width: 730px;"></video>
+  <video src="https://github.com/user-attachments/assets/7e08b319-adf0-482d-83e8-3b4ec56845eb" controls="controls" style="max-width: 730px;">
+  </video>
+  [![YouTube](http://i.ytimg.com/vi/P0HsnOmAPn8/hqdefault.jpg)](https://www.youtube.com/watch?v=P0HsnOmAPn8)
+
+   <video src="example-tutorials/Linked-account-creation.mp4" placeholder="Product-variant-creation" autoplay loop controls muted title="Variant-creation">
+    Sorry, your browser doesn't support HTML 5 video.
+   </video>
+
 
 # Reference
 ## API Docs
