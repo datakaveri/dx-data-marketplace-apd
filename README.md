@@ -51,6 +51,13 @@ All users can interact with the data marketplace API server using HTTPs requests
 ## Setup and Installation
 Setup and Installation guide is available [here](./docs/Setup-and-Installation.md)
 
+# Tutorial
+## Tutorials and Explanation
+The following video depicts the steps to publish the product, variant on Data Marketplace
+
+<video src="https://github.com/user-attachments/assets/7e08b319-adf0-482d-83e8-3b4ec56845eb" controls="controls" style="max-width: 730px;"></video>
+
+
 # Reference
 ## API Docs
 API docs are available [here](https://redocly.github.io/redoc/?url=https://raw.githubusercontent.com/datakaveri/iudx-data-marketplace-apd/refs/heads/main/docs/openapi.yaml)
