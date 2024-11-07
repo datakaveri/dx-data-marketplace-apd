@@ -63,7 +63,17 @@ The following video depicts the steps to publish the product, variant on Data Ma
    <video src="example-tutorials/Linked-account-creation.mp4" placeholder="Product-variant-creation" autoplay loop controls muted title="Variant-creation">
     Sorry, your browser doesn't support HTML 5 video.
    </video>
-
+  
+  <video src="https://github.com/user-attachments/assets/47d929cc-0c6b-4b67-9204-2359bda0fae0" controls="controls" style="max-width: 730px;">
+  </video>
+  <video src="https://github.com/user-attachments/assets/73a4a09e-b439-48a4-aa64-b819884363d3" controls="controls" style="max-width: 730px;">
+  </video>
+  <video src="https://github.com/user-attachments/assets/f82532b4-0911-4e39-9a86-ee25565e1e28" controls="controls" style="max-width: 730px;">
+  </video>
+  <video src="https://github.com/user-attachments/assets/3dd62d52-dcb9-417e-bb91-375e3dcf6e64" controls="controls" style="max-width: 730px;">
+  </video>
+  <video src="https://github.com/user-attachments/assets/3624afe7-bb33-448a-91dc-f654a5f754ec" controls="controls" style="max-width: 730px;">
+  </video>
 
 # Reference
 ## API Docs
