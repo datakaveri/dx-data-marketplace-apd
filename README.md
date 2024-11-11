@@ -54,7 +54,9 @@ Setup and Installation guide is available [here](./docs/Setup-and-Installation.m
 # Tutorial
 ## Tutorials and Explanation
 The following video depicts the steps to publish the product, variant on Data Marketplace
+
 [Watch Full Video](https://github.com/user-attachments/assets/7e08b319-adf0-482d-83e8-3b4ec56845eb)
+
 
 
 
