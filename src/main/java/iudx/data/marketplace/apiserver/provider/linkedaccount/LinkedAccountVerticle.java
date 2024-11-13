@@ -1,4 +1,4 @@
-package iudx.data.marketplace.apiserver.provider.linkedAccount;
+package iudx.data.marketplace.apiserver.provider.linkedaccount;
 
 import static iudx.data.marketplace.common.Constants.*;
 
@@ -9,8 +9,6 @@ import iudx.data.marketplace.auditing.AuditingService;
 import iudx.data.marketplace.common.Api;
 import iudx.data.marketplace.postgres.PostgresService;
 import iudx.data.marketplace.razorpay.RazorPayService;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 
 public class LinkedAccountVerticle extends AbstractVerticle {
   //  private static final Logger LOGGER = LogManager.getLogger(LinkedAccountVerticle.class);

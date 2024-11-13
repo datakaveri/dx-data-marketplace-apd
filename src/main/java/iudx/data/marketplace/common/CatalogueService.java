@@ -26,7 +26,8 @@ public class CatalogueService {
   static WebClient catWebClient;
   private static String catHost;
   private static int catPort;
-  private static String catItemPath, catRelPath;
+  private static String catItemPath;
+  private static String catRelPath;
 
   public CatalogueService(Vertx vertx, JsonObject config) {
     catHost = config.getString(CAT_SERVER_HOST);
@@ -123,7 +124,6 @@ public class CatalogueService {
   }
 
   public Future<JsonObject> searchApi(JsonObject params) {
-    Promise<JsonObject> promise = Promise.promise();
 
     JsonArray keysArray = new JsonArray();
     JsonArray valuesArray = new JsonArray();
@@ -137,6 +137,7 @@ public class CatalogueService {
 
     LOGGER.debug(keysArray.getList().toString());
     LOGGER.debug(valuesArray.getList().toString());
+    Promise<JsonObject> promise = Promise.promise();
 
     catWebClient
         .get(catPort, catHost, "/iudx/cat/v1/search")
@@ -145,13 +146,14 @@ public class CatalogueService {
         .send(
             searchApiHandler -> {
               if (searchApiHandler.succeeded()) {
+                promise.complete(searchApiHandler.result().bodyAsJsonObject());
                 LOGGER.debug(searchApiHandler.result().bodyAsJsonObject());
               } else {
+                promise.fail(searchApiHandler.cause());
                 LOGGER.error(searchApiHandler.cause());
               }
             });
 
-    promise.complete();
     return promise.future();
   }
 }

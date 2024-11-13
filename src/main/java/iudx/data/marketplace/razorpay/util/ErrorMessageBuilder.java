@@ -1,6 +1,6 @@
 package iudx.data.marketplace.razorpay.util;
 
-import static iudx.data.marketplace.apiserver.provider.linkedAccount.util.Constants.FAILURE_MESSAGE;
+import static iudx.data.marketplace.apiserver.provider.linkedaccount.util.Constants.FAILURE_MESSAGE;
 
 import iudx.data.marketplace.common.ResponseUrn;
 import java.util.Map;

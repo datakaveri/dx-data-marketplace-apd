@@ -1,7 +1,7 @@
 package iudx.data.marketplace.razorpay;
 
-import static iudx.data.marketplace.apiserver.provider.linkedAccount.util.Constants.ACCOUNT_TYPE;
-import static iudx.data.marketplace.apiserver.provider.linkedAccount.util.Constants.FAILURE_MESSAGE;
+import static iudx.data.marketplace.apiserver.provider.linkedaccount.util.Constants.ACCOUNT_TYPE;
+import static iudx.data.marketplace.apiserver.provider.linkedaccount.util.Constants.FAILURE_MESSAGE;
 import static iudx.data.marketplace.product.util.Constants.*;
 import static iudx.data.marketplace.razorpay.Constants.*;
 

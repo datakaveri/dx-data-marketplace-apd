@@ -64,13 +64,6 @@ public class ProviderApis {
   Router init() {
 
     ValidationHandler productValidationHandler = new ValidationHandler(RequestType.PRODUCT);
-    ValidationHandler variantValidationHandler = new ValidationHandler(RequestType.PRODUCT_VARIANT);
-    ValidationHandler deleteVariantValidationHandler =
-        new ValidationHandler(RequestType.DELETE_PRODUCT_VARIANT);
-    ValidationHandler listVariantValidationHandler =
-        new ValidationHandler(RequestType.LIST_PRODUCT_VARIANT);
-    ValidationHandler resourceValidationHandler = new ValidationHandler(RequestType.RESOURCE);
-    ValidationHandler purchaseValidationHandler = new ValidationHandler(RequestType.PURCHASE);
     ExceptionHandler exceptionHandler = new ExceptionHandler();
 
     productService = ProductService.createProxy(vertx, PRODUCT_SERVICE_ADDRESS);
@@ -90,6 +83,7 @@ public class ProviderApis {
         .handler(AuthHandler.create(authenticationService, api, postgresService, authClient))
         .handler(this::handleDeleteProduct)
         .failureHandler(exceptionHandler);
+    ValidationHandler resourceValidationHandler = new ValidationHandler(RequestType.RESOURCE);
 
     router
         .get(api.getProviderListProductsPath())
@@ -97,6 +91,7 @@ public class ProviderApis {
         .handler(AuthHandler.create(authenticationService, api, postgresService, authClient))
         .handler(this::listProducts)
         .failureHandler(exceptionHandler);
+    ValidationHandler purchaseValidationHandler = new ValidationHandler(RequestType.PURCHASE);
 
     router
         .get(api.getProviderListPurchasesPath())
@@ -104,6 +99,7 @@ public class ProviderApis {
         .handler(AuthHandler.create(authenticationService, api, postgresService, authClient))
         .handler(this::listPurchases)
         .failureHandler(exceptionHandler);
+    ValidationHandler variantValidationHandler = new ValidationHandler(RequestType.PRODUCT_VARIANT);
 
     router
         .post(api.getProviderProductVariantPath())
@@ -118,13 +114,16 @@ public class ProviderApis {
         .handler(AuthHandler.create(authenticationService, api, postgresService, authClient))
         .handler(this::handleUpdateProductVariant)
         .failureHandler(exceptionHandler);
-
+    ValidationHandler listVariantValidationHandler =
+        new ValidationHandler(RequestType.LIST_PRODUCT_VARIANT);
     router
         .get(api.getProviderProductVariantPath())
         .handler(listVariantValidationHandler)
         .handler(AuthHandler.create(authenticationService, api, postgresService, authClient))
         .handler(this::handleGetProductVariants)
         .failureHandler(exceptionHandler);
+    ValidationHandler deleteVariantValidationHandler =
+        new ValidationHandler(RequestType.DELETE_PRODUCT_VARIANT);
 
     router
         .delete(api.getProviderProductVariantPath())

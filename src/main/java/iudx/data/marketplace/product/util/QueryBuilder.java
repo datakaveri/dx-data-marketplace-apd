@@ -19,8 +19,11 @@ import org.apache.logging.log4j.Logger;
 public class QueryBuilder {
 
   public static final Logger LOGGER = LogManager.getLogger(QueryBuilder.class);
-  private String productTable, resourceTable, productResourceRelationTable, productVariantTable;
-  private Supplier<String> supplier;
+  private final String productTable;
+  private final String resourceTable;
+  private final String productResourceRelationTable;
+  private final String productVariantTable;
+  private final Supplier<String> supplier;
 
   public QueryBuilder(JsonArray tables) {
     this.productTable = tables.getString(0);
@@ -38,38 +41,32 @@ public class QueryBuilder {
 
     // Product Table entry
     queries.add(
-        new StringBuilder(
-                INSERT_PRODUCT_QUERY
-                    .replace("$0", productTable)
-                    .replace("$1", productId)
-                    .replace("$2", providerId)
-                    .replace("$3", providerName)
-                    .replace("$4", Status.ACTIVE.toString()))
-            .toString());
+        INSERT_PRODUCT_QUERY
+            .replace("$0", productTable)
+            .replace("$1", productId)
+            .replace("$2", providerId)
+            .replace("$3", providerName)
+            .replace("$4", Status.ACTIVE.toString()));
 
     // Resource Table entry
     resourceDetails.forEach(
         resource -> {
           queries.add(
-              new StringBuilder(
-                      INSERT_RESOURCE_QUERY
-                          .replace("$0", resourceTable)
-                          .replace("$1", ((JsonObject) resource).getString(RESOURCE_ID))
-                          .replace("$2", ((JsonObject) resource).getString(RESOURCE_NAME))
-                          .replace("$3", providerId)
-                          .replace("$4", providerName)
-                          .replace("$5", request.getString(RESOURCE_SERVER))
-                          .replace("$6", ((JsonObject) resource).getString("accessPolicy")))
-                  .toString());
+              INSERT_RESOURCE_QUERY
+                  .replace("$0", resourceTable)
+                  .replace("$1", ((JsonObject) resource).getString(RESOURCE_ID))
+                  .replace("$2", ((JsonObject) resource).getString(RESOURCE_NAME))
+                  .replace("$3", providerId)
+                  .replace("$4", providerName)
+                  .replace("$5", request.getString(RESOURCE_SERVER))
+                  .replace("$6", ((JsonObject) resource).getString("accessPolicy")));
 
           // Product-Resource relationship table entry
           queries.add(
-              new StringBuilder(
-                      INSERT_P_R_REL_QUERY
-                          .replace("$0", productResourceRelationTable)
-                          .replace("$1", productId)
-                          .replace("$2", ((JsonObject) resource).getString(RESOURCE_ID)))
-                  .toString());
+              INSERT_P_R_REL_QUERY
+                  .replace("$0", productResourceRelationTable)
+                  .replace("$1", productId)
+                  .replace("$2", ((JsonObject) resource).getString(RESOURCE_ID)));
         });
 
     LOGGER.debug("Queries : " + queries);
@@ -146,6 +143,19 @@ public class QueryBuilder {
     return query.toString();
   }
 
+  public String updateProductVariantStatusQuery(String productVariantId) {
+    StringBuilder query =
+        new StringBuilder(
+            UPDATE_PV_STATUS_QUERY
+                .replace("$0", productVariantTable)
+                .replace("$1", productVariantId)
+                .replace("$3", Status.ACTIVE.toString())
+                .replace("$4", Status.INACTIVE.toString()));
+
+    LOGGER.debug("Query : " + query);
+    return query.toString();
+  }
+
   public String checkProductVariantExistence(String productId, String variantName) {
     StringBuilder query =
         new StringBuilder(CHECK_IF_PV_EXISTS.replace("$1", productId).replace("$2", variantName));
@@ -159,18 +169,7 @@ public class QueryBuilder {
     return query.toString();
   }
 
-  public String updateProductVariantStatusQuery(String productVariantId) {
-    StringBuilder query =
-        new StringBuilder(
-            UPDATE_PV_STATUS_QUERY
-                .replace("$0", productVariantTable)
-                .replace("$1", productVariantId)
-                .replace("$3", Status.ACTIVE.toString())
-                .replace("$4", Status.INACTIVE.toString()));
 
-    LOGGER.debug("Query : " + query);
-    return query.toString();
-  }
 
   public String selectProductVariant(String productId, String variantName) {
     StringBuilder query =

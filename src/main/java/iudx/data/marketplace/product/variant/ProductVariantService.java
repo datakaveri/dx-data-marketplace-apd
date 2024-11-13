@@ -84,7 +84,7 @@ public interface ProductVariantService {
    * @param user Provider user
    * @param request query param if any
    * @param handler Asynchronous JsonObject handler that contains the list of purchases
-   * @return
+   * @return ProductVariantService which is a service
    */
   @Fluent
   ProductVariantService listPurchase(

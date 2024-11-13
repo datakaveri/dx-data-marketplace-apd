@@ -106,7 +106,8 @@ public class ProductVariantServiceImpl implements ProductVariantService {
                   handler.handle(Future.failedFuture(failureMessage));
                   return;
                 }
-                int i, j;
+                int i;
+                int j;
                 for (i = 0; i < resources.size(); i++) {
                   for (j = 0; j < resResources.size(); j++) {
                     String reqId = resources.getJsonObject(i).getString(ID);
@@ -163,8 +164,7 @@ public class ProductVariantServiceImpl implements ProductVariantService {
           if (handler.succeeded()) {
             if (handler.result().getInteger("totalHits") != 0) {
               promise.complete(true);
-            }
-            else {
+            } else {
               promise.complete(false);
             }
           } else {

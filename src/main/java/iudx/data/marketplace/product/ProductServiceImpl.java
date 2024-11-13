@@ -1,7 +1,6 @@
 package iudx.data.marketplace.product;
 
-import static iudx.data.marketplace.apiserver.provider.linkedAccount.util.Constants.*;
-import static iudx.data.marketplace.apiserver.provider.linkedAccount.util.Constants.FAILURE_MESSAGE;
+import static iudx.data.marketplace.apiserver.provider.linkedaccount.util.Constants.*;
 import static iudx.data.marketplace.apiserver.util.Constants.RESULTS;
 import static iudx.data.marketplace.common.Constants.*;
 import static iudx.data.marketplace.product.util.Constants.*;

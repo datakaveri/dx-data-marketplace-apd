@@ -16,9 +16,9 @@ public interface AuditingService {
     return new AuditingServiceVertxEBProxy(vertx, address);
   }
 
-  /***
-   * This methods creates is used to create audit logs to be stored in respective databases
+  /** This methods creates is used to create audit logs to be stored in respective databases
    * by sending the messages through the data broker
+   *
    * @param user The user Object that is created during user authentication
    * @param information would contain the request body, response and essential additional information
    * @param api Endpoint that is called by the user

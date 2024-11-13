@@ -1,6 +1,6 @@
-package iudx.data.marketplace.apiserver.provider.linkedAccount;
+package iudx.data.marketplace.apiserver.provider.linkedaccount;
 
-import static iudx.data.marketplace.apiserver.provider.linkedAccount.util.Constants.*;
+import static iudx.data.marketplace.apiserver.provider.linkedaccount.util.Constants.*;
 import static iudx.data.marketplace.apiserver.util.Constants.*;
 
 import com.google.common.hash.Hashing;
@@ -130,7 +130,6 @@ public class CreateLinkedAccount {
    */
   public JsonObject getLinkedAccountDetails(
       JsonObject request, String referenceId, String emailId) {
-    String businessType = request.getString("businessType");
     String category = request.getJsonObject("profile").getString("category");
     String subcategory = request.getJsonObject("profile").getString("subcategory");
     JsonObject registered =
@@ -141,7 +140,6 @@ public class CreateLinkedAccount {
     String state = registered.getString("state");
     String postalCode = registered.getString("postalCode");
     String country = registered.getString("country");
-    String contactName = request.getString("contactName");
 
     JsonObject registeredJson =
         new JsonObject()
@@ -153,11 +151,7 @@ public class CreateLinkedAccount {
             .put("country", country);
 
     JsonObject addressJson = new JsonObject().put("registered", registeredJson);
-    JsonObject profileJson =
-        new JsonObject()
-            .put("category", category)
-            .put("subcategory", subcategory)
-            .put("addresses", addressJson);
+
 
     JsonObject legalInfoJson = new JsonObject();
     /* checks if optional field legal info is null */
@@ -173,32 +167,27 @@ public class CreateLinkedAccount {
     }
     String phoneNumber = request.getString("phone");
     String legalBusinessName = request.getString("legalBusinessName");
-    String customerFacingBusinessName = request.getString("customerFacingBusinessName");
+    String businessType = request.getString("businessType");
+    JsonObject profileJson = new JsonObject().put("category", category)
+        .put("subcategory", subcategory).put("addresses", addressJson);
+    JsonObject details = new JsonObject().put("email", emailId).put("phone", phoneNumber)
+        .put("legal_business_name", legalBusinessName).put("type", ACCOUNT_TYPE).put("reference_id", referenceId)
+        .put("business_type", businessType).put("profile", profileJson).put("legal_info", legalInfoJson);
 
     setLegalBusinessName(legalBusinessName);
     setEmailId(emailId);
     setPhoneNumber(phoneNumber);
     setBusinessType(businessType);
-
-    JsonObject details =
-        new JsonObject()
-            .put("email", emailId)
-            .put("phone", phoneNumber)
-            .put("legal_business_name", legalBusinessName)
-            .put("type", ACCOUNT_TYPE)
-            .put("reference_id", referenceId)
-            .put("business_type", businessType)
-            .put("profile", profileJson)
-            .put("legal_info", legalInfoJson);
-
     setCustomerFacingBusinessName(legalBusinessName);
     /* customer facing business name is not a necessary field in the request body
      * while inserting in the DB, if customer facing business name is null, it is
      * replaced with the legal business name */
+    String customerFacingBusinessName = request.getString("customerFacingBusinessName");
     if (StringUtils.isNotBlank(customerFacingBusinessName)) {
       setCustomerFacingBusinessName(customerFacingBusinessName);
       details.put("customer_facing_business_name", customerFacingBusinessName);
     }
+    String contactName = request.getString("contactName");
     if (StringUtils.isNotBlank(contactName)) {
       details.put("contact_name", contactName);
     }

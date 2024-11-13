@@ -1,6 +1,6 @@
-package iudx.data.marketplace.apiserver.provider.linkedAccount;
+package iudx.data.marketplace.apiserver.provider.linkedaccount;
 
-import static iudx.data.marketplace.apiserver.provider.linkedAccount.util.Constants.*;
+import static iudx.data.marketplace.apiserver.provider.linkedaccount.util.Constants.*;
 import static iudx.data.marketplace.apiserver.util.Constants.RESULTS;
 
 import io.vertx.core.Future;
@@ -83,34 +83,6 @@ public class UpdateLinkedAccount {
   }
 
   public String getAccountRequest(JsonObject requestBody) {
-    String category = requestBody.getJsonObject("profile").getString("category");
-    String subcategory = requestBody.getJsonObject("profile").getString("subcategory");
-    JsonObject registered =
-        requestBody.getJsonObject("profile").getJsonObject("addresses").getJsonObject("registered");
-    String street1 = registered.getString("street1");
-    String street2 = registered.getString("street2");
-    String city = registered.getString("city");
-    String state = registered.getString("state");
-    String postalCode = registered.getString("postalCode");
-    String country = registered.getString("country");
-    String contactName = requestBody.getString("contactName");
-
-    JsonObject registeredJson =
-        new JsonObject()
-            .put("street1", street1)
-            .put("street2", street2)
-            .put("city", city)
-            .put("state", state)
-            .put("postal_code", postalCode)
-            .put("country", country);
-
-    JsonObject addressJson = new JsonObject().put("registered", registeredJson);
-    JsonObject profileJson =
-        new JsonObject()
-            .put("category", category)
-            .put("subcategory", subcategory)
-            .put("addresses", addressJson);
-
     JsonObject legalInfoJson = new JsonObject();
     /* checks if optional field legal info is null */
     if (requestBody.getJsonObject("legalInfo") != null) {
@@ -125,10 +97,28 @@ public class UpdateLinkedAccount {
     }
     String phoneNumber = requestBody.getString("phone");
     String legalBusinessName = requestBody.getString("legalBusinessName");
-    String customerFacingBusinessName = requestBody.getString("customerFacingBusinessName");
 
     setLegalBusinessName(legalBusinessName);
     setPhoneNumber(phoneNumber);
+    String category = requestBody.getJsonObject("profile").getString("category");
+    String subcategory = requestBody.getJsonObject("profile").getString("subcategory");
+    JsonObject registered =
+        requestBody.getJsonObject("profile").getJsonObject("addresses").getJsonObject("registered");
+    String street1 = registered.getString("street1");
+    String street2 = registered.getString("street2");
+    String city = registered.getString("city");
+    String state = registered.getString("state");
+    String postalCode = registered.getString("postalCode");
+    String country = registered.getString("country");
+    JsonObject registeredJson = new JsonObject().put("street1", street1).put("street2", street2).put("city", city)
+        .put("state", state).put("postal_code", postalCode).put("country", country);
+    JsonObject addressJson = new JsonObject().put("registered", registeredJson);
+
+    JsonObject profileJson =
+        new JsonObject()
+            .put("category", category)
+            .put("subcategory", subcategory)
+            .put("addresses", addressJson);
 
     JsonObject details =
         new JsonObject()
@@ -136,6 +126,7 @@ public class UpdateLinkedAccount {
             .put("legal_business_name", legalBusinessName)
             .put("profile", profileJson)
             .put("legal_info", legalInfoJson);
+    String customerFacingBusinessName = requestBody.getString("customerFacingBusinessName");
 
     setCustomerFacingBusinessName(legalBusinessName);
     /* customer facing business name is not a necessary field in the request body
@@ -145,6 +136,8 @@ public class UpdateLinkedAccount {
       setCustomerFacingBusinessName(customerFacingBusinessName);
       details.put("customer_facing_business_name", customerFacingBusinessName);
     }
+    String contactName = requestBody.getString("contactName");
+
     if (StringUtils.isNotBlank(contactName)) {
       details.put("contact_name", contactName);
     }

@@ -32,7 +32,7 @@ public interface ConsumerService {
    * @param consumer as User object
    * @param request which is a JsonObject
    * @param handler which is a Request Handler
-   * @return ConsumerService which ia service
+   * @return ConsumerService which is a service
    */
   @Fluent
   ConsumerService listResources(
@@ -44,7 +44,7 @@ public interface ConsumerService {
    * @param consumer as User object
    * @param request which is a JsonObject
    * @param handler which is a Request Handler
-   * @return ConsumerService which ia service
+   * @return ConsumerService which is a service
    */
   @Fluent
   ConsumerService listProviders(
@@ -56,7 +56,7 @@ public interface ConsumerService {
    * @param consumer as User object
    * @param request which is a JsonObject
    * @param handler which is a Request Handler
-   * @return ConsumerService which ia service
+   * @return ConsumerService which is a service
    */
   @Fluent
   ConsumerService listProducts(
@@ -65,10 +65,10 @@ public interface ConsumerService {
   /**
    * The createOrder method creates an order for the consumer against a product variant
    *
-   * @param request
+   * @param request to Create order as Json object containing product variant ID
    * @param user Consumer User
-   * @param handler
-   * @return
+   * @param handler which is a Request Handler
+   * @return ConsumerService which is a service
    */
   @Fluent
   ConsumerService createOrder(
@@ -96,7 +96,7 @@ public interface ConsumerService {
    * @param user Consumer user
    * @param request query param if any
    * @param handler Asynchronous JsonObject handler that contains the list of purchases
-   * @return
+   * @return ConsumerService which is a service
    */
   @Fluent
   ConsumerService listPurchase(

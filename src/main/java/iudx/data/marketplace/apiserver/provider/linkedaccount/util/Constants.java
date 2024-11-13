@@ -1,4 +1,4 @@
-package iudx.data.marketplace.apiserver.provider.linkedAccount.util;
+package iudx.data.marketplace.apiserver.provider.linkedaccount.util;
 
 public class Constants {
   public static final String INSERT_MERCHANT_INFO_QUERY =

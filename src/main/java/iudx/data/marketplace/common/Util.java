@@ -78,24 +78,23 @@ public class Util {
    * @return creates a product json object with a given structure
    */
   public JsonObject getProductInfo(JsonObject row) {
-    JsonObject productJson =
-        new JsonObject()
-            .put(
-                "product",
-                new JsonObject()
+    JsonObject productJson = new JsonObject().put("product", new JsonObject()
                     .put("productId", row.getString("productId"))
                     .put("productVariantId", row.getString("productVariantId"))
                     .put("resources", row.getJsonArray("resources"))
                     .put("productVariantName", row.getString("productVariantName"))
                     .put("price", row.getFloat("price"))
                     .put("expiryInMonths", row.getInteger("expiryInMonths")));
+    removeRedundantKeys(row);
+    return productJson;
+  }
 
+  private void removeRedundantKeys(JsonObject row) {
     row.remove("productId");
     row.remove("productVariantId");
     row.remove("resources");
     row.remove("price");
     row.remove("expiryInMonths");
     row.remove("productVariantName");
-    return productJson;
   }
 }

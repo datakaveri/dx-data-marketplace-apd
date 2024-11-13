@@ -61,10 +61,7 @@ public class ConsumerApis {
 
     ValidationHandler resourceValidationHandler = new ValidationHandler(RequestType.RESOURCE);
     ValidationHandler providerValidationHandler = new ValidationHandler(RequestType.PROVIDER);
-    ValidationHandler orderValidationHandler = new ValidationHandler(RequestType.ORDER);
-    ValidationHandler purchaseValidationHandler = new ValidationHandler(RequestType.PURCHASE);
     ExceptionHandler exceptionHandler = new ExceptionHandler();
-    ValidationHandler productVariantHandler = new ValidationHandler(RequestType.PRODUCT);
 
     consumerService = ConsumerService.createProxy(vertx, CONSUMER_SERVICE_ADDRESS);
 
@@ -89,6 +86,8 @@ public class ConsumerApis {
         .handler(this::listProducts)
         .failureHandler(exceptionHandler);
 
+    ValidationHandler purchaseValidationHandler = new ValidationHandler(RequestType.PURCHASE);
+
     router
         .get(api.getConsumerListPurchases())
         .handler(purchaseValidationHandler)
@@ -96,12 +95,16 @@ public class ConsumerApis {
         .handler(this::listPurchases)
         .failureHandler(exceptionHandler);
 
+    ValidationHandler productVariantHandler = new ValidationHandler(RequestType.PRODUCT);
+
     router
         .get(api.getConsumerProductVariantPath())
         .handler(productVariantHandler)
         .handler(AuthHandler.create(authenticationService, api, postgresService, authClient))
         .handler(this::listProductVariants)
         .failureHandler(exceptionHandler);
+
+    ValidationHandler orderValidationHandler = new ValidationHandler(RequestType.ORDER);
 
     router
         .post(CONSUMER_PATH + ORDERS_PATH + "/:productVariantId")
@@ -263,14 +266,6 @@ public class ConsumerApis {
         });
   }
 
-  private void handleFailureResponse(RoutingContext routingContext, Throwable cause) {
-    routingContext
-        .response()
-        .putHeader(CONTENT_TYPE, APPLICATION_JSON)
-        .setStatusCode(400)
-        .end(cause.getMessage());
-  }
-
   private void handleSuccessResponse(
       RoutingContext routingContext, int statusCode, JsonObject result) {
 
@@ -290,7 +285,17 @@ public class ConsumerApis {
             .setStatusCode(statusCode)
             .end();
         break;
+      default:
+        break;
     }
+  }
+
+  private void handleFailureResponse(RoutingContext routingContext, Throwable cause) {
+    routingContext
+        .response()
+        .putHeader(CONTENT_TYPE, APPLICATION_JSON)
+        .setStatusCode(400)
+        .end(cause.getMessage());
   }
 
   /**

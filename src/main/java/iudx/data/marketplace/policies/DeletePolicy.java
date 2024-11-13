@@ -54,7 +54,6 @@ public class DeletePolicy {
   public Future<JsonObject> executeUpdateQuery(String query, UUID policyUuid, User user) {
     LOG.debug("inside executeUpdateQuery");
     Promise<JsonObject> promise = Promise.promise();
-//    Tuple tuple = Tuple.of(policyUuid);
     JsonObject param = new JsonObject().put("$1", policyUuid.toString());
 
     postgresService.executePreparedQuery(

@@ -20,7 +20,7 @@ import io.vertx.ext.web.handler.TimeoutHandler;
 import iudx.data.marketplace.apiserver.handlers.AuthHandler;
 import iudx.data.marketplace.apiserver.handlers.ExceptionHandler;
 import iudx.data.marketplace.apiserver.handlers.ValidationHandler;
-import iudx.data.marketplace.apiserver.provider.linkedAccount.LinkedAccountService;
+import iudx.data.marketplace.apiserver.provider.linkedaccount.LinkedAccountService;
 import iudx.data.marketplace.apiserver.util.RequestType;
 import iudx.data.marketplace.authenticator.AuthClient;
 import iudx.data.marketplace.authenticator.AuthenticationService;
@@ -95,7 +95,6 @@ public class ApiServerVerticle extends AbstractVerticle {
     webClientOptions.setTrustAll(false).setVerifyHost(true).setSsl(true);
     webClient = WebClient.create(vertx, webClientOptions);
 
-    Api api = Api.getInstance(config().getString("dxApiBasePath"));
 
     /* Initialize service proxy */
     policyService = PolicyService.createProxy(vertx, POLICY_SERVICE_ADDRESS);
@@ -163,6 +162,7 @@ public class ApiServerVerticle extends AbstractVerticle {
     serverOptions.setCompressionSupported(true).setCompressionLevel(5);
     server = vertx.createHttpServer(serverOptions);
     server.requestHandler(router).listen(port);
+    Api api = Api.getInstance(config().getString("dxApiBasePath"));
 
     router
         .route(PROVIDER_PATH + "/*")
@@ -533,9 +533,6 @@ public class ApiServerVerticle extends AbstractVerticle {
     response.putHeader(CONTENT_TYPE, APPLICATION_JSON).setStatusCode(statusCode).end(result);
   }
 
-  private void handleResponse(HttpServerResponse response, int statusCode, String result) {
-    response.putHeader(CONTENT_TYPE, APPLICATION_JSON).setStatusCode(statusCode).end(result);
-  }
 
   /**
    * Handles Failed HTTP Response
@@ -580,6 +577,10 @@ public class ApiServerVerticle extends AbstractVerticle {
       LOGGER.error("Error : Expecting JSON from backend service [ jsonFormattingException ] ");
       handleResponse(response, BAD_REQUEST, ResponseUrn.BACKING_SERVICE_FORMAT_URN);
     }
+  }
+
+  private void handleResponse(HttpServerResponse response, int statusCode, String result) {
+    response.putHeader(CONTENT_TYPE, APPLICATION_JSON).setStatusCode(statusCode).end(result);
   }
 
   private void handleResponse(
