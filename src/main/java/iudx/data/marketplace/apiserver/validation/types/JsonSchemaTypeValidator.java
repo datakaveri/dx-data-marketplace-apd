@@ -63,11 +63,11 @@ public class JsonSchemaTypeValidator implements Validator {
 
     LOGGER.debug(schemaPath);
     final JsonSchema schema;
-    try {
-      final JsonNode sc = loadResource(schemaPath);
-    } catch (Exception e) {
-      LOGGER.error("Validation Error {}", e.getMessage());
-    }
+//    try {
+//      final JsonNode sc = loadResource(schemaPath);
+//    } catch (Exception e) {
+//      LOGGER.error("Validation Error {}", e.getMessage());
+//    }
     final JsonNode schemaNode = loadResource(schemaPath);
     LOGGER.debug(schemaNode.asText());
     final JsonSchemaFactory factory = JsonSchemaFactory.byDefault();

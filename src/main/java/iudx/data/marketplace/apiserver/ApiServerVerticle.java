@@ -63,7 +63,6 @@ public class ApiServerVerticle extends AbstractVerticle {
   private WebClientOptions webClientOptions;
   private AuthenticationService authenticationService;
   private LinkedAccountService linkedAccountService;
-  private AuditingService auditingService;
   private WebhookService webhookService;
 
   /**
@@ -329,7 +328,6 @@ public class ApiServerVerticle extends AbstractVerticle {
 
     JsonObject requestBody = routingContext.body().asJsonObject();
     HttpServerRequest request = routingContext.request();
-    HttpServerResponse response = routingContext.response();
     String xRazorpaySignature = request.headers().get(HEADER_X_RAZORPAY_SIGNATURE);
 
     razorPayService
@@ -349,7 +347,6 @@ public class ApiServerVerticle extends AbstractVerticle {
   private void paymentFailedRequestHandler(RoutingContext routingContext) {
 
     JsonObject requestBody = routingContext.body().asJsonObject();
-    HttpServerRequest request = routingContext.request();
     HttpServerResponse response = routingContext.response();
 
     LOGGER.debug(requestBody);
@@ -374,7 +371,6 @@ public class ApiServerVerticle extends AbstractVerticle {
   private void paymentAuthorizedRequestHandler(RoutingContext routingContext) {
 
     JsonObject requestBody = routingContext.body().asJsonObject();
-    HttpServerRequest request = routingContext.request();
     HttpServerResponse response = routingContext.response();
 
     LOGGER.debug(requestBody);
@@ -385,7 +381,6 @@ public class ApiServerVerticle extends AbstractVerticle {
   private void orderPaidRequestHandler(RoutingContext routingContext) {
 
     JsonObject requestBody = routingContext.body().asJsonObject();
-    HttpServerRequest request = routingContext.request();
     HttpServerResponse response = routingContext.response();
 
     String orderId =
