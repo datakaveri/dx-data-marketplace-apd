@@ -327,6 +327,8 @@
                         <exclude>**/*Service.class</exclude>
 
 
+                        <!-- Excluding package info -->
+                        <exclude>**/package-info.class</exclude>
                         <!-- Caller class for policy  -->
                         <exclude>iudx/data/marketplace/policies/PolicyServiceImpl.class</exclude>
                         <!-- deployment helper classes -->
