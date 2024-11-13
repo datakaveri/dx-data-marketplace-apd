@@ -68,9 +68,9 @@ public class ProviderApis {
     ValidationHandler variantValidationHandler =
         new ValidationHandler(vertx, RequestType.PRODUCT_VARIANT);
     ValidationHandler deleteVariantValidationHandler =
-            new ValidationHandler(vertx, RequestType.DELETE_PRODUCT_VARIANT);
+        new ValidationHandler(vertx, RequestType.DELETE_PRODUCT_VARIANT);
     ValidationHandler listVariantValidationHandler =
-            new ValidationHandler(vertx, RequestType.LIST_PRODUCT_VARIANT);
+        new ValidationHandler(vertx, RequestType.LIST_PRODUCT_VARIANT);
     ValidationHandler resourceValidationHandler =
         new ValidationHandler(vertx, RequestType.RESOURCE);
     ValidationHandler purchaseValidationHandler =
@@ -162,11 +162,10 @@ public class ProviderApis {
             } else if (errorMessage.contains(ResponseUrn.INTERNAL_SERVER_ERR_URN.getMessage())) {
               routingContext.fail(
                   new DxRuntimeException(500, ResponseUrn.INTERNAL_SERVER_ERR_URN, errorMessage));
-            } else if( errorMessage.contains(ResponseUrn.FORBIDDEN_URN.getUrn()))
-            {
-              handleFailureResponse(routingContext, errorMessage, HttpStatusCode.FORBIDDEN.getValue());
-            }
-            else {
+            } else if (errorMessage.contains(ResponseUrn.FORBIDDEN_URN.getUrn())) {
+              handleFailureResponse(
+                  routingContext, errorMessage, HttpStatusCode.FORBIDDEN.getValue());
+            } else {
               handleFailureResponse(routingContext, handler.cause());
             }
           }
@@ -233,18 +232,21 @@ public class ProviderApis {
     String productId = requestParams.get("productId");
     String paymentStatus = requestParams.get("paymentStatus");
     JsonObject requestJson =
-        new JsonObject().put("resourceId", resourceId).put("productId", productId).put("paymentStatus", paymentStatus);
-    variantService
-            .listPurchase(provider, requestJson, handler -> {
-              if(handler.succeeded())
-              {
-                handleSuccessResponse(routingContext, HttpStatusCode.SUCCESS.getValue(), handler.result());
-              }
-              else
-              {
-                handleFailure(routingContext, handler.cause().getMessage());
-              }
-            });
+        new JsonObject()
+            .put("resourceId", resourceId)
+            .put("productId", productId)
+            .put("paymentStatus", paymentStatus);
+    variantService.listPurchase(
+        provider,
+        requestJson,
+        handler -> {
+          if (handler.succeeded()) {
+            handleSuccessResponse(
+                routingContext, HttpStatusCode.SUCCESS.getValue(), handler.result());
+          } else {
+            handleFailure(routingContext, handler.cause().getMessage());
+          }
+        });
   }
 
   private void handleCreateProductVariant(RoutingContext routingContext) {
@@ -268,7 +270,7 @@ public class ProviderApis {
                       ResponseUrn.RESOURCE_ALREADY_EXISTS_URN,
                       ResponseUrn.RESOURCE_ALREADY_EXISTS_URN.getMessage()));
 
-            } else if (errMessage.contains(ResponseUrn.FORBIDDEN_URN.getUrn())){
+            } else if (errMessage.contains(ResponseUrn.FORBIDDEN_URN.getUrn())) {
               handleFailureResponse(
                   routingContext, errMessage, HttpStatusCode.FORBIDDEN.getValue());
             } else {
@@ -335,8 +337,7 @@ public class ProviderApis {
           if (handler.succeeded()) {
             handleSuccessResponse(routingContext, 200, handler.result());
           } else {
-            handleFailure(
-                routingContext, handler.cause().getMessage());
+            handleFailure(routingContext, handler.cause().getMessage());
           }
         });
   }
@@ -349,12 +350,13 @@ public class ProviderApis {
         .end(cause.getMessage());
   }
 
-  private void handleFailureResponse(RoutingContext routingContext, String failureMessage, int statusCode) {
+  private void handleFailureResponse(
+      RoutingContext routingContext, String failureMessage, int statusCode) {
     routingContext
-            .response()
-            .putHeader(CONTENT_TYPE, APPLICATION_JSON)
-            .setStatusCode(statusCode)
-            .end(failureMessage);
+        .response()
+        .putHeader(CONTENT_TYPE, APPLICATION_JSON)
+        .setStatusCode(statusCode)
+        .end(failureMessage);
   }
 
   private void handleFailure(RoutingContext routingContext, String failureMessage) {

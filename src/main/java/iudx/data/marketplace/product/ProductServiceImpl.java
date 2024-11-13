@@ -62,18 +62,17 @@ public class ProductServiceImpl implements ProductService {
     return sameProviderForAll;
   }
 
-    private boolean isSameApdUrlForAll(JsonArray resourceDetails) {
-        LOGGER.debug("current APD URL is : {}",  this.apdUrl);
-        String currentApdUrl = this.apdUrl;
-        boolean sameApdUrl = true;
-        for (int i = 0; i < resourceDetails.size() && sameApdUrl; i++) {
-            String apdUrlOfResource = resourceDetails.getJsonObject(i).getString(APD_URL);
-            LOGGER.debug("APD URL of the current resource is : {}", apdUrlOfResource);
-            sameApdUrl =
-                    apdUrlOfResource.equals(currentApdUrl);
-        }
-        return sameApdUrl;
+  private boolean isSameApdUrlForAll(JsonArray resourceDetails) {
+    LOGGER.debug("current APD URL is : {}", this.apdUrl);
+    String currentApdUrl = this.apdUrl;
+    boolean sameApdUrl = true;
+    for (int i = 0; i < resourceDetails.size() && sameApdUrl; i++) {
+      String apdUrlOfResource = resourceDetails.getJsonObject(i).getString(APD_URL);
+      LOGGER.debug("APD URL of the current resource is : {}", apdUrlOfResource);
+      sameApdUrl = apdUrlOfResource.equals(currentApdUrl);
     }
+    return sameApdUrl;
+  }
 
   @Override
   public ProductService createProduct(

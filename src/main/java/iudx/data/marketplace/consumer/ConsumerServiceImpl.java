@@ -364,8 +364,7 @@ public class ConsumerServiceImpl implements ConsumerService {
     return this;
   }
 
-  Future<JsonObject> generateOrderEntry(
-      JsonObject orderInfo, String variantId, String consumerId) {
+  Future<JsonObject> generateOrderEntry(JsonObject orderInfo, String variantId, String consumerId) {
     Promise<JsonObject> promise = Promise.promise();
     QueryContainer queryContainer = getQueryContainer(orderInfo, variantId, consumerId);
 

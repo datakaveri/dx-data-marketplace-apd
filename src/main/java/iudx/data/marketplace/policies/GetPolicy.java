@@ -21,9 +21,8 @@ import static iudx.data.marketplace.policies.util.Constants.GET_POLICY_4_CONSUME
 import static iudx.data.marketplace.policies.util.Constants.GET_POLICY_4_PROVIDER_QUERY;
 
 public class GetPolicy {
-    private static final Logger LOG = LoggerFactory.getLogger(GetPolicy.class);
     public static final String FAILURE_MESSAGE = "Policy could not be fetched";
-
+    private static final Logger LOG = LoggerFactory.getLogger(GetPolicy.class);
     private final PostgresService postgresService;
 
   public GetPolicy(PostgresService postgresService) {

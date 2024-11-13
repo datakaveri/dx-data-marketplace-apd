@@ -39,10 +39,11 @@ public class LinkedAccountVerticle extends AbstractVerticle {
     razorPayService = RazorPayService.createProxy(vertx, RAZORPAY_SERVICE_ADDRESS);
 
     createLinkedAccount =
-        new CreateLinkedAccount(postgresService, api, auditingService,razorPayService);
+        new CreateLinkedAccount(postgresService, api, auditingService, razorPayService);
 
     fetchLinkedAccount = new FetchLinkedAccount(postgresService, api, razorPayService);
-    updateLinkedAccount = new UpdateLinkedAccount(postgresService, api, auditingService, razorPayService);
+    updateLinkedAccount =
+        new UpdateLinkedAccount(postgresService, api, auditingService, razorPayService);
     linkedAccountService =
         new LinkedAccountServiceImpl(createLinkedAccount, fetchLinkedAccount, updateLinkedAccount);
 

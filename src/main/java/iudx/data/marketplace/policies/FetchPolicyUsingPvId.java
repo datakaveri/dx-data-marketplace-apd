@@ -16,6 +16,7 @@ import java.util.stream.Collectors;
 import static iudx.data.marketplace.policies.util.Constants.FETCH_POLICY;
 import static iudx.data.marketplace.policies.util.Constants.FETCH_PRODUCT_VARIANT;
 import static iudx.data.marketplace.product.util.Constants.RESULTS;
+
 public class FetchPolicyUsingPvId {
   private static final Logger LOG = LoggerFactory.getLogger(FetchPolicyUsingPvId.class);
   private PostgresService postgresService;

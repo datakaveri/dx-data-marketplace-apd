@@ -16,17 +16,17 @@ public enum PaymentStatus {
     paymentStatus = value;
   }
 
-  public String getPaymentStatus()
-  {
-    return paymentStatus;
-  }
-
   public static PaymentStatus fromString(String value)
   {
     return Stream.of(values())
             .filter(element -> element.getPaymentStatus().equalsIgnoreCase(value))
             .findAny()
             .orElseThrow(() -> new DxRuntimeException(404, PAYMENT_STATUS_NOT_FOUND));
+  }
+
+  public String getPaymentStatus()
+  {
+    return paymentStatus;
   }
 
 }

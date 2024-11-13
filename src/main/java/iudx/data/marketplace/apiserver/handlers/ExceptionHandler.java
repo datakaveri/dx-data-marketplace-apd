@@ -60,10 +60,10 @@ public class ExceptionHandler implements Handler<RoutingContext> {
       LOGGER.error(failure.fillInStackTrace());
 
       String INTERNAL_ERROR_RESP =
-        new RespBuilder()
-            .withType(ResponseUrn.INTERNAL_SERVER_ERR_URN.getUrn())
-            .withTitle(ResponseUrn.INTERNAL_SERVER_ERR_URN.getMessage())
-            .getResponse();
+          new RespBuilder()
+              .withType(ResponseUrn.INTERNAL_SERVER_ERR_URN.getUrn())
+              .withTitle(ResponseUrn.INTERNAL_SERVER_ERR_URN.getMessage())
+              .getResponse();
 
       routingContext
           .response()
@@ -72,7 +72,6 @@ public class ExceptionHandler implements Handler<RoutingContext> {
           .end(INTERNAL_ERROR_RESP);
 
       routingContext.next();
-
     }
     routingContext.next();
   }
@@ -112,8 +111,6 @@ public class ExceptionHandler implements Handler<RoutingContext> {
       routingContext.next();
       return;
     }
-
-
   }
 
   /**

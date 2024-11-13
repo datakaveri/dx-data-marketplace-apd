@@ -16,14 +16,15 @@ public enum Role {
     Role(String value) {
         role = value;
     }
-    public String getRole() {
-        return role;
-    }
 
     public static Role fromString(String roleValue) {
         return Stream.of(values())
                 .filter(element -> element.getRole().equalsIgnoreCase(roleValue))
                 .findAny()
                 .orElseThrow(() -> new DxRuntimeException(404, ROLE_NOT_FOUND));
+    }
+
+    public String getRole() {
+        return role;
     }
 }

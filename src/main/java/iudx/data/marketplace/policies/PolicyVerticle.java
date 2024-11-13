@@ -46,7 +46,8 @@ public class PolicyVerticle extends AbstractVerticle {
     verifyPolicy = new VerifyPolicy(postgresServiceImpl);
     fetchPolicyUsingPvId = new FetchPolicyUsingPvId(postgresServiceImpl);
     policyService =
-            new PolicyServiceImpl(deletePolicy, createPolicy, getPolicy, verifyPolicy,fetchPolicyUsingPvId);
+        new PolicyServiceImpl(
+            deletePolicy, createPolicy, getPolicy, verifyPolicy, fetchPolicyUsingPvId);
 
     new ServiceBinder(vertx)
         .setAddress(POLICY_SERVICE_ADDRESS)

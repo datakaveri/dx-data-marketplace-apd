@@ -45,15 +45,15 @@ public class LinkedAccountServiceImpl implements LinkedAccountService {
     Promise<JsonObject> promise = Promise.promise();
 
     this.fetchLinkedAccount
-            .initiateFetchingLinkedAccount(user)
-            .onComplete(
-                    handler -> {
-                      if (handler.succeeded()) {
-                        promise.complete(handler.result());
-                      } else {
-                        promise.fail(handler.cause().getMessage());
-                      }
-                    });
+        .initiateFetchingLinkedAccount(user)
+        .onComplete(
+            handler -> {
+              if (handler.succeeded()) {
+                promise.complete(handler.result());
+              } else {
+                promise.fail(handler.cause().getMessage());
+              }
+            });
     return promise.future();
   }
 
@@ -62,15 +62,15 @@ public class LinkedAccountServiceImpl implements LinkedAccountService {
     Promise<JsonObject> promise = Promise.promise();
 
     this.updateLinkedAccount
-            .initiateUpdatingLinkedAccount(request, user)
-            .onComplete(
-                    handler -> {
-                      if (handler.succeeded()) {
-                        promise.complete(handler.result());
-                      } else {
-                        promise.fail(handler.cause().getMessage());
-                      }
-                    });
+        .initiateUpdatingLinkedAccount(request, user)
+        .onComplete(
+            handler -> {
+              if (handler.succeeded()) {
+                promise.complete(handler.result());
+              } else {
+                promise.fail(handler.cause().getMessage());
+              }
+            });
     return promise.future();
   }
 }

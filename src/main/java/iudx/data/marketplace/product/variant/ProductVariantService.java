@@ -10,7 +10,8 @@ import io.vertx.core.Vertx;
 import io.vertx.core.json.JsonObject;
 import iudx.data.marketplace.policies.User;
 
-@VertxGen @ProxyGen
+@VertxGen
+@ProxyGen
 public interface ProductVariantService {
 
   /**
@@ -26,56 +27,66 @@ public interface ProductVariantService {
   }
 
   /**
-   * The createProductVariant method implements the creation of a product variant on the IUDX data marketplace.
+   * The createProductVariant method implements the creation of a product variant on the IUDX data
+   * marketplace.
    *
    * @param request which is a JsonObject
    * @param handler which is a Request Handler
    * @return ProductVariantService which is a service
    */
   @Fluent
-  ProductVariantService createProductVariant(User user, JsonObject request, Handler<AsyncResult<JsonObject>> handler);
+  ProductVariantService createProductVariant(
+      User user, JsonObject request, Handler<AsyncResult<JsonObject>> handler);
 
   /**
-   * The updateProductVariant method implements the update of a product variant on the IUDX data marketplace.
+   * The updateProductVariant method implements the update of a product variant on the IUDX data
+   * marketplace.
    *
    * @param request which is a JsonObject
    * @param handler which is a Request Handler
    * @return ProductVariantService which is a service
    */
   @Fluent
-  ProductVariantService updateProductVariant(User user, JsonObject request, Handler<AsyncResult<JsonObject>> handler);
+  ProductVariantService updateProductVariant(
+      User user, JsonObject request, Handler<AsyncResult<JsonObject>> handler);
 
   /**
-   * The deleteProductVariant method implements the soft delete of a product variant on the IUDX data marketplace.
+   * The deleteProductVariant method implements the soft delete of a product variant on the IUDX
+   * data marketplace.
    *
    * @param request which is a JsonObject
    * @param handler which is a Request Handler
    * @return ProductVariantService which is a service
    */
   @Fluent
-  ProductVariantService deleteProductVariant(User user, JsonObject request, Handler<AsyncResult<JsonObject>> handler);
+  ProductVariantService deleteProductVariant(
+      User user, JsonObject request, Handler<AsyncResult<JsonObject>> handler);
 
   /**
-   * The listProductVariant method implements the fetch of product variant(s) on the IUDX data marketplace.
+   * The listProductVariant method implements the fetch of product variant(s) on the IUDX data
+   * marketplace.
+   *
    * @param user which is the calling user Object
    * @param request which is a JsonObject
    * @param handler which is a Request Handler
    * @return ProductVariantService which is a service
    */
   @Fluent
-  ProductVariantService listProductVariants(User user, JsonObject request, Handler<AsyncResult<JsonObject>> handler);
-
+  ProductVariantService listProductVariants(
+      User user, JsonObject request, Handler<AsyncResult<JsonObject>> handler);
 
   /**
-   * List purchase will fetch invoice related info, provider, consumer and product variant related information
-   * After the purchase is made. Both successful and failed payments are displayed
-   * List purchase will list all the purchases if no query parameters are given
-   * It can also list purchases based on the productId, resourceId if it is given in the query parameter
+   * List purchase will fetch invoice related info, provider, consumer and product variant related
+   * information After the purchase is made. Both successful and failed payments are displayed List
+   * purchase will list all the purchases if no query parameters are given It can also list
+   * purchases based on the productId, resourceId if it is given in the query parameter
+   *
    * @param user Provider user
    * @param request query param if any
    * @param handler Asynchronous JsonObject handler that contains the list of purchases
    * @return
    */
   @Fluent
-  ProductVariantService listPurchase(User user, JsonObject request, Handler<AsyncResult<JsonObject>> handler);
+  ProductVariantService listPurchase(
+      User user, JsonObject request, Handler<AsyncResult<JsonObject>> handler);
 }

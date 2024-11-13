@@ -30,13 +30,17 @@ public class ProductVerticle extends AbstractVerticle {
     razorPayService = RazorPayService.createProxy(vertx, RAZORPAY_SERVICE_ADDRESS);
 
     isAccountActivationCheckBeingDone = config().getBoolean("isAccountActivationCheckBeingDone");
-    if(!isAccountActivationCheckBeingDone)
-    {
-      LOGGER.warn("\n\n" +"account activation check is set to false. Enable it in production" + "\n\n" );
+    if (!isAccountActivationCheckBeingDone) {
+      LOGGER.warn(
+          "\n\n" + "account activation check is set to false. Enable it in production" + "\n\n");
     }
-    productService = new ProductServiceImpl(config(), postgresService, catService, razorPayService, isAccountActivationCheckBeingDone);
-
-
+    productService =
+        new ProductServiceImpl(
+            config(),
+            postgresService,
+            catService,
+            razorPayService,
+            isAccountActivationCheckBeingDone);
 
     binder = new ServiceBinder(vertx);
     consumer =

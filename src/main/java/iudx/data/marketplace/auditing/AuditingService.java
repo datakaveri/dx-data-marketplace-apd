@@ -25,6 +25,7 @@ public interface AuditingService {
    * @param httpMethod Http Method of the endpoint
    * @return Future of type void
    */
-  Future<Void> handleAuditLogs (User user, JsonObject information, String api, String httpMethod);
+  Future<Void> handleAuditLogs(User user, JsonObject information, String api, String httpMethod);
+
   Future<Void> insertAuditLogIntoRmq(JsonObject request);
 }

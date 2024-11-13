@@ -6,7 +6,6 @@ import java.util.Objects;
 
 public class AuthorizationRequest {
 
-
   private final Method method;
   private final String api;
 

@@ -14,6 +14,18 @@ import iudx.data.marketplace.policies.User;
 public interface ConsumerService {
 
   /**
+   * The createProxy helps the code generation blocks to generate proxy code.
+   *
+   * @param vertx which is the vertx instance
+   * @param address which is the proxy address
+   * @return ProductServiceVertxEBProxy which is a service proxy
+   */
+  @GenIgnore
+  static ConsumerService createProxy(Vertx vertx, String address) {
+    return new ConsumerServiceVertxEBProxy(vertx, address);
+  }
+
+  /**
    * The listResources method fetches some or all resources available on the IUDX marketplace
    * @param consumer as User object
    * @param request which is a JsonObject
@@ -62,18 +74,6 @@ public interface ConsumerService {
    */
   @Fluent
   ConsumerService listProductVariants(User user,JsonObject request, Handler<AsyncResult<JsonObject>> handler);
-
-  /**
-   * The createProxy helps the code generation blocks to generate proxy code.
-   *
-   * @param vertx which is the vertx instance
-   * @param address which is the proxy address
-   * @return ProductServiceVertxEBProxy which is a service proxy
-   */
-  @GenIgnore
-  static ConsumerService createProxy(Vertx vertx, String address) {
-    return new ConsumerServiceVertxEBProxy(vertx, address);
-  }
 
   /**
    * List purchase will fetch invoice related info, provider, consumer and product variant related information

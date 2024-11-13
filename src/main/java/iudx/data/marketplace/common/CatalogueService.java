@@ -116,7 +116,8 @@ public class CatalogueService {
                     new JsonObject().put(RESOURCE_ID, resourceID).put("totalHits", totalHits);
                 promise.complete(res);
               } else {
-                LOGGER.debug("Cat web client call to {} failed for id: {} ", catRelPath, resourceID);
+                LOGGER.debug(
+                    "Cat web client call to {} failed for id: {} ", catRelPath, resourceID);
                 promise.fail(
                     "Cat web client call to " + catItemPath + " failed for id: " + resourceID);
               }
@@ -131,11 +132,12 @@ public class CatalogueService {
     JsonArray keysArray = new JsonArray();
     JsonArray valuesArray = new JsonArray();
 
-    params.forEach(entry -> {
-      keysArray.add(entry.getKey());
-      JsonArray valueArray = new JsonArray().add(entry.getValue());
-      valuesArray.add(valueArray.getList());
-    });
+    params.forEach(
+        entry -> {
+          keysArray.add(entry.getKey());
+          JsonArray valueArray = new JsonArray().add(entry.getValue());
+          valuesArray.add(valueArray.getList());
+        });
 
     LOGGER.debug(keysArray.getList().toString());
     LOGGER.debug(valuesArray.getList().toString());
@@ -144,8 +146,9 @@ public class CatalogueService {
         .get(catPort, catHost, "/iudx/cat/v1/search")
         .addQueryParam("property", keysArray.getList().toString())
         .addQueryParam("value", valuesArray.getList().toString())
-            .send(searchApiHandler -> {
-              if(searchApiHandler.succeeded()) {
+        .send(
+            searchApiHandler -> {
+              if (searchApiHandler.succeeded()) {
                 LOGGER.debug(searchApiHandler.result().bodyAsJsonObject());
               } else {
                 LOGGER.error(searchApiHandler.cause());

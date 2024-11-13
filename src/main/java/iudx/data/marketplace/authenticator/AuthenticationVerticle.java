@@ -30,6 +30,7 @@ public class AuthenticationVerticle extends AbstractVerticle {
   private MessageConsumer<JsonObject> consumer;
   private WebClient webClient;
   private Api api;
+
   static WebClient createWebClient(Vertx vertx, JsonObject config) {
     return createWebClient(vertx, config, false);
   }
@@ -115,4 +116,5 @@ public class AuthenticationVerticle extends AbstractVerticle {
               }
             });
     return promise.future();
-  }}
+  }
+}

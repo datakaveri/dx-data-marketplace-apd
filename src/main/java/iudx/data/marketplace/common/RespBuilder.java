@@ -13,8 +13,8 @@ public class RespBuilder {
     response.put(JSON_TYPE, type);
     return this;
   }
-  public RespBuilder withType(int statusCode)
-  {
+
+  public RespBuilder withType(int statusCode) {
     response.put(JSON_TYPE, statusCode);
     return this;
   }
@@ -38,6 +38,7 @@ public class RespBuilder {
     response.put(RESULTS, result);
     return this;
   }
+
   public JsonObject getJsonResponse() {
     return response;
   }

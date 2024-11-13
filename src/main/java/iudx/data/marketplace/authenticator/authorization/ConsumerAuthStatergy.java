@@ -11,7 +11,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-
 import static iudx.data.marketplace.authenticator.authorization.Method.GET;
 import static iudx.data.marketplace.authenticator.authorization.Method.POST;
 
@@ -20,9 +19,11 @@ public class ConsumerAuthStatergy implements AuthorizationStatergy {
   private static volatile ConsumerAuthStatergy instance;
 
   Map<String, List<AuthorizationRequest>> consumerAuthorizationRules = new HashMap<>();
+
   private ConsumerAuthStatergy(Api apis) {
     buildPermissions(apis);
   }
+
   public static ConsumerAuthStatergy getInstance(Api apis) {
     if (instance == null) {
       synchronized (ConsumerAuthStatergy.class) {
@@ -33,6 +34,7 @@ public class ConsumerAuthStatergy implements AuthorizationStatergy {
     }
     return instance;
   }
+
   private void buildPermissions(Api apis) {
     // api access list
     List<AuthorizationRequest> apiAccessList = new ArrayList<>();
@@ -50,6 +52,7 @@ public class ConsumerAuthStatergy implements AuthorizationStatergy {
     apiAccessList.add(new AuthorizationRequest(GET, apis.getPoliciesUrl()));
     consumerAuthorizationRules.put("api", apiAccessList);
   }
+
   @Override
   public boolean isAuthorized(AuthorizationRequest authorizationRequest, JwtData jwtData) {
     String endpoint = authorizationRequest.getApi();

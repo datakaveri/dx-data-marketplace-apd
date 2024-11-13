@@ -140,11 +140,6 @@ public class AuthenticationServiceImpl implements AuthenticationService {
     return this;
   }
 
-  // class to contain intermediate data for token introspection
-  final class ResultContainer {
-    JwtData jwtData;
-  }
-
   Future<JwtData> decodeJwt(String jwtToken) {
     Promise<JwtData> promise = Promise.promise();
     TokenCredentials credentials = new TokenCredentials(jwtToken);
@@ -164,6 +159,11 @@ public class AuthenticationServiceImpl implements AuthenticationService {
                       promise.fail("failed to decode/validate jwt token : " + err.getMessage());
                     });
     return promise.future();
+  }
+
+  // class to contain intermediate data for token introspection
+  final class ResultContainer {
+    JwtData jwtData;
   }
 
 

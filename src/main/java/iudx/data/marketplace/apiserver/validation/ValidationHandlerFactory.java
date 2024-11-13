@@ -16,7 +16,7 @@ public class ValidationHandlerFactory {
   private static final Logger LOGGER = LogManager.getLogger(ValidationHandlerFactory.class);
 
   public List<Validator> build(
-          final RequestType requestType, final MultiMap parameters, final JsonObject body) {
+      final RequestType requestType, final MultiMap parameters, final JsonObject body) {
     LOGGER.debug("getValidation4Context() started for : " + requestType);
     LOGGER.debug("type : " + requestType);
     List<Validator> validator = null;
@@ -79,6 +79,7 @@ public class ValidationHandlerFactory {
     validators.add(new UuidTypeValidator(parameters.get(PRODUCT_VARIANT_ID), true));
     return validators;
   }
+
   private List<Validator> getPaymentWebhookValidator(JsonObject body) {
     List<Validator> validators = new ArrayList<>();
     validators.add(new JsonSchemaTypeValidator(body, RequestType.ORDER_PAID_WEBHOOK));
@@ -91,10 +92,11 @@ public class ValidationHandlerFactory {
     validators.add(new ProductIdTypeValidator(parameters.get("productId"), true));
     return validators;
   }
+
   private List<Validator> getPurchaseValidator(MultiMap parameters) {
     List<Validator> validators = new ArrayList<>();
 
-    validators.add(new UuidTypeValidator(parameters.get("resourceId"),false));
+    validators.add(new UuidTypeValidator(parameters.get("resourceId"), false));
     validators.add(new ProductIdTypeValidator(parameters.get("productId"), false));
     validators.add(new OrderIdTypeValidator(parameters.get("orderId"), false));
     return validators;
@@ -112,12 +114,12 @@ public class ValidationHandlerFactory {
     return validators;
   }
 
-  private List<Validator> getPutLinkedAccountValidator(JsonObject body, RequestType requestType)
-  {
+  private List<Validator> getPutLinkedAccountValidator(JsonObject body, RequestType requestType) {
     List<Validator> validators = new ArrayList<>();
     validators.add(new JsonSchemaTypeValidator(body, requestType));
     return validators;
   }
+
   private List<Validator> getOrderValidator(MultiMap parameters) {
     List<Validator> validators = new ArrayList<>();
     validators.add(new UuidTypeValidator(parameters.get(PRODUCT_VARIANT_ID), true));
@@ -152,7 +154,7 @@ public class ValidationHandlerFactory {
   }
 
   private List<Validator> getProductValidators(
-          final MultiMap parameters, final JsonObject body, final RequestType requestType) {
+      final MultiMap parameters, final JsonObject body, final RequestType requestType) {
     List<Validator> validators = new ArrayList<>();
 
     if (body == null || body.isEmpty()) {
@@ -165,7 +167,7 @@ public class ValidationHandlerFactory {
   }
 
   private List<Validator> getProductVariantValidators(
-          final MultiMap parameters, final JsonObject body, final RequestType requestType) {
+      final MultiMap parameters, final JsonObject body, final RequestType requestType) {
     List<Validator> validators = new ArrayList<>();
 
     if (body == null || body.isEmpty()) {
@@ -177,15 +179,14 @@ public class ValidationHandlerFactory {
     return validators;
   }
 
-  private List<Validator> getDeleteProductVariantValidators(final MultiMap parameters, final  RequestType requestType)
-  {
+  private List<Validator> getDeleteProductVariantValidators(
+      final MultiMap parameters, final RequestType requestType) {
     List<Validator> validators = new ArrayList<>();
     validators.add(new UuidTypeValidator(parameters.get(PRODUCT_VARIANT_ID), true));
     return validators;
   }
 
-  private List<Validator> listProductVariantValidators(final MultiMap parameters)
-  {
+  private List<Validator> listProductVariantValidators(final MultiMap parameters) {
     List<Validator> validators = new ArrayList<>();
     validators.add(new ProductIdTypeValidator(parameters.get(PRODUCT_ID), true));
     return validators;

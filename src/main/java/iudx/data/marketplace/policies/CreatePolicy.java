@@ -141,7 +141,6 @@ public class CreatePolicy {
                     return policyCreationFuture;
                   });
               return policyCreationFuture;
-
             });
 
     return future;

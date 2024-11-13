@@ -23,17 +23,24 @@ import static iudx.data.marketplace.common.ResponseUrn.SCHEMA_READ_ERROR_URN;
 
 public class JsonSchemaTypeValidator implements Validator {
   private static final Logger LOGGER = LogManager.getLogger(JsonSchemaTypeValidator.class);
-
-  private final JsonObject body;
-  private final RequestType requestType;
   private static String pkg = Validator.class.getPackageName();
   private static final String PACKAGE_NAME = "/" + pkg.replace(".","/");
+  private final JsonObject body;
+  private final RequestType requestType;
 
   public JsonSchemaTypeValidator(JsonObject body, RequestType requestType) {
     this.body = body;
     this.requestType = requestType;
     isValid();
   }
+
+  public static JsonNode loadResource(final String name) throws IOException {
+    return JsonLoader.fromResource(name);
+  }
+
+  public static JsonNode loadString(final String obj) throws IOException {
+    return JsonLoader.fromString(obj);
+    }
 
   @Override
   public boolean isValid() {
@@ -83,13 +90,6 @@ public class JsonSchemaTypeValidator implements Validator {
     return isValid;
   }
 
-  public static JsonNode loadResource(final String name) throws IOException {
-    return JsonLoader.fromResource(name);
-  }
-
-  public static JsonNode loadString(final String obj) throws IOException {
-    return JsonLoader.fromString(obj);
-    }
   @Override
   public int failureCode() {
     return HttpStatusCode.BAD_REQUEST.getValue();

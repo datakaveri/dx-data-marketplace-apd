@@ -38,39 +38,39 @@ public class QueryBuilder {
 
     // Product Table entry
     queries.add(
-            new StringBuilder(
-                    INSERT_PRODUCT_QUERY
-                            .replace("$0", productTable)
-                            .replace("$1", productID)
-                            .replace("$2", providerID)
-                            .replace("$3", providerName)
-                            .replace("$4", Status.ACTIVE.toString()))
-                    .toString());
+        new StringBuilder(
+                INSERT_PRODUCT_QUERY
+                    .replace("$0", productTable)
+                    .replace("$1", productID)
+                    .replace("$2", providerID)
+                    .replace("$3", providerName)
+                    .replace("$4", Status.ACTIVE.toString()))
+            .toString());
 
     // Resource Table entry
     resourceDetails.forEach(
-            resource -> {
-              queries.add(
-                      new StringBuilder(
-                              INSERT_RESOURCE_QUERY
-                                      .replace("$0", resourceTable)
-                                      .replace("$1", ((JsonObject) resource).getString(RESOURCE_ID))
-                                      .replace("$2", ((JsonObject) resource).getString(RESOURCE_NAME))
-                                      .replace("$3", providerID)
-                                      .replace("$4", providerName)
-                                      .replace("$5", request.getString(RESOURCE_SERVER))
-                                      .replace("$6", ((JsonObject) resource).getString("accessPolicy")))
-                              .toString());
+        resource -> {
+          queries.add(
+              new StringBuilder(
+                      INSERT_RESOURCE_QUERY
+                          .replace("$0", resourceTable)
+                          .replace("$1", ((JsonObject) resource).getString(RESOURCE_ID))
+                          .replace("$2", ((JsonObject) resource).getString(RESOURCE_NAME))
+                          .replace("$3", providerID)
+                          .replace("$4", providerName)
+                          .replace("$5", request.getString(RESOURCE_SERVER))
+                          .replace("$6", ((JsonObject) resource).getString("accessPolicy")))
+                  .toString());
 
-              // Product-Resource relationship table entry
-              queries.add(
-                      new StringBuilder(
-                              INSERT_P_R_REL_QUERY
-                                      .replace("$0", productResourceRelationTable)
-                                      .replace("$1", productID)
-                                      .replace("$2", ((JsonObject) resource).getString(RESOURCE_ID)))
-                              .toString());
-            });
+          // Product-Resource relationship table entry
+          queries.add(
+              new StringBuilder(
+                      INSERT_P_R_REL_QUERY
+                          .replace("$0", productResourceRelationTable)
+                          .replace("$1", productID)
+                          .replace("$2", ((JsonObject) resource).getString(RESOURCE_ID)))
+                  .toString());
+        });
 
     LOGGER.debug("Queries : " + queries);
     return queries;
@@ -80,11 +80,11 @@ public class QueryBuilder {
 
     StringBuilder query;
     query =
-            new StringBuilder(
-                    LIST_PRODUCT_FOR_RESOURCE
-                            .replace("$0", productTable)
-                            .replace("$9", productResourceRelationTable)
-                            .replace("$8", resourceTable));
+        new StringBuilder(
+            LIST_PRODUCT_FOR_RESOURCE
+                .replace("$0", productTable)
+                .replace("$9", productResourceRelationTable)
+                .replace("$8", resourceTable));
     if (request.containsKey("resourceId")) {
       query.append(" and rt._id=$4");
     }
@@ -96,13 +96,13 @@ public class QueryBuilder {
 
   public String buildProductDetailsQuery(String productID, String providerId) {
     StringBuilder query =
-            new StringBuilder(
-                    SELECT_PRODUCT_DETAILS
-                            .replace("$0", productTable)
-                            .replace("$9", productResourceRelationTable)
-                            .replace("$8", resourceTable)
-                            .replace("$1", productID)
-                            .replace("$2", providerId));
+        new StringBuilder(
+            SELECT_PRODUCT_DETAILS
+                .replace("$0", productTable)
+                .replace("$9", productResourceRelationTable)
+                .replace("$8", resourceTable)
+                .replace("$1", productID)
+                .replace("$2", providerId));
 
     return query.toString();
   }
@@ -111,23 +111,22 @@ public class QueryBuilder {
 
     JsonArray resources = request.getJsonArray(RESOURCES_ARRAY);
 
-
     // UUID for each product variant.
     String pvID = supplier.get();
 
     LOGGER.debug("request is : " + request.encodePrettily());
     StringBuilder query =
-            new StringBuilder(
-                    INSERT_PV_QUERY
-                            .replace("$0", productVariantTable)
-                            .replace("$1", pvID)
-                            .replace("$2", request.getString("provider_id"))
-                            .replace("$3", request.getString(PRODUCT_ID))
-                            .replace("$4", request.getString(Constants.PRODUCT_VARIANT_NAME))
-                            .replace("$5", resources.encode())
-                            .replace("$6", request.getDouble(PRICE).toString())
-                            .replace("$7", request.getInteger(DURATION).toString())
-                            .replace("$s", Status.ACTIVE.toString()));
+        new StringBuilder(
+            INSERT_PV_QUERY
+                .replace("$0", productVariantTable)
+                .replace("$1", pvID)
+                .replace("$2", request.getString("provider_id"))
+                .replace("$3", request.getString(PRODUCT_ID))
+                .replace("$4", request.getString(Constants.PRODUCT_VARIANT_NAME))
+                .replace("$5", resources.encode())
+                .replace("$6", request.getDouble(PRICE).toString())
+                .replace("$7", request.getInteger(DURATION).toString())
+                .replace("$s", Status.ACTIVE.toString()));
 
     LOGGER.debug(query);
     return query.toString();
@@ -135,34 +134,27 @@ public class QueryBuilder {
 
   public String updateProductVariantStatusQuery(String productID, String variant) {
     StringBuilder query =
-            new StringBuilder(
-                    UPDATE_PV_STATUS
-                            .replace("$0", productVariantTable)
-                            .replace("$1", productID)
-                            .replace("$2", variant)
-                            .replace("$3", Status.ACTIVE.toString())
-                            .replace("$4", Status.INACTIVE.toString()));
+        new StringBuilder(
+            UPDATE_PV_STATUS
+                .replace("$0", productVariantTable)
+                .replace("$1", productID)
+                .replace("$2", variant)
+                .replace("$3", Status.ACTIVE.toString())
+                .replace("$4", Status.INACTIVE.toString()));
 
     LOGGER.debug("Query to update pv status : {}", query);
     return query.toString();
   }
 
-  public String checkProductVariantExistence(String productId, String variantName)
-  {
+  public String checkProductVariantExistence(String productId, String variantName) {
     StringBuilder query =
-            new StringBuilder(CHECK_IF_PV_EXISTS
-                    .replace("$1", productId)
-                    .replace("$2", variantName));
+        new StringBuilder(CHECK_IF_PV_EXISTS.replace("$1", productId).replace("$2", variantName));
     LOGGER.debug("Query to check pv existence : {}", query);
     return query.toString();
   }
 
-  public String checkIfProductExists(String productId, String providerId)
-  {
-    StringBuilder query = new StringBuilder(
-            CHECK_IF_PRODUCT_EXISTS
-                    .replace("$1", productId)
-    );
+  public String checkIfProductExists(String productId, String providerId) {
+    StringBuilder query = new StringBuilder(CHECK_IF_PRODUCT_EXISTS.replace("$1", productId));
     LOGGER.debug("Query to check if product exists : {}", query);
     return query.toString();
   }
@@ -182,23 +174,22 @@ public class QueryBuilder {
 
   public String selectProductVariant(String productID, String variantName) {
     StringBuilder query =
-            new StringBuilder(
-                    SELECT_PV_QUERY
-                            .replace("$0", productVariantTable)
-                            .replace("$1", productID)
-                            .replace("$2", variantName)
-                            .replace("$3", Status.ACTIVE.toString()));
+        new StringBuilder(
+            SELECT_PV_QUERY
+                .replace("$0", productVariantTable)
+                .replace("$1", productID)
+                .replace("$2", variantName)
+                .replace("$3", Status.ACTIVE.toString()));
     LOGGER.debug("select product variant query : {}", query);
     return query.toString();
   }
 
   public String listProductVariants(JsonObject request, String providerId) {
 
-    StringBuilder query = new StringBuilder(
-            FETCH_ACTIVE_PRODUCT_VARIANTS);
+    StringBuilder query = new StringBuilder(FETCH_ACTIVE_PRODUCT_VARIANTS);
     query.append(" AND P.\"providerId\"=$3");
 
-    if(request.containsKey(Constants.PRODUCT_VARIANT_NAME)) {
+    if (request.containsKey(Constants.PRODUCT_VARIANT_NAME)) {
       query.append(" AND P.\"productVariantName\"=$4");
     }
     query.append(" ORDER BY P.\"updatedAt\" DESC");
@@ -215,121 +206,93 @@ public class QueryBuilder {
     return request;
   }
 
-  public String listPurchaseForProviderDuringPendingStatus(String providerId, String resourceId, String productId, String rsUrl)
-  {
+  public String listPurchaseForProviderDuringPendingStatus(
+      String providerId, String resourceId, String productId, String rsUrl) {
     boolean isProductIdPresent = StringUtils.isNotBlank(productId);
     boolean isResourceIdPresent = StringUtils.isNotBlank(resourceId);
 
     StringBuilder query =
-            new StringBuilder(LIST_PENDING_PAYMENTS_4_PROVIDER.replace("$1", providerId).replace("$2", rsUrl));
+        new StringBuilder(
+            LIST_PENDING_PAYMENTS_4_PROVIDER.replace("$1", providerId).replace("$2", rsUrl));
 
-    if(isProductIdPresent && !isResourceIdPresent)
-    {
-      query = new StringBuilder(LIST_PENDING_PAYMENTS_4_PROVIDER_WITH_GIVEN_PRODUCT
-              .replace("$1", productId)
-              .replace("$2", providerId)
-              .replace("$3", rsUrl));
+    if (isProductIdPresent && !isResourceIdPresent) {
+      query =
+          new StringBuilder(
+              LIST_PENDING_PAYMENTS_4_PROVIDER_WITH_GIVEN_PRODUCT
+                  .replace("$1", productId)
+                  .replace("$2", providerId)
+                  .replace("$3", rsUrl));
     }
 
-    if(isResourceIdPresent && !isProductIdPresent)
-    {
-      query = new StringBuilder(LIST_PENDING_PAYMENTS_WITH_GIVEN_RESOURCE
-              .replace("$1", resourceId)
-              .replace("$2", providerId)
-              .replace("$3", rsUrl));
+    if (isResourceIdPresent && !isProductIdPresent) {
+      query =
+          new StringBuilder(
+              LIST_PENDING_PAYMENTS_WITH_GIVEN_RESOURCE
+                  .replace("$1", resourceId)
+                  .replace("$2", providerId)
+                  .replace("$3", rsUrl));
     }
     query.append(" \n ORDER BY I.modified_at DESC ");
     LOGGER.debug("Query :" + query);
     return query.toString();
   }
 
-  public String listPurchaseForProviderDuringFailedPayment(String providerId, String resourceId, String productId, String rsUrl)
-  {
+  public String listPurchaseForProviderDuringFailedPayment(
+      String providerId, String resourceId, String productId, String rsUrl) {
     boolean isProductIdPresent = StringUtils.isNotBlank(productId);
     boolean isResourceIdPresent = StringUtils.isNotBlank(resourceId);
 
     StringBuilder query =
-            new StringBuilder(LIST_FAILED_PAYMENTS_4_PROVIDER.replace("$1", providerId).replace("$2",rsUrl));
+        new StringBuilder(
+            LIST_FAILED_PAYMENTS_4_PROVIDER.replace("$1", providerId).replace("$2", rsUrl));
 
-    if(isProductIdPresent && !isResourceIdPresent)
-    {
-      query = new StringBuilder(LIST_FAILED_PAYMENTS_4_PROVIDER_WITH_GIVEN_PRODUCT
-              .replace("$1", productId)
-              .replace("$2", providerId)
-              .replace("$3", rsUrl));
+    if (isProductIdPresent && !isResourceIdPresent) {
+      query =
+          new StringBuilder(
+              LIST_FAILED_PAYMENTS_4_PROVIDER_WITH_GIVEN_PRODUCT
+                  .replace("$1", productId)
+                  .replace("$2", providerId)
+                  .replace("$3", rsUrl));
     }
 
-    if(isResourceIdPresent && !isProductIdPresent)
-    {
-      query = new StringBuilder(LIST_FAILED_PAYMENTS_WITH_GIVEN_RESOURCE
-              .replace("$1", resourceId)
-              .replace("$2", providerId)
-              .replace("$3", rsUrl));
+    if (isResourceIdPresent && !isProductIdPresent) {
+      query =
+          new StringBuilder(
+              LIST_FAILED_PAYMENTS_WITH_GIVEN_RESOURCE
+                  .replace("$1", resourceId)
+                  .replace("$2", providerId)
+                  .replace("$3", rsUrl));
     }
     query.append(" \n ORDER BY I.modified_at DESC ");
     LOGGER.debug("Query :" + query);
     return query.toString();
   }
 
-  public String listSuccessfulPurchaseForProvider(String providerId, String resourceId, String productId,
-  String rsUrl)
-  {
+  public String listSuccessfulPurchaseForProvider(
+      String providerId, String resourceId, String productId, String rsUrl) {
     boolean isProductIdPresent = StringUtils.isNotBlank(productId);
     boolean isResourceIdPresent = StringUtils.isNotBlank(resourceId);
 
     StringBuilder query =
-            new StringBuilder(LIST_SUCCESSFUL_PAYMENTS_4_PROVIDER.replace("$1", providerId).replace("$2", rsUrl));
+        new StringBuilder(
+            LIST_SUCCESSFUL_PAYMENTS_4_PROVIDER.replace("$1", providerId).replace("$2", rsUrl));
 
-    if(isProductIdPresent && !isResourceIdPresent)
-    {
-      query = new StringBuilder(LIST_SUCCESSFUL_PAYMENTS_4_PROVIDER_WITH_GIVEN_PRODUCT
-              .replace("$1", productId)
-              .replace("$2", providerId)
-              .replace("$3", rsUrl));
+    if (isProductIdPresent && !isResourceIdPresent) {
+      query =
+          new StringBuilder(
+              LIST_SUCCESSFUL_PAYMENTS_4_PROVIDER_WITH_GIVEN_PRODUCT
+                  .replace("$1", productId)
+                  .replace("$2", providerId)
+                  .replace("$3", rsUrl));
     }
 
-    if(isResourceIdPresent && !isProductIdPresent)
-    {
-      query = new StringBuilder(LIST_SUCCESSFUL_PAYMENTS_4_PROVIDER_WITH_GIVEN_RESOURCE
-              .replace("$1", resourceId)
-              .replace("$2", providerId)
-              .replace("$3", rsUrl));
-    }
-
-
-    query.append(" \n ORDER BY I.modified_at DESC ");
-    LOGGER.debug("Query :" + query);
-    return query.toString();
-  }
-  public String listPurchaseForConsumerDuringPendingPayment(String consumerId, String resourceId, String productId, String orderId, String rsUrl)
-  {
-    boolean isProductIdPresent = StringUtils.isNotBlank(productId);
-    boolean isResourceIdPresent = StringUtils.isNotBlank(resourceId);
-    boolean isOrderIdPresent = StringUtils.isNotBlank(orderId);
-    StringBuilder query =
-            new StringBuilder(LIST_PENDING_PAYMENTS_4_CONSUMER.replace("$1", consumerId).replace("$2",rsUrl));
-
-    if(isProductIdPresent && !isResourceIdPresent)
-    {
-      query = new StringBuilder(LIST_PENDING_PAYMENTS_4_CONSUMER_WITH_GIVEN_PRODUCT
-              .replace("$1", productId)
-              .replace("$2", consumerId)
-              .replace("$3", rsUrl));
-    }
-
-    if(isResourceIdPresent && !isProductIdPresent)
-    {
-      query = new StringBuilder(LIST_PENDING_PAYMENTS_4_CONSUMER_WITH_GIVEN_RESOURCE
-              .replace("$1", resourceId)
-              .replace("$2", consumerId)
-              .replace("$3", rsUrl));
-    }
-    if(isOrderIdPresent)
-    {
-      query = new StringBuilder(LIST_PENDING_PAYMENTS_4_CONSUMER_WITH_GIVEN_ORDER
-              .replace("$1", orderId)
-              .replace("$2", consumerId)
-              .replace("$3", rsUrl));
+    if (isResourceIdPresent && !isProductIdPresent) {
+      query =
+          new StringBuilder(
+              LIST_SUCCESSFUL_PAYMENTS_4_PROVIDER_WITH_GIVEN_RESOURCE
+                  .replace("$1", resourceId)
+                  .replace("$2", providerId)
+                  .replace("$3", rsUrl));
     }
 
     query.append(" \n ORDER BY I.modified_at DESC ");
@@ -337,81 +300,125 @@ public class QueryBuilder {
     return query.toString();
   }
 
-
-  public String listPurchaseForConsumerDuringFailurePayment(String consumerId, String resourceId, String productId, String orderId, String rsUrl)
-  {
+  public String listPurchaseForConsumerDuringPendingPayment(
+      String consumerId, String resourceId, String productId, String orderId, String rsUrl) {
     boolean isProductIdPresent = StringUtils.isNotBlank(productId);
     boolean isResourceIdPresent = StringUtils.isNotBlank(resourceId);
     boolean isOrderIdPresent = StringUtils.isNotBlank(orderId);
-
     StringBuilder query =
-            new StringBuilder(LIST_FAILED_PAYMENTS_4_CONSUMER.replace("$1", consumerId).replace("$2", rsUrl));
+        new StringBuilder(
+            LIST_PENDING_PAYMENTS_4_CONSUMER.replace("$1", consumerId).replace("$2", rsUrl));
 
-    if(isProductIdPresent && !isResourceIdPresent)
-    {
-      query = new StringBuilder(LIST_FAILED_PAYMENTS_4_CONSUMER_WITH_GIVEN_PRODUCT
-              .replace("$1", productId)
-              .replace("$2", consumerId)
-              .replace("$3", rsUrl));
+    if (isProductIdPresent && !isResourceIdPresent) {
+      query =
+          new StringBuilder(
+              LIST_PENDING_PAYMENTS_4_CONSUMER_WITH_GIVEN_PRODUCT
+                  .replace("$1", productId)
+                  .replace("$2", consumerId)
+                  .replace("$3", rsUrl));
     }
 
-    if(isResourceIdPresent && !isProductIdPresent)
-    {
-      query = new StringBuilder(LIST_FAILED_PAYMENTS_4_CONSUMER_WITH_GIVEN_RESOURCE
-              .replace("$1", resourceId)
-              .replace("$2", consumerId)
-              .replace("$3", rsUrl));
+    if (isResourceIdPresent && !isProductIdPresent) {
+      query =
+          new StringBuilder(
+              LIST_PENDING_PAYMENTS_4_CONSUMER_WITH_GIVEN_RESOURCE
+                  .replace("$1", resourceId)
+                  .replace("$2", consumerId)
+                  .replace("$3", rsUrl));
     }
-    if(isOrderIdPresent)
-    {
-      query = new StringBuilder(LIST_FAILED_PAYMENTS_4_CONSUMER_WITH_GIVEN_ORDER
-              .replace("$1", orderId)
-              .replace("$2", consumerId)
-              .replace("$3", rsUrl));
+    if (isOrderIdPresent) {
+      query =
+          new StringBuilder(
+              LIST_PENDING_PAYMENTS_4_CONSUMER_WITH_GIVEN_ORDER
+                  .replace("$1", orderId)
+                  .replace("$2", consumerId)
+                  .replace("$3", rsUrl));
     }
+
     query.append(" \n ORDER BY I.modified_at DESC ");
     LOGGER.debug("Query :" + query);
     return query.toString();
   }
 
-  public String listPurchaseForConsumerDuringSuccessfulPayment(String consumerId, String resourceId, String productId, String orderId, String rsUrl)
-  {
+  public String listPurchaseForConsumerDuringFailurePayment(
+      String consumerId, String resourceId, String productId, String orderId, String rsUrl) {
     boolean isProductIdPresent = StringUtils.isNotBlank(productId);
     boolean isResourceIdPresent = StringUtils.isNotBlank(resourceId);
     boolean isOrderIdPresent = StringUtils.isNotBlank(orderId);
 
     StringBuilder query =
-            new StringBuilder(LIST_SUCCESSFUL_PAYMENTS_PAYMENTS_4_CONSUMER.replace("$1", consumerId).replace("$2", rsUrl));
+        new StringBuilder(
+            LIST_FAILED_PAYMENTS_4_CONSUMER.replace("$1", consumerId).replace("$2", rsUrl));
 
-    if(isProductIdPresent && !isResourceIdPresent)
-    {
-      query = new StringBuilder(LIST_SUCCESSFUL_PAYMENTS_4_CONSUMER_WITH_GIVEN_PRODUCT
-              .replace("$1", productId)
-              .replace("$2", consumerId)
-              .replace("$3", rsUrl));
+    if (isProductIdPresent && !isResourceIdPresent) {
+      query =
+          new StringBuilder(
+              LIST_FAILED_PAYMENTS_4_CONSUMER_WITH_GIVEN_PRODUCT
+                  .replace("$1", productId)
+                  .replace("$2", consumerId)
+                  .replace("$3", rsUrl));
     }
 
-    if(isResourceIdPresent && !isProductIdPresent)
-    {
-      query = new StringBuilder(LIST_SUCCESSFUL_PAYMENTS_4_CONSUMER_WITH_GIVEN_RESOURCE
-              .replace("$1", resourceId)
-              .replace("$2", consumerId)
-              .replace("$3", rsUrl));
+    if (isResourceIdPresent && !isProductIdPresent) {
+      query =
+          new StringBuilder(
+              LIST_FAILED_PAYMENTS_4_CONSUMER_WITH_GIVEN_RESOURCE
+                  .replace("$1", resourceId)
+                  .replace("$2", consumerId)
+                  .replace("$3", rsUrl));
     }
-    if(isOrderIdPresent)
-    {
-      query = new StringBuilder(LIST_SUCCESSFUL_PAYMENTS_4_CONSUMER_WITH_GIVEN_ORDER
-              .replace("$1", orderId)
-              .replace("$2", consumerId)
-              .replace("$3", rsUrl));
+    if (isOrderIdPresent) {
+      query =
+          new StringBuilder(
+              LIST_FAILED_PAYMENTS_4_CONSUMER_WITH_GIVEN_ORDER
+                  .replace("$1", orderId)
+                  .replace("$2", consumerId)
+                  .replace("$3", rsUrl));
     }
     query.append(" \n ORDER BY I.modified_at DESC ");
     LOGGER.debug("Query :" + query);
     return query.toString();
   }
 
+  public String listPurchaseForConsumerDuringSuccessfulPayment(
+      String consumerId, String resourceId, String productId, String orderId, String rsUrl) {
+    boolean isProductIdPresent = StringUtils.isNotBlank(productId);
+    boolean isResourceIdPresent = StringUtils.isNotBlank(resourceId);
+    boolean isOrderIdPresent = StringUtils.isNotBlank(orderId);
 
+    StringBuilder query =
+        new StringBuilder(
+            LIST_SUCCESSFUL_PAYMENTS_PAYMENTS_4_CONSUMER
+                .replace("$1", consumerId)
+                .replace("$2", rsUrl));
 
+    if (isProductIdPresent && !isResourceIdPresent) {
+      query =
+          new StringBuilder(
+              LIST_SUCCESSFUL_PAYMENTS_4_CONSUMER_WITH_GIVEN_PRODUCT
+                  .replace("$1", productId)
+                  .replace("$2", consumerId)
+                  .replace("$3", rsUrl));
+    }
 
-
+    if (isResourceIdPresent && !isProductIdPresent) {
+      query =
+          new StringBuilder(
+              LIST_SUCCESSFUL_PAYMENTS_4_CONSUMER_WITH_GIVEN_RESOURCE
+                  .replace("$1", resourceId)
+                  .replace("$2", consumerId)
+                  .replace("$3", rsUrl));
+    }
+    if (isOrderIdPresent) {
+      query =
+          new StringBuilder(
+              LIST_SUCCESSFUL_PAYMENTS_4_CONSUMER_WITH_GIVEN_ORDER
+                  .replace("$1", orderId)
+                  .replace("$2", consumerId)
+                  .replace("$3", rsUrl));
+    }
+    query.append(" \n ORDER BY I.modified_at DESC ");
+    LOGGER.debug("Query :" + query);
+    return query.toString();
+  }
 }

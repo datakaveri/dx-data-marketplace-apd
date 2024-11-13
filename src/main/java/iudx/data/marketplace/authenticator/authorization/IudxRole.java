@@ -13,16 +13,16 @@ public enum IudxRole {
     this.role = role;
   }
 
-  public String getRole() {
-    return this.role;
-  }
-
   public static IudxRole fromRole(final JwtData jwtData) {
     String role = jwtData.getRole().equalsIgnoreCase(DELEGATE.getRole()) ? jwtData.getDrl() : jwtData.getRole();
     return Stream.of(values())
       .filter(v -> v.role.equalsIgnoreCase(role))
       .findAny()
       .orElse(null);
+  }
+
+  public String getRole() {
+    return this.role;
   }
 
 

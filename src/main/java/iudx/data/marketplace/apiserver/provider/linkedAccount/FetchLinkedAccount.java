@@ -27,9 +27,7 @@ public class FetchLinkedAccount {
   String createdAt;
 
   public FetchLinkedAccount(
-      PostgresService postgresService,
-      Api api,
-      RazorPayService razorPayService) {
+      PostgresService postgresService, Api api, RazorPayService razorPayService) {
     this.postgresService = postgresService;
     this.api = api;
     this.razorPayService = razorPayService;
@@ -187,6 +185,7 @@ public class FetchLinkedAccount {
   public void setRazorpayAccountProductId(String razorpayAccountProductId) {
     this.razorpayAccountProductId = razorpayAccountProductId;
   }
+
   public String getUpdatedAt() {
     return updatedAt;
   }
@@ -194,14 +193,12 @@ public class FetchLinkedAccount {
   public void setUpdatedAt(String updatedAt) {
     this.updatedAt = updatedAt;
   }
-  public String getCreatedAt()
-  {
+
+  public String getCreatedAt() {
     return createdAt;
   }
 
-  public void setCreatedAt(String createdAt)
-  {
+  public void setCreatedAt(String createdAt) {
     this.createdAt = createdAt;
   }
-
 }

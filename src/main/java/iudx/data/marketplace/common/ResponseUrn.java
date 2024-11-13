@@ -68,19 +68,19 @@ public enum ResponseUrn {
     this.message = message;
   }
 
+  public static ResponseUrn fromCode(final String urn) {
+    return Stream.of(values())
+            .filter(v -> v.urn.equalsIgnoreCase(urn))
+            .findAny()
+            .orElse(YET_NOT_IMPLEMENTED_URN); // if backend service dont respond with urn
+  }
+
   public String getUrn() {
     return urn;
   }
 
   public String getMessage() {
     return message;
-  }
-
-  public static ResponseUrn fromCode(final String urn) {
-    return Stream.of(values())
-            .filter(v -> v.urn.equalsIgnoreCase(urn))
-            .findAny()
-            .orElse(YET_NOT_IMPLEMENTED_URN); // if backend service dont respond with urn
   }
 
   public String toString() {

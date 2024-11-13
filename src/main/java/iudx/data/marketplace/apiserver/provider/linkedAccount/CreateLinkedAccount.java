@@ -335,13 +335,14 @@ public class CreateLinkedAccount {
   public void setStatus(String status) {
     this.status = status;
   }
-  public void setAccountProductId(String rzpAccountProductId){
-    this.accountProductId = rzpAccountProductId;
-  }
 
   public String getAccountProductId()
   {
     return this.accountProductId;
+  }
+
+  public void setAccountProductId(String rzpAccountProductId){
+    this.accountProductId = rzpAccountProductId;
   }
 
   public Future<Void> addAuditLogs(String referenceId, User provider) {

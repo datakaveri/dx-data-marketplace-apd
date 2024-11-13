@@ -124,27 +124,27 @@ public final class JwtData {
   @Override
   public String toString() {
     return "JwtData [access_token="
-            + accessToken
-            + ", sub="
-            + sub
-            + ", iss="
-            + iss
-            + ", aud="
-            + aud
-            + ", exp="
-            + exp
-            + ", iat="
-            + iat
-            + ", iid="
-            + iid
-            + ", role="
-            + role
-            + ", cons="
-            + cons
-            + ", drl="
-            + drl
-            + ", did="
-            + did
-            + "]";
+        + accessToken
+        + ", sub="
+        + sub
+        + ", iss="
+        + iss
+        + ", aud="
+        + aud
+        + ", exp="
+        + exp
+        + ", iat="
+        + iat
+        + ", iid="
+        + iid
+        + ", role="
+        + role
+        + ", cons="
+        + cons
+        + ", drl="
+        + drl
+        + ", did="
+        + did
+        + "]";
   }
 }

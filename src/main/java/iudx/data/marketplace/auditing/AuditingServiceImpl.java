@@ -28,7 +28,8 @@ public class AuditingServiceImpl implements AuditingService {
   }
 
   @Override
-  public Future<Void> handleAuditLogs(User user, JsonObject information, String api, String httpMethod) {
+  public Future<Void> handleAuditLogs(
+      User user, JsonObject information, String api, String httpMethod) {
     LOGGER.debug("handleAuditLogs started");
     String userId = user.getUserId();
     ZonedDateTime zst = ZonedDateTime.now(ZoneId.of("Asia/Kolkata"));
@@ -45,18 +46,17 @@ public class AuditingServiceImpl implements AuditingService {
 
     Promise<Void> promise = Promise.promise();
     LOGGER.debug("AuditLog: " + auditLog);
-    this
-            .insertAuditLogIntoRmq(auditLog)
-            .onComplete(
-                    handler -> {
-                      if (handler.succeeded()) {
-                        LOGGER.info("Audit data published into RMQ.");
-                        promise.complete();
-                      } else {
-                        LOGGER.error("failed: " + handler.cause().getMessage());
-                        promise.complete();
-                      }
-                    });
+    this.insertAuditLogIntoRmq(auditLog)
+        .onComplete(
+            handler -> {
+              if (handler.succeeded()) {
+                LOGGER.info("Audit data published into RMQ.");
+                promise.complete();
+              } else {
+                LOGGER.error("failed: " + handler.cause().getMessage());
+                promise.complete();
+              }
+            });
 
     return promise.future();
   }

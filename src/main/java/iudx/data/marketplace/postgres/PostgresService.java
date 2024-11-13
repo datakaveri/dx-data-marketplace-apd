@@ -29,6 +29,17 @@ import java.util.List;
 public interface PostgresService {
 
   /**
+   * The createProxy helps the code generation blocks to generate proxy code.
+   * @param vertx which is the vertx instance
+   * @param address which is the proxy address
+   * @return PostgresServiceVertxRBProxy which is a service proxy
+   */
+  @GenIgnore
+  static PostgresService createProxy(Vertx vertx, String address) {
+    return new PostgresServiceVertxEBProxy(vertx, address);
+  }
+
+  /**
    * The executeQuery implements single query operations with the database.
    *
    * @param query which is a String
@@ -69,17 +80,6 @@ public interface PostgresService {
    */
   @Fluent
   PostgresService executeTransaction(final List<String> queries, Handler<AsyncResult<JsonObject>> handler);
-
-  /**
-   * The createProxy helps the code generation blocks to generate proxy code.
-   * @param vertx which is the vertx instance
-   * @param address which is the proxy address
-   * @return PostgresServiceVertxRBProxy which is a service proxy
-   */
-  @GenIgnore
-  static PostgresService createProxy(Vertx vertx, String address) {
-    return new PostgresServiceVertxEBProxy(vertx, address);
-  }
 
   @Fluent
   PostgresService checkPolicy(final String query,final JsonObject param, Handler<AsyncResult<JsonObject>> handler);

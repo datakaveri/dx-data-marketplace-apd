@@ -300,7 +300,7 @@ public class RazorPayServiceImpl implements RazorPayService {
     return promise.future();
   }
 
-   Future<JsonObject> recordPayment(JsonObject request) {
+  Future<JsonObject> recordPayment(JsonObject request) {
     Promise<JsonObject> promise = Promise.promise();
 
     StringBuilder query = new StringBuilder(RECORD_PAYMENT.replace("$0", paymentTable));

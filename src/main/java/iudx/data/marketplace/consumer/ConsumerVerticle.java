@@ -30,7 +30,10 @@ public class ConsumerVerticle extends AbstractVerticle {
 
     consumerService = new ConsumerServiceImpl(config(), postgresService, razorPayService, util);
     binder = new ServiceBinder(vertx);
-    consumer = binder.setAddress(CONSUMER_SERVICE_ADDRESS).register(ConsumerService.class, consumerService);
+    consumer =
+        binder
+            .setAddress(CONSUMER_SERVICE_ADDRESS)
+            .register(ConsumerService.class, consumerService);
     LOGGER.info("Consumer Service started");
   }
 

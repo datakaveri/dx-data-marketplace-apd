@@ -167,7 +167,6 @@ public class ApiServerVerticle extends AbstractVerticle {
     server = vertx.createHttpServer(serverOptions);
     server.requestHandler(router).listen(port);
 
-
     router
         .route(PROVIDER_PATH + "/*")
         .subRouter(
@@ -180,7 +179,8 @@ public class ApiServerVerticle extends AbstractVerticle {
                 .init());
 
     ExceptionHandler exceptionHandler = new ExceptionHandler();
-    ValidationHandler checkPolicyValidationHandler = new ValidationHandler(vertx, RequestType.CHECK_POLICY);
+    ValidationHandler checkPolicyValidationHandler =
+        new ValidationHandler(vertx, RequestType.CHECK_POLICY);
     ValidationHandler verifyValidationHandler = new ValidationHandler(vertx, RequestType.VERIFY);
     ValidationHandler postLinkedAccountHandler =
         new ValidationHandler(vertx, RequestType.POST_ACCOUNT);
@@ -192,7 +192,6 @@ public class ApiServerVerticle extends AbstractVerticle {
         .handler(AuthHandler.create(authenticationService, api, postgresService, authClient))
         .handler(this::getPoliciesHandler)
         .failureHandler(exceptionHandler);
-
 
     router
         .post(api.getProductUserMapsPath())
@@ -235,12 +234,12 @@ public class ApiServerVerticle extends AbstractVerticle {
         .handler(this::handleFetchLinkedAccount)
         .failureHandler(exceptionHandler);
 
-      router
-              .get(api.getCheckPolicyPath())
-              .handler(checkPolicyValidationHandler)
-              .handler(AuthHandler.create(authenticationService, api, postgresService, authClient))
-              .handler(this::checkPolicyHandler)
-              .failureHandler(exceptionHandler);
+    router
+        .get(api.getCheckPolicyPath())
+        .handler(checkPolicyValidationHandler)
+        .handler(AuthHandler.create(authenticationService, api, postgresService, authClient))
+        .handler(this::checkPolicyHandler)
+        .failureHandler(exceptionHandler);
 
     /*Webhook routes */
 
@@ -308,25 +307,24 @@ public class ApiServerVerticle extends AbstractVerticle {
     port = config().getInteger("httpPort") == null ? 8080 : config().getInteger("httpPort");
   }
 
-
   private void checkPolicyHandler(RoutingContext routingContext) {
-        HttpServerResponse response = routingContext.response();
+    HttpServerResponse response = routingContext.response();
 
-        User user = routingContext.get("user");
-        String productVariantId = routingContext.request().getParam("productVariantId");
-        policyService
-                .checkPolicy(productVariantId, user)
-                .onComplete(
-                        handler -> {
-                            if (handler.succeeded()) {
-                                int statusCode = handler.result().getInteger(STATUS_CODE);
-                                 String result = handler.result().getJsonObject(RESULTS).encode();
-                                handleSuccessResponse(response, statusCode, result);
-                            } else {
-                                handleFailureResponse(routingContext, handler.cause().getMessage());
-                            }
-                        });
-    }
+    User user = routingContext.get("user");
+    String productVariantId = routingContext.request().getParam("productVariantId");
+    policyService
+        .checkPolicy(productVariantId, user)
+        .onComplete(
+            handler -> {
+              if (handler.succeeded()) {
+                int statusCode = handler.result().getInteger(STATUS_CODE);
+                String result = handler.result().getJsonObject(RESULTS).encode();
+                handleSuccessResponse(response, statusCode, result);
+              } else {
+                handleFailureResponse(routingContext, handler.cause().getMessage());
+              }
+            });
+  }
 
   private void handleWebhookSignatureValidation(RoutingContext routingContext) {
 
@@ -423,10 +421,9 @@ public class ApiServerVerticle extends AbstractVerticle {
             })
         .onFailure(
             verifyFailed -> {
-                handleResponse(response, BAD_REQUEST.getValue(), verifyFailed.getMessage());
+              handleResponse(response, BAD_REQUEST.getValue(), verifyFailed.getMessage());
             });
   }
-
 
   private void printDeployedEndpoints(Router router) {
     for (Route route : router.getRoutes()) {
@@ -435,7 +432,6 @@ public class ApiServerVerticle extends AbstractVerticle {
       }
     }
   }
-
 
   private void getPoliciesHandler(RoutingContext routingContext) {
     HttpServerResponse response = routingContext.response();
@@ -545,9 +541,10 @@ public class ApiServerVerticle extends AbstractVerticle {
   private void handleSuccessResponse(HttpServerResponse response, int statusCode, String result) {
     response.putHeader(CONTENT_TYPE, APPLICATION_JSON).setStatusCode(statusCode).end(result);
   }
-    private void handleResponse(HttpServerResponse response, int statusCode, String result) {
-        response.putHeader(CONTENT_TYPE, APPLICATION_JSON).setStatusCode(statusCode).end(result);
-    }
+
+  private void handleResponse(HttpServerResponse response, int statusCode, String result) {
+    response.putHeader(CONTENT_TYPE, APPLICATION_JSON).setStatusCode(statusCode).end(result);
+  }
 
   /**
    * Handles Failed HTTP Response

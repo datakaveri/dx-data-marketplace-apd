@@ -36,6 +36,38 @@ public class PostgresServiceImpl implements PostgresService {
     this.client = pgclient;
   }
 
+  private static Future<Void> executeBatch(
+      SqlConnection conn, ConcurrentLinkedQueue<String> statements) {
+    try {
+      var statement = statements.poll();
+      if (statement == null) {
+        return Future.succeededFuture();
+      }
+      Promise<Void> promise = Promise.promise();
+
+      Collector<Row, ?, List<JsonObject>> rowCollector =
+          Collectors.mapping(row -> row.toJson(), Collectors.toList());
+      conn.query(statement)
+          .collecting(rowCollector)
+          .execute()
+          .map(rows -> rows.value())
+          .onSuccess(
+              successHandler -> {
+                executeBatch(conn, statements).onComplete(h -> {
+                  promise.complete();
+                });
+              })
+          .onFailure(
+              failureHandler -> {
+                  LOGGER.debug("Failure : {}",failureHandler.getMessage() );
+                  LOGGER.error("Fail db");
+                promise.fail(failureHandler);
+              });
+      return promise.future();
+    } catch (Throwable t) {
+      return Future.failedFuture(t);
+    }
+  }
 
   @Override
   public PostgresService executeQuery(
@@ -96,39 +128,6 @@ public class PostgresServiceImpl implements PostgresService {
               handler.handle(Future.failedFuture(response));
             });
     return this;
-  }
-
-  private static Future<Void> executeBatch(
-      SqlConnection conn, ConcurrentLinkedQueue<String> statements) {
-    try {
-      var statement = statements.poll();
-      if (statement == null) {
-        return Future.succeededFuture();
-      }
-      Promise<Void> promise = Promise.promise();
-
-      Collector<Row, ?, List<JsonObject>> rowCollector =
-          Collectors.mapping(row -> row.toJson(), Collectors.toList());
-      conn.query(statement)
-          .collecting(rowCollector)
-          .execute()
-          .map(rows -> rows.value())
-          .onSuccess(
-              successHandler -> {
-                executeBatch(conn, statements).onComplete(h -> {
-                  promise.complete();
-                });
-              })
-          .onFailure(
-              failureHandler -> {
-                  LOGGER.debug("Failure : {}",failureHandler.getMessage() );
-                  LOGGER.error("Fail db");
-                promise.fail(failureHandler);
-              });
-      return promise.future();
-    } catch (Throwable t) {
-      return Future.failedFuture(t);
-    }
   }
 
   @Override

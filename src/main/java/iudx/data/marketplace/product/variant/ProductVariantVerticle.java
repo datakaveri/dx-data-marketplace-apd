@@ -15,7 +15,7 @@ import static iudx.data.marketplace.common.Constants.PRODUCT_VARIANT_SERVICE_ADD
 public class ProductVariantVerticle extends AbstractVerticle {
   public static final Logger LOGGER = LogManager.getLogger(ProductVariantVerticle.class);
   private MessageConsumer<JsonObject> consumer;
-  private ServiceBinder  binder;
+  private ServiceBinder binder;
   private PostgresService postgresService;
   private ProductVariantService variantService;
   private Util util;
@@ -27,7 +27,10 @@ public class ProductVariantVerticle extends AbstractVerticle {
     variantService = new ProductVariantServiceImpl(config(), postgresService, util);
 
     binder = new ServiceBinder(vertx);
-    consumer = binder.setAddress(PRODUCT_VARIANT_SERVICE_ADDRESS).register(ProductVariantService.class, variantService);
+    consumer =
+        binder
+            .setAddress(PRODUCT_VARIANT_SERVICE_ADDRESS)
+            .register(ProductVariantService.class, variantService);
     LOGGER.info("Product Variant Service started");
   }
 
@@ -36,4 +39,3 @@ public class ProductVariantVerticle extends AbstractVerticle {
     binder.unregister(consumer);
   }
 }
-
