@@ -59,13 +59,10 @@ public class ConsumerApis {
 
   Router init() {
 
-    ValidationHandler resourceValidationHandler =
-        new ValidationHandler(RequestType.RESOURCE);
-    ValidationHandler providerValidationHandler =
-        new ValidationHandler(RequestType.PROVIDER);
+    ValidationHandler resourceValidationHandler = new ValidationHandler(RequestType.RESOURCE);
+    ValidationHandler providerValidationHandler = new ValidationHandler(RequestType.PROVIDER);
     ValidationHandler orderValidationHandler = new ValidationHandler(RequestType.ORDER);
-    ValidationHandler purchaseValidationHandler =
-        new ValidationHandler(RequestType.PURCHASE);
+    ValidationHandler purchaseValidationHandler = new ValidationHandler(RequestType.PURCHASE);
     ExceptionHandler exceptionHandler = new ExceptionHandler();
     ValidationHandler productVariantHandler = new ValidationHandler(RequestType.PRODUCT);
 

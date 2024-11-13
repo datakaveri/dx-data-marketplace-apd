@@ -179,10 +179,8 @@ public class ApiServerVerticle extends AbstractVerticle {
     ValidationHandler checkPolicyValidationHandler =
         new ValidationHandler(RequestType.CHECK_POLICY);
     ValidationHandler verifyValidationHandler = new ValidationHandler(RequestType.VERIFY);
-    ValidationHandler postLinkedAccountHandler =
-        new ValidationHandler(RequestType.POST_ACCOUNT);
-    ValidationHandler putLinkedAccountHandler =
-        new ValidationHandler(RequestType.PUT_ACCOUNT);
+    ValidationHandler postLinkedAccountHandler = new ValidationHandler(RequestType.POST_ACCOUNT);
+    ValidationHandler putLinkedAccountHandler = new ValidationHandler(RequestType.PUT_ACCOUNT);
 
     router
         .get(api.getPoliciesUrl())
@@ -190,10 +188,10 @@ public class ApiServerVerticle extends AbstractVerticle {
         .handler(this::getPoliciesHandler)
         .failureHandler(exceptionHandler);
 
-//    router
-//        .post(api.getProductUserMapsPath())
-//        .handler(this::mapUserToProduct)
-//        .failureHandler(exceptionHandler);
+    //    router
+    //        .post(api.getProductUserMapsPath())
+    //        .handler(this::mapUserToProduct)
+    //        .failureHandler(exceptionHandler);
 
     router
         .post(api.getVerifyUrl())
@@ -327,10 +325,10 @@ public class ApiServerVerticle extends AbstractVerticle {
 
     JsonObject requestBody = routingContext.body().asJsonObject();
     HttpServerRequest request = routingContext.request();
-    String xRazorpaySignature = request.headers().get(HEADER_X_RAZORPAY_SIGNATURE);
+    String xrazorpaySignature = request.headers().get(HEADER_X_RAZORPAY_SIGNATURE);
 
     razorPayService
-        .webhookSignatureValidator(requestBody, xRazorpaySignature)
+        .webhookSignatureValidator(requestBody, xrazorpaySignature)
         .onSuccess(
             requestValidated -> {
               LOGGER.debug("Request Validated");
@@ -443,7 +441,7 @@ public class ApiServerVerticle extends AbstractVerticle {
             });
   }
 
-//  private void mapUserToProduct(RoutingContext routingContext) {}
+  //  private void mapUserToProduct(RoutingContext routingContext) {}
 
   private void handlePostLinkedAccount(RoutingContext routingContext) {
     JsonObject requestBody = routingContext.body().asJsonObject();

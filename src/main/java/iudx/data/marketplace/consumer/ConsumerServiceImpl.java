@@ -140,8 +140,8 @@ public class ConsumerServiceImpl implements ConsumerService {
                 .replace("$8", resourceTable));
 
     if (request.containsKey("resourceId")) {
-      String resourceID = request.getString("resourceId");
-      params.put("resourceId", resourceID);
+      String resourceId = request.getString("resourceId");
+      params.put("resourceId", resourceId);
       query.append(" and rt._id=$2");
     } else if (request.containsKey("providerId")) {
       String providerId = request.getString("providerId");
@@ -170,7 +170,7 @@ public class ConsumerServiceImpl implements ConsumerService {
   @Override
   public ConsumerService createOrder(
       JsonObject request, User user, Handler<AsyncResult<JsonObject>> handler) {
-//    String resourceServerUrl = user.getResourceServerUrl();
+    //    String resourceServerUrl = user.getResourceServerUrl();
 
     String variantId = request.getString(PRODUCT_VARIANT_ID);
     String consumerId = user.getUserId();
@@ -228,21 +228,21 @@ public class ConsumerServiceImpl implements ConsumerService {
 
       Future<JsonArray> paymentFuture = executePurchaseQuery(query, resourceId, productId, user);
 
-//      Future<JsonArray> userResponseFuture =
-          paymentFuture.onComplete(
-              pgHandler -> {
-                if (pgHandler.succeeded()) {
-                  JsonObject response =
-                      new JsonObject()
-                          .put(TYPE, ResponseUrn.SUCCESS_URN.getUrn())
-                          .put(TITLE, ResponseUrn.SUCCESS_URN.getMessage())
-                          .put(RESULTS, pgHandler.result());
-                  handler.handle(Future.succeededFuture(response));
+      //      Future<JsonArray> userResponseFuture =
+      paymentFuture.onComplete(
+          pgHandler -> {
+            if (pgHandler.succeeded()) {
+              JsonObject response =
+                  new JsonObject()
+                      .put(TYPE, ResponseUrn.SUCCESS_URN.getUrn())
+                      .put(TITLE, ResponseUrn.SUCCESS_URN.getMessage())
+                      .put(RESULTS, pgHandler.result());
+              handler.handle(Future.succeededFuture(response));
 
-                } else {
-                  handler.handle(Future.failedFuture(pgHandler.cause().getMessage()));
-                }
-              });
+            } else {
+              handler.handle(Future.failedFuture(pgHandler.cause().getMessage()));
+            }
+          });
     } catch (DxRuntimeException exception) {
       LOGGER.debug("Exception : " + exception.getMessage());
       String failureMessage =

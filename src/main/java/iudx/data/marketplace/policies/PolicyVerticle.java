@@ -6,7 +6,6 @@ import io.vertx.core.AbstractVerticle;
 import io.vertx.serviceproxy.ServiceBinder;
 import iudx.data.marketplace.auditing.AuditingService;
 import iudx.data.marketplace.common.Api;
-import iudx.data.marketplace.common.CatalogueService;
 import iudx.data.marketplace.postgres.PostgresService;
 
 public class PolicyVerticle extends AbstractVerticle {

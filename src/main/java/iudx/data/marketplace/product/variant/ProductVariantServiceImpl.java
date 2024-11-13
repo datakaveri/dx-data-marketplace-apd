@@ -161,8 +161,12 @@ public class ProductVariantServiceImpl implements ProductVariantService {
         query,
         handler -> {
           if (handler.succeeded()) {
-            if (handler.result().getInteger("totalHits") != 0) promise.complete(true);
-            else promise.complete(false);
+            if (handler.result().getInteger("totalHits") != 0) {
+              promise.complete(true);
+            }
+            else {
+              promise.complete(false);
+            }
           } else {
             promise.fail(handler.cause());
           }
@@ -284,7 +288,9 @@ public class ProductVariantServiceImpl implements ProductVariantService {
                           .withType(ResponseUrn.RESOURCE_NOT_FOUND_URN.getUrn())
                           .withTitle(ResponseUrn.RESOURCE_NOT_FOUND_URN.getMessage())
                           .withDetail(
-                              "Product Variant cannot be updated as the product is in INACTIVE state or product is not found")
+                              "Product Variant cannot be updated as the product is in INACTIVE state or "
+                                  +
+                                  "product is not found")
                           .getResponse()));
             }
 
@@ -446,21 +452,21 @@ public class ProductVariantServiceImpl implements ProductVariantService {
       }
 
       Future<JsonArray> paymentFuture = executePurchaseQuery(query, resourceId, productId, user);
-//      Future<JsonArray> userResponseFuture =
-          paymentFuture.onComplete(
-              pgHandler -> {
-                if (pgHandler.succeeded()) {
-                  JsonObject response =
-                      new JsonObject()
-                          .put(TYPE, ResponseUrn.SUCCESS_URN.getUrn())
-                          .put(TITLE, ResponseUrn.SUCCESS_URN.getMessage())
-                          .put(RESULTS, pgHandler.result());
-                  handler.handle(Future.succeededFuture(response));
+      //      Future<JsonArray> userResponseFuture =
+      paymentFuture.onComplete(
+          pgHandler -> {
+            if (pgHandler.succeeded()) {
+              JsonObject response =
+                  new JsonObject()
+                      .put(TYPE, ResponseUrn.SUCCESS_URN.getUrn())
+                      .put(TITLE, ResponseUrn.SUCCESS_URN.getMessage())
+                      .put(RESULTS, pgHandler.result());
+              handler.handle(Future.succeededFuture(response));
 
-                } else {
-                  handler.handle(Future.failedFuture(pgHandler.cause().getMessage()));
-                }
-              });
+            } else {
+              handler.handle(Future.failedFuture(pgHandler.cause().getMessage()));
+            }
+          });
 
     } catch (DxRuntimeException exception) {
       LOGGER.debug("Exception : " + exception.getMessage());

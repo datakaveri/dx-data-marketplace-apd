@@ -76,9 +76,7 @@ public class RazorPayServiceImpl implements RazorPayService {
       String status = order.get(STATUS);
       if (!status.equals(CREATED)) {
         throw new DxRuntimeException(
-            400,
-            ResponseUrn.ORDER_NOT_CREATED,
-            "Order creation returned with status : " + status);
+            400, ResponseUrn.ORDER_NOT_CREATED, "Order creation returned with status : " + status);
       }
       JSONArray transfersArray = order.get(TRANFERS);
       JSONObject transferResponse = transfersArray.getJSONObject(0);
@@ -265,8 +263,7 @@ public class RazorPayServiceImpl implements RazorPayService {
         LOGGER.error("Linked account not activated");
         String detail =
             "To activate linked account please complete the KYC, filling account information etc., "
-                +
-                "in your Razorpay merchant dashboard";
+                + "in your Razorpay merchant dashboard";
         promise.fail(detail);
       }
     } catch (RazorpayException e) {

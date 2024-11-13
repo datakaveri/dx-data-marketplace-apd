@@ -64,16 +64,13 @@ public class ProviderApis {
   Router init() {
 
     ValidationHandler productValidationHandler = new ValidationHandler(RequestType.PRODUCT);
-    ValidationHandler variantValidationHandler =
-        new ValidationHandler(RequestType.PRODUCT_VARIANT);
+    ValidationHandler variantValidationHandler = new ValidationHandler(RequestType.PRODUCT_VARIANT);
     ValidationHandler deleteVariantValidationHandler =
         new ValidationHandler(RequestType.DELETE_PRODUCT_VARIANT);
     ValidationHandler listVariantValidationHandler =
         new ValidationHandler(RequestType.LIST_PRODUCT_VARIANT);
-    ValidationHandler resourceValidationHandler =
-        new ValidationHandler(RequestType.RESOURCE);
-    ValidationHandler purchaseValidationHandler =
-        new ValidationHandler(RequestType.PURCHASE);
+    ValidationHandler resourceValidationHandler = new ValidationHandler(RequestType.RESOURCE);
+    ValidationHandler purchaseValidationHandler = new ValidationHandler(RequestType.PURCHASE);
     ExceptionHandler exceptionHandler = new ExceptionHandler();
 
     productService = ProductService.createProxy(vertx, PRODUCT_SERVICE_ADDRESS);
@@ -431,6 +428,8 @@ public class ProviderApis {
             .putHeader(CONTENT_TYPE, APPLICATION_JSON)
             .setStatusCode(statusCode)
             .end();
+        break;
+      default:
         break;
     }
   }

@@ -86,7 +86,7 @@ public class ExceptionHandler implements Handler<RoutingContext> {
   /**
    * Handles the JsonDecode Exception.
    *
-   * @param routingContext
+   * @param routingContext associated with the request to add the appropriate response
    */
   public void handleDecodeException(RoutingContext routingContext) {
 
@@ -116,7 +116,7 @@ public class ExceptionHandler implements Handler<RoutingContext> {
   /**
    * Handles the exception from casting a object to different object.
    *
-   * @param routingContext
+   * @param routingContext associated with the request to add the appropriate response
    */
   public void handleClassCastException(RoutingContext routingContext) {
 

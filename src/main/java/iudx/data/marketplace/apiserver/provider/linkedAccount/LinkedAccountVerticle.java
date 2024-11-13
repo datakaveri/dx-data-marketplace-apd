@@ -13,7 +13,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 public class LinkedAccountVerticle extends AbstractVerticle {
-//  private static final Logger LOGGER = LogManager.getLogger(LinkedAccountVerticle.class);
+  //  private static final Logger LOGGER = LogManager.getLogger(LinkedAccountVerticle.class);
 
   private PostgresService postgresService;
   private LinkedAccountServiceImpl linkedAccountService;

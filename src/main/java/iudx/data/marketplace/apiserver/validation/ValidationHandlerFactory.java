@@ -180,8 +180,7 @@ public class ValidationHandlerFactory {
     return validators;
   }
 
-  private List<Validator> getDeleteProductVariantValidators(
-      final MultiMap parameters) {
+  private List<Validator> getDeleteProductVariantValidators(final MultiMap parameters) {
     List<Validator> validators = new ArrayList<>();
     validators.add(new UuidTypeValidator(parameters.get(PRODUCT_VARIANT_ID), true));
     return validators;

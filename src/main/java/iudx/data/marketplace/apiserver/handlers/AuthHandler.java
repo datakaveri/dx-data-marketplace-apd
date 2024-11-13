@@ -91,8 +91,7 @@ public class AuthHandler implements Handler<RoutingContext> {
       } else {
         processAuthFailure(context, "Invalid token");
       }
-    } else // for all the other endpoints
-    {
+    } else { // for all the other endpoints
       checkAuth(requestJson, authInfo)
           .onSuccess(
               userObject -> {

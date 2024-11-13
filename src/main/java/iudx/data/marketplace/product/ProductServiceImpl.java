@@ -193,8 +193,8 @@ public class ProductServiceImpl implements ProductService {
   }
 
   private List<Future> fetchItemDetailsFromCat(
-      JsonObject request, String providerId, String productID, JsonArray resourceDetails) {
-    request.put(PROVIDER_ID, providerId).put(PRODUCT_ID, productID);
+      JsonObject request, String providerId, String productId, JsonArray resourceDetails) {
+    request.put(PROVIDER_ID, providerId).put(PRODUCT_ID, productId);
 
     JsonArray resourceIds = request.getJsonArray(RESOURCE_IDS);
 
@@ -424,13 +424,13 @@ public class ProductServiceImpl implements ProductService {
             if (!handler.result().getJsonArray(RESULTS).isEmpty()) {
               JsonObject result = handler.result().getJsonArray(RESULTS).getJsonObject(0);
               String accountId = result.getString("account_id");
-              String rzp_account_product_id = result.getString("rzp_account_product_id");
+              String rzpAccountProductId = result.getString("rzp_account_product_id");
               String status = result.getString("status");
               LOGGER.info(
                   "Provider with _id : {} , with accountId {}, accountProductId {} has status : {}",
                   providerId,
                   accountId,
-                  rzp_account_product_id,
+                  rzpAccountProductId,
                   status);
               promise.complete(result);
             } else {

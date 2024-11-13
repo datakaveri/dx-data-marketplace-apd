@@ -139,8 +139,7 @@ public class PostgresServiceImpl implements PostgresService {
         .withTransaction(
             connection -> {
               ConcurrentLinkedQueue<String> statements = new ConcurrentLinkedQueue<>(queries);
-              Future<Void> eB = executeBatch(connection, statements);
-              return eB;
+              return executeBatch(connection, statements);
             })
         .onComplete(
             completeHandler -> {

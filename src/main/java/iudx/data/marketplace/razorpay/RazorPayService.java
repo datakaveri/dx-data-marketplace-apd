@@ -27,7 +27,7 @@ public interface RazorPayService {
    * method also creates a transfer from the order to the respective merchant account
    *
    * @param request which is a JsonObject
-   * @retun Future<JsonObject> which is a vertx Future
+   * @retun Future JsonObject which is a vertx Future
    */
   Future<JsonObject> createOrder(JsonObject request);
 

@@ -32,7 +32,7 @@ public class QueryBuilder {
 
   public List<String> buildCreateProductQueries(JsonObject request, JsonArray resourceDetails) {
     String productId = request.getString(PRODUCT_ID);
-    String providerID = request.getString(PROVIDER_ID);
+    String providerId = request.getString(PROVIDER_ID);
     String providerName = request.getString(PROVIDER_NAME);
     List<String> queries = new ArrayList<String>();
 
@@ -42,7 +42,7 @@ public class QueryBuilder {
                 INSERT_PRODUCT_QUERY
                     .replace("$0", productTable)
                     .replace("$1", productId)
-                    .replace("$2", providerID)
+                    .replace("$2", providerId)
                     .replace("$3", providerName)
                     .replace("$4", Status.ACTIVE.toString()))
             .toString());
@@ -56,7 +56,7 @@ public class QueryBuilder {
                           .replace("$0", resourceTable)
                           .replace("$1", ((JsonObject) resource).getString(RESOURCE_ID))
                           .replace("$2", ((JsonObject) resource).getString(RESOURCE_NAME))
-                          .replace("$3", providerID)
+                          .replace("$3", providerId)
                           .replace("$4", providerName)
                           .replace("$5", request.getString(RESOURCE_SERVER))
                           .replace("$6", ((JsonObject) resource).getString("accessPolicy")))
@@ -112,14 +112,14 @@ public class QueryBuilder {
     JsonArray resources = request.getJsonArray(RESOURCES_ARRAY);
 
     // UUID for each product variant.
-    String pvID = supplier.get();
+    String pvId = supplier.get();
 
     LOGGER.debug("request is : " + request.encodePrettily());
     StringBuilder query =
         new StringBuilder(
             INSERT_PV_QUERY
                 .replace("$0", productVariantTable)
-                .replace("$1", pvID)
+                .replace("$1", pvId)
                 .replace("$2", request.getString("provider_id"))
                 .replace("$3", request.getString(PRODUCT_ID))
                 .replace("$4", request.getString(PRODUCT_VARIANT_NAME))
