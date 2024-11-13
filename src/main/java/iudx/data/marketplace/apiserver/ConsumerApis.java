@@ -278,14 +278,12 @@ public class ConsumerApis {
             .setStatusCode(statusCode)
             .end(result.toString());
         break;
-      case 204:
+      default: //204
         routingContext
             .response()
             .putHeader(CONTENT_TYPE, APPLICATION_JSON)
             .setStatusCode(statusCode)
             .end();
-        break;
-      default:
         break;
     }
   }
