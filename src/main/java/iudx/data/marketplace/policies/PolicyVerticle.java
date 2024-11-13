@@ -17,14 +17,12 @@ public class PolicyVerticle extends AbstractVerticle {
   private CreatePolicy createPolicy;
   private VerifyPolicy verifyPolicy;
   private GetPolicy getPolicy;
-  private CatalogueService catalogueService;
   private AuditingService auditingService;
   private Api api;
   private FetchPolicyUsingPvId fetchPolicyUsingPvId;
 
   @Override
   public void start() {
-    catalogueService = new CatalogueService(vertx, config());
     postgresServiceImpl = PostgresService.createProxy(vertx, POSTGRES_SERVICE_ADDRESS);
     auditingService = AuditingService.createProxy(vertx, AUDITING_SERVICE_ADDRESS);
     api = Api.getInstance(config().getString("dxApiBasePath"));

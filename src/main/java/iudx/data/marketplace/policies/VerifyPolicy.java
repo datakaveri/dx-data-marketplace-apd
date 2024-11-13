@@ -72,7 +72,7 @@ public class VerifyPolicy {
 
   private Future<JsonObject> checkExistingPoliciesForId(
       UUID itemId, UUID ownerId, String userEmailId) {
-    Tuple selectTuples = Tuple.of(itemId, ownerId, Status.ACTIVE, userEmailId);
+//    Tuple selectTuples = Tuple.of(itemId, ownerId, Status.ACTIVE, userEmailId);
     String query;
 
     JsonObject params =

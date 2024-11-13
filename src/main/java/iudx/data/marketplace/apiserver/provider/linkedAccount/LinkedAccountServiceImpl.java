@@ -8,7 +8,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class LinkedAccountServiceImpl implements LinkedAccountService {
-  private static final Logger LOG = LoggerFactory.getLogger(LinkedAccountServiceImpl.class);
+//  private static final Logger LOG = LoggerFactory.getLogger(LinkedAccountServiceImpl.class);
 
   private final CreateLinkedAccount createLinkedAccount;
   private final FetchLinkedAccount fetchLinkedAccount;

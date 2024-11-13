@@ -28,7 +28,7 @@ public class ValidationHandlerFactory {
         validator = getProductVariantValidators(parameters, body, requestType);
         break;
       case DELETE_PRODUCT_VARIANT:
-        validator = getDeleteProductVariantValidators(parameters, requestType);
+        validator = getDeleteProductVariantValidators(parameters);
         break;
       case LIST_PRODUCT_VARIANT:
         validator = listProductVariantValidators(parameters);
@@ -43,7 +43,7 @@ public class ValidationHandlerFactory {
         validator = getPolicyValidators(body);
         break;
       case VERIFY:
-        validator = getVerifyPolicyValidator(parameters, body);
+        validator = getVerifyPolicyValidator(body);
         break;
       case ORDER:
         validator = getOrderValidator(parameters);
@@ -127,7 +127,7 @@ public class ValidationHandlerFactory {
     return validators;
   }
 
-  private List<Validator> getVerifyPolicyValidator(MultiMap parameters, JsonObject body) {
+  private List<Validator> getVerifyPolicyValidator(JsonObject body) {
     List<Validator> validators = new ArrayList<>();
     validators.add(new JsonSchemaTypeValidator(body, RequestType.VERIFY));
     return validators;
@@ -181,7 +181,7 @@ public class ValidationHandlerFactory {
   }
 
   private List<Validator> getDeleteProductVariantValidators(
-      final MultiMap parameters, final RequestType requestType) {
+      final MultiMap parameters) {
     List<Validator> validators = new ArrayList<>();
     validators.add(new UuidTypeValidator(parameters.get(PRODUCT_VARIANT_ID), true));
     return validators;

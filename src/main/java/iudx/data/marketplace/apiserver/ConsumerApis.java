@@ -60,14 +60,14 @@ public class ConsumerApis {
   Router init() {
 
     ValidationHandler resourceValidationHandler =
-        new ValidationHandler(vertx, RequestType.RESOURCE);
+        new ValidationHandler(RequestType.RESOURCE);
     ValidationHandler providerValidationHandler =
-        new ValidationHandler(vertx, RequestType.PROVIDER);
-    ValidationHandler orderValidationHandler = new ValidationHandler(vertx, RequestType.ORDER);
+        new ValidationHandler(RequestType.PROVIDER);
+    ValidationHandler orderValidationHandler = new ValidationHandler(RequestType.ORDER);
     ValidationHandler purchaseValidationHandler =
-        new ValidationHandler(vertx, RequestType.PURCHASE);
+        new ValidationHandler(RequestType.PURCHASE);
     ExceptionHandler exceptionHandler = new ExceptionHandler();
-    ValidationHandler productVariantHandler = new ValidationHandler(vertx, RequestType.PRODUCT);
+    ValidationHandler productVariantHandler = new ValidationHandler(RequestType.PRODUCT);
 
     consumerService = ConsumerService.createProxy(vertx, CONSUMER_SERVICE_ADDRESS);
 

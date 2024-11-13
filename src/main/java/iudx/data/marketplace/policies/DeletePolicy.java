@@ -28,7 +28,6 @@ public class DeletePolicy {
   private static final Logger LOG = LoggerFactory.getLogger(DeletePolicy.class);
   private static final String FAILURE_MESSAGE = "Policy could not be deleted";
   private final PostgresService postgresService;
-  private PgPool pool;
   private AuditingService auditingService;
   private Api api;
 
@@ -57,7 +56,7 @@ public class DeletePolicy {
   public Future<JsonObject> executeUpdateQuery(String query, UUID policyUuid, User user) {
     LOG.debug("inside executeUpdateQuery");
     Promise<JsonObject> promise = Promise.promise();
-    Tuple tuple = Tuple.of(policyUuid);
+//    Tuple tuple = Tuple.of(policyUuid);
     JsonObject param = new JsonObject().put("$1", policyUuid.toString());
 
     postgresService.executePreparedQuery(

@@ -446,7 +446,7 @@ public class ProductVariantServiceImpl implements ProductVariantService {
       }
 
       Future<JsonArray> paymentFuture = executePurchaseQuery(query, resourceId, productId, user);
-      Future<JsonArray> userResponseFuture =
+//      Future<JsonArray> userResponseFuture =
           paymentFuture.onComplete(
               pgHandler -> {
                 if (pgHandler.succeeded()) {

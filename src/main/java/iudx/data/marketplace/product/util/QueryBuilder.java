@@ -4,6 +4,7 @@ import static iudx.data.marketplace.auditing.util.Constants.*;
 import static iudx.data.marketplace.common.Constants.*;
 import static iudx.data.marketplace.consumer.util.Constants.*;
 import static iudx.data.marketplace.product.util.Constants.*;
+import static iudx.data.marketplace.product.util.Constants.PRODUCT_VARIANT_NAME;
 
 import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
@@ -121,7 +122,7 @@ public class QueryBuilder {
                 .replace("$1", pvID)
                 .replace("$2", request.getString("provider_id"))
                 .replace("$3", request.getString(PRODUCT_ID))
-                .replace("$4", request.getString(Constants.PRODUCT_VARIANT_NAME))
+                .replace("$4", request.getString(PRODUCT_VARIANT_NAME))
                 .replace("$5", resources.encode())
                 .replace("$6", request.getDouble(PRICE).toString())
                 .replace("$7", request.getInteger(DURATION).toString())
@@ -188,7 +189,7 @@ public class QueryBuilder {
     StringBuilder query = new StringBuilder(FETCH_ACTIVE_PRODUCT_VARIANTS);
     query.append(" AND P.\"providerId\"=$3");
 
-    if (request.containsKey(Constants.PRODUCT_VARIANT_NAME)) {
+    if (request.containsKey(PRODUCT_VARIANT_NAME)) {
       query.append(" AND P.\"productVariantName\"=$4");
     }
     query.append(" ORDER BY P.\"updatedAt\" DESC");

@@ -63,17 +63,17 @@ public class ProviderApis {
 
   Router init() {
 
-    ValidationHandler productValidationHandler = new ValidationHandler(vertx, RequestType.PRODUCT);
+    ValidationHandler productValidationHandler = new ValidationHandler(RequestType.PRODUCT);
     ValidationHandler variantValidationHandler =
-        new ValidationHandler(vertx, RequestType.PRODUCT_VARIANT);
+        new ValidationHandler(RequestType.PRODUCT_VARIANT);
     ValidationHandler deleteVariantValidationHandler =
-        new ValidationHandler(vertx, RequestType.DELETE_PRODUCT_VARIANT);
+        new ValidationHandler(RequestType.DELETE_PRODUCT_VARIANT);
     ValidationHandler listVariantValidationHandler =
-        new ValidationHandler(vertx, RequestType.LIST_PRODUCT_VARIANT);
+        new ValidationHandler(RequestType.LIST_PRODUCT_VARIANT);
     ValidationHandler resourceValidationHandler =
-        new ValidationHandler(vertx, RequestType.RESOURCE);
+        new ValidationHandler(RequestType.RESOURCE);
     ValidationHandler purchaseValidationHandler =
-        new ValidationHandler(vertx, RequestType.PURCHASE);
+        new ValidationHandler(RequestType.PURCHASE);
     ExceptionHandler exceptionHandler = new ExceptionHandler();
 
     productService = ProductService.createProxy(vertx, PRODUCT_SERVICE_ADDRESS);

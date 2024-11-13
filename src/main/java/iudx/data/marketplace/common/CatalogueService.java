@@ -27,10 +27,8 @@ public class CatalogueService {
   private static String catHost;
   private static int catPort;
   private static String catItemPath, catRelPath;
-  private Vertx vertx;
 
   public CatalogueService(Vertx vertx, JsonObject config) {
-    this.vertx = vertx;
     catHost = config.getString(CAT_SERVER_HOST);
     catPort = config.getInteger(CAT_SERVER_PORT);
     catItemPath = config.getString(CAT_ITEM_PATH);

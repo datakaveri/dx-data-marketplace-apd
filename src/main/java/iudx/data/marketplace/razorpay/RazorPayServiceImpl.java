@@ -47,7 +47,7 @@ public class RazorPayServiceImpl implements RazorPayService {
     Promise<JsonObject> promise = Promise.promise();
     LOGGER.debug(request);
 
-    Integer amountInPaise = (int) (Double.parseDouble((request.getString(PRICE))) * 100);
+    Integer amountInPaise = (int) (Double.parseDouble(request.getString(PRICE)) * 100);
     JSONObject orderRequest =
         new JSONObject()
             .put(AMOUNT, amountInPaise)
@@ -78,7 +78,7 @@ public class RazorPayServiceImpl implements RazorPayService {
         throw new DxRuntimeException(
             400,
             ResponseUrn.ORDER_NOT_CREATED,
-            ("Order creation returned with status : " + status));
+            "Order creation returned with status : " + status);
       }
       JSONArray transfersArray = order.get(TRANFERS);
       JSONObject transferResponse = transfersArray.getJSONObject(0);

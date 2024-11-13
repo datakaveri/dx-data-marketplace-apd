@@ -16,7 +16,6 @@ public class WebhookVerticle extends AbstractVerticle {
 
   private static final Logger LOGGER = LogManager.getLogger(WebhookVerticle.class);
 
-  private MessageConsumer<JsonObject> consumer;
   private ServiceBinder binder;
   private PostgresService postgresService;
   private PolicyService policyService;
@@ -32,7 +31,7 @@ public class WebhookVerticle extends AbstractVerticle {
     webhookService = new WebhookServiceImpl(postgresService, policyService, invoiceTable);
 
     binder = new ServiceBinder(vertx);
-    consumer =
+//    MessageConsumer<JsonObject> consumer =
         binder.setAddress(WEBHOOK_SERVICE_ADDRESS).register(WebhookService.class, webhookService);
     LOGGER.info("webhook Service started");
   }

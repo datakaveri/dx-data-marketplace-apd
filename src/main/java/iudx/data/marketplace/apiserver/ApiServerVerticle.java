@@ -22,7 +22,6 @@ import iudx.data.marketplace.apiserver.handlers.ExceptionHandler;
 import iudx.data.marketplace.apiserver.handlers.ValidationHandler;
 import iudx.data.marketplace.apiserver.provider.linkedAccount.LinkedAccountService;
 import iudx.data.marketplace.apiserver.util.RequestType;
-import iudx.data.marketplace.auditing.AuditingService;
 import iudx.data.marketplace.authenticator.AuthClient;
 import iudx.data.marketplace.authenticator.AuthenticationService;
 import iudx.data.marketplace.common.*;
@@ -178,12 +177,12 @@ public class ApiServerVerticle extends AbstractVerticle {
 
     ExceptionHandler exceptionHandler = new ExceptionHandler();
     ValidationHandler checkPolicyValidationHandler =
-        new ValidationHandler(vertx, RequestType.CHECK_POLICY);
-    ValidationHandler verifyValidationHandler = new ValidationHandler(vertx, RequestType.VERIFY);
+        new ValidationHandler(RequestType.CHECK_POLICY);
+    ValidationHandler verifyValidationHandler = new ValidationHandler(RequestType.VERIFY);
     ValidationHandler postLinkedAccountHandler =
-        new ValidationHandler(vertx, RequestType.POST_ACCOUNT);
+        new ValidationHandler(RequestType.POST_ACCOUNT);
     ValidationHandler putLinkedAccountHandler =
-        new ValidationHandler(vertx, RequestType.PUT_ACCOUNT);
+        new ValidationHandler(RequestType.PUT_ACCOUNT);
 
     router
         .get(api.getPoliciesUrl())
@@ -191,10 +190,10 @@ public class ApiServerVerticle extends AbstractVerticle {
         .handler(this::getPoliciesHandler)
         .failureHandler(exceptionHandler);
 
-    router
-        .post(api.getProductUserMapsPath())
-        .handler(this::mapUserToProduct)
-        .failureHandler(exceptionHandler);
+//    router
+//        .post(api.getProductUserMapsPath())
+//        .handler(this::mapUserToProduct)
+//        .failureHandler(exceptionHandler);
 
     router
         .post(api.getVerifyUrl())
@@ -204,7 +203,7 @@ public class ApiServerVerticle extends AbstractVerticle {
         .failureHandler(exceptionHandler);
 
     ValidationHandler verifyPaymentValidationHandler =
-        new ValidationHandler(vertx, RequestType.VERIFY_PAYMENT);
+        new ValidationHandler(RequestType.VERIFY_PAYMENT);
     router
         .post(api.getVerifyPaymentApi())
         .handler(verifyPaymentValidationHandler)
@@ -242,7 +241,7 @@ public class ApiServerVerticle extends AbstractVerticle {
     /*Webhook routes */
 
     ValidationHandler orderPaidRequestValidationHandler =
-        new ValidationHandler(vertx, RequestType.ORDER_PAID_WEBHOOK);
+        new ValidationHandler(RequestType.ORDER_PAID_WEBHOOK);
     router
         .post("/order-paid-webhooks")
         .handler(this::handleWebhookSignatureValidation)
@@ -251,7 +250,7 @@ public class ApiServerVerticle extends AbstractVerticle {
         .failureHandler(exceptionHandler);
 
     ValidationHandler paymentAuthorizedRequestValidationHandler =
-        new ValidationHandler(vertx, RequestType.PAYMENT_AUTHORIZED_WEBHOOK);
+        new ValidationHandler(RequestType.PAYMENT_AUTHORIZED_WEBHOOK);
     router
         .post("/payment-authorized")
         .handler(this::handleWebhookSignatureValidation)
@@ -259,7 +258,7 @@ public class ApiServerVerticle extends AbstractVerticle {
         .handler(this::paymentAuthorizedRequestHandler);
 
     ValidationHandler paymentFailedRequestValidationHandler =
-        new ValidationHandler(vertx, RequestType.PAYMENT_FAILED_WEBHOOK);
+        new ValidationHandler(RequestType.PAYMENT_FAILED_WEBHOOK);
     router
         .post("/payments-failed")
         .handler(this::handleWebhookSignatureValidation)
@@ -444,7 +443,7 @@ public class ApiServerVerticle extends AbstractVerticle {
             });
   }
 
-  private void mapUserToProduct(RoutingContext routingContext) {}
+//  private void mapUserToProduct(RoutingContext routingContext) {}
 
   private void handlePostLinkedAccount(RoutingContext routingContext) {
     JsonObject requestBody = routingContext.body().asJsonObject();

@@ -2,7 +2,6 @@ package iudx.data.marketplace.apiserver.handlers;
 
 import io.vertx.core.Handler;
 import io.vertx.core.MultiMap;
-import io.vertx.core.Vertx;
 import io.vertx.core.json.JsonObject;
 import io.vertx.ext.web.RoutingContext;
 import iudx.data.marketplace.apiserver.util.RequestType;
@@ -20,10 +19,8 @@ public class ValidationHandler implements Handler<RoutingContext> {
   private static final Logger LOGGER = LogManager.getLogger(ValidationHandler.class);
 
   private RequestType requestType;
-  private Vertx vertx;
 
-  public ValidationHandler(Vertx vertx, RequestType requestType) {
-    this.vertx = vertx;
+  public ValidationHandler(RequestType requestType) {
     this.requestType = requestType;
   }
 

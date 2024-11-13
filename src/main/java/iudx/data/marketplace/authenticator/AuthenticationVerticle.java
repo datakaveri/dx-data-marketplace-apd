@@ -24,7 +24,6 @@ public class AuthenticationVerticle extends AbstractVerticle {
   private static final Logger LOGGER = LogManager.getLogger(AuthenticationVerticle.class);
 
   private AuthenticationService authenticationService;
-  private CatalogueService catalogueService;
   private ServiceBinder binder;
   private MessageConsumer<JsonObject> consumer;
   private WebClient webClient;
@@ -76,9 +75,9 @@ public class AuthenticationVerticle extends AbstractVerticle {
               }
               JWTAuth jwtAuth = JWTAuth.create(vertx, jwtAuthOptions);
 
-              catalogueService = new CatalogueService(vertx, config());
+//           CatalogueService catalogueService = new CatalogueService(vertx, config());
               api = Api.getInstance(config().getString("dxApiBasePath"));
-              authenticationService = new AuthenticationServiceImpl(vertx, jwtAuth, config(), api);
+              authenticationService = new AuthenticationServiceImpl(jwtAuth, config(), api);
 
               /* Publish the Authentication service with the Event Bus against an address. */
               consumer =

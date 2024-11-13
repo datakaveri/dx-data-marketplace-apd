@@ -170,7 +170,7 @@ public class ConsumerServiceImpl implements ConsumerService {
   @Override
   public ConsumerService createOrder(
       JsonObject request, User user, Handler<AsyncResult<JsonObject>> handler) {
-    String resourceServerUrl = user.getResourceServerUrl();
+//    String resourceServerUrl = user.getResourceServerUrl();
 
     String variantId = request.getString(PRODUCT_VARIANT_ID);
     String consumerId = user.getUserId();
@@ -228,7 +228,7 @@ public class ConsumerServiceImpl implements ConsumerService {
 
       Future<JsonArray> paymentFuture = executePurchaseQuery(query, resourceId, productId, user);
 
-      Future<JsonArray> userResponseFuture =
+//      Future<JsonArray> userResponseFuture =
           paymentFuture.onComplete(
               pgHandler -> {
                 if (pgHandler.succeeded()) {

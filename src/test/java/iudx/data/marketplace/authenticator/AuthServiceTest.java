@@ -59,7 +59,7 @@ public class AuthServiceTest {
     JWTAuth jwtAuth = JWTAuth.create(vertx, jwtAuthOptions);
     catService = mock(CatalogueService.class);
 
-    authenticationServiceImpl = new AuthenticationServiceImpl(vertx, jwtAuth, config, api);
+    authenticationServiceImpl = new AuthenticationServiceImpl( jwtAuth, config, api);
     testContext.completeNow();
   }
 
@@ -176,7 +176,7 @@ public class AuthServiceTest {
         JWTAuth jwtAuth = JWTAuth.create(vertx, jwtAuthOptions);
         catService = mock(CatalogueService.class);
 
-        AuthenticationServiceImpl authenticationServiceImpl = new AuthenticationServiceImpl(vertx, jwtAuth, config, api);
+        AuthenticationServiceImpl authenticationServiceImpl = new AuthenticationServiceImpl( jwtAuth, config, api);
 
         JsonObject authInfo = new JsonObject()
                 .put(TOKEN, JwtHelper.providerToken);
