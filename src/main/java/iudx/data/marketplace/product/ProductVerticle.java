@@ -1,5 +1,7 @@
 package iudx.data.marketplace.product;
 
+import static iudx.data.marketplace.common.Constants.*;
+
 import io.vertx.core.AbstractVerticle;
 import io.vertx.core.eventbus.MessageConsumer;
 import io.vertx.core.json.JsonObject;
@@ -9,8 +11,6 @@ import iudx.data.marketplace.postgres.PostgresService;
 import iudx.data.marketplace.razorpay.RazorPayService;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-
-import static iudx.data.marketplace.common.Constants.*;
 
 public class ProductVerticle extends AbstractVerticle {
   private static final Logger LOGGER = LogManager.getLogger(ProductVerticle.class);

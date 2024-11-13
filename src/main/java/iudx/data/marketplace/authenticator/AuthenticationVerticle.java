@@ -1,5 +1,8 @@
 package iudx.data.marketplace.authenticator;
 
+import static iudx.data.marketplace.common.Constants.AUTH_SERVICE_ADDRESS;
+import static iudx.data.marketplace.common.Constants.JWT_LEEWAY_TIME;
+
 import io.vertx.core.AbstractVerticle;
 import io.vertx.core.Future;
 import io.vertx.core.Promise;
@@ -12,14 +15,10 @@ import io.vertx.ext.auth.jwt.JWTAuthOptions;
 import io.vertx.ext.web.client.WebClient;
 import io.vertx.ext.web.client.WebClientOptions;
 import io.vertx.serviceproxy.ServiceBinder;
-import iudx.data.marketplace.common.CatalogueService;
-
 import iudx.data.marketplace.common.Api;
+import iudx.data.marketplace.common.CatalogueService;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-
-import static iudx.data.marketplace.common.Constants.AUTH_SERVICE_ADDRESS;
-import static iudx.data.marketplace.common.Constants.JWT_LEEWAY_TIME;
 
 public class AuthenticationVerticle extends AbstractVerticle {
   private static final Logger LOGGER = LogManager.getLogger(AuthenticationVerticle.class);

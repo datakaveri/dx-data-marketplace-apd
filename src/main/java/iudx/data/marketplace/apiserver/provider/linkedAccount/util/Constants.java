@@ -7,11 +7,11 @@ public class Constants {
           + " provider_id, status, rzp_account_product_id) "
           + " VALUES ('$1', '$2', '$3', '$4', '$5','$6', '$7', '$8', '$9');";
 
-public static final String FETCH_MERCHANT_INFO_QUERY =
-        "SELECT account_id, rzp_account_product_id, status FROM merchant_table WHERE provider_id = '$1'";
+  public static final String FETCH_MERCHANT_INFO_QUERY =
+      "SELECT account_id, rzp_account_product_id, status FROM merchant_table WHERE provider_id = '$1'";
 
-public static   String UPDATE_LINKED_ACCOUNT_STATUS_QUERY =
-          "UPDATE merchant_table SET status = 'ACTIVATED' WHERE provider_id = '$1' RETURNING reference_id";
+  public static String UPDATE_LINKED_ACCOUNT_STATUS_QUERY =
+      "UPDATE merchant_table SET status = 'ACTIVATED' WHERE provider_id = '$1' RETURNING reference_id";
 
   public static final String ACCOUNT_TYPE = "route";
   public static final String FAILURE_MESSAGE = "User registration incomplete : ";
@@ -20,12 +20,12 @@ public static   String UPDATE_LINKED_ACCOUNT_STATUS_QUERY =
           + "M.modified_at AS \"updatedAt\" , M.created_at AS  \"createdAt\" \n"
           + "FROM merchant_table M\n"
           + "WHERE M.provider_id = '$1'\n";
-  public static final String GET_MERCHANT_INFO_QUERY = "SELECT account_id, reference_id FROM merchant_table WHERE provider_id = '$1'" +
-          " AND email = '$2'";
+  public static final String GET_MERCHANT_INFO_QUERY =
+      "SELECT account_id, reference_id FROM merchant_table WHERE provider_id = '$1'"
+          + " AND email = '$2'";
 
-  public static final String UPDATE_MERCHANT_INFO_QUERY = "UPDATE merchant_table SET " +
-          " phone_number = '$1', legal_business_name = '$2', customer_facing_business_name = '$3' " +
-          " WHERE provider_id = '$4' AND email = '$5' RETURNING account_id; ";
-
-
+  public static final String UPDATE_MERCHANT_INFO_QUERY =
+      "UPDATE merchant_table SET "
+          + " phone_number = '$1', legal_business_name = '$2', customer_facing_business_name = '$3' "
+          + " WHERE provider_id = '$4' AND email = '$5' RETURNING account_id; ";
 }

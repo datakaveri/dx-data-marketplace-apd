@@ -1,13 +1,11 @@
 package iudx.data.marketplace.policies;
 
+import static iudx.data.marketplace.apiserver.util.Constants.*;
+
 import io.vertx.codegen.annotations.DataObject;
 import io.vertx.core.json.JsonObject;
 import iudx.data.marketplace.apiserver.util.Role;
-import iudx.data.marketplace.policies.UserConverter;
-
 import java.util.Objects;
-
-import static iudx.data.marketplace.apiserver.util.Constants.*;
 
 /**
  * User class is used to initialize information about the user like id, role, email-Id etc., <br>

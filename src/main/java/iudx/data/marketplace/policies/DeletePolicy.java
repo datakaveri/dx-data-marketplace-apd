@@ -2,23 +2,16 @@ package iudx.data.marketplace.policies;
 
 import static iudx.data.marketplace.apiserver.util.Constants.*;
 import static iudx.data.marketplace.auditing.util.Constants.*;
-import static iudx.data.marketplace.auditing.util.Constants.RESPONSE_SIZE;
-import static iudx.data.marketplace.auditing.util.Constants.USERID;
 import static iudx.data.marketplace.common.HttpStatusCode.BAD_REQUEST;
 import static iudx.data.marketplace.common.HttpStatusCode.FORBIDDEN;
 import static iudx.data.marketplace.common.ResponseUrn.FORBIDDEN_URN;
 import static iudx.data.marketplace.policies.util.Constants.CHECK_IF_POLICY_PRESENT_QUERY;
 import static iudx.data.marketplace.policies.util.Constants.DELETE_POLICY_QUERY;
 
-import io.vertx.core.AsyncResult;
 import io.vertx.core.Future;
-import io.vertx.core.Handler;
 import io.vertx.core.Promise;
 import io.vertx.core.http.HttpMethod;
-import io.vertx.core.http.HttpServerRequest;
-import io.vertx.core.http.HttpServerResponse;
 import io.vertx.core.json.JsonObject;
-import io.vertx.ext.web.RoutingContext;
 import io.vertx.pgclient.PgPool;
 import io.vertx.sqlclient.Tuple;
 import iudx.data.marketplace.auditing.AuditingService;
@@ -27,11 +20,6 @@ import iudx.data.marketplace.common.HttpStatusCode;
 import iudx.data.marketplace.common.ResponseUrn;
 import iudx.data.marketplace.policies.util.Status;
 import iudx.data.marketplace.postgres.PostgresService;
-import iudx.data.marketplace.postgres.PostgresServiceImpl;
-
-import java.time.ZoneId;
-import java.time.ZonedDateTime;
-import java.time.temporal.ChronoUnit;
 import java.util.UUID;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

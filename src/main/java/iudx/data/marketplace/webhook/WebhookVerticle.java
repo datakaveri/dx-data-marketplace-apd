@@ -1,5 +1,8 @@
 package iudx.data.marketplace.webhook;
 
+import static iudx.data.marketplace.common.Constants.*;
+import static iudx.data.marketplace.product.util.Constants.TABLES;
+
 import io.vertx.core.AbstractVerticle;
 import io.vertx.core.eventbus.MessageConsumer;
 import io.vertx.core.json.JsonObject;
@@ -8,9 +11,6 @@ import iudx.data.marketplace.policies.PolicyService;
 import iudx.data.marketplace.postgres.PostgresService;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-
-import static iudx.data.marketplace.common.Constants.*;
-import static iudx.data.marketplace.product.util.Constants.TABLES;
 
 public class WebhookVerticle extends AbstractVerticle {
 

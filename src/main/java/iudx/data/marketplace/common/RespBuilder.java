@@ -1,10 +1,10 @@
 package iudx.data.marketplace.common;
 
-import io.vertx.core.json.JsonArray;
-import io.vertx.core.json.JsonObject;
-
 import static iudx.data.marketplace.apiserver.util.Constants.*;
 import static iudx.data.marketplace.apiserver.util.Constants.RESULTS;
+
+import io.vertx.core.json.JsonArray;
+import io.vertx.core.json.JsonObject;
 
 public class RespBuilder {
   private JsonObject response = new JsonObject();

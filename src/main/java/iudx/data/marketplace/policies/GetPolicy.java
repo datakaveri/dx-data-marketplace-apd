@@ -1,24 +1,19 @@
 package iudx.data.marketplace.policies;
 
-import io.vertx.core.Future;
-import io.vertx.core.Promise;
-import io.vertx.core.json.JsonArray;
-import io.vertx.core.json.JsonObject;
-import io.vertx.sqlclient.Tuple;
-import iudx.data.marketplace.apiserver.util.Role;
-
-import iudx.data.marketplace.common.HttpStatusCode;
-import iudx.data.marketplace.common.ResponseUrn;
-import iudx.data.marketplace.postgres.PostgresService;
-import iudx.data.marketplace.postgres.PostgresServiceImpl;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-
 import static iudx.data.marketplace.apiserver.util.Constants.*;
 import static iudx.data.marketplace.common.HttpStatusCode.BAD_REQUEST;
 import static iudx.data.marketplace.policies.util.Constants.GET_POLICY_4_CONSUMER_QUERY;
 import static iudx.data.marketplace.policies.util.Constants.GET_POLICY_4_PROVIDER_QUERY;
+
+import io.vertx.core.Future;
+import io.vertx.core.Promise;
+import io.vertx.core.json.JsonObject;
+import iudx.data.marketplace.apiserver.util.Role;
+import iudx.data.marketplace.common.HttpStatusCode;
+import iudx.data.marketplace.common.ResponseUrn;
+import iudx.data.marketplace.postgres.PostgresService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class GetPolicy {
     public static final String FAILURE_MESSAGE = "Policy could not be fetched";

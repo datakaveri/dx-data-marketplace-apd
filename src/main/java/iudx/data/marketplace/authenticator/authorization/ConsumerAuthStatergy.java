@@ -1,18 +1,16 @@
 package iudx.data.marketplace.authenticator.authorization;
 
-import io.vertx.core.json.JsonArray;
+import static iudx.data.marketplace.authenticator.authorization.Method.GET;
+import static iudx.data.marketplace.authenticator.authorization.Method.POST;
+
 import iudx.data.marketplace.authenticator.model.JwtData;
 import iudx.data.marketplace.common.Api;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
-
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
-import static iudx.data.marketplace.authenticator.authorization.Method.GET;
-import static iudx.data.marketplace.authenticator.authorization.Method.POST;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 public class ConsumerAuthStatergy implements AuthorizationStatergy {
   private static final Logger LOGGER = LogManager.getLogger(ConsumerAuthStatergy.class);

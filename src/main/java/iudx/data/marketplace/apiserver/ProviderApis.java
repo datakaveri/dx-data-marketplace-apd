@@ -30,7 +30,6 @@ import iudx.data.marketplace.postgres.PostgresService;
 import iudx.data.marketplace.product.ProductService;
 import iudx.data.marketplace.product.variant.ProductVariantService;
 import java.util.Map;
-
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 

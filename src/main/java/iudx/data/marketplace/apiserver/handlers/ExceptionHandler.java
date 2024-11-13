@@ -1,5 +1,7 @@
 package iudx.data.marketplace.apiserver.handlers;
 
+import static iudx.data.marketplace.apiserver.util.Constants.*;
+
 import io.vertx.core.Handler;
 import io.vertx.core.json.DecodeException;
 import io.vertx.core.json.JsonObject;
@@ -11,8 +13,6 @@ import iudx.data.marketplace.common.ResponseUrn;
 import org.apache.http.HttpStatus;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-
-import static iudx.data.marketplace.apiserver.util.Constants.*;
 
 public class ExceptionHandler implements Handler<RoutingContext> {
 

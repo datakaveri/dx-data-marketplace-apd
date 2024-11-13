@@ -8,13 +8,12 @@ import io.vertx.ext.web.RoutingContext;
 import iudx.data.marketplace.apiserver.util.RequestType;
 import iudx.data.marketplace.apiserver.validation.ValidationHandlerFactory;
 import iudx.data.marketplace.apiserver.validation.types.Validator;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
-
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 public class ValidationHandler implements Handler<RoutingContext> {
 

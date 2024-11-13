@@ -1,29 +1,23 @@
 package iudx.data.marketplace.policies;
 
-import io.vertx.core.Future;
-import io.vertx.core.Promise;
-import io.vertx.core.json.JsonArray;
-import io.vertx.core.json.JsonObject;
-import io.vertx.sqlclient.Row;
-import io.vertx.sqlclient.Tuple;
-import iudx.data.marketplace.common.CatalogueService;
-import iudx.data.marketplace.common.HttpStatusCode;
-import iudx.data.marketplace.common.ResponseUrn;
-import iudx.data.marketplace.policies.util.Status;
-import iudx.data.marketplace.postgres.PostgresService;
-import iudx.data.marketplace.postgres.PostgresServiceImpl;
-import org.apache.commons.lang.StringUtils;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
-
-import java.util.HashSet;
-import java.util.Set;
-import java.util.UUID;
-
 import static iudx.data.marketplace.apiserver.util.Constants.*;
 import static iudx.data.marketplace.common.HttpStatusCode.INTERNAL_SERVER_ERROR;
 import static iudx.data.marketplace.common.HttpStatusCode.VERIFY_FORBIDDEN;
 import static iudx.data.marketplace.policies.util.Constants.*;
+
+import io.vertx.core.Future;
+import io.vertx.core.Promise;
+import io.vertx.core.json.JsonArray;
+import io.vertx.core.json.JsonObject;
+import io.vertx.sqlclient.Tuple;
+import iudx.data.marketplace.common.HttpStatusCode;
+import iudx.data.marketplace.common.ResponseUrn;
+import iudx.data.marketplace.policies.util.Status;
+import iudx.data.marketplace.postgres.PostgresService;
+import java.util.UUID;
+import org.apache.commons.lang.StringUtils;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 public class VerifyPolicy {
   private static final Logger LOGGER = LogManager.getLogger(VerifyPolicy.class);

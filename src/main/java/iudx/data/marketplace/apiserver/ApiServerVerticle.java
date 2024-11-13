@@ -9,7 +9,6 @@ import io.vertx.core.AbstractVerticle;
 import io.vertx.core.http.*;
 import io.vertx.core.json.DecodeException;
 import io.vertx.core.json.JsonObject;
-import io.vertx.core.net.JksOptions;
 import io.vertx.ext.web.Route;
 import io.vertx.ext.web.Router;
 import io.vertx.ext.web.RoutingContext;

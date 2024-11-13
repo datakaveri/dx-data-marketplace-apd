@@ -1,21 +1,20 @@
 package iudx.data.marketplace.auditing;
 
+import static iudx.data.marketplace.auditing.util.Constants.*;
+import static iudx.data.marketplace.auditing.util.Constants.ISO_TIME;
+import static iudx.data.marketplace.product.util.Constants.TABLES;
+
 import io.vertx.core.Future;
 import io.vertx.core.Promise;
 import io.vertx.core.json.JsonObject;
 import iudx.data.marketplace.auditing.databroker.DataBrokerService;
 import iudx.data.marketplace.policies.User;
 import iudx.data.marketplace.product.util.QueryBuilder;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
-
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.time.temporal.ChronoUnit;
-
-import static iudx.data.marketplace.auditing.util.Constants.*;
-import static iudx.data.marketplace.auditing.util.Constants.ISO_TIME;
-import static iudx.data.marketplace.product.util.Constants.TABLES;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 public class AuditingServiceImpl implements AuditingService {
   private static final Logger LOGGER = LogManager.getLogger(AuditingServiceImpl.class);

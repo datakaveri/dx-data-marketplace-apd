@@ -1,5 +1,8 @@
 package iudx.data.marketplace.apiserver.provider.linkedAccount;
 
+import static iudx.data.marketplace.apiserver.provider.linkedAccount.util.Constants.*;
+import static iudx.data.marketplace.apiserver.util.Constants.RESULTS;
+
 import io.vertx.core.Future;
 import io.vertx.core.Promise;
 import io.vertx.core.json.JsonObject;
@@ -13,9 +16,6 @@ import iudx.data.marketplace.razorpay.RazorPayService;
 import org.apache.commons.lang.StringUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-
-import static iudx.data.marketplace.apiserver.provider.linkedAccount.util.Constants.*;
-import static iudx.data.marketplace.apiserver.util.Constants.RESULTS;
 
 public class FetchLinkedAccount {
   private static final Logger LOGGER = LogManager.getLogger(FetchLinkedAccount.class);

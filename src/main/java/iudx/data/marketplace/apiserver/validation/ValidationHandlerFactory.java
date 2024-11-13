@@ -1,16 +1,15 @@
 package iudx.data.marketplace.apiserver.validation;
 
+import static iudx.data.marketplace.apiserver.util.Constants.*;
+
 import io.vertx.core.MultiMap;
 import io.vertx.core.json.JsonObject;
 import iudx.data.marketplace.apiserver.util.RequestType;
 import iudx.data.marketplace.apiserver.validation.types.*;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
-
 import java.util.ArrayList;
 import java.util.List;
-
-import static iudx.data.marketplace.apiserver.util.Constants.*;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 public class ValidationHandlerFactory {
   private static final Logger LOGGER = LogManager.getLogger(ValidationHandlerFactory.class);

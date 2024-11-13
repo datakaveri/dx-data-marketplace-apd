@@ -27,11 +27,11 @@ import java.util.stream.Collectors;
 import static iudx.data.marketplace.apiserver.util.Constants.RESULTS;
 import static iudx.data.marketplace.apiserver.util.Constants.STATUS_CODE;
 
-
 public class PostgresServiceImpl implements PostgresService {
   private static final Logger LOGGER = LogManager.getLogger(PostgresServiceImpl.class);
 
   private final PgPool client;
+
   public PostgresServiceImpl(final PgPool pgclient) {
     this.client = pgclient;
   }
@@ -53,14 +53,16 @@ public class PostgresServiceImpl implements PostgresService {
           .map(rows -> rows.value())
           .onSuccess(
               successHandler -> {
-                executeBatch(conn, statements).onComplete(h -> {
-                  promise.complete();
-                });
+                executeBatch(conn, statements)
+                    .onComplete(
+                        h -> {
+                          promise.complete();
+                        });
               })
           .onFailure(
               failureHandler -> {
-                  LOGGER.debug("Failure : {}",failureHandler.getMessage() );
-                  LOGGER.error("Fail db");
+                LOGGER.debug("Failure : {}", failureHandler.getMessage());
+                LOGGER.error("Fail db");
                 promise.fail(failureHandler);
               });
       return promise.future();
@@ -93,8 +95,8 @@ public class PostgresServiceImpl implements PostgresService {
             })
         .onFailure(
             failureHandler -> {
-                LOGGER.debug("Failure : {}",failureHandler.getMessage() );
-                String response =
+              LOGGER.debug("Failure : {}", failureHandler.getMessage());
+              String response =
                   new RespBuilder()
                       .withType(ResponseUrn.DB_ERROR_URN.getUrn())
                       .withTitle(ResponseUrn.DB_ERROR_URN.getMessage())
@@ -118,8 +120,8 @@ public class PostgresServiceImpl implements PostgresService {
             })
         .onFailure(
             failureHandler -> {
-                LOGGER.debug("Failure : {}",failureHandler.getMessage() );
-                String response =
+              LOGGER.debug("Failure : {}", failureHandler.getMessage());
+              String response =
                   new RespBuilder()
                       .withType(ResponseUrn.DB_ERROR_URN.getUrn())
                       .withTitle(ResponseUrn.DB_ERROR_URN.getMessage())
@@ -153,8 +155,8 @@ public class PostgresServiceImpl implements PostgresService {
                 handler.handle(Future.succeededFuture(responseJson));
               } else {
                 LOGGER.debug("transaction failed");
-                LOGGER.debug("Failure : {}",completeHandler.cause().getMessage());
-                  String response =
+                LOGGER.debug("Failure : {}", completeHandler.cause().getMessage());
+                String response =
                     new RespBuilder()
                         .withType(ResponseUrn.DB_ERROR_URN.getUrn())
                         .withTitle(ResponseUrn.DB_ERROR_URN.getMessage())
@@ -201,7 +203,7 @@ public class PostgresServiceImpl implements PostgresService {
             })
         .onFailure(
             failureHandler -> {
-                LOGGER.debug("Failure : {}",failureHandler.getMessage());
+              LOGGER.debug("Failure : {}", failureHandler.getMessage());
               String response =
                   new RespBuilder()
                       .withType(ResponseUrn.DB_ERROR_URN.getUrn())
@@ -223,10 +225,10 @@ public class PostgresServiceImpl implements PostgresService {
     LOGGER.debug("query params : " + queryParams.encode());
 
     //    Tuple tuple = Tuple.of(resourceIds,consumerEmailId);
-      UUID[] ids = resourceIds.stream().map(e -> UUID.fromString(e.toString())).toArray(UUID[]::new);
+    UUID[] ids = resourceIds.stream().map(e -> UUID.fromString(e.toString())).toArray(UUID[]::new);
     Tuple tuple = Tuple.of(ids, consumerEmailId);
 
-      Collector<Row, ?, List<JsonObject>> rowCollector =
+    Collector<Row, ?, List<JsonObject>> rowCollector =
         Collectors.mapping(row -> row.toJson(), Collectors.toList());
 
     client
@@ -242,8 +244,11 @@ public class PostgresServiceImpl implements PostgresService {
               LOGGER.debug("response from DB from fetch policy : {}", successHandler);
               if (successHandler.isEmpty()) {
                 LOGGER.error("Empty from DB while fetching policy related info");
-                JsonObject response = new JsonObject()
-                        .put(RESULTS, new RespBuilder()
+                JsonObject response =
+                    new JsonObject()
+                        .put(
+                            RESULTS,
+                            new RespBuilder()
                                 .withType(HttpStatusCode.NO_CONTENT.getValue())
                                 .withTitle(HttpStatusCode.NO_CONTENT.getUrn())
                                 .getJsonResponse());
@@ -252,10 +257,13 @@ public class PostgresServiceImpl implements PostgresService {
                         response.put(STATUS_CODE, HttpStatusCode.NO_CONTENT.getValue())));
 
               } else {
-                  List<String> resourceId = successHandler.stream().map(e -> e.getString("resources")).collect(Collectors.toList());
+                List<String> resourceId =
+                    successHandler.stream()
+                        .map(e -> e.getString("resources"))
+                        .collect(Collectors.toList());
                 LOGGER.info(
                     "Policy exists for the resource IDs : {} present in the product variant",
-                        resourceId);
+                    resourceId);
                 JsonObject responseJson =
                     new JsonObject()
                         .put(
@@ -263,8 +271,9 @@ public class PostgresServiceImpl implements PostgresService {
                             new RespBuilder()
                                 .withType(ResponseUrn.SUCCESS_URN.getUrn())
                                 .withTitle(ResponseUrn.SUCCESS_URN.getMessage())
-                                .withDetail("Policy exists for the resource ID(s) : " +
-                                        resourceId
+                                .withDetail(
+                                    "Policy exists for the resource ID(s) : "
+                                        + resourceId
                                         + " from the product variant")
                                 .getJsonResponse())
                         .put(STATUS_CODE, HttpStatusCode.SUCCESS.getValue());

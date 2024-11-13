@@ -10,8 +10,6 @@ import io.vertx.ext.web.client.WebClientOptions;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import java.util.concurrent.TimeUnit;
-
 /**
  * The Catalogue Service
  *

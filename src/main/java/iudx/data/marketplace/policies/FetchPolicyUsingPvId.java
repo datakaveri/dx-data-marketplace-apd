@@ -1,5 +1,9 @@
 package iudx.data.marketplace.policies;
 
+import static iudx.data.marketplace.policies.util.Constants.FETCH_POLICY;
+import static iudx.data.marketplace.policies.util.Constants.FETCH_PRODUCT_VARIANT;
+import static iudx.data.marketplace.product.util.Constants.RESULTS;
+
 import io.vertx.core.Future;
 import io.vertx.core.Promise;
 import io.vertx.core.json.JsonObject;
@@ -7,15 +11,10 @@ import iudx.data.marketplace.common.HttpStatusCode;
 import iudx.data.marketplace.common.RespBuilder;
 import iudx.data.marketplace.common.ResponseUrn;
 import iudx.data.marketplace.postgres.PostgresService;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import java.util.List;
 import java.util.stream.Collectors;
-
-import static iudx.data.marketplace.policies.util.Constants.FETCH_POLICY;
-import static iudx.data.marketplace.policies.util.Constants.FETCH_PRODUCT_VARIANT;
-import static iudx.data.marketplace.product.util.Constants.RESULTS;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class FetchPolicyUsingPvId {
   private static final Logger LOG = LoggerFactory.getLogger(FetchPolicyUsingPvId.class);

@@ -1,6 +1,5 @@
 package iudx.data.marketplace.authenticator.authorization;
 
-import iudx.data.marketplace.common.Api;
 
 import java.util.Objects;
 

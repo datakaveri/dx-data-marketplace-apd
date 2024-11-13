@@ -5,7 +5,6 @@ import static iudx.data.marketplace.common.ResponseUrn.INVALID_ID_VALUE_URN;
 
 import iudx.data.marketplace.apiserver.exceptions.DxRuntimeException;
 import iudx.data.marketplace.common.HttpStatusCode;
-import org.apache.commons.lang.StringUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 

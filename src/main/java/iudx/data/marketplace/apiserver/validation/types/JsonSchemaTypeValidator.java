@@ -24,7 +24,7 @@ import static iudx.data.marketplace.common.ResponseUrn.SCHEMA_READ_ERROR_URN;
 public class JsonSchemaTypeValidator implements Validator {
   private static final Logger LOGGER = LogManager.getLogger(JsonSchemaTypeValidator.class);
   private static String pkg = Validator.class.getPackageName();
-  private static final String PACKAGE_NAME = "/" + pkg.replace(".","/");
+  private static final String PACKAGE_NAME = "/" + pkg.replace(".", "/");
   private final JsonObject body;
   private final RequestType requestType;
 
@@ -40,7 +40,7 @@ public class JsonSchemaTypeValidator implements Validator {
 
   public static JsonNode loadString(final String obj) throws IOException {
     return JsonLoader.fromString(obj);
-    }
+  }
 
   @Override
   public boolean isValid() {
@@ -48,16 +48,19 @@ public class JsonSchemaTypeValidator implements Validator {
     try {
       isValid = validateJson(body, requestType);
     } catch (IOException | ProcessingException e) {
-      throw new DxRuntimeException(failureCode(), SCHEMA_READ_ERROR_URN, failureMessage(body.encode()));
+      throw new DxRuntimeException(
+          failureCode(), SCHEMA_READ_ERROR_URN, failureMessage(body.encode()));
     }
-    if(!isValid) {
-      throw new DxRuntimeException(failureCode(), INVALID_PAYLOAD_FORMAT_URN, INVALID_PAYLOAD_FORMAT_URN.getMessage());
+    if (!isValid) {
+      throw new DxRuntimeException(
+          failureCode(), INVALID_PAYLOAD_FORMAT_URN, INVALID_PAYLOAD_FORMAT_URN.getMessage());
     } else {
       return true;
     }
   }
 
-  private boolean validateJson(JsonObject body, RequestType requestType) throws IOException, ProcessingException, DxRuntimeException {
+  private boolean validateJson(JsonObject body, RequestType requestType)
+      throws IOException, ProcessingException, DxRuntimeException {
     LOGGER.debug(body);
     boolean isValid;
     String schemaPath = PACKAGE_NAME + "/".concat(requestType.getFilename()).concat("_schema.json");
@@ -65,7 +68,7 @@ public class JsonSchemaTypeValidator implements Validator {
     LOGGER.debug(schemaPath);
     final JsonSchema schema;
     try {
-     final JsonNode sc = loadResource(schemaPath);
+      final JsonNode sc = loadResource(schemaPath);
     } catch (Exception e) {
       LOGGER.error("Validation Error {}", e.getMessage());
     }
@@ -77,12 +80,14 @@ public class JsonSchemaTypeValidator implements Validator {
     try {
       JsonNode jsonobj = loadString(body.toString());
       ProcessingReport report = schema.validate(jsonobj);
-      report.forEach( x -> {
-        if(x.getLogLevel().toString().equalsIgnoreCase("error")) {
-          LOGGER.error(x.getMessage());
-          throw new DxRuntimeException(failureCode(), INVALID_PAYLOAD_FORMAT_URN, x.getMessage());
-        }
-      });
+      report.forEach(
+          x -> {
+            if (x.getLogLevel().toString().equalsIgnoreCase("error")) {
+              LOGGER.error(x.getMessage());
+              throw new DxRuntimeException(
+                  failureCode(), INVALID_PAYLOAD_FORMAT_URN, x.getMessage());
+            }
+          });
       isValid = report.isSuccess();
     } catch (IOException | ProcessingException e) {
       isValid = false;
