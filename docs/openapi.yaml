@@ -11,7 +11,7 @@ consumes:
   - "application/json"
   - "text/plain"
 info:
-  version: 1.0.0
+  version: 1.0.1
   title: DX Data Marketplace APIs
   description: |-
     # Introduction
@@ -46,7 +46,7 @@ info:
 
   contact:
     name: For support contact DX Team at
-    email: support@iudx.org.in
+    email: support@datakaveri.org
     url:  https://dataforpublicgood.org.in/
   license:
     name: Apache 2.0

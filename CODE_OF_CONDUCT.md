@@ -49,7 +49,7 @@ This Code of Conduct will help inform your interactions and reinforce values tha
 
 ### Reporting the behavior
 If you believe that someone is violating the code of conduct, or have any other concerns, please contact
-our team immediately by sending an email to support@iudx.org.in. All reports will be reviewed and investigated and will result in a response that is deemed necessary and appropriate to the circumstances.
+our team immediately by sending an email to support@datakaveri.org. All reports will be reviewed and investigated and will result in a response that is deemed necessary and appropriate to the circumstances.
 
 
 ## Attribution

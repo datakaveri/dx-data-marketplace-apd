@@ -6,7 +6,7 @@ info:
   version: 4.5.0
   description: 'The data marketplace is IUDX''s platform that enables data Providers to host their resources as a product. Likewise, data consumers can buy the products listed by various providers '
   contact:
-    email: support@iudx.org.in
+    email: support@datakaveri.org
     name: For support contact IUDX team at
 paths:
   /provider/product:
