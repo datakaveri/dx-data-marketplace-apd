@@ -21,7 +21,7 @@ public class PostgresVerticle extends AbstractVerticle {
   private PoolOptions poolOptions;
   private PgPool pool;
 
-  private String databaseIP;
+  private String databaseIp;
   private int databasePort;
   private String databaseName;
   private String databaseUserName;
@@ -33,7 +33,7 @@ public class PostgresVerticle extends AbstractVerticle {
   @Override
   public void start() throws Exception {
 
-    databaseIP = config().getString("databaseIP");
+    databaseIp = config().getString("databaseIP");
     databasePort = config().getInteger("databasePort");
     databaseName = config().getString("databaseName");
     databaseUserName = config().getString("databaseUserName");
@@ -43,7 +43,7 @@ public class PostgresVerticle extends AbstractVerticle {
     this.connectOptions =
         new PgConnectOptions()
             .setPort(databasePort)
-            .setHost(databaseIP)
+            .setHost(databaseIp)
             .setDatabase(databaseName)
             .setUser(databaseUserName)
             .setPassword(databasePassword)

@@ -264,7 +264,9 @@ public class RazorPayServiceImpl implements RazorPayService {
       } else {
         LOGGER.error("Linked account not activated");
         String detail =
-            "To activate linked account please complete the KYC, filling account information etc., in your Razorpay merchant dashboard";
+            "To activate linked account please complete the KYC, filling account information etc., "
+                +
+                "in your Razorpay merchant dashboard";
         promise.fail(detail);
       }
     } catch (RazorpayException e) {

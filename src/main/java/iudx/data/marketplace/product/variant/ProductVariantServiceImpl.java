@@ -40,18 +40,18 @@ public class ProductVariantServiceImpl implements ProductVariantService {
   @Override
   public ProductVariantService createProductVariant(
       User user, JsonObject request, Handler<AsyncResult<JsonObject>> handler) {
-    String productID = request.getString(PRODUCT_ID);
+    String productId = request.getString(PRODUCT_ID);
     String variantName = request.getString(PRODUCT_VARIANT_NAME);
     String providerId = user.getUserId();
-    Future<JsonObject> productDetailsFuture = getProductDetails(productID, providerId);
+    Future<JsonObject> productDetailsFuture = getProductDetails(productId, providerId);
     JsonArray resources = request.getJsonArray(RESOURCES_ARRAY);
-    Future<Boolean> checkIfProductExists = checkForExistenceOfProduct(productID, providerId);
+    Future<Boolean> checkIfProductExists = checkForExistenceOfProduct(productId, providerId);
 
     Future<Boolean> checkForExistence =
         checkIfProductExists.compose(
             isProductFound -> {
               if (isProductFound) {
-                return checkIfProductVariantExists(productID, variantName);
+                return checkIfProductVariantExists(productId, variantName);
               } else {
                 String failureMessage =
                     new RespBuilder()
@@ -109,9 +109,9 @@ public class ProductVariantServiceImpl implements ProductVariantService {
                 int i, j;
                 for (i = 0; i < resources.size(); i++) {
                   for (j = 0; j < resResources.size(); j++) {
-                    String reqID = resources.getJsonObject(i).getString(ID);
-                    String resID = resResources.getJsonObject(j).getString(ID);
-                    if (reqID.equalsIgnoreCase(resID)) {
+                    String reqId = resources.getJsonObject(i).getString(ID);
+                    String resId = resResources.getJsonObject(j).getString(ID);
+                    if (reqId.equalsIgnoreCase(resId)) {
                       resResources.getJsonObject(j).mergeIn(resources.getJsonObject(i));
                       break;
                     }
@@ -139,7 +139,7 @@ public class ProductVariantServiceImpl implements ProductVariantService {
                                         .add(
                                             new JsonObject()
                                                 .put("productVariantId", productVariantId)
-                                                .put("productId", productID)
+                                                .put("productId", productId)
                                                 .put(PRODUCT_VARIANT_NAME, variantName)))
                                 .withDetail("Product Variant created successfully");
                         handler.handle(Future.succeededFuture(respBuilder.getJsonResponse()));
@@ -154,9 +154,9 @@ public class ProductVariantServiceImpl implements ProductVariantService {
     return this;
   }
 
-  private Future<Boolean> checkIfProductVariantExists(String productID, String variantName) {
+  private Future<Boolean> checkIfProductVariantExists(String productId, String variantName) {
     Promise<Boolean> promise = Promise.promise();
-    String query = queryBuilder.selectProductVariant(productID, variantName);
+    String query = queryBuilder.selectProductVariant(productId, variantName);
     pgService.executeCountQuery(
         query,
         handler -> {
@@ -170,10 +170,10 @@ public class ProductVariantServiceImpl implements ProductVariantService {
     return promise.future();
   }
 
-  Future<JsonObject> getProductDetails(String productID, String providerId) {
+  Future<JsonObject> getProductDetails(String productId, String providerId) {
     Promise<JsonObject> promise = Promise.promise();
 
-    String query = queryBuilder.buildProductDetailsQuery(productID, providerId);
+    String query = queryBuilder.buildProductDetailsQuery(productId, providerId);
     LOGGER.debug(query);
     pgService.executeQuery(
         query,
@@ -242,10 +242,10 @@ public class ProductVariantServiceImpl implements ProductVariantService {
   public ProductVariantService updateProductVariant(
       User user, JsonObject request, Handler<AsyncResult<JsonObject>> handler) {
 
-    String productID = request.getString(PRODUCT_ID);
+    String productId = request.getString(PRODUCT_ID);
     String variant = request.getString(PRODUCT_VARIANT_NAME);
     /* check if the product variant exists */
-    String query = queryBuilder.checkProductVariantExistence(productID, variant);
+    String query = queryBuilder.checkProductVariantExistence(productId, variant);
     pgService.executeQuery(
         query,
         existenceHandler -> {
@@ -254,7 +254,7 @@ public class ProductVariantServiceImpl implements ProductVariantService {
             if (!isEmpty) {
 
               Future<Boolean> updateProductVariantFuture =
-                  updateProductVariantStatus(productID, variant);
+                  updateProductVariantStatus(productId, variant);
               updateProductVariantFuture.onComplete(
                   updateHandler -> {
                     if (updateHandler.result()) {
@@ -297,9 +297,9 @@ public class ProductVariantServiceImpl implements ProductVariantService {
     return this;
   }
 
-  Future<Boolean> updateProductVariantStatus(String productID, String variant) {
+  Future<Boolean> updateProductVariantStatus(String productId, String variant) {
     Promise<Boolean> promise = Promise.promise();
-    String query = queryBuilder.updateProductVariantStatusQuery(productID, variant);
+    String query = queryBuilder.updateProductVariantStatusQuery(productId, variant);
 
     pgService.executeQuery(
         query,

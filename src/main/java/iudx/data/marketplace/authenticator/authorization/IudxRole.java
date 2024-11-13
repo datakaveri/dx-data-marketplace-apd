@@ -1,7 +1,6 @@
 package iudx.data.marketplace.authenticator.authorization;
 
 import iudx.data.marketplace.authenticator.model.JwtData;
-
 import java.util.stream.Stream;
 
 public enum IudxRole {

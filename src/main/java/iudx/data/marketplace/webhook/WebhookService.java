@@ -25,13 +25,13 @@ public interface WebhookService {
 
   /**
    * @param orderId which is a String generated from Razorpay
-   * @return Future<JsonObject> which is a vertx Future
+   * @return Future JsonObject which is a vertx Future
    */
   Future<JsonObject> recordOrderPaid(String orderId);
 
   /**
    * @param orderId which is a String generated from Razorpay
-   * @return Future<Void> which is a vertx Future
+   * @return Future Void which is a vertx Future
    */
   Future<Void> recordPaymentFailure(String orderId);
 }

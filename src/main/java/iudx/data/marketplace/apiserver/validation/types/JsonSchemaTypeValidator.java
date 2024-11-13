@@ -1,9 +1,11 @@
 package iudx.data.marketplace.apiserver.validation.types;
 
+import static iudx.data.marketplace.common.ResponseUrn.INVALID_PAYLOAD_FORMAT_URN;
+import static iudx.data.marketplace.common.ResponseUrn.SCHEMA_READ_ERROR_URN;
+
 import com.fasterxml.jackson.databind.JsonNode;
 import com.github.fge.jackson.JsonLoader;
 import com.github.fge.jsonschema.core.exceptions.ProcessingException;
-import com.github.fge.jsonschema.core.report.ProcessingMessage;
 import com.github.fge.jsonschema.core.report.ProcessingReport;
 import com.github.fge.jsonschema.main.JsonSchema;
 import com.github.fge.jsonschema.main.JsonSchemaFactory;
@@ -11,15 +13,9 @@ import io.vertx.core.json.JsonObject;
 import iudx.data.marketplace.apiserver.exceptions.DxRuntimeException;
 import iudx.data.marketplace.apiserver.util.RequestType;
 import iudx.data.marketplace.common.HttpStatusCode;
+import java.io.IOException;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-
-import java.io.IOException;
-import java.io.PrintWriter;
-import java.io.StringWriter;
-
-import static iudx.data.marketplace.common.ResponseUrn.INVALID_PAYLOAD_FORMAT_URN;
-import static iudx.data.marketplace.common.ResponseUrn.SCHEMA_READ_ERROR_URN;
 
 public class JsonSchemaTypeValidator implements Validator {
   private static final Logger LOGGER = LogManager.getLogger(JsonSchemaTypeValidator.class);

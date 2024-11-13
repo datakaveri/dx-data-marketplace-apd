@@ -21,7 +21,7 @@ public class ProductIdTypeValidator implements Validator {
     this.required = required;
   }
 
-  public boolean isValidID(final String value) {
+  public boolean isValidId(final String value) {
     String[] variable = value.split(":");
     try {
       boolean isValidUrn = StringUtils.isNotBlank(variable[0]) && variable[0].equals(STRING_URN);
@@ -57,7 +57,7 @@ public class ProductIdTypeValidator implements Validator {
       LOGGER.error("Validation error : Value exceed max character limit.");
       throw new DxRuntimeException(failureCode(), INVALID_ID_VALUE_URN, failureMessage(value));
     }
-    if (!isValidID(value)) {
+    if (!isValidId(value)) {
       LOGGER.error("Validation error : Invalid Name");
       throw new DxRuntimeException(failureCode(), INVALID_ID_VALUE_URN, failureMessage(value));
     }

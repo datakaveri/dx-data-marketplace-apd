@@ -48,15 +48,15 @@ public class CatalogueService {
    * using a webClient
    *
    * @see io.vertx.ext.web.client.WebClient
-   * @param itemID which is String
+   * @param itemId which is String
    * @return Future which is of type JsonObject
    */
-  public Future<JsonObject> getItemDetails(String itemID) {
+  public Future<JsonObject> getItemDetails(String itemId) {
     Promise<JsonObject> promise = Promise.promise();
     JsonObject itemDetails = new JsonObject();
     catWebClient
         .get(catPort, catHost, catItemPath)
-        .addQueryParam("id", itemID)
+        .addQueryParam("id", itemId)
         .send(
             catItemHandler -> {
               if (catItemHandler.succeeded()) {
@@ -67,13 +67,13 @@ public class CatalogueService {
                   if (result.getJsonArray("type").contains(TYPE_PROVIDER)) {
                     itemDetails
                         .put("type", TYPE_PROVIDER)
-                        .put(PROVIDER_ID, itemID)
+                        .put(PROVIDER_ID, itemId)
                         .put("ownerUserId", result.getString("ownerUserId", ""))
                         .put(PROVIDER_NAME, result.getString("description", ""));
                   } else if (result.getJsonArray("type").contains(TYPE_RI)) {
                     itemDetails
                         .put("type", TYPE_RI)
-                        .put(RESOURCE_ID, itemID)
+                        .put(RESOURCE_ID, itemId)
                         .put(RESOURCE_NAME, result.getString("label", ""))
                         .put(RESOURCE_SERVER, result.getValue(RESOURCE_SERVER))
                         .put(PROVIDER, result.getValue(PROVIDER))
@@ -82,11 +82,11 @@ public class CatalogueService {
                   }
                   promise.complete(itemDetails);
                 } else {
-                  promise.fail("Item with id { " + itemID + " } not found ");
+                  promise.fail("Item with id { " + itemId + " } not found ");
                 }
               } else {
-                LOGGER.debug("Cat web client call to {} failed for id: {} ", catItemPath, itemID);
-                promise.fail("Cat web client call to " + catItemPath + " failed for id: " + itemID);
+                LOGGER.debug("Cat web client call to {} failed for id: {} ", catItemPath, itemId);
+                promise.fail("Cat web client call to " + catItemPath + " failed for id: " + itemId);
               }
             });
 
@@ -97,27 +97,27 @@ public class CatalogueService {
    * The getResourceCount method calls the IUDX catalogue relationship endpoint using a webClient
    *
    * @see io.vertx.ext.web.client.WebClient
-   * @param resourceID which is a String
+   * @param resourceId which is a String
    * @return Future which is of type JsonObject
    */
-  public Future<JsonObject> getResourceCount(String resourceID) {
+  public Future<JsonObject> getResourceCount(String resourceId) {
     Promise<JsonObject> promise = Promise.promise();
     catWebClient
         .get(catPort, catHost, catRelPath)
-        .addQueryParam("id", resourceID)
+        .addQueryParam("id", resourceId)
         .addQueryParam("rel", "resource")
         .send(
             catRelHandler -> {
               if (catRelHandler.succeeded()) {
                 int totalHits = catRelHandler.result().bodyAsJsonObject().getInteger("totalHits");
                 JsonObject res =
-                    new JsonObject().put(RESOURCE_ID, resourceID).put("totalHits", totalHits);
+                    new JsonObject().put(RESOURCE_ID, resourceId).put("totalHits", totalHits);
                 promise.complete(res);
               } else {
                 LOGGER.debug(
-                    "Cat web client call to {} failed for id: {} ", catRelPath, resourceID);
+                    "Cat web client call to {} failed for id: {} ", catRelPath, resourceId);
                 promise.fail(
-                    "Cat web client call to " + catItemPath + " failed for id: " + resourceID);
+                    "Cat web client call to " + catItemPath + " failed for id: " + resourceId);
               }
             });
 

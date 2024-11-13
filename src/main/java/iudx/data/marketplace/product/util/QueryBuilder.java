@@ -30,7 +30,7 @@ public class QueryBuilder {
   }
 
   public List<String> buildCreateProductQueries(JsonObject request, JsonArray resourceDetails) {
-    String productID = request.getString(PRODUCT_ID);
+    String productId = request.getString(PRODUCT_ID);
     String providerID = request.getString(PROVIDER_ID);
     String providerName = request.getString(PROVIDER_NAME);
     List<String> queries = new ArrayList<String>();
@@ -40,7 +40,7 @@ public class QueryBuilder {
         new StringBuilder(
                 INSERT_PRODUCT_QUERY
                     .replace("$0", productTable)
-                    .replace("$1", productID)
+                    .replace("$1", productId)
                     .replace("$2", providerID)
                     .replace("$3", providerName)
                     .replace("$4", Status.ACTIVE.toString()))
@@ -66,7 +66,7 @@ public class QueryBuilder {
               new StringBuilder(
                       INSERT_P_R_REL_QUERY
                           .replace("$0", productResourceRelationTable)
-                          .replace("$1", productID)
+                          .replace("$1", productId)
                           .replace("$2", ((JsonObject) resource).getString(RESOURCE_ID)))
                   .toString());
         });
@@ -93,14 +93,14 @@ public class QueryBuilder {
     return query.toString();
   }
 
-  public String buildProductDetailsQuery(String productID, String providerId) {
+  public String buildProductDetailsQuery(String productId, String providerId) {
     StringBuilder query =
         new StringBuilder(
             SELECT_PRODUCT_DETAILS
                 .replace("$0", productTable)
                 .replace("$9", productResourceRelationTable)
                 .replace("$8", resourceTable)
-                .replace("$1", productID)
+                .replace("$1", productId)
                 .replace("$2", providerId));
 
     return query.toString();
@@ -131,12 +131,12 @@ public class QueryBuilder {
     return query.toString();
   }
 
-  public String updateProductVariantStatusQuery(String productID, String variant) {
+  public String updateProductVariantStatusQuery(String productId, String variant) {
     StringBuilder query =
         new StringBuilder(
             UPDATE_PV_STATUS
                 .replace("$0", productVariantTable)
-                .replace("$1", productID)
+                .replace("$1", productId)
                 .replace("$2", variant)
                 .replace("$3", Status.ACTIVE.toString())
                 .replace("$4", Status.INACTIVE.toString()));
@@ -171,12 +171,12 @@ public class QueryBuilder {
     return query.toString();
   }
 
-  public String selectProductVariant(String productID, String variantName) {
+  public String selectProductVariant(String productId, String variantName) {
     StringBuilder query =
         new StringBuilder(
             SELECT_PV_QUERY
                 .replace("$0", productVariantTable)
-                .replace("$1", productID)
+                .replace("$1", productId)
                 .replace("$2", variantName)
                 .replace("$3", Status.ACTIVE.toString()));
     LOGGER.debug("select product variant query : {}", query);

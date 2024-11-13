@@ -59,7 +59,7 @@ public class ExceptionHandler implements Handler<RoutingContext> {
       LOGGER.error(" -------------- ");
       LOGGER.error(failure.fillInStackTrace());
 
-      String INTERNAL_ERROR_RESP =
+      String internalErrorResp =
           new RespBuilder()
               .withType(ResponseUrn.INTERNAL_SERVER_ERR_URN.getUrn())
               .withTitle(ResponseUrn.INTERNAL_SERVER_ERR_URN.getMessage())
@@ -69,7 +69,7 @@ public class ExceptionHandler implements Handler<RoutingContext> {
           .response()
           .setStatusCode(500)
           .putHeader(HEADER_CONTENT_TYPE, APPLICATION_JSON)
-          .end(INTERNAL_ERROR_RESP);
+          .end(internalErrorResp);
 
       routingContext.next();
     }

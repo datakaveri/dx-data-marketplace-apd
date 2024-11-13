@@ -1,10 +1,10 @@
 package iudx.data.marketplace.authenticator;
 
-import iudx.data.marketplace.authenticator.authorization.*;
-import iudx.data.marketplace.authenticator.model.JwtData;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
-import iudx.data.marketplace.common.Api;
+import static iudx.data.marketplace.apiserver.util.Constants.*;
+import static iudx.data.marketplace.apiserver.util.Constants.API_ENDPOINT;
+import static iudx.data.marketplace.authenticator.authorization.IudxRole.DELEGATE;
+import static iudx.data.marketplace.authenticator.util.Constants.*;
+import static iudx.data.marketplace.common.Constants.APD_URL;
 
 import io.vertx.core.AsyncResult;
 import io.vertx.core.Future;
@@ -14,13 +14,11 @@ import io.vertx.core.Vertx;
 import io.vertx.core.json.JsonObject;
 import io.vertx.ext.auth.authentication.TokenCredentials;
 import io.vertx.ext.auth.jwt.JWTAuth;
-
-import static iudx.data.marketplace.apiserver.util.Constants.*;
-import static iudx.data.marketplace.apiserver.util.Constants.API_ENDPOINT;
-import static iudx.data.marketplace.apiserver.util.Constants.METHOD;
-import static iudx.data.marketplace.authenticator.authorization.IudxRole.DELEGATE;
-import static iudx.data.marketplace.authenticator.util.Constants.*;
-import static iudx.data.marketplace.common.Constants.APD_URL;
+import iudx.data.marketplace.authenticator.authorization.*;
+import iudx.data.marketplace.authenticator.model.JwtData;
+import iudx.data.marketplace.common.Api;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 public class AuthenticationServiceImpl implements AuthenticationService {
 

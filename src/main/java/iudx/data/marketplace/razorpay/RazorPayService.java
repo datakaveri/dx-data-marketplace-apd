@@ -36,7 +36,7 @@ public interface RazorPayService {
    * RazorPay This method also creates a payment record in the marketplace database
    *
    * @param request which is a JsonObject
-   * @retun Future<JsonObject> which is a vertx Future
+   * @retun Future JsonObject which is a vertx Future
    */
   Future<JsonObject> verifyPayment(JsonObject request);
 

@@ -1,5 +1,8 @@
 package iudx.data.marketplace.postgres;
 
+import static iudx.data.marketplace.apiserver.util.Constants.RESULTS;
+import static iudx.data.marketplace.apiserver.util.Constants.STATUS_CODE;
+
 import io.vertx.core.*;
 import io.vertx.core.AsyncResult;
 import io.vertx.core.Future;
@@ -14,18 +17,14 @@ import io.vertx.sqlclient.Tuple;
 import iudx.data.marketplace.common.HttpStatusCode;
 import iudx.data.marketplace.common.RespBuilder;
 import iudx.data.marketplace.common.ResponseUrn;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.stream.Collector;
 import java.util.stream.Collectors;
-
-import static iudx.data.marketplace.apiserver.util.Constants.RESULTS;
-import static iudx.data.marketplace.apiserver.util.Constants.STATUS_CODE;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 public class PostgresServiceImpl implements PostgresService {
   private static final Logger LOGGER = LogManager.getLogger(PostgresServiceImpl.class);

@@ -34,10 +34,10 @@ public class ValidationHandlerFactory {
         validator = listProductVariantValidators(parameters);
         break;
       case RESOURCE:
-        validator = getResourceIDValidators(parameters);
+        validator = getResourceIdValidators(parameters);
         break;
       case PROVIDER:
-        validator = getProviderIDValidators(parameters);
+        validator = getProviderIdValidators(parameters);
         break;
       case POLICY:
         validator = getPolicyValidators(body);
@@ -68,6 +68,8 @@ public class ValidationHandlerFactory {
         break;
       case CHECK_POLICY:
         validator = getCheckPolicyValidator(parameters);
+        break;
+      default:
         break;
     }
     return validator;
@@ -137,7 +139,7 @@ public class ValidationHandlerFactory {
     return validators;
   }
 
-  private List<Validator> getResourceIDValidators(final MultiMap parameters) {
+  private List<Validator> getResourceIdValidators(final MultiMap parameters) {
     List<Validator> validators = new ArrayList<>();
 
     validators.add(new UuidTypeValidator(parameters.get("resourceId"), false));
@@ -145,7 +147,7 @@ public class ValidationHandlerFactory {
     return validators;
   }
 
-  private List<Validator> getProviderIDValidators(final MultiMap parameters) {
+  private List<Validator> getProviderIdValidators(final MultiMap parameters) {
     List<Validator> validators = new ArrayList<>();
 
     validators.add(new UuidTypeValidator(parameters.get(PROVIDER_ID), false));

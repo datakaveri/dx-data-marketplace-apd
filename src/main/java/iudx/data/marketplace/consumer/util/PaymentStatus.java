@@ -1,10 +1,9 @@
 package iudx.data.marketplace.consumer.util;
 
-import iudx.data.marketplace.apiserver.exceptions.DxRuntimeException;
-
-import java.util.stream.Stream;
-
 import static iudx.data.marketplace.common.ResponseUrn.PAYMENT_STATUS_NOT_FOUND;
+
+import iudx.data.marketplace.apiserver.exceptions.DxRuntimeException;
+import java.util.stream.Stream;
 
 public enum PaymentStatus {
   PENDING("PENDING"),

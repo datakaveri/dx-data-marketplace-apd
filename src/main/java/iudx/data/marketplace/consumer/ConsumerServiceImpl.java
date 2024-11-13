@@ -70,12 +70,12 @@ public class ConsumerServiceImpl implements ConsumerService {
 
     StringBuilder query = new StringBuilder(LIST_RESOURCES_QUERY.replace("$0", resourceTable));
     if (request.containsKey("resourceId")) {
-      String resourceID = request.getString("resourceId");
-      params.put("resourceId", resourceID);
+      String resourceId = request.getString("resourceId");
+      params.put("resourceId", resourceId);
       query = new StringBuilder(LIST_RESOURCES_QUERY_4_RESOURCE.replace("$0", resourceTable));
     } else if (request.containsKey("providerId")) {
-      String providerID = request.getString("providerId");
-      params.put("providerId", providerID);
+      String providerId = request.getString("providerId");
+      params.put("providerId", providerId);
       query = new StringBuilder(LIST_RESOURCES_QUERY_4_PROVIDER.replace("$0", resourceTable));
     }
     LOGGER.debug("List resources query : {}", query);
@@ -102,8 +102,8 @@ public class ConsumerServiceImpl implements ConsumerService {
 
     String query = LIST_PROVIDERS_QUERY;
     if (request.containsKey("providerId")) {
-      String providerID = request.getString("providerId");
-      params.put("providerId", providerID);
+      String providerId = request.getString("providerId");
+      params.put("providerId", providerId);
       query = LIST_PROVIDER_WITH_GIVEN_PROVIDER_ID;
     }
     LOGGER.debug("Query : " + query);
@@ -144,8 +144,8 @@ public class ConsumerServiceImpl implements ConsumerService {
       params.put("resourceId", resourceID);
       query.append(" and rt._id=$2");
     } else if (request.containsKey("providerId")) {
-      String providerID = request.getString("providerId");
-      params.put("providerId", providerID);
+      String providerId = request.getString("providerId");
+      params.put("providerId", providerId);
       query.append(" and pt.provider_id=$2");
     }
     query.append(" group by pt.product_id, rt.resource_server");

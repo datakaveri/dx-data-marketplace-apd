@@ -79,16 +79,16 @@ public class ProductServiceImpl implements ProductService {
       User user, JsonObject request, Handler<AsyncResult<JsonObject>> handler) {
 
     JsonArray resourceDetails = new JsonArray();
-    String providerID = user.getUserId();
-    String productID =
-        URN_PREFIX.concat(providerID).concat(":").concat(request.getString(PRODUCT_ID));
+    String providerId = user.getUserId();
+    String productId =
+        URN_PREFIX.concat(providerId).concat(":").concat(request.getString(PRODUCT_ID));
 
     /* Check Merchant Account Existence on RazorPay */
     checkMerchantAccountStatus(user)
         .compose(
             merchantAccountStatus -> {
               List<Future> itemFutures =
-                  fetchItemDetailsFromCat(request, providerID, productID, resourceDetails);
+                  fetchItemDetailsFromCat(request, providerId, productId, resourceDetails);
 
               return CompositeFuture.all(itemFutures);
             })
@@ -108,7 +108,7 @@ public class ProductServiceImpl implements ProductService {
               if (!sameProviderForAll) {
                 return Future.failedFuture("The resources listed belong to different providers");
               } else {
-                return checkIfProductExists(providerID, productID);
+                return checkIfProductExists(providerId, productId);
               }
             })
         /* Check if product already exists */
@@ -128,7 +128,7 @@ public class ProductServiceImpl implements ProductService {
                 if (!completeHandler
                     .result()
                     .getString("ownerUserId")
-                    .equalsIgnoreCase(providerID)) {
+                    .equalsIgnoreCase(providerId)) {
 
                   handler.handle(
                       Future.failedFuture(
@@ -155,7 +155,7 @@ public class ProductServiceImpl implements ProductService {
                               new RespBuilder()
                                   .withType(ResponseUrn.SUCCESS_URN.getUrn())
                                   .withTitle(ResponseUrn.SUCCESS_URN.getMessage())
-                                  .withResult(new JsonObject().put(PRODUCT_ID, productID))
+                                  .withResult(new JsonObject().put(PRODUCT_ID, productId))
                                   .withDetail("Product created successfully")
                                   .getJsonResponse();
                           handler.handle(Future.succeededFuture(result));
@@ -193,8 +193,8 @@ public class ProductServiceImpl implements ProductService {
   }
 
   private List<Future> fetchItemDetailsFromCat(
-      JsonObject request, String providerID, String productID, JsonArray resourceDetails) {
-    request.put(PROVIDER_ID, providerID).put(PRODUCT_ID, productID);
+      JsonObject request, String providerId, String productID, JsonArray resourceDetails) {
+    request.put(PROVIDER_ID, providerId).put(PRODUCT_ID, productID);
 
     JsonArray resourceIds = request.getJsonArray(RESOURCE_IDS);
 
@@ -216,14 +216,14 @@ public class ProductServiceImpl implements ProductService {
     return itemFutures;
   }
 
-  Future<Boolean> checkIfProductExists(String providerID, String productID) {
+  Future<Boolean> checkIfProductExists(String providerId, String productId) {
     Promise<Boolean> promise = Promise.promise();
     StringBuilder query =
         new StringBuilder(
             SELECT_PRODUCT_QUERY
                 .replace("$0", productTableName)
-                .replace("$1", providerID)
-                .replace("$2", productID));
+                .replace("$1", providerId)
+                .replace("$2", productId));
 
     LOGGER.debug("checkQuery: {}", query);
     pgService.executeCountQuery(
@@ -247,15 +247,15 @@ public class ProductServiceImpl implements ProductService {
   public ProductService deleteProduct(
       User user, JsonObject request, Handler<AsyncResult<JsonObject>> handler) {
 
-    String providerID = user.getUserId();
-    String productID = request.getString(PRODUCT_ID);
+    String providerId = user.getUserId();
+    String productId = request.getString(PRODUCT_ID);
     JsonObject params =
-        new JsonObject().put(STATUS, Status.INACTIVE.toString()).put(PRODUCT_ID, productID);
+        new JsonObject().put(STATUS, Status.INACTIVE.toString()).put(PRODUCT_ID, productId);
 
     JsonObject deleteProductVariantParams =
-        new JsonObject().put(PRODUCT_ID, productID).put(PROVIDER_ID, providerID);
+        new JsonObject().put(PRODUCT_ID, productId).put(PROVIDER_ID, providerId);
 
-    checkIfProductExists(providerID, productID)
+    checkIfProductExists(providerId, productId)
         .onComplete(
             existsHandler -> {
               LOGGER.error(existsHandler.result());
@@ -329,12 +329,12 @@ public class ProductServiceImpl implements ProductService {
   public ProductService listProducts(
       User user, JsonObject request, Handler<AsyncResult<JsonObject>> handler) {
 
-    String providerID = user.getUserId();
+    String providerId = user.getUserId();
     String resourceServerUrl = user.getResourceServerUrl();
     JsonObject params =
         new JsonObject()
             .put(STATUS, Status.ACTIVE.toString())
-            .put(PROVIDER_ID, providerID)
+            .put(PROVIDER_ID, providerId)
             .put("resourceServerUrl", resourceServerUrl);
 
     if (request.containsKey("resourceId")) {

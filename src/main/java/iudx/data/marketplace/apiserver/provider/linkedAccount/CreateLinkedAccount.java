@@ -1,5 +1,8 @@
 package iudx.data.marketplace.apiserver.provider.linkedAccount;
 
+import static iudx.data.marketplace.apiserver.provider.linkedAccount.util.Constants.*;
+import static iudx.data.marketplace.apiserver.util.Constants.*;
+
 import com.google.common.hash.Hashing;
 import io.vertx.core.Future;
 import io.vertx.core.Promise;
@@ -13,16 +16,12 @@ import iudx.data.marketplace.common.ResponseUrn;
 import iudx.data.marketplace.policies.User;
 import iudx.data.marketplace.postgres.PostgresService;
 import iudx.data.marketplace.razorpay.RazorPayService;
-import org.apache.commons.lang.StringUtils;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
-
 import java.nio.charset.StandardCharsets;
 import java.security.SecureRandom;
 import java.util.Arrays;
-
-import static iudx.data.marketplace.apiserver.provider.linkedAccount.util.Constants.*;
-import static iudx.data.marketplace.apiserver.util.Constants.*;
+import org.apache.commons.lang.StringUtils;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 public class CreateLinkedAccount {
   private static final Logger LOGGER = LogManager.getLogger(CreateLinkedAccount.class);
@@ -73,7 +72,7 @@ public class CreateLinkedAccount {
             isRazorpayFlowSuccessful -> {
               if (isRazorpayFlowSuccessful) {
                 /* insert in DB */
-                return insertInfoInDB(INSERT_MERCHANT_INFO_QUERY, referenceId);
+                return insertInfoInDb(INSERT_MERCHANT_INFO_QUERY, referenceId);
               } else {
                 return Future.failedFuture(razorpayFlowFuture.cause().getMessage());
               }
@@ -214,7 +213,7 @@ public class CreateLinkedAccount {
    * @param referenceId Acts as primary key to store record
    * @return Success or failure response of type Future Json object
    */
-  Future<JsonObject> insertInfoInDB(String query, String referenceId) {
+  Future<JsonObject> insertInfoInDb(String query, String referenceId) {
     Promise<JsonObject> promise = Promise.promise();
     String finalQuery =
         query
