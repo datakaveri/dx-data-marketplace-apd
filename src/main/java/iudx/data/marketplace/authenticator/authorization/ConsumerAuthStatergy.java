@@ -1,28 +1,27 @@
 package iudx.data.marketplace.authenticator.authorization;
 
-import io.vertx.core.json.JsonArray;
+import static iudx.data.marketplace.authenticator.authorization.Method.GET;
+import static iudx.data.marketplace.authenticator.authorization.Method.POST;
+
 import iudx.data.marketplace.authenticator.model.JwtData;
 import iudx.data.marketplace.common.Api;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
-
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
-
-import static iudx.data.marketplace.authenticator.authorization.Method.GET;
-import static iudx.data.marketplace.authenticator.authorization.Method.POST;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 public class ConsumerAuthStatergy implements AuthorizationStatergy {
   private static final Logger LOGGER = LogManager.getLogger(ConsumerAuthStatergy.class);
   private static volatile ConsumerAuthStatergy instance;
 
   Map<String, List<AuthorizationRequest>> consumerAuthorizationRules = new HashMap<>();
+
   private ConsumerAuthStatergy(Api apis) {
     buildPermissions(apis);
   }
+
   public static ConsumerAuthStatergy getInstance(Api apis) {
     if (instance == null) {
       synchronized (ConsumerAuthStatergy.class) {
@@ -33,6 +32,7 @@ public class ConsumerAuthStatergy implements AuthorizationStatergy {
     }
     return instance;
   }
+
   private void buildPermissions(Api apis) {
     // api access list
     List<AuthorizationRequest> apiAccessList = new ArrayList<>();
@@ -50,6 +50,7 @@ public class ConsumerAuthStatergy implements AuthorizationStatergy {
     apiAccessList.add(new AuthorizationRequest(GET, apis.getPoliciesUrl()));
     consumerAuthorizationRules.put("api", apiAccessList);
   }
+
   @Override
   public boolean isAuthorized(AuthorizationRequest authorizationRequest, JwtData jwtData) {
     String endpoint = authorizationRequest.getApi();

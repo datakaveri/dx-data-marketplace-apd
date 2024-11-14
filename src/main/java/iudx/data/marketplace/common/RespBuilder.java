@@ -1,10 +1,10 @@
 package iudx.data.marketplace.common;
 
-import io.vertx.core.json.JsonArray;
-import io.vertx.core.json.JsonObject;
-
 import static iudx.data.marketplace.apiserver.util.Constants.*;
 import static iudx.data.marketplace.apiserver.util.Constants.RESULTS;
+
+import io.vertx.core.json.JsonArray;
+import io.vertx.core.json.JsonObject;
 
 public class RespBuilder {
   private JsonObject response = new JsonObject();
@@ -13,8 +13,8 @@ public class RespBuilder {
     response.put(JSON_TYPE, type);
     return this;
   }
-  public RespBuilder withType(int statusCode)
-  {
+
+  public RespBuilder withType(int statusCode) {
     response.put(JSON_TYPE, statusCode);
     return this;
   }
@@ -38,6 +38,7 @@ public class RespBuilder {
     response.put(RESULTS, result);
     return this;
   }
+
   public JsonObject getJsonResponse() {
     return response;
   }

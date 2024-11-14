@@ -30,30 +30,30 @@ public class Constants {
           + " ORDER BY modified_at DESC ";
 
   public static final String LIST_PROVIDERS_QUERY =
-          "SELECT DISTINCT U._id AS \"providerId\", COUNT(R._id) AS \"numberOfResources\", \n"
-                  + "R.provider_name AS \"providerName\", \n"
-                  + "R.resource_server AS \"resourceServerUrl\",\n"
-                  + "U.modified_at AS \"updatedAt\"\n"
-                  + ",U.created_at AS \"createdAt\"\n"
-                  + "FROM user_table U\n"
-                  + "INNER JOIN resource_entity R \n"
-                  + "ON U._id = R.provider_id\n"
-                  + "WHERE R.resource_server = $1 \n"
-                  + "GROUP BY U._id, R.provider_name, R.resource_server, U.modified_at\n"
-                  + "ORDER BY U.modified_at DESC";
+      "SELECT DISTINCT U._id AS \"providerId\", COUNT(R._id) AS \"numberOfResources\", \n"
+          + "R.provider_name AS \"providerName\", \n"
+          + "R.resource_server AS \"resourceServerUrl\",\n"
+          + "U.modified_at AS \"updatedAt\"\n"
+          + ",U.created_at AS \"createdAt\"\n"
+          + "FROM user_table U\n"
+          + "INNER JOIN resource_entity R \n"
+          + "ON U._id = R.provider_id\n"
+          + "WHERE R.resource_server = $1 \n"
+          + "GROUP BY U._id, R.provider_name, R.resource_server, U.modified_at\n"
+          + "ORDER BY U.modified_at DESC";
   public static final String LIST_PROVIDER_WITH_GIVEN_PROVIDER_ID =
-          "SELECT DISTINCT U._id AS \"providerId\", COUNT(R._id) AS \"numberOfResources\", \n"
-                  + "R.provider_name AS \"providerName\", \n"
-                  + "R.resource_server AS \"resourceServerUrl\",\n"
-                  + "U.modified_at AS \"updatedAt\"\n"
-                  + ",U.created_at AS \"createdAt\"\n"
-                  + "FROM user_table U\n"
-                  + "INNER JOIN resource_entity R \n"
-                  + "ON U._id = R.provider_id\n"
-                  + "WHERE R.resource_server = $1 \n"
-                  + "AND U._id = $2 \n"
-                  + "GROUP BY U._id, R.provider_name, R.resource_server, U.modified_at\n"
-                  + "ORDER BY U.modified_at DESC";
+      "SELECT DISTINCT U._id AS \"providerId\", COUNT(R._id) AS \"numberOfResources\", \n"
+          + "R.provider_name AS \"providerName\", \n"
+          + "R.resource_server AS \"resourceServerUrl\",\n"
+          + "U.modified_at AS \"updatedAt\"\n"
+          + ",U.created_at AS \"createdAt\"\n"
+          + "FROM user_table U\n"
+          + "INNER JOIN resource_entity R \n"
+          + "ON U._id = R.provider_id\n"
+          + "WHERE R.resource_server = $1 \n"
+          + "AND U._id = $2 \n"
+          + "GROUP BY U._id, R.provider_name, R.resource_server, U.modified_at\n"
+          + "ORDER BY U.modified_at DESC";
 
   public static final String LIST_PRODUCTS =
       "select pt.product_id AS \"productId\", pt.provider_name AS \"providerName\", "
@@ -67,12 +67,12 @@ public class Constants {
           + "where  pt.status='ACTIVE' AND rt.resource_server = $1";
 
   public static final String GET_PRODUCT_VARIANT_INFO =
-          "select pv._id, pv.product_variant_name, pv.product_id, pv.provider_id, pv.price, m.account_id "
-                  + "from $0 as pv inner join $9 as m on pv.provider_id = m.provider_id "
-                  + "where pv._id=$1 and pv.status=$2";
+      "select pv._id, pv.product_variant_name, pv.product_id, pv.provider_id, pv.price, m.account_id "
+          + "from $0 as pv inner join $9 as m on pv.provider_id = m.provider_id "
+          + "where pv._id=$1 and pv.status=$2";
 
   public static final String INSERT_ORDER_QUERY =
-          "insert into $0 (order_id, amount, currency, account_id, notes) values ('$1', $2, '$3', '$4', '$5')";
+      "insert into $0 (order_id, amount, currency, account_id, notes) values ('$1', $2, '$3', '$4', '$5')";
   public static final String LIST_FAILED_OR_PENDING_PAYMENTS =
       "SELECT DISTINCT I._id AS \"invoiceId\", P.\"providerId\",\n"
           + "U.email_id AS \"providerEmailId\", U.first_name AS \"providerFirstName\",\n"
@@ -126,13 +126,14 @@ public class Constants {
           + " AND P.\"resourceServerUrl\" = '$3'";
 
   public static final String LIST_SUCCESSFUL_PAYMENTS_4_CONSUMER_WITH_GIVEN_ORDER =
-          LIST_SUCCESSFUL_PAYMENTS
+      LIST_SUCCESSFUL_PAYMENTS
           + " WHERE \n"
           + " I.order_id = $1  AND I.consumer_id = '$2'"
-         + " AND P.\"resourceServerUrl\" = '$3'";
+          + " AND P.\"resourceServerUrl\" = '$3'";
   public static final String LIST_PENDING_PAYMENTS_4_CONSUMER =
-          LIST_FAILED_OR_PENDING_PAYMENTS + " WHERE I.consumer_id = '$1'  AND I.payment_status = 'PENDING' "
-                  + " AND P.\"resourceServerUrl\" = '$2'";
+      LIST_FAILED_OR_PENDING_PAYMENTS
+          + " WHERE I.consumer_id = '$1'  AND I.payment_status = 'PENDING' "
+          + " AND P.\"resourceServerUrl\" = '$2'";
   public static final String LIST_PENDING_PAYMENTS_4_CONSUMER_WITH_GIVEN_PRODUCT =
       LIST_FAILED_OR_PENDING_PAYMENTS
           + " WHERE\n"
@@ -148,26 +149,25 @@ public class Constants {
           + " AND P.\"resourceServerUrl\" = '$3'";
 
   public static final String LIST_PENDING_PAYMENTS_4_CONSUMER_WITH_GIVEN_ORDER =
-          LIST_FAILED_OR_PENDING_PAYMENTS
-                  + " WHERE \n"
-                  + " I.order_id = $1  "
-                  + " AND I.consumer_id = '$2' AND I.payment_status = 'PENDING' "
-                  + " AND P.\"resourceServerUrl\" = '$3'";
+      LIST_FAILED_OR_PENDING_PAYMENTS
+          + " WHERE \n"
+          + " I.order_id = $1  "
+          + " AND I.consumer_id = '$2' AND I.payment_status = 'PENDING' "
+          + " AND P.\"resourceServerUrl\" = '$3'";
 
-  public static final String LIST_FAILED_PAYMENTS_4_CONSUMER = LIST_PENDING_PAYMENTS_4_CONSUMER.replace("PENDING","FAILED");
-  public static final String LIST_FAILED_PAYMENTS_4_CONSUMER_WITH_GIVEN_PRODUCT = LIST_PENDING_PAYMENTS_4_CONSUMER_WITH_GIVEN_PRODUCT
-          .replace("PENDING", "FAILED");
-  public static final String LIST_FAILED_PAYMENTS_4_CONSUMER_WITH_GIVEN_RESOURCE = LIST_PENDING_PAYMENTS_4_CONSUMER_WITH_GIVEN_RESOURCE
-          .replace("PENDING", "FAILED");
-
+  public static final String LIST_FAILED_PAYMENTS_4_CONSUMER =
+      LIST_PENDING_PAYMENTS_4_CONSUMER.replace("PENDING", "FAILED");
+  public static final String LIST_FAILED_PAYMENTS_4_CONSUMER_WITH_GIVEN_PRODUCT =
+      LIST_PENDING_PAYMENTS_4_CONSUMER_WITH_GIVEN_PRODUCT.replace("PENDING", "FAILED");
+  public static final String LIST_FAILED_PAYMENTS_4_CONSUMER_WITH_GIVEN_RESOURCE =
+      LIST_PENDING_PAYMENTS_4_CONSUMER_WITH_GIVEN_RESOURCE.replace("PENDING", "FAILED");
 
   public static final String LIST_FAILED_PAYMENTS_4_CONSUMER_WITH_GIVEN_ORDER =
-          LIST_PENDING_PAYMENTS_4_CONSUMER_WITH_GIVEN_ORDER
-                  .replace("PENDING", "FAILED");
+      LIST_PENDING_PAYMENTS_4_CONSUMER_WITH_GIVEN_ORDER.replace("PENDING", "FAILED");
 
   public static final String INSERT_INVOICE_QUERY =
-          "insert into $0 (_id, consumer_id, order_id, product_variant_id, payment_status, payment_time, expiry) "
-                  + "values ('$1', '$2', '$3', '$4', '$5', '$6', (select validity from $p where _id = '$4'))";
+      "insert into $0 (_id, consumer_id, order_id, product_variant_id, payment_status, payment_time, expiry) "
+          + "values ('$1', '$2', '$3', '$4', '$5', '$6', (select validity from $p where _id = '$4'))";
 
   public static final String TRANSFER_ID = "id";
   public static final String SOURCE = "source";
@@ -180,21 +180,21 @@ public class Constants {
   public static final String TRANSFERS = "transfers";
   public static final String TABLES = "tables";
 
-//  public static final String FETCH_ACTIVE_PRODUCT_VARIANTS =
-//          "SELECT _id AS \"productVariantId\","
-//                  + " product_variant_name AS \"productVariantName\", \"product_id\" AS \"productId\",\n"
-//                  + "provider_id AS \"providerId\", resource_info AS \"resources\", \n"
-//                  + "price AS \"price\", validity AS \"expiryInMonths\"\n"
-//                  + " , modified_at AS \"updatedAt\" "
-//                  + " , created_at AS \"createdAt\" "
-//                  + "FROM product_variant\n"
-//                  + "WHERE product_id = '$1'\n"
-//                  + "AND status = 'ACTIVE'  "
-//                  + " ORDER BY modified_at DESC";
+  //  public static final String FETCH_ACTIVE_PRODUCT_VARIANTS =
+  //          "SELECT _id AS \"productVariantId\","
+  //                  + " product_variant_name AS \"productVariantName\", \"product_id\" AS
+  // \"productId\",\n"
+  //                  + "provider_id AS \"providerId\", resource_info AS \"resources\", \n"
+  //                  + "price AS \"price\", validity AS \"expiryInMonths\"\n"
+  //                  + " , modified_at AS \"updatedAt\" "
+  //                  + " , created_at AS \"createdAt\" "
+  //                  + "FROM product_variant\n"
+  //                  + "WHERE product_id = '$1'\n"
+  //                  + "AND status = 'ACTIVE'  "
+  //                  + " ORDER BY modified_at DESC";
   public static final String FETCH_ACTIVE_PRODUCT_VARIANTS =
       "SELECT * FROM product_variant_view P\n"
           + "WHERE P.\"productId\" = $1 \n"
           + "AND P.\"productVariantStatus\" = 'ACTIVE'\n"
           + "AND P.\"resourceServerUrl\" = $2\n";
-
 }

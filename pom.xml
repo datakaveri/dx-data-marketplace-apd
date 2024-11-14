@@ -273,6 +273,43 @@
                 <version>8.5.13</version>
             </plugin>
             <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-pmd-plugin</artifactId>
+                <version>${maven-pmd-plugin.version}</version>
+                <configuration>
+                    <targetJdk>${openjdk.version}</targetJdk>
+                    <rulesets>
+                        <ruleset>./iudx-pmd-ruleset.xml</ruleset>
+                    </rulesets>
+                    <printFailingErrors>true</printFailingErrors>
+                    <!--<maxAllowedViolations>622</maxAllowedViolations>-->
+                    <excludeRoots>
+                        <excludeRoot>target/generated-sources</excludeRoot>
+                    </excludeRoots>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-checkstyle-plugin</artifactId>
+                <version>${maven-checkstyle-plugin-google.version}</version>
+                <dependencies>
+                    <dependency>
+                        <groupId>com.puppycrawl.tools</groupId>
+                        <artifactId>checkstyle</artifactId>
+                        <version>${checkstyle.version}</version>
+                    </dependency>
+                </dependencies>
+                <configuration>
+                    <!--  <violationSeverity>warning</violationSeverity>  -->
+                    <consoleOutput>true</consoleOutput>
+                    <encoding>UTF-8</encoding>
+                    <configLocation>./google_checks.xml</configLocation>
+                    <sourceDirectories>
+                        <sourceDirectory>${project.build.sourceDirectory}</sourceDirectory>
+                    </sourceDirectories>
+                </configuration>
+            </plugin>
+            <plugin>
                 <groupId>org.jacoco</groupId>
                 <artifactId>jacoco-maven-plugin</artifactId>
                 <version>${jacoco-maven-plugin.version}</version>
@@ -327,6 +364,8 @@
                         <exclude>**/*Service.class</exclude>
 
 
+                        <!-- Excluding package info -->
+                        <exclude>**/package-info.class</exclude>
                         <!-- Caller class for policy  -->
                         <exclude>iudx/data/marketplace/policies/PolicyServiceImpl.class</exclude>
                         <!-- deployment helper classes -->
@@ -492,22 +531,6 @@
         <plugins>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-pmd-plugin</artifactId>
-                <version>${maven-pmd-plugin.version}</version>
-                <configuration>
-                    <targetJdk>${openjdk.version}</targetJdk>
-                    <rulesets>
-                        <ruleset>./iudx-pmd-ruleset.xml</ruleset>
-                    </rulesets>
-                    <printFailingErrors>true</printFailingErrors>
-                    <!--<maxAllowedViolations>622</maxAllowedViolations>-->
-                    <excludeRoots>
-                        <excludeRoot>target/generated-sources</excludeRoot>
-                    </excludeRoots>
-                </configuration>
-            </plugin>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-checkstyle-plugin</artifactId>
                 <version>${maven-checkstyle-plugin-google.version}</version>
                 <configuration>
@@ -537,22 +560,6 @@
                         </reports>
                     </reportSet>
                 </reportSets>
-            </plugin>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-pmd-plugin</artifactId>
-                <version>${maven-pmd-plugin.version}</version>
-                <configuration>
-                    <targetJdk>${openjdk.version}</targetJdk>
-                    <rulesets>
-                        <ruleset>./iudx-pmd-ruleset.xml</ruleset>
-                    </rulesets>
-                    <printFailingErrors>true</printFailingErrors>
-                    <!--<maxAllowedViolations>622</maxAllowedViolations>-->
-                    <excludeRoots>
-                        <excludeRoot>target/generated-sources</excludeRoot>
-                    </excludeRoots>
-                </configuration>
             </plugin>
 
 

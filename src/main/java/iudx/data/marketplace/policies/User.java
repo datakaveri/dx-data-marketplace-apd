@@ -1,13 +1,11 @@
 package iudx.data.marketplace.policies;
 
+import static iudx.data.marketplace.apiserver.util.Constants.*;
+
 import io.vertx.codegen.annotations.DataObject;
 import io.vertx.core.json.JsonObject;
 import iudx.data.marketplace.apiserver.util.Role;
-import iudx.data.marketplace.policies.UserConverter;
-
 import java.util.Objects;
-
-import static iudx.data.marketplace.apiserver.util.Constants.*;
 
 /**
  * User class is used to initialize information about the user like id, role, email-Id etc., <br>
@@ -96,8 +94,12 @@ public class User {
 
   @Override
   public boolean equals(Object o) {
-    if (this == o) return true;
-    if (!(o instanceof User)) return false;
+    if (this == o) {
+      return true;
+    }
+    if (!(o instanceof User)) {
+      return false;
+    }
     User user = (User) o;
     return Objects.equals(userId, user.userId)
         && userRole == user.userRole

@@ -1,11 +1,8 @@
 package iudx.data.marketplace.authenticator.authorization;
 
-import iudx.data.marketplace.common.Api;
-
 import java.util.Objects;
 
 public class AuthorizationRequest {
-
 
   private final Method method;
   private final String api;
@@ -25,8 +22,12 @@ public class AuthorizationRequest {
 
   @Override
   public boolean equals(Object o) {
-    if (this == o) return true;
-    if (!(o instanceof AuthorizationRequest)) return false;
+    if (this == o) {
+      return true;
+    }
+    if (!(o instanceof AuthorizationRequest)) {
+      return false;
+    }
     AuthorizationRequest that = (AuthorizationRequest) o;
     return method == that.method && Objects.equals(api, that.api);
   }

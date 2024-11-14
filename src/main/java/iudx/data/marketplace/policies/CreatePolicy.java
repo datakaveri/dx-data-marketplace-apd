@@ -31,7 +31,8 @@ public class CreatePolicy {
   private int expiryInMonths;
   private String consumerEmailId;
   private String expiryAt;
-  private User provider;
+
+  //  private User provider;
 
   public CreatePolicy(PostgresService postgresService, AuditingService auditingService, Api api) {
     this.postgresService = postgresService;
@@ -141,7 +142,6 @@ public class CreatePolicy {
                     return policyCreationFuture;
                   });
               return policyCreationFuture;
-
             });
 
     return future;

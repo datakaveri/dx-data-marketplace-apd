@@ -1,43 +1,36 @@
 package iudx.data.marketplace.authenticator.authorization;
 
-import io.vertx.core.json.JsonArray;
+import static iudx.data.marketplace.authenticator.authorization.Method.*;
+
 import iudx.data.marketplace.authenticator.model.JwtData;
 import iudx.data.marketplace.common.Api;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
-
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
-
-import static iudx.data.marketplace.authenticator.authorization.Method.*;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 public class ProviderAuthStatergy implements AuthorizationStatergy {
   private static final Logger LOGGER = LogManager.getLogger(ProviderAuthStatergy.class);
   private static volatile ProviderAuthStatergy instance;
   Map<String, List<AuthorizationRequest>> providerAuthorizationRequest = new HashMap<>();
 
-  private ProviderAuthStatergy(Api api)
-  {
+  private ProviderAuthStatergy(Api api) {
     buildPermissions(api);
   }
 
-  public static ProviderAuthStatergy getInstance(Api api)
-  {
-    if(instance == null)
-    {
-      synchronized (ProviderAuthStatergy.class)
-      {
-        if(instance == null)
-        {
+  public static ProviderAuthStatergy getInstance(Api api) {
+    if (instance == null) {
+      synchronized (ProviderAuthStatergy.class) {
+        if (instance == null) {
           instance = new ProviderAuthStatergy(api);
         }
       }
     }
     return instance;
   }
+
   private void buildPermissions(Api api) {
     List<AuthorizationRequest> apiAccessList = new ArrayList<>();
     apiAccessList.add(new AuthorizationRequest(POST, api.getProviderProductPath()));
@@ -49,7 +42,7 @@ public class ProviderAuthStatergy implements AuthorizationStatergy {
     apiAccessList.add(new AuthorizationRequest(GET, api.getProviderProductVariantPath()));
     apiAccessList.add(new AuthorizationRequest(DELETE, api.getProviderProductVariantPath()));
 
-//    Linked Account APIs
+    //    Linked Account APIs
     apiAccessList.add(new AuthorizationRequest(POST, api.getLinkedAccountService()));
     apiAccessList.add(new AuthorizationRequest(PUT, api.getLinkedAccountService()));
     apiAccessList.add(new AuthorizationRequest(GET, api.getLinkedAccountService()));

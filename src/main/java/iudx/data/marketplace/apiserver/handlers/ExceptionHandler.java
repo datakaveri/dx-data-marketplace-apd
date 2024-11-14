@@ -1,5 +1,7 @@
 package iudx.data.marketplace.apiserver.handlers;
 
+import static iudx.data.marketplace.apiserver.util.Constants.*;
+
 import io.vertx.core.Handler;
 import io.vertx.core.json.DecodeException;
 import io.vertx.core.json.JsonObject;
@@ -11,8 +13,6 @@ import iudx.data.marketplace.common.ResponseUrn;
 import org.apache.http.HttpStatus;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-
-import static iudx.data.marketplace.apiserver.util.Constants.*;
 
 public class ExceptionHandler implements Handler<RoutingContext> {
 
@@ -59,20 +59,19 @@ public class ExceptionHandler implements Handler<RoutingContext> {
       LOGGER.error(" -------------- ");
       LOGGER.error(failure.fillInStackTrace());
 
-      String INTERNAL_ERROR_RESP =
-        new RespBuilder()
-            .withType(ResponseUrn.INTERNAL_SERVER_ERR_URN.getUrn())
-            .withTitle(ResponseUrn.INTERNAL_SERVER_ERR_URN.getMessage())
-            .getResponse();
+      String internalErrorResp =
+          new RespBuilder()
+              .withType(ResponseUrn.INTERNAL_SERVER_ERR_URN.getUrn())
+              .withTitle(ResponseUrn.INTERNAL_SERVER_ERR_URN.getMessage())
+              .getResponse();
 
       routingContext
           .response()
           .setStatusCode(500)
           .putHeader(HEADER_CONTENT_TYPE, APPLICATION_JSON)
-          .end(INTERNAL_ERROR_RESP);
+          .end(internalErrorResp);
 
       routingContext.next();
-
     }
     routingContext.next();
   }
@@ -87,7 +86,7 @@ public class ExceptionHandler implements Handler<RoutingContext> {
   /**
    * Handles the JsonDecode Exception.
    *
-   * @param routingContext
+   * @param routingContext associated with the request to add the appropriate response
    */
   public void handleDecodeException(RoutingContext routingContext) {
 
@@ -112,14 +111,12 @@ public class ExceptionHandler implements Handler<RoutingContext> {
       routingContext.next();
       return;
     }
-
-
   }
 
   /**
    * Handles the exception from casting a object to different object.
    *
-   * @param routingContext
+   * @param routingContext associated with the request to add the appropriate response
    */
   public void handleClassCastException(RoutingContext routingContext) {
 

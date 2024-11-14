@@ -1,14 +1,12 @@
-package iudx.data.marketplace.apiserver.provider.linkedAccount;
+package iudx.data.marketplace.apiserver.provider.linkedaccount;
 
 import io.vertx.core.Future;
 import io.vertx.core.Promise;
 import io.vertx.core.json.JsonObject;
 import iudx.data.marketplace.policies.User;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 public class LinkedAccountServiceImpl implements LinkedAccountService {
-  private static final Logger LOG = LoggerFactory.getLogger(LinkedAccountServiceImpl.class);
+  //  private static final Logger LOG = LoggerFactory.getLogger(LinkedAccountServiceImpl.class);
 
   private final CreateLinkedAccount createLinkedAccount;
   private final FetchLinkedAccount fetchLinkedAccount;
@@ -45,15 +43,15 @@ public class LinkedAccountServiceImpl implements LinkedAccountService {
     Promise<JsonObject> promise = Promise.promise();
 
     this.fetchLinkedAccount
-            .initiateFetchingLinkedAccount(user)
-            .onComplete(
-                    handler -> {
-                      if (handler.succeeded()) {
-                        promise.complete(handler.result());
-                      } else {
-                        promise.fail(handler.cause().getMessage());
-                      }
-                    });
+        .initiateFetchingLinkedAccount(user)
+        .onComplete(
+            handler -> {
+              if (handler.succeeded()) {
+                promise.complete(handler.result());
+              } else {
+                promise.fail(handler.cause().getMessage());
+              }
+            });
     return promise.future();
   }
 
@@ -62,15 +60,15 @@ public class LinkedAccountServiceImpl implements LinkedAccountService {
     Promise<JsonObject> promise = Promise.promise();
 
     this.updateLinkedAccount
-            .initiateUpdatingLinkedAccount(request, user)
-            .onComplete(
-                    handler -> {
-                      if (handler.succeeded()) {
-                        promise.complete(handler.result());
-                      } else {
-                        promise.fail(handler.cause().getMessage());
-                      }
-                    });
+        .initiateUpdatingLinkedAccount(request, user)
+        .onComplete(
+            handler -> {
+              if (handler.succeeded()) {
+                promise.complete(handler.result());
+              } else {
+                promise.fail(handler.cause().getMessage());
+              }
+            });
     return promise.future();
   }
 }

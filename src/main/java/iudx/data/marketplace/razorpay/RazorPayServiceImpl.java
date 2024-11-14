@@ -1,7 +1,7 @@
 package iudx.data.marketplace.razorpay;
 
-import static iudx.data.marketplace.apiserver.provider.linkedAccount.util.Constants.ACCOUNT_TYPE;
-import static iudx.data.marketplace.apiserver.provider.linkedAccount.util.Constants.FAILURE_MESSAGE;
+import static iudx.data.marketplace.apiserver.provider.linkedaccount.util.Constants.ACCOUNT_TYPE;
+import static iudx.data.marketplace.apiserver.provider.linkedaccount.util.Constants.FAILURE_MESSAGE;
 import static iudx.data.marketplace.product.util.Constants.*;
 import static iudx.data.marketplace.razorpay.Constants.*;
 
@@ -47,7 +47,7 @@ public class RazorPayServiceImpl implements RazorPayService {
     Promise<JsonObject> promise = Promise.promise();
     LOGGER.debug(request);
 
-    Integer amountInPaise = (int) (Double.parseDouble((request.getString(PRICE))) * 100);
+    Integer amountInPaise = (int) (Double.parseDouble(request.getString(PRICE)) * 100);
     JSONObject orderRequest =
         new JSONObject()
             .put(AMOUNT, amountInPaise)
@@ -76,9 +76,7 @@ public class RazorPayServiceImpl implements RazorPayService {
       String status = order.get(STATUS);
       if (!status.equals(CREATED)) {
         throw new DxRuntimeException(
-            400,
-            ResponseUrn.ORDER_NOT_CREATED,
-            ("Order creation returned with status : " + status));
+            400, ResponseUrn.ORDER_NOT_CREATED, "Order creation returned with status : " + status);
       }
       JSONArray transfersArray = order.get(TRANFERS);
       JSONObject transferResponse = transfersArray.getJSONObject(0);
@@ -264,7 +262,8 @@ public class RazorPayServiceImpl implements RazorPayService {
       } else {
         LOGGER.error("Linked account not activated");
         String detail =
-            "To activate linked account please complete the KYC, filling account information etc., in your Razorpay merchant dashboard";
+            "To activate linked account please complete the KYC, filling account information etc., "
+                + "in your Razorpay merchant dashboard";
         promise.fail(detail);
       }
     } catch (RazorpayException e) {
@@ -300,7 +299,7 @@ public class RazorPayServiceImpl implements RazorPayService {
     return promise.future();
   }
 
-   Future<JsonObject> recordPayment(JsonObject request) {
+  Future<JsonObject> recordPayment(JsonObject request) {
     Promise<JsonObject> promise = Promise.promise();
 
     StringBuilder query = new StringBuilder(RECORD_PAYMENT.replace("$0", paymentTable));

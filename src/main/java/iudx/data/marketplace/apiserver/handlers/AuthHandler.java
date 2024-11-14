@@ -91,8 +91,7 @@ public class AuthHandler implements Handler<RoutingContext> {
       } else {
         processAuthFailure(context, "Invalid token");
       }
-    } else // for all the other endpoints
-    {
+    } else { // for all the other endpoints
       checkAuth(requestJson, authInfo)
           .onSuccess(
               userObject -> {
@@ -129,7 +128,7 @@ public class AuthHandler implements Handler<RoutingContext> {
     return promise.future();
   }
 
-   Future<User> getUserInfo(JsonObject tokenIntrospectResult) {
+  Future<User> getUserInfo(JsonObject tokenIntrospectResult) {
     LOGGER.info("Getting user info..");
     Promise<User> promise = Promise.promise();
     UserContainer userContainer = new UserContainer();
@@ -242,13 +241,13 @@ public class AuthHandler implements Handler<RoutingContext> {
       return api.getConsumerListProducts();
     } else if (url.contains(api.getConsumerOrderApi())) {
       return api.getConsumerOrderApi();
-    } else if(url.matches(api.getLinkedAccountService())){
+    } else if (url.matches(api.getLinkedAccountService())) {
       return api.getLinkedAccountService();
-    } else if(url.matches(api.getConsumerListResourcePath())) {
+    } else if (url.matches(api.getConsumerListResourcePath())) {
       return api.getConsumerListResourcePath();
-    } else if(url.matches(api.getConsumerProductVariantPath())) {
+    } else if (url.matches(api.getConsumerProductVariantPath())) {
       return api.getConsumerProductVariantPath();
-    } else if(url.matches(api.getVerifyPaymentApi())) {
+    } else if (url.matches(api.getVerifyPaymentApi())) {
       return api.getVerifyPaymentApi();
     } else if (url.matches(api.getCheckPolicyPath())) {
       return api.getCheckPolicyPath();

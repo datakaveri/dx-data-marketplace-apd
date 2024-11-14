@@ -1,4 +1,3 @@
-
 package iudx.data.marketplace.apiserver.exceptions;
 
 import iudx.data.marketplace.common.ResponseUrn;

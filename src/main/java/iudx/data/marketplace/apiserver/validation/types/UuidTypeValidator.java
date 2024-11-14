@@ -20,7 +20,7 @@ public class UuidTypeValidator implements Validator {
     this.required = required;
   }
 
-  public boolean isValidID(final String value) {
+  public boolean isValidId(final String value) {
     return VALIDATION_IUDX_ID_REGEX.matcher(value).matches();
   }
 
@@ -43,7 +43,7 @@ public class UuidTypeValidator implements Validator {
       LOGGER.error("Validation error : Value mismatch character limit.");
       throw new DxRuntimeException(failureCode(), INVALID_ID_URN, failureMessage(value));
     }
-    if (!isValidID(value)) {
+    if (!isValidId(value)) {
       LOGGER.error("Validation error : Invalid ID");
       throw new DxRuntimeException(failureCode(), INVALID_ID_URN, failureMessage(value));
     }

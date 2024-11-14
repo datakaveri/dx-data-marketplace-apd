@@ -1,4 +1,7 @@
-package iudx.data.marketplace.apiserver.provider.linkedAccount;
+package iudx.data.marketplace.apiserver.provider.linkedaccount;
+
+import static iudx.data.marketplace.apiserver.provider.linkedaccount.util.Constants.*;
+import static iudx.data.marketplace.apiserver.util.Constants.RESULTS;
 
 import io.vertx.core.Future;
 import io.vertx.core.Promise;
@@ -14,9 +17,6 @@ import org.apache.commons.lang.StringUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import static iudx.data.marketplace.apiserver.provider.linkedAccount.util.Constants.*;
-import static iudx.data.marketplace.apiserver.util.Constants.RESULTS;
-
 public class FetchLinkedAccount {
   private static final Logger LOGGER = LogManager.getLogger(FetchLinkedAccount.class);
   PostgresService postgresService;
@@ -27,9 +27,7 @@ public class FetchLinkedAccount {
   String createdAt;
 
   public FetchLinkedAccount(
-      PostgresService postgresService,
-      Api api,
-      RazorPayService razorPayService) {
+      PostgresService postgresService, Api api, RazorPayService razorPayService) {
     this.postgresService = postgresService;
     this.api = api;
     this.razorPayService = razorPayService;
@@ -55,11 +53,9 @@ public class FetchLinkedAccount {
 
   public Future<JsonObject> generateSuccessResponse(JsonObject rzpResponseJson) {
     String emailId = rzpResponseJson.getString("email");
-    String accountId = rzpResponseJson.getString("id");
     String type = rzpResponseJson.getString("type");
     String status = rzpResponseJson.getString("status");
     String referenceId = rzpResponseJson.getString("reference_id");
-    String businessType = rzpResponseJson.getString("business_type");
     String category = rzpResponseJson.getJsonObject("profile").getString("category");
     String subcategory = rzpResponseJson.getJsonObject("profile").getString("subcategory");
     JsonObject registered =
@@ -104,12 +100,8 @@ public class FetchLinkedAccount {
       }
     }
     String phoneNumber = rzpResponseJson.getString("phone");
-    String legalBusinessName = rzpResponseJson.getString("legal_business_name");
-    String customerFacingBusinessName = rzpResponseJson.getString("customer_facing_business_name");
-
-    JsonObject details =
-        new JsonObject()
-            .put("accountId", accountId)
+    String accountId = rzpResponseJson.getString("id");
+    JsonObject details = new JsonObject().put("accountId", accountId)
             .put("type", type)
             .put("status", status)
             .put("email", emailId)
@@ -119,9 +111,16 @@ public class FetchLinkedAccount {
     if (StringUtils.isNotBlank(contactName)) {
       details.put("contactName", contactName);
     }
+
+    String businessType = rzpResponseJson.getString("business_type");
+    String legalBusinessName = rzpResponseJson.getString("legal_business_name");
+
     details.put("referenceId", referenceId);
     details.put("businessType", businessType);
     details.put("legalBusinessName", legalBusinessName);
+
+    String customerFacingBusinessName = rzpResponseJson.getString("customer_facing_business_name");
+
     if (StringUtils.isNotBlank(customerFacingBusinessName)) {
       details.put("customerFacingBusinessName", customerFacingBusinessName);
     }
@@ -150,13 +149,13 @@ public class FetchLinkedAccount {
           if (handler.succeeded()) {
             if (!handler.result().getJsonArray(RESULTS).isEmpty()) {
               JsonObject result = handler.result().getJsonArray(RESULTS).getJsonObject(0);
-              String accountId = result.getString("account_id");
               String accountProductId = result.getString("rzp_account_product_id");
               String updatedAt = result.getString("updatedAt");
               String createdAt = result.getString("createdAt");
               setRazorpayAccountProductId(accountProductId);
               setUpdatedAt(updatedAt);
               setCreatedAt(createdAt);
+              String accountId = result.getString("account_id");
               promise.complete(new JsonObject().put("accountId", accountId));
             } else {
               promise.fail(
@@ -187,6 +186,7 @@ public class FetchLinkedAccount {
   public void setRazorpayAccountProductId(String razorpayAccountProductId) {
     this.razorpayAccountProductId = razorpayAccountProductId;
   }
+
   public String getUpdatedAt() {
     return updatedAt;
   }
@@ -194,14 +194,12 @@ public class FetchLinkedAccount {
   public void setUpdatedAt(String updatedAt) {
     this.updatedAt = updatedAt;
   }
-  public String getCreatedAt()
-  {
+
+  public String getCreatedAt() {
     return createdAt;
   }
 
-  public void setCreatedAt(String createdAt)
-  {
+  public void setCreatedAt(String createdAt) {
     this.createdAt = createdAt;
   }
-
 }

@@ -1,15 +1,15 @@
 package iudx.data.marketplace.apiserver.validation.types;
 
+import static iudx.data.marketplace.apiserver.util.Constants.VALIDATION_VARIANT_NAME_MAX_LEN;
+import static iudx.data.marketplace.apiserver.util.Constants.VALIDATION_VARIANT_NAME_REGEX;
+import static iudx.data.marketplace.common.ResponseUrn.INVALID_NAME_URN;
+
 import iudx.data.marketplace.apiserver.exceptions.DxRuntimeException;
 import iudx.data.marketplace.common.HttpStatusCode;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import static iudx.data.marketplace.apiserver.util.Constants.VALIDATION_VARIANT_NAME_MAX_LEN;
-import static iudx.data.marketplace.apiserver.util.Constants.VALIDATION_VARIANT_NAME_REGEX;
-import static iudx.data.marketplace.common.ResponseUrn.INVALID_NAME_URN;
-
-public class VariantNameTypeValidator implements Validator{
+public class VariantNameTypeValidator implements Validator {
 
   private static final Logger LOGGER = LogManager.getLogger(VariantNameTypeValidator.class);
 

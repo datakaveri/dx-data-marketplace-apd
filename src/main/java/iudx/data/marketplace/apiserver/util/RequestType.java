@@ -25,11 +25,11 @@ public enum RequestType {
 
   private String filename;
 
-  public String getFilename() {
-    return this.filename;
+  RequestType(String filename) {
+    this.filename = filename;
   }
 
-  private RequestType(String filename) {
-    this.filename = filename;
+  public String getFilename() {
+    return this.filename;
   }
 }

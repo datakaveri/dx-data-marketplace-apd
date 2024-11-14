@@ -27,5 +27,6 @@ public class Constants {
   public static final String RAZORPAY_PAYMENT_ID = "razorpay_payment_id";
   public static final String RAZORPAY_SIGNATURE = "razorpay_signature";
 
-  public static final String RECORD_PAYMENT = "insert into $0 (order_id, payment_id, payment_signature) values ($1,$2,$3) on conflict do nothing";
+  public static final String RECORD_PAYMENT =
+      "insert into $0 (order_id, payment_id, payment_signature) values ($1,$2,$3) on conflict do nothing";
 }

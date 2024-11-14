@@ -1,5 +1,8 @@
 package iudx.data.marketplace.authenticator;
 
+import static iudx.data.marketplace.common.Constants.AUTH_SERVICE_ADDRESS;
+import static iudx.data.marketplace.common.Constants.JWT_LEEWAY_TIME;
+
 import io.vertx.core.AbstractVerticle;
 import io.vertx.core.Future;
 import io.vertx.core.Promise;
@@ -12,24 +15,19 @@ import io.vertx.ext.auth.jwt.JWTAuthOptions;
 import io.vertx.ext.web.client.WebClient;
 import io.vertx.ext.web.client.WebClientOptions;
 import io.vertx.serviceproxy.ServiceBinder;
-import iudx.data.marketplace.common.CatalogueService;
-
 import iudx.data.marketplace.common.Api;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-
-import static iudx.data.marketplace.common.Constants.AUTH_SERVICE_ADDRESS;
-import static iudx.data.marketplace.common.Constants.JWT_LEEWAY_TIME;
 
 public class AuthenticationVerticle extends AbstractVerticle {
   private static final Logger LOGGER = LogManager.getLogger(AuthenticationVerticle.class);
 
   private AuthenticationService authenticationService;
-  private CatalogueService catalogueService;
   private ServiceBinder binder;
   private MessageConsumer<JsonObject> consumer;
   private WebClient webClient;
   private Api api;
+
   static WebClient createWebClient(Vertx vertx, JsonObject config) {
     return createWebClient(vertx, config, false);
   }
@@ -76,9 +74,9 @@ public class AuthenticationVerticle extends AbstractVerticle {
               }
               JWTAuth jwtAuth = JWTAuth.create(vertx, jwtAuthOptions);
 
-              catalogueService = new CatalogueService(vertx, config());
+              /*CatalogueService catalogueService = new CatalogueService(vertx, config());*/
               api = Api.getInstance(config().getString("dxApiBasePath"));
-              authenticationService = new AuthenticationServiceImpl(vertx, jwtAuth, config(), api);
+              authenticationService = new AuthenticationServiceImpl(jwtAuth, config(), api);
 
               /* Publish the Authentication service with the Event Bus against an address. */
               consumer =
@@ -115,4 +113,5 @@ public class AuthenticationVerticle extends AbstractVerticle {
               }
             });
     return promise.future();
-  }}
+  }
+}

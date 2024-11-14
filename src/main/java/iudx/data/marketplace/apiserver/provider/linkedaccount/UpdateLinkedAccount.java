@@ -1,4 +1,7 @@
-package iudx.data.marketplace.apiserver.provider.linkedAccount;
+package iudx.data.marketplace.apiserver.provider.linkedaccount;
+
+import static iudx.data.marketplace.apiserver.provider.linkedaccount.util.Constants.*;
+import static iudx.data.marketplace.apiserver.util.Constants.RESULTS;
 
 import io.vertx.core.Future;
 import io.vertx.core.Promise;
@@ -16,9 +19,6 @@ import org.apache.commons.lang.StringUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import static iudx.data.marketplace.apiserver.provider.linkedAccount.util.Constants.*;
-import static iudx.data.marketplace.apiserver.util.Constants.RESULTS;
-
 public class UpdateLinkedAccount {
   private static Logger LOGGER = LogManager.getLogger(UpdateLinkedAccount.class);
   PostgresService postgresService;
@@ -34,12 +34,16 @@ public class UpdateLinkedAccount {
   String providerId;
 
   public UpdateLinkedAccount(
-      PostgresService postgresService, Api api, AuditingService auditingService, RazorPayService razorPayService) {
+      PostgresService postgresService,
+      Api api,
+      AuditingService auditingService,
+      RazorPayService razorPayService) {
     this.postgresService = postgresService;
     this.api = api;
     this.auditingService = auditingService;
     this.razorPayService = razorPayService;
   }
+
   public Future<JsonObject> initiateUpdatingLinkedAccount(JsonObject request, User provider) {
 
     String accountRequest = getAccountRequest(request);
@@ -48,61 +52,37 @@ public class UpdateLinkedAccount {
     String emailId = provider.getEmailId();
     setEmailId(emailId);
 
-    Future<JsonObject> accountInfoFuture = getAccountId(GET_MERCHANT_INFO_QUERY, providerId, emailId);
-    Future<Boolean> updateAccountInfoInRzpFuture = accountInfoFuture.compose(accountInfoJson -> {
-      String accountId = accountInfoJson.getString("accountId");
-      /* set account id */
-      setRzpAccountId(accountId);
-      return razorPayService.updateLinkedAccount(accountRequest,accountId);
-    });
-    Future<JsonObject> userResponseFuture = updateAccountInfoInRzpFuture.compose(isEditInRazorpaySuccessful -> {
-      if(isEditInRazorpaySuccessful)
-      {
-        return updateMerchantInfo(UPDATE_MERCHANT_INFO_QUERY, providerId, emailId);
-      }
-      return Future.failedFuture(updateAccountInfoInRzpFuture.cause().getMessage());
-    });
+    Future<JsonObject> accountInfoFuture =
+        getAccountId(GET_MERCHANT_INFO_QUERY, providerId, emailId);
+    Future<Boolean> updateAccountInfoInRzpFuture =
+        accountInfoFuture.compose(
+            accountInfoJson -> {
+              String accountId = accountInfoJson.getString("accountId");
+              /* set account id */
+              setRzpAccountId(accountId);
+              return razorPayService.updateLinkedAccount(accountRequest, accountId);
+            });
+    Future<JsonObject> userResponseFuture =
+        updateAccountInfoInRzpFuture.compose(
+            isEditInRazorpaySuccessful -> {
+              if (isEditInRazorpaySuccessful) {
+                return updateMerchantInfo(UPDATE_MERCHANT_INFO_QUERY, providerId, emailId);
+              }
+              return Future.failedFuture(updateAccountInfoInRzpFuture.cause().getMessage());
+            });
 
     /* send the information for auditing */
     /* accountId, referenceId, Non-sensitive PII */
-    userResponseFuture.compose(insertInDbSuccessful -> {
-      Future<Void> auditFuture = addAuditLogs(provider);
-      return auditFuture;
-    });
+    userResponseFuture.compose(
+        insertInDbSuccessful -> {
+          Future<Void> auditFuture = addAuditLogs(provider);
+          return auditFuture;
+        });
 
     return userResponseFuture;
   }
 
-  public String getAccountRequest(JsonObject requestBody)
-  {
-    String category = requestBody.getJsonObject("profile").getString("category");
-    String subcategory = requestBody.getJsonObject("profile").getString("subcategory");
-    JsonObject registered =
-            requestBody.getJsonObject("profile").getJsonObject("addresses").getJsonObject("registered");
-    String street1 = registered.getString("street1");
-    String street2 = registered.getString("street2");
-    String city = registered.getString("city");
-    String state = registered.getString("state");
-    String postalCode = registered.getString("postalCode");
-    String country = registered.getString("country");
-    String contactName = requestBody.getString("contactName");
-
-    JsonObject registeredJson =
-            new JsonObject()
-                    .put("street1", street1)
-                    .put("street2", street2)
-                    .put("city", city)
-                    .put("state", state)
-                    .put("postal_code", postalCode)
-                    .put("country", country);
-
-    JsonObject addressJson = new JsonObject().put("registered", registeredJson);
-    JsonObject profileJson =
-            new JsonObject()
-                    .put("category", category)
-                    .put("subcategory", subcategory)
-                    .put("addresses", addressJson);
-
+  public String getAccountRequest(JsonObject requestBody) {
     JsonObject legalInfoJson = new JsonObject();
     /* checks if optional field legal info is null */
     if (requestBody.getJsonObject("legalInfo") != null) {
@@ -117,17 +97,36 @@ public class UpdateLinkedAccount {
     }
     String phoneNumber = requestBody.getString("phone");
     String legalBusinessName = requestBody.getString("legalBusinessName");
-    String customerFacingBusinessName = requestBody.getString("customerFacingBusinessName");
 
     setLegalBusinessName(legalBusinessName);
     setPhoneNumber(phoneNumber);
+    String category = requestBody.getJsonObject("profile").getString("category");
+    String subcategory = requestBody.getJsonObject("profile").getString("subcategory");
+    JsonObject registered =
+        requestBody.getJsonObject("profile").getJsonObject("addresses").getJsonObject("registered");
+    String street1 = registered.getString("street1");
+    String street2 = registered.getString("street2");
+    String city = registered.getString("city");
+    String state = registered.getString("state");
+    String postalCode = registered.getString("postalCode");
+    String country = registered.getString("country");
+    JsonObject registeredJson = new JsonObject().put("street1", street1).put("street2", street2).put("city", city)
+        .put("state", state).put("postal_code", postalCode).put("country", country);
+    JsonObject addressJson = new JsonObject().put("registered", registeredJson);
+
+    JsonObject profileJson =
+        new JsonObject()
+            .put("category", category)
+            .put("subcategory", subcategory)
+            .put("addresses", addressJson);
 
     JsonObject details =
-            new JsonObject()
-                    .put("phone", phoneNumber)
-                    .put("legal_business_name", legalBusinessName)
-                    .put("profile", profileJson)
-                    .put("legal_info", legalInfoJson);
+        new JsonObject()
+            .put("phone", phoneNumber)
+            .put("legal_business_name", legalBusinessName)
+            .put("profile", profileJson)
+            .put("legal_info", legalInfoJson);
+    String customerFacingBusinessName = requestBody.getString("customerFacingBusinessName");
 
     setCustomerFacingBusinessName(legalBusinessName);
     /* customer facing business name is not a necessary field in the request body
@@ -137,50 +136,52 @@ public class UpdateLinkedAccount {
       setCustomerFacingBusinessName(customerFacingBusinessName);
       details.put("customer_facing_business_name", customerFacingBusinessName);
     }
+    String contactName = requestBody.getString("contactName");
+
     if (StringUtils.isNotBlank(contactName)) {
       details.put("contact_name", contactName);
     }
     return details.encode();
   }
 
-  public Future<JsonObject> getAccountId(String query, String providerId, String emailId)
-  {
+  public Future<JsonObject> getAccountId(String query, String providerId, String emailId) {
     Promise<JsonObject> promise = Promise.promise();
     String finalQuery = query.replace("$1", providerId).replace("$2", emailId);
-    postgresService.executeQuery(finalQuery, handler -> {
-      if(handler.succeeded())
-      {
-        boolean isResultEmpty = handler.result().getJsonArray(RESULTS).isEmpty();
-        if(!isResultEmpty)
-        {
-          JsonObject result = handler.result().getJsonArray(RESULTS).getJsonObject(0);
-          String accountId = result.getString("account_id");
+    postgresService.executeQuery(
+        finalQuery,
+        handler -> {
+          if (handler.succeeded()) {
+            boolean isResultEmpty = handler.result().getJsonArray(RESULTS).isEmpty();
+            if (!isResultEmpty) {
+              JsonObject result = handler.result().getJsonArray(RESULTS).getJsonObject(0);
+              String accountId = result.getString("account_id");
 
-          /* set referenceId */
-          setReferenceId(result.getString("reference_id"));
+              /* set referenceId */
+              setReferenceId(result.getString("reference_id"));
 
-          promise.complete(new JsonObject().put("accountId", accountId).put("referenceId", referenceId));
-        }
-        else
-        {
-          LOGGER.fatal("Linked account is not created or there was a problem while inserting the record in postgres");
-          promise.fail(
+              promise.complete(
+                  new JsonObject().put("accountId", accountId).put("referenceId", referenceId));
+            } else {
+              LOGGER.fatal(
+                  "Linked account is not created or there was a problem while inserting the record in postgres");
+              promise.fail(
                   new RespBuilder()
-                          .withType(HttpStatusCode.NOT_FOUND.getValue())
-                          .withTitle(ResponseUrn.RESOURCE_NOT_FOUND_URN.getUrn())
-                          .withDetail("Linked account cannot be updated as, it is not found")
-                          .getResponse());
-        }
-      }
-      else {
-        LOGGER.error("Failed to fetch account id from postgres : {}", handler.cause().getMessage());
-        promise.fail(new RespBuilder()
-                .withType(HttpStatusCode.INTERNAL_SERVER_ERROR.getValue())
-                .withTitle(ResponseUrn.INTERNAL_SERVER_ERR_URN.getUrn())
-                .withDetail("Linked account could not be updated : Internal Server error")
-                .getResponse());
-      }
-    });
+                      .withType(HttpStatusCode.NOT_FOUND.getValue())
+                      .withTitle(ResponseUrn.RESOURCE_NOT_FOUND_URN.getUrn())
+                      .withDetail("Linked account cannot be updated as, it is not found")
+                      .getResponse());
+            }
+          } else {
+            LOGGER.error(
+                "Failed to fetch account id from postgres : {}", handler.cause().getMessage());
+            promise.fail(
+                new RespBuilder()
+                    .withType(HttpStatusCode.INTERNAL_SERVER_ERROR.getValue())
+                    .withTitle(ResponseUrn.INTERNAL_SERVER_ERR_URN.getUrn())
+                    .withDetail("Linked account could not be updated : Internal Server error")
+                    .getResponse());
+          }
+        });
 
     return promise.future();
   }
@@ -276,47 +277,41 @@ public class UpdateLinkedAccount {
     this.customerFacingBusinessName = customerFacingBusinessName;
   }
 
-  public String getEmailId()
-  {
+  public String getEmailId() {
     return this.emailId;
   }
 
-  public void setEmailId(String emailId)
-  {
+  public void setEmailId(String emailId) {
     this.emailId = emailId;
   }
 
-  public String getRzpAccountId()
-  {
+  public String getRzpAccountId() {
     return this.rzpAccountId;
   }
 
-  public void setRzpAccountId(String rzpAccountId)
-  {
+  public void setRzpAccountId(String rzpAccountId) {
     this.rzpAccountId = rzpAccountId;
   }
 
-  public String getProviderId()
-  {
+  public String getProviderId() {
     return this.providerId;
   }
 
-  public void setProviderId(String providerId)
-  {
+  public void setProviderId(String providerId) {
     this.providerId = providerId;
   }
 
   public Future<Void> addAuditLogs(User provider) {
     JsonObject auditInfo =
-            new JsonObject()
-                    .put("referenceId", getReferenceId())
-                    .put("email", getEmailId())
-                    .put("phoneNumber", getPhoneNumber())
-                    .put("legalBusinessName", getLegalBusinessName())
-                    .put("customerFacingBusinessName", getCustomerFacingBusinessName())
-                    .put("accountId", getRzpAccountId())
-                    .put("providerId", getProviderId());
+        new JsonObject()
+            .put("referenceId", getReferenceId())
+            .put("email", getEmailId())
+            .put("phoneNumber", getPhoneNumber())
+            .put("legalBusinessName", getLegalBusinessName())
+            .put("customerFacingBusinessName", getCustomerFacingBusinessName())
+            .put("accountId", getRzpAccountId())
+            .put("providerId", getProviderId());
     return auditingService.handleAuditLogs(
-            provider, auditInfo, api.getLinkedAccountService(), HttpMethod.PUT.toString());
+        provider, auditInfo, api.getLinkedAccountService(), HttpMethod.PUT.toString());
   }
 }

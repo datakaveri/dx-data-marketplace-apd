@@ -351,7 +351,7 @@ public class ConsumerServiceTest {
   @DisplayName("Test Create Order - Success")
   public void testCreateOrderSuccess(VertxTestContext testContext) {
 
-    when(consumer.getResourceServerUrl()).thenReturn("rs.iudx.io");
+    lenient().when(consumer.getResourceServerUrl()).thenReturn("rs.iudx.io");
     when(consumer.getUserId()).thenReturn("consumer-id");
     request.put(PRODUCT_VARIANT_ID, "pv-id");
     doAnswer(
@@ -386,7 +386,7 @@ public class ConsumerServiceTest {
   @DisplayName("Test Order Create - Get Order Related Info Failed")
   public void testOrderCreateRelatedInfoFailed(VertxTestContext testContext) {
 
-    when(consumer.getResourceServerUrl()).thenReturn("rs.iudx.io");
+    lenient().when(consumer.getResourceServerUrl()).thenReturn("rs.iudx.io");
     when(consumer.getUserId()).thenReturn("consumer-id");
     request.put(PRODUCT_VARIANT_ID, "pv-id");
     doAnswer(Answer -> Future.failedFuture("Expected Message")).when(consumerServiceSpy).getOrderRelatedInfo(anyString());
@@ -405,7 +405,7 @@ public class ConsumerServiceTest {
   @DisplayName("Test Order Create - RazorPay create order Failed")
   public void testOrderCreateRazorpayFailed(VertxTestContext testContext) {
 
-    when(consumer.getResourceServerUrl()).thenReturn("rs.iudx.io");
+    lenient().when(consumer.getResourceServerUrl()).thenReturn("rs.iudx.io");
     when(consumer.getUserId()).thenReturn("consumer-id");
     request.put(PRODUCT_VARIANT_ID, "pv-id");
     doAnswer(
@@ -434,7 +434,7 @@ public class ConsumerServiceTest {
   @DisplayName("Test Order Create - Generate Order Entry Failed")
   public void testOrderCreateGenerateOrderFailed(VertxTestContext testContext) {
 
-    when(consumer.getResourceServerUrl()).thenReturn("rs.iudx.io");
+    lenient().when(consumer.getResourceServerUrl()).thenReturn("rs.iudx.io");
     when(consumer.getUserId()).thenReturn("consumer-id");
     request.put(PRODUCT_VARIANT_ID, "pv-id");
     doAnswer(

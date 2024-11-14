@@ -1,5 +1,8 @@
 package iudx.data.marketplace.authenticator;
 
+import static iudx.data.marketplace.apiserver.util.Constants.*;
+import static iudx.data.marketplace.common.HttpStatusCode.INTERNAL_SERVER_ERROR;
+
 import io.vertx.core.Future;
 import io.vertx.core.Promise;
 import io.vertx.core.buffer.Buffer;
@@ -9,9 +12,6 @@ import io.vertx.ext.web.client.WebClient;
 import iudx.data.marketplace.policies.User;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-
-import static iudx.data.marketplace.apiserver.util.Constants.*;
-import static iudx.data.marketplace.common.HttpStatusCode.INTERNAL_SERVER_ERROR;
 
 public class AuthClient {
 

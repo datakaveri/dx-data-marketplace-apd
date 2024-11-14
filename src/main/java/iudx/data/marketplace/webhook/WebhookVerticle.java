@@ -1,23 +1,19 @@
 package iudx.data.marketplace.webhook;
 
+import static iudx.data.marketplace.common.Constants.*;
+import static iudx.data.marketplace.product.util.Constants.TABLES;
+
 import io.vertx.core.AbstractVerticle;
-import io.vertx.core.eventbus.MessageConsumer;
-import io.vertx.core.json.JsonObject;
 import io.vertx.serviceproxy.ServiceBinder;
 import iudx.data.marketplace.policies.PolicyService;
 import iudx.data.marketplace.postgres.PostgresService;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import static iudx.data.marketplace.common.Constants.*;
-import static iudx.data.marketplace.product.util.Constants.TABLES;
-
 public class WebhookVerticle extends AbstractVerticle {
 
   private static final Logger LOGGER = LogManager.getLogger(WebhookVerticle.class);
 
-
-  private MessageConsumer<JsonObject> consumer;
   private ServiceBinder binder;
   private PostgresService postgresService;
   private PolicyService policyService;
@@ -33,9 +29,8 @@ public class WebhookVerticle extends AbstractVerticle {
     webhookService = new WebhookServiceImpl(postgresService, policyService, invoiceTable);
 
     binder = new ServiceBinder(vertx);
-    consumer = binder
-        .setAddress(WEBHOOK_SERVICE_ADDRESS)
-        .register(WebhookService.class, webhookService);
+    //    MessageConsumer<JsonObject> consumer =
+    binder.setAddress(WEBHOOK_SERVICE_ADDRESS).register(WebhookService.class, webhookService);
     LOGGER.info("webhook Service started");
   }
 }

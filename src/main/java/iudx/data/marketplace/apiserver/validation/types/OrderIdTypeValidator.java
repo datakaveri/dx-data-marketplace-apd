@@ -5,7 +5,6 @@ import static iudx.data.marketplace.common.ResponseUrn.INVALID_ID_VALUE_URN;
 
 import iudx.data.marketplace.apiserver.exceptions.DxRuntimeException;
 import iudx.data.marketplace.common.HttpStatusCode;
-import org.apache.commons.lang.StringUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -21,7 +20,7 @@ public class OrderIdTypeValidator implements Validator {
     this.required = required;
   }
 
-  public boolean isValidID(final String value) {
+  public boolean isValidId(final String value) {
     return ORDER_ID_PATTERN.matcher(value).matches();
   }
 
@@ -44,7 +43,7 @@ public class OrderIdTypeValidator implements Validator {
       LOGGER.error("Validation error : Value exceed min character limit.");
       throw new DxRuntimeException(failureCode(), INVALID_ID_VALUE_URN, failureMessage(value));
     }
-    if (!isValidID(value)) {
+    if (!isValidId(value)) {
       LOGGER.error("Validation error : Invalid Order ID");
       throw new DxRuntimeException(failureCode(), INVALID_ID_VALUE_URN, failureMessage(value));
     }

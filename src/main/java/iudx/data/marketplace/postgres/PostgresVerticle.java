@@ -1,5 +1,7 @@
 package iudx.data.marketplace.postgres;
 
+import static iudx.data.marketplace.common.Constants.POSTGRES_SERVICE_ADDRESS;
+
 import io.vertx.core.AbstractVerticle;
 import io.vertx.core.eventbus.MessageConsumer;
 import io.vertx.core.json.JsonObject;
@@ -10,8 +12,6 @@ import io.vertx.sqlclient.PoolOptions;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import static iudx.data.marketplace.common.Constants.POSTGRES_SERVICE_ADDRESS;
-
 public class PostgresVerticle extends AbstractVerticle {
   private static final Logger LOGGER = LogManager.getLogger(PostgresVerticle.class);
   private MessageConsumer<JsonObject> consumer;
@@ -21,7 +21,7 @@ public class PostgresVerticle extends AbstractVerticle {
   private PoolOptions poolOptions;
   private PgPool pool;
 
-  private String databaseIP;
+  private String databaseIp;
   private int databasePort;
   private String databaseName;
   private String databaseUserName;
@@ -33,7 +33,7 @@ public class PostgresVerticle extends AbstractVerticle {
   @Override
   public void start() throws Exception {
 
-    databaseIP = config().getString("databaseIP");
+    databaseIp = config().getString("databaseIP");
     databasePort = config().getInteger("databasePort");
     databaseName = config().getString("databaseName");
     databaseUserName = config().getString("databaseUserName");
@@ -43,7 +43,7 @@ public class PostgresVerticle extends AbstractVerticle {
     this.connectOptions =
         new PgConnectOptions()
             .setPort(databasePort)
-            .setHost(databaseIP)
+            .setHost(databaseIp)
             .setDatabase(databaseName)
             .setUser(databaseUserName)
             .setPassword(databasePassword)

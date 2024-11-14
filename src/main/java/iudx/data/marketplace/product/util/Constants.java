@@ -24,16 +24,20 @@ public class Constants {
   public static final String INSERT_PRODUCT_QUERY =
       "insert into $0 (product_id, provider_id, provider_name, status) values ('$1', '$2', '$3', '$4')";
   public static final String INSERT_RESOURCE_QUERY =
-      "insert into $0 (_id, resource_name, provider_id, provider_name, resource_server, accessPolicy) values ('$1', '$2', '$3', '$4', '$5', '$6') on conflict (_id) do nothing";
+      "insert into $0 (_id, resource_name, provider_id, provider_name, resource_server, accessPolicy)"
+          +
+          " values ('$1', '$2', '$3', '$4', '$5', '$6') on conflict (_id) do nothing";
 
   public static final String INSERT_P_R_REL_QUERY =
       "insert into $0 (product_id, resource_id) values ('$1', '$2')";
 
-  public static final String DELETE_PRODUCT_QUERY = "update $0 set status=$1 where product_id=$2 and status = 'ACTIVE' returning product_id";
-  public static final String DELETE_PV_QUERY = "UPDATE product_variant SET status = 'INACTIVE' WHERE \n " +
-          "product_id = $1 \n " +
-          "AND provider_id = $2 \n " +
-          "RETURNING _id";
+  public static final String DELETE_PRODUCT_QUERY =
+      "update $0 set status=$1 where product_id=$2 and status = 'ACTIVE' returning product_id";
+  public static final String DELETE_PV_QUERY =
+      "UPDATE product_variant SET status = 'INACTIVE' WHERE \n "
+          + "product_id = $1 \n "
+          + "AND provider_id = $2 \n "
+          + "RETURNING _id";
   public static final String LIST_PRODUCT_FOR_RESOURCE =
       "select pt.product_id AS \"productId\", pt.provider_name AS \"providerName\", "
           + " pt.modified_at AS \"updatedAt\" ,  pt.created_at AS \"createdAt\" ,"
@@ -59,12 +63,15 @@ public class Constants {
           + "group by pt.product_id";
 
   public static final String INSERT_PV_QUERY =
-          "insert into $0 (_id, provider_id, product_id, product_variant_name, resource_info, price, validity, status)" +
-                  " values ('$1', '$2', '$3', '$4','$5'::JSON, '$6', $7, '$s') RETURNING _id";
+      "insert into $0 (_id, provider_id, product_id, product_variant_name, resource_info, price, validity, status)"
+          + " values ('$1', '$2', '$3', '$4','$5'::JSON, '$6', $7, '$s') RETURNING _id";
 
-  public static final String UPDATE_PV_STATUS = "update $0 set status='$4' where product_id='$1' and product_variant_name='$2' and status='$3'";
-  public static final String CHECK_IF_PV_EXISTS = "SELECT * FROM product_variant WHERE product_id = '$1' AND product_variant_name = '$2' AND status = 'ACTIVE'";
-  public static final String CHECK_IF_PRODUCT_EXISTS = "SELECT * FROM product WHERE product_id = '$1' ";
+  public static final String UPDATE_PV_STATUS =
+      "update $0 set status='$4' where product_id='$1' and product_variant_name='$2' and status='$3'";
+  public static final String CHECK_IF_PV_EXISTS =
+      "SELECT * FROM product_variant WHERE product_id = '$1' AND product_variant_name = '$2' AND status = 'ACTIVE'";
+  public static final String CHECK_IF_PRODUCT_EXISTS =
+      "SELECT * FROM product WHERE product_id = '$1' ";
   public static final String UPDATE_PV_STATUS_QUERY =
       "update $0 set status='$4' where _id='$1' and status='$3' RETURNING _id";
   public static final String SELECT_PV_QUERY =
@@ -109,8 +116,9 @@ public class Constants {
           + " INNER JOIN user_table U\n"
           + " ON U._id = I.consumer_id ";
   public static final String LIST_SUCCESSFUL_PAYMENTS_4_PROVIDER =
-      LIST_SUCCESSFUL_PURCHASE + "WHERE P.\"providerId\" = '$1' "
-              + " AND P.\"resourceServerUrl\" = '$2'";
+      LIST_SUCCESSFUL_PURCHASE
+          + "WHERE P.\"providerId\" = '$1' "
+          + " AND P.\"resourceServerUrl\" = '$2'";
   public static final String LIST_SUCCESSFUL_PAYMENTS_4_PROVIDER_WITH_GIVEN_PRODUCT =
       LIST_SUCCESSFUL_PURCHASE
           + "WHERE\n"
@@ -129,7 +137,7 @@ public class Constants {
   public static final String LIST_PENDING_PAYMENTS_4_PROVIDER =
       LIST_FAILED_OR_PENDING_PAYMENTS
           + "WHERE P.\"providerId\" = '$1'  AND I.payment_status = 'PENDING' "
-              + " AND P.\"resourceServerUrl\" = '$2'";
+          + " AND P.\"resourceServerUrl\" = '$2'";
   public static final String LIST_PENDING_PAYMENTS_4_PROVIDER_WITH_GIVEN_PRODUCT =
       LIST_FAILED_OR_PENDING_PAYMENTS
           + "WHERE\n"

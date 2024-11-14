@@ -54,14 +54,16 @@ public class WebhookServiceImpl implements WebhookService {
         new StringBuilder(UPDATE_PAYMENT_STATUS_QUERY.replace("$0", invoiceTable));
 
     JsonObject params =
-        new JsonObject().put(PAYMENT_STATUS, paymentStatus.getPaymentStatus()).put(ORDER_ID, orderId);
+        new JsonObject()
+            .put(PAYMENT_STATUS, paymentStatus.getPaymentStatus())
+            .put(ORDER_ID, orderId);
 
     postgresService.executePreparedQuery(
         query.toString(),
         params,
         pgHandler -> {
           if (pgHandler.succeeded()) {
-              LOGGER.debug("Result after updating : {}", pgHandler.result().encode());
+            LOGGER.debug("Result after updating : {}", pgHandler.result().encode());
             promise.complete();
           } else {
             promise.fail(pgHandler.cause());

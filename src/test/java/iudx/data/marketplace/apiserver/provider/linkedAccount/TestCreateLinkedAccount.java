@@ -6,6 +6,7 @@ import io.vertx.core.Handler;
 import io.vertx.core.json.JsonObject;
 import io.vertx.junit5.VertxExtension;
 import io.vertx.junit5.VertxTestContext;
+import iudx.data.marketplace.apiserver.provider.linkedaccount.CreateLinkedAccount;
 import iudx.data.marketplace.auditing.AuditingService;
 import iudx.data.marketplace.common.Api;
 import iudx.data.marketplace.common.HttpStatusCode;
@@ -24,7 +25,7 @@ import org.mockito.invocation.InvocationOnMock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.mockito.stubbing.Answer;
 
-import static iudx.data.marketplace.apiserver.provider.linkedAccount.util.Constants.FAILURE_MESSAGE;
+import static iudx.data.marketplace.apiserver.provider.linkedaccount.util.Constants.FAILURE_MESSAGE;
 import static iudx.data.marketplace.apiserver.util.Constants.*;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;

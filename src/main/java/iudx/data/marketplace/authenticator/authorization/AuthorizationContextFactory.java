@@ -3,7 +3,7 @@ package iudx.data.marketplace.authenticator.authorization;
 import iudx.data.marketplace.common.Api;
 
 public class AuthorizationContextFactory {
-  public static AuthorizationStatergy create(IudxRole role, Api api){
+  public static AuthorizationStatergy create(IudxRole role, Api api) {
     if (role == null) {
       throw new IllegalArgumentException(role + " role is not defined in IUDX");
     }
@@ -17,7 +17,5 @@ public class AuthorizationContextFactory {
       default:
         throw new IllegalArgumentException(role + " role is not defined in IUDX");
     }
-
   }
-
 }

@@ -7,21 +7,9 @@ import io.vertx.core.Future;
 import io.vertx.core.Vertx;
 import io.vertx.core.json.JsonObject;
 
-@VertxGen @ProxyGen
+@VertxGen
+@ProxyGen
 public interface WebhookService {
-
-  /**
-   * @param orderId which is a String generated from Razorpay
-   * @return Future<JsonObject> which is a vertx Future
-   */
-  Future<JsonObject> recordOrderPaid(String orderId);
-
-  /**
-   * @param orderId which is a String generated from Razorpay
-   * @return Future<Void> which is a vertx Future
-   */
-  Future<Void> recordPaymentFailure(String orderId);
-
 
   /**
    * The createProxy helps the code generation blocks to generate proxy code.
@@ -34,4 +22,16 @@ public interface WebhookService {
   static WebhookService createProxy(Vertx vertx, String address) {
     return new WebhookServiceVertxEBProxy(vertx, address);
   }
+
+  /**
+   * @param orderId which is a String generated from Razorpay
+   * @return Future JsonObject which is a vertx Future
+   */
+  Future<JsonObject> recordOrderPaid(String orderId);
+
+  /**
+   * @param orderId which is a String generated from Razorpay
+   * @return Future Void which is a vertx Future
+   */
+  Future<Void> recordPaymentFailure(String orderId);
 }

@@ -2,36 +2,22 @@ package iudx.data.marketplace.policies;
 
 import static iudx.data.marketplace.apiserver.util.Constants.*;
 import static iudx.data.marketplace.auditing.util.Constants.*;
-import static iudx.data.marketplace.auditing.util.Constants.RESPONSE_SIZE;
-import static iudx.data.marketplace.auditing.util.Constants.USERID;
 import static iudx.data.marketplace.common.HttpStatusCode.BAD_REQUEST;
 import static iudx.data.marketplace.common.HttpStatusCode.FORBIDDEN;
 import static iudx.data.marketplace.common.ResponseUrn.FORBIDDEN_URN;
 import static iudx.data.marketplace.policies.util.Constants.CHECK_IF_POLICY_PRESENT_QUERY;
 import static iudx.data.marketplace.policies.util.Constants.DELETE_POLICY_QUERY;
 
-import io.vertx.core.AsyncResult;
 import io.vertx.core.Future;
-import io.vertx.core.Handler;
 import io.vertx.core.Promise;
 import io.vertx.core.http.HttpMethod;
-import io.vertx.core.http.HttpServerRequest;
-import io.vertx.core.http.HttpServerResponse;
 import io.vertx.core.json.JsonObject;
-import io.vertx.ext.web.RoutingContext;
-import io.vertx.pgclient.PgPool;
-import io.vertx.sqlclient.Tuple;
 import iudx.data.marketplace.auditing.AuditingService;
 import iudx.data.marketplace.common.Api;
 import iudx.data.marketplace.common.HttpStatusCode;
 import iudx.data.marketplace.common.ResponseUrn;
 import iudx.data.marketplace.policies.util.Status;
 import iudx.data.marketplace.postgres.PostgresService;
-import iudx.data.marketplace.postgres.PostgresServiceImpl;
-
-import java.time.ZoneId;
-import java.time.ZonedDateTime;
-import java.time.temporal.ChronoUnit;
 import java.util.UUID;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -40,7 +26,6 @@ public class DeletePolicy {
   private static final Logger LOG = LoggerFactory.getLogger(DeletePolicy.class);
   private static final String FAILURE_MESSAGE = "Policy could not be deleted";
   private final PostgresService postgresService;
-  private PgPool pool;
   private AuditingService auditingService;
   private Api api;
 
@@ -69,9 +54,7 @@ public class DeletePolicy {
   public Future<JsonObject> executeUpdateQuery(String query, UUID policyUuid, User user) {
     LOG.debug("inside executeUpdateQuery");
     Promise<JsonObject> promise = Promise.promise();
-    Tuple tuple = Tuple.of(policyUuid);
-    JsonObject param = new JsonObject()
-            .put("$1", policyUuid.toString());
+    JsonObject param = new JsonObject().put("$1", policyUuid.toString());
 
     postgresService.executePreparedQuery(
         query,
@@ -94,10 +77,12 @@ public class DeletePolicy {
               /* sending information for auditing */
 
               /* audit info = Request body + response + extra information if any*/
-              JsonObject auditInfo = new JsonObject()
+              JsonObject auditInfo =
+                  new JsonObject()
                       .put("policyId", policyUuid.toString())
                       .put("policyStatus", Status.DELETED.toString());
-              auditingService.handleAuditLogs(user, auditInfo, api.getPoliciesUrl(), HttpMethod.DELETE.toString());
+              auditingService.handleAuditLogs(
+                  user, auditInfo, api.getPoliciesUrl(), HttpMethod.DELETE.toString());
 
               promise.complete(responseJson);
             }
@@ -105,16 +90,15 @@ public class DeletePolicy {
             LOG.debug("update query failed");
             LOG.error("Failure while executing the query : {}", queryHandler.cause().getMessage());
             promise.fail(
-                    new JsonObject()
-                            .put(TYPE, HttpStatusCode.INTERNAL_SERVER_ERROR.getValue())
-                            .put(TITLE, ResponseUrn.DB_ERROR_URN.getUrn())
-                            .put(DETAIL, "Policy could not be deleted, update query failed")
-                            .encode());
+                new JsonObject()
+                    .put(TYPE, HttpStatusCode.INTERNAL_SERVER_ERROR.getValue())
+                    .put(TITLE, ResponseUrn.DB_ERROR_URN.getUrn())
+                    .put(DETAIL, "Policy could not be deleted, update query failed")
+                    .encode());
           }
         });
     return promise.future();
   }
-
 
   /**
    * Queries postgres table to check if the policy given in the request is owned by the provider or
@@ -131,10 +115,9 @@ public class DeletePolicy {
     String ownerId = user.getUserId();
     LOG.info("What's the ownerId : " + ownerId);
 
-    JsonObject param = new JsonObject()
-            .put("$1", policyUuid.toString());
+    JsonObject param = new JsonObject().put("$1", policyUuid.toString());
     postgresService.executePreparedQuery(
-       query,
+        query,
         param,
         queryHandler -> {
           if (queryHandler.succeeded()) {
