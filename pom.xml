@@ -27,6 +27,16 @@
         <micrometer.version>1.12.3</micrometer.version>
         <hazelcast.version>4.0.2</hazelcast.version>
         <curator.version>5.6.0</curator.version>
+        <commons-lang.version>2.6</commons-lang.version>
+        <httpcore.version>4.4.14</httpcore.version>
+        <json-schema-validator.version>2.2.14</json-schema-validator.version>
+        <mockito-inline.version>5.2.0</mockito-inline.version>
+        <mockito-junit-jupiter.version>5.11.0</mockito-junit-jupiter.version>
+        <client.version>2.1</client.version>
+        <guava.version>33.0.0-jre</guava.version>
+        <razorpay-java.version>1.4.5</razorpay-java.version>
+        <postgresql.version>42.7.2</postgresql.version>
+        <flyway-maven-plugin.version>8.5.13</flyway-maven-plugin.version>
 
         <exec.mainClass>iudx.data.marketplace.deploy.Deployer</exec.mainClass>
         <config.file>config.json</config.file>
@@ -59,46 +69,52 @@
         <dependency>
             <groupId>io.vertx</groupId>
             <artifactId>vertx-service-proxy</artifactId>
+            <version>${vertx.version}</version>
         </dependency>
         <dependency>
             <groupId>io.vertx</groupId>
             <artifactId>vertx-service-discovery</artifactId>
+            <version>${vertx.version}</version>
         </dependency>
         <dependency>
             <groupId>io.vertx</groupId>
             <artifactId>vertx-core</artifactId>
+            <version>${vertx.version}</version>
         </dependency>
         <dependency>
             <groupId>io.vertx</groupId>
             <artifactId>vertx-web</artifactId>
+            <version>${vertx.version}</version>
         </dependency>
         <dependency>
             <groupId>io.vertx</groupId>
             <artifactId>vertx-web-client</artifactId>
+            <version>${vertx.version}</version>
         </dependency>
         <!-- https://mvnrepository.com/artifact/commons-lang/commons-lang -->
         <dependency>
             <groupId>commons-lang</groupId>
             <artifactId>commons-lang</artifactId>
-            <version>2.6</version>
+            <version>${commons-lang.version}</version>
         </dependency>
 
         <!-- https://mvnrepository.com/artifact/org.apache.http/httpcore -->
         <dependency>
             <groupId>org.apache.httpcomponents</groupId>
             <artifactId>httpcore</artifactId>
-            <version>4.4.14</version>
+            <version>${httpcore.version}</version>
         </dependency>
 
 
         <dependency>
             <groupId>io.vertx</groupId>
             <artifactId>vertx-json-schema</artifactId>
+            <version>${vertx.version}</version>
         </dependency>
         <dependency>
             <groupId>com.github.java-json-tools</groupId>
             <artifactId>json-schema-validator</artifactId>
-            <version>2.2.14</version>
+            <version>${json-schema-validator.version}</version>
         </dependency>
         <dependency>
             <groupId>io.vertx</groupId>
@@ -108,13 +124,13 @@
         <dependency>
             <groupId>org.mockito</groupId>
             <artifactId>mockito-inline</artifactId>
-            <version>5.2.0</version>
+            <version>${mockito-inline.version}</version>
             <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.mockito</groupId>
             <artifactId>mockito-junit-jupiter</artifactId>
-            <version>5.11.0</version>
+            <version>${mockito-junit-jupiter.version}</version>
             <scope>test</scope>
         </dependency>
         <!-- test container dependency-->
@@ -142,7 +158,7 @@
         <dependency>
             <groupId>com.ongres.scram</groupId>
             <artifactId>client</artifactId>
-            <version>2.1</version>
+            <version>${client.version}</version>
         </dependency>
         <!-- log4j2 logging dependencies-->
         <dependency>
@@ -177,10 +193,12 @@
         <dependency>
             <groupId>io.vertx</groupId>
             <artifactId>vertx-rabbitmq-client</artifactId>
+            <version>${vertx.version}</version>
         </dependency>
         <dependency>
             <groupId>io.vertx</groupId>
             <artifactId>vertx-micrometer-metrics</artifactId>
+            <version>${vertx.version}</version>
         </dependency>
         <dependency>
             <groupId>io.micrometer</groupId>
@@ -191,6 +209,7 @@
         <dependency>
             <groupId>io.vertx</groupId>
             <artifactId>vertx-hazelcast</artifactId>
+            <version>${vertx.version}</version>
         </dependency>
         <dependency>
             <groupId>com.hazelcast</groupId>
@@ -211,6 +230,7 @@
         <dependency>
             <groupId>io.vertx</groupId>
             <artifactId>vertx-junit5</artifactId>
+            <version>${vertx.version}</version>
         </dependency>
         <dependency>
             <groupId>org.junit.jupiter</groupId>
@@ -222,7 +242,7 @@
         <dependency>
             <groupId>com.google.guava</groupId>
             <artifactId>guava</artifactId>
-            <version>33.0.0-jre</version>
+            <version>${guava.version}</version>
         </dependency>
 
         <!-- test container dependency-->
@@ -250,7 +270,7 @@
         <dependency>
             <groupId>com.razorpay</groupId>
             <artifactId>razorpay-java</artifactId>
-            <version>1.4.5</version>
+            <version>${razorpay-java.version}</version>
         </dependency>
 
         <!-- https://mvnrepository.com/artifact/org.postgresql/postgresql -->
@@ -261,7 +281,7 @@
         <dependency>
             <groupId>org.postgresql</groupId>
             <artifactId>postgresql</artifactId>
-            <version>42.7.2</version>
+            <version>${postgresql.version}</version>
         </dependency>
     </dependencies>
 
@@ -270,7 +290,7 @@
             <plugin>
                 <groupId>org.flywaydb</groupId>
                 <artifactId>flyway-maven-plugin</artifactId>
-                <version>8.5.13</version>
+                <version>${flyway-maven-plugin.version}</version>
             </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
