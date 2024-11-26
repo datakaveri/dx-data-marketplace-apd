@@ -100,11 +100,6 @@
             <scope>test</scope>
         </dependency>
 
-        <dependency>
-            <groupId>org.apache.maven.plugins</groupId>
-            <artifactId>maven-checkstyle-plugin</artifactId>
-            <version>${maven-checkstyle-plugin-google.version}</version>
-        </dependency>
 
         <dependency>
             <groupId>io.vertx</groupId>
