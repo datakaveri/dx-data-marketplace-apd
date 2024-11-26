@@ -11,7 +11,7 @@ consumes:
   - "application/json"
   - "text/plain"
 info:
-  version: 1.0.1
+  version: 1.1.0
   title: DX Data Marketplace APIs
   description: |-
     # Introduction
