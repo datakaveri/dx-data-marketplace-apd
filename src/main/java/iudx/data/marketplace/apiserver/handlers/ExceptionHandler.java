@@ -109,7 +109,6 @@ public class ExceptionHandler implements Handler<RoutingContext> {
           .end(response);
 
       routingContext.next();
-      return;
     }
   }
 

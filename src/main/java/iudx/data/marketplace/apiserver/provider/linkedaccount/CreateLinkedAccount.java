@@ -174,11 +174,7 @@ public class CreateLinkedAccount {
         .put("legal_business_name", legalBusinessName).put("type", ACCOUNT_TYPE).put("reference_id", referenceId)
         .put("business_type", businessType).put("profile", profileJson).put("legal_info", legalInfoJson);
 
-    setLegalBusinessName(legalBusinessName);
-    setEmailId(emailId);
-    setPhoneNumber(phoneNumber);
-    setBusinessType(businessType);
-    setCustomerFacingBusinessName(legalBusinessName);
+    setMerchantInfo(emailId, legalBusinessName, phoneNumber, businessType);
     /* customer facing business name is not a necessary field in the request body
      * while inserting in the DB, if customer facing business name is null, it is
      * replaced with the legal business name */
@@ -192,6 +188,14 @@ public class CreateLinkedAccount {
       details.put("contact_name", contactName);
     }
     return details;
+  }
+
+  private void setMerchantInfo(String emailId, String legalBusinessName, String phoneNumber, String businessType) {
+    setLegalBusinessName(legalBusinessName);
+    setEmailId(emailId);
+    setPhoneNumber(phoneNumber);
+    setBusinessType(businessType);
+    setCustomerFacingBusinessName(legalBusinessName);
   }
 
   /**
