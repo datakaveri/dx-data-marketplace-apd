@@ -36,6 +36,7 @@
         <razorpay-java.version>1.4.8</razorpay-java.version>
         <postgresql.version>42.7.4</postgresql.version>
         <flyway-maven-plugin.version>9.22.3</flyway-maven-plugin.version>
+        <maven-dependency-plugin.version>3.8.1</maven-dependency-plugin.version>
 
         <exec.mainClass>iudx.data.marketplace.deploy.Deployer</exec.mainClass>
         <config.file>config.json</config.file>
@@ -80,6 +81,31 @@
             <artifactId>vertx-core</artifactId>
             <version>${vertx.version}</version>
         </dependency>
+        <dependency>
+            <groupId>io.vertx</groupId>
+            <artifactId>vertx-auth-oauth2</artifactId>
+            <version>${vertx.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>io.vertx</groupId>
+            <artifactId>vertx-jdbc-client</artifactId>
+            <version>${vertx.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>io.vertx</groupId>
+            <artifactId>vertx-unit</artifactId>
+            <version>${vertx.version}</version>
+            <scope>test</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-checkstyle-plugin</artifactId>
+            <version>${maven-checkstyle-plugin-google.version}</version>
+        </dependency>
+
         <dependency>
             <groupId>io.vertx</groupId>
             <artifactId>vertx-web</artifactId>
@@ -372,6 +398,61 @@
                         <!-- deployment helper classes -->
                         <exclude>iudx/data/marketplace/deploy/*.class</exclude>
                     </excludes>
+                </configuration>
+            </plugin>
+            <!--  Plugin for analyzing unused dependency -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-dependency-plugin</artifactId>
+                <version>${maven-dependency-plugin.version}</version>
+                <configuration>
+                    <!-- adding following dependencies to not consider as unused dependency -->
+                    <usedDependencies>
+                        <dependency>
+                            org.apache.logging.log4j:log4j-slf4j2-impl
+                        </dependency>
+                        <dependency>
+                            com.lmax:disruptor
+                        </dependency>
+                        <dependency>
+                            org.mockito:mockito-inline
+                        </dependency>
+                        <dependency>
+                            org.apache.maven.plugins:maven-checkstyle-plugin
+                        </dependency>
+                        <!-- Adding all the vertx dependencies -->
+                        <dependency>
+                            io.vertx:vertx-auth-oauth2
+                        </dependency>
+                        <dependency>
+                            io.vertx:vertx-service-discovery
+                        </dependency>
+                        <dependency>
+                            io.vertx:vertx-unit
+                        </dependency>
+                        <dependency>
+                            io.vertx:vertx-jdbc-client
+                        </dependency>
+                        <dependency>
+                            org.junit.jupiter:junit-jupiter-engine
+                        </dependency>
+                        <!-- Adding postgres dependency -->
+                        <dependency>
+                            org.postgresql:postgresql
+                        </dependency>
+                        <dependency>
+                            org.apache.curator:curator-x-discovery
+                        </dependency>
+                        <dependency>
+                            io.vertx:vertx-json-schema
+                        </dependency>
+                        <dependency>
+                            com.ongres.scram:client
+                        </dependency>
+                        <dependency>
+                            io.micrometer:micrometer-registry-prometheus
+                        </dependency>
+                    </usedDependencies>
                 </configuration>
             </plugin>
             <plugin>
