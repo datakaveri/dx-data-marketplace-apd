@@ -9,7 +9,7 @@
     <properties>
         <vertx.version>4.5.11</vertx.version>
         <openjdk.version>11</openjdk.version>
-        <junit-jupiter-engine.version>5.10.2</junit-jupiter-engine.version>
+        <junit-jupiter-engine.version>5.11.3</junit-jupiter-engine.version>
         <apache-log4j2.version>2.24.2</apache-log4j2.version>
         <jacoco-maven-plugin.version>0.8.12</jacoco-maven-plugin.version>
         <checkstyle.version>10.20.1</checkstyle.version>
@@ -20,7 +20,7 @@
         <maven-pmd-plugin.version>3.26.0</maven-pmd-plugin.version>
         <maven-checkstyle-plugin-google.version>3.6.0</maven-checkstyle-plugin-google.version>
         <maven-surefire-report-plugin.version>3.5.2</maven-surefire-report-plugin.version>
-        <junit-jupiter.params>5.10.2</junit-jupiter.params>
+        <junit-jupiter.params>5.11.3</junit-jupiter.params>
         <testcontainer.params>1.20.4</testcontainer.params>
         <lmax-disruptor.version>4.0.0</lmax-disruptor.version>
         <micrometer.version>1.14.1</micrometer.version>
@@ -30,7 +30,7 @@
         <httpcore.version>4.4.16</httpcore.version>
         <json-schema-validator.version>2.2.14</json-schema-validator.version>
         <mockito-inline.version>5.2.0</mockito-inline.version>
-        <mockito-junit-jupiter.version>5.11.0</mockito-junit-jupiter.version>
+        <mockito-junit-jupiter.version>5.14.2</mockito-junit-jupiter.version>
         <client.version>2.1</client.version>
         <guava.version>33.3.1-jre</guava.version>
         <razorpay-java.version>1.4.8</razorpay-java.version>
