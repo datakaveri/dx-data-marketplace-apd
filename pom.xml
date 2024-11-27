@@ -18,12 +18,12 @@
         <maven-javadoc-plugin.version>3.11.1</maven-javadoc-plugin.version>
         <exec-maven-plugin.version>3.5.0</exec-maven-plugin.version>
         <maven-pmd-plugin.version>3.26.0</maven-pmd-plugin.version>
-        <maven-checkstyle-plugin-google.version>3.3.1</maven-checkstyle-plugin-google.version>
+        <maven-checkstyle-plugin-google.version>3.6.0</maven-checkstyle-plugin-google.version>
         <maven-surefire-report-plugin.version>3.5.2</maven-surefire-report-plugin.version>
         <junit-jupiter.params>5.10.2</junit-jupiter.params>
         <testcontainer.params>1.20.4</testcontainer.params>
         <lmax-disruptor.version>4.0.0</lmax-disruptor.version>
-        <micrometer.version>1.12.3</micrometer.version>
+        <micrometer.version>1.14.1</micrometer.version>
         <hazelcast.version>4.0.2</hazelcast.version>
         <curator.version>5.7.1</curator.version>
         <commons-lang.version>2.6</commons-lang.version>
@@ -37,6 +37,7 @@
         <postgresql.version>42.7.4</postgresql.version>
         <flyway-maven-plugin.version>9.22.3</flyway-maven-plugin.version>
         <maven-dependency-plugin.version>3.8.1</maven-dependency-plugin.version>
+        <httpclient.version>4.5.14</httpclient.version>
 
         <exec.mainClass>iudx.data.marketplace.deploy.Deployer</exec.mainClass>
         <config.file>config.json</config.file>
@@ -245,7 +246,7 @@
         <!-- -->
         <dependency>
             <groupId>io.micrometer</groupId>
-            <artifactId>micrometer-registry-prometheus</artifactId>
+            <artifactId>micrometer-registry-prometheus-simpleclient</artifactId>
             <version>${micrometer.version}</version>
         </dependency>
         <dependency>
@@ -266,6 +267,16 @@
             <version>${guava.version}</version>
         </dependency>
 
+        <dependency>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-checkstyle-plugin</artifactId>
+            <version>${maven-checkstyle-plugin-google.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.httpcomponents</groupId>
+            <artifactId>httpclient</artifactId>
+            <version>${httpclient.version}</version>
+        </dependency>
 
         <!-- Razorpay Client dependency  -->
         <dependency>
