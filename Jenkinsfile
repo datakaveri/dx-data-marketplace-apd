@@ -28,6 +28,7 @@ pipeline {
     stage('Unit Tests and Code Coverage Test'){
       steps{
         script{
+        sh 'sudo update-alternatives --set java /usr/lib/jvm/java-21-openjdk-amd64/bin/java'
           sh 'cp /home/ubuntu/configs/dmp-apd-server-config-test.json ./secrets/all-verticles-configs/config-test.json'
            catchError(buildResult: 'SUCCESS', stageResult: 'UNSTABLE') {
               sh "mvn clean test checkstyle:checkstyle pmd:pmd"
@@ -36,7 +37,6 @@ pipeline {
         
       }
       post{
-
       always {
 
         xunit (
@@ -64,6 +64,7 @@ pipeline {
         cleanup{
           script{
             sh 'sudo rm -rf target/'
+            sh 'sudo update-alternatives --set java /usr/lib/jvm/java-11-openjdk-amd64/bin/java'
           }
         }        
       }
