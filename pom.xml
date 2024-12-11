@@ -7,8 +7,10 @@
     <version>1.0.0-SNAPSHOT</version>
 
     <properties>
+        <maven.compiler.source>21</maven.compiler.source>
+        <maven.compiler.target>21</maven.compiler.target>
         <vertx.version>4.5.11</vertx.version>
-        <openjdk.version>11</openjdk.version>
+        <openjdk.version>21</openjdk.version>
         <junit-jupiter-engine.version>5.11.3</junit-jupiter-engine.version>
         <apache-log4j2.version>2.24.2</apache-log4j2.version>
         <jacoco-maven-plugin.version>0.8.12</jacoco-maven-plugin.version>
@@ -29,6 +31,7 @@
         <commons-lang.version>2.6</commons-lang.version>
         <httpcore.version>4.4.16</httpcore.version>
         <json-schema-validator.version>2.2.14</json-schema-validator.version>
+        <argLine>-Dnet.bytebuddy.experimental=true</argLine>
         <mockito-inline.version>5.2.0</mockito-inline.version>
         <mockito-junit-jupiter.version>5.14.2</mockito-junit-jupiter.version>
         <client.version>2.1</client.version>
