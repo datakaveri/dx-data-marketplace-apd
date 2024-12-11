@@ -37,7 +37,6 @@ pipeline {
         
       }
       post{
-
       always {
 
         xunit (
@@ -65,6 +64,7 @@ pipeline {
         cleanup{
           script{
             sh 'sudo rm -rf target/'
+            sh 'sudo update-alternatives --set java /usr/lib/jvm/java-11-openjdk-amd64/bin/java'
           }
         }        
       }
@@ -111,7 +111,6 @@ pipeline {
         }
         cleanup{
           script{
-          sh 'sudo update-alternatives --set java /usr/lib/jvm/java-11-openjdk-amd64/bin/java'
             sh 'docker compose -f docker-compose.test.yml down --remove-orphans'
           }
         }
@@ -162,7 +161,6 @@ pipeline {
           steps {
             node('built-in') {
               script{
-              sh 'sudo update-alternatives --set java /usr/lib/jvm/java-21-openjdk-amd64/bin/java'
                 sh 'newman run /var/lib/jenkins/iudx/dmp-apd/Newman/DX-Data-Marketplace-APIs.postman_collection.json -e /home/ubuntu/configs/cd/dmp-apd-postman-env.json --insecure -r htmlextra --reporter-htmlextra-export /var/lib/jenkins/iudx/dmp-apd/Newman/report/cd-report.html --reporter-htmlextra-skipSensitiveData'
               }
             }
@@ -171,7 +169,6 @@ pipeline {
             always{
               node('built-in') {
                 script{
-                   sh 'sudo update-alternatives --set java /usr/lib/jvm/java-11-openjdk-amd64/bin/java'
                   publishHTML([allowMissing: false, alwaysLinkToLastBuild: true, keepAll: true, reportDir: '/var/lib/jenkins/iudx/dmp-apd/Newman/report/', reportFiles: 'cd-report.html', reportTitles: '', reportName: 'Swarm Integration Test Report'])
                 }
               }
