@@ -17,6 +17,7 @@ import io.vertx.ext.web.client.WebClientOptions;
 import io.vertx.ext.web.handler.BodyHandler;
 import io.vertx.ext.web.handler.CorsHandler;
 import io.vertx.ext.web.handler.TimeoutHandler;
+import iudx.data.marketplace.apiserver.handlers.AccessHandler;
 import iudx.data.marketplace.apiserver.handlers.AuthHandler;
 import iudx.data.marketplace.apiserver.handlers.ExceptionHandler;
 import iudx.data.marketplace.apiserver.handlers.ValidationHandler;
@@ -24,6 +25,7 @@ import iudx.data.marketplace.apiserver.provider.linkedaccount.LinkedAccountServi
 import iudx.data.marketplace.apiserver.util.RequestType;
 import iudx.data.marketplace.aaaService.AuthClient;
 import iudx.data.marketplace.authenticator.AuthenticationService;
+import iudx.data.marketplace.authenticator.model.DxRole;
 import iudx.data.marketplace.common.*;
 import iudx.data.marketplace.policies.PolicyService;
 import iudx.data.marketplace.policies.User;
@@ -63,6 +65,7 @@ public class ApiServerVerticle extends AbstractVerticle {
   private AuthenticationService authenticationService;
   private LinkedAccountService linkedAccountService;
   private WebhookService webhookService;
+  private AccessHandler accessHandler;
 
   /**
    * This method is used to start the Verticle. It deploys a verticle in a cluster, reads the
@@ -106,6 +109,7 @@ public class ApiServerVerticle extends AbstractVerticle {
     authenticationService = AuthenticationService.createProxy(vertx, AUTH_SERVICE_ADDRESS);
     linkedAccountService = LinkedAccountService.createProxy(vertx, LINKED_ACCOUNT_ADDRESS);
     webhookService = WebhookService.createProxy(vertx, WEBHOOK_SERVICE_ADDRESS);
+    accessHandler = new AccessHandler();
     router = Router.router(vertx);
 
     router
@@ -186,6 +190,7 @@ public class ApiServerVerticle extends AbstractVerticle {
     router
         .get(api.getPoliciesUrl())
         .handler(AuthHandler.create(authenticationService, api, postgresService, authClient))
+        .handler(accessHandler.setUserRolesForEndpoint(DxRole.CONSUMER, DxRole.PROVIDER, DxRole.DELEGATE))
         .handler(this::getPoliciesHandler)
         .failureHandler(exceptionHandler);
 
@@ -207,6 +212,7 @@ public class ApiServerVerticle extends AbstractVerticle {
         .post(api.getVerifyPaymentApi())
         .handler(verifyPaymentValidationHandler)
         .handler(AuthHandler.create(authenticationService, api, postgresService, authClient))
+        .handler(accessHandler.setUserRolesForEndpoint(DxRole.CONSUMER, DxRole.DELEGATE))
         .handler(this::handleVerifyPayment)
         .failureHandler(exceptionHandler);
 
@@ -214,6 +220,7 @@ public class ApiServerVerticle extends AbstractVerticle {
         .post(api.getLinkedAccountService())
         .handler(postLinkedAccountHandler)
         .handler(AuthHandler.create(authenticationService, api, postgresService, authClient))
+        .handler(accessHandler.setUserRolesForEndpoint(DxRole.PROVIDER, DxRole.DELEGATE))
         .handler(this::handlePostLinkedAccount)
         .failureHandler(exceptionHandler);
 
@@ -221,12 +228,14 @@ public class ApiServerVerticle extends AbstractVerticle {
         .put(api.getLinkedAccountService())
         .handler(putLinkedAccountHandler)
         .handler(AuthHandler.create(authenticationService, api, postgresService, authClient))
+        .handler(accessHandler.setUserRolesForEndpoint( DxRole.PROVIDER, DxRole.DELEGATE))
         .handler(this::handlePutLinkedAccount)
         .failureHandler(exceptionHandler);
 
     router
         .get(api.getLinkedAccountService())
         .handler(AuthHandler.create(authenticationService, api, postgresService, authClient))
+        .handler(accessHandler.setUserRolesForEndpoint( DxRole.PROVIDER, DxRole.DELEGATE))
         .handler(this::handleFetchLinkedAccount)
         .failureHandler(exceptionHandler);
 
@@ -234,6 +243,7 @@ public class ApiServerVerticle extends AbstractVerticle {
         .get(api.getCheckPolicyPath())
         .handler(checkPolicyValidationHandler)
         .handler(AuthHandler.create(authenticationService, api, postgresService, authClient))
+        .handler(accessHandler.setUserRolesForEndpoint(DxRole.CONSUMER, DxRole.DELEGATE))
         .handler(this::checkPolicyHandler)
         .failureHandler(exceptionHandler);
 
