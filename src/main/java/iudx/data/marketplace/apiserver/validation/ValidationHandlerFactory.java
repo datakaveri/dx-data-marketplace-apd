@@ -44,7 +44,7 @@ public class ValidationHandlerFactory {
         validator = getPolicyValidators(body, parameters);
         break;
       case VERIFY:
-        validator = getVerifyPolicyValidator(body, parameters);
+        validator = getVerifyPolicyValidator(body);
         break;
       case ORDER:
         validator = getOrderValidator(parameters);
@@ -139,9 +139,8 @@ public class ValidationHandlerFactory {
     return validators;
   }
 
-  private List<Validator> getVerifyPolicyValidator(JsonObject body, MultiMap parameters) {
+  private List<Validator> getVerifyPolicyValidator(JsonObject body) {
     List<Validator> validators = new ArrayList<>();
-    validators.add(new BearerTokenTypeValidator(parameters.get(HEADER_BEARER_AUTHORIZATION), false));
     validators.add(new JsonSchemaTypeValidator(body, RequestType.VERIFY));
     return validators;
   }
