@@ -1,4 +1,4 @@
-package iudx.data.marketplace.common;
+package iudx.data.marketplace.catalogueService;
 
 import static iudx.data.marketplace.common.Constants.*;
 

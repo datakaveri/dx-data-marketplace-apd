@@ -1,4 +1,4 @@
-package iudx.data.marketplace.authenticator.authorization;
+package iudx.data.marketplace.authenticator.handler;
 
 import iudx.data.marketplace.authenticator.model.JwtData;
 import java.util.stream.Stream;

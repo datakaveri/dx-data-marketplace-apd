@@ -19,11 +19,10 @@ import io.vertx.junit5.VertxTestContext;
 
 import iudx.data.marketplace.common.Api;
 import iudx.data.marketplace.configuration.Configuration;
-import iudx.data.marketplace.authenticator.authorization.Method;
+import iudx.data.marketplace.authenticator.handler.Method;
 import iudx.data.marketplace.authenticator.model.JwtData;
-import iudx.data.marketplace.common.CatalogueService;
+import iudx.data.marketplace.catalogueService.CatalogueService;
 import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;

@@ -1,4 +1,4 @@
-package iudx.data.marketplace.authenticator;
+package iudx.data.marketplace.aaaService;
 
 import static iudx.data.marketplace.apiserver.util.Constants.*;
 import static iudx.data.marketplace.common.HttpStatusCode.INTERNAL_SERVER_ERROR;

@@ -2,7 +2,7 @@ package iudx.data.marketplace.authenticator;
 
 import static iudx.data.marketplace.apiserver.util.Constants.*;
 import static iudx.data.marketplace.apiserver.util.Constants.API_ENDPOINT;
-import static iudx.data.marketplace.authenticator.authorization.IudxRole.DELEGATE;
+import static iudx.data.marketplace.authenticator.handler.IudxRole.DELEGATE;
 import static iudx.data.marketplace.authenticator.util.Constants.*;
 import static iudx.data.marketplace.common.Constants.APD_URL;
 
@@ -13,7 +13,7 @@ import io.vertx.core.Promise;
 import io.vertx.core.json.JsonObject;
 import io.vertx.ext.auth.authentication.TokenCredentials;
 import io.vertx.ext.auth.jwt.JWTAuth;
-import iudx.data.marketplace.authenticator.authorization.*;
+import iudx.data.marketplace.authenticator.handler.*;
 import iudx.data.marketplace.authenticator.model.JwtData;
 import iudx.data.marketplace.common.Api;
 import org.apache.logging.log4j.LogManager;
