@@ -18,7 +18,7 @@ public class Constants {
 
   // Header params
   public static final String HEADER_TOKEN = "token";
-  public static final String AUTHORIZATION_KEY = "Authorization";
+  public static final String HEADER_BEARER_AUTHORIZATION = "Authorization";
 
   public static final String HEADER_HOST = "Host";
   public static final String HEADER_ACCEPT = "Accept";
@@ -105,6 +105,10 @@ public class Constants {
       Pattern.compile(
           "[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-4[a-fA-F0-9]{3}-[89abAB][a-fA-F0-9]{3}-[a-fA-F0-9]{12}");
   public static final Pattern ORDER_ID_PATTERN = Pattern.compile("order_[a-zA-Z0-9]+");
+  public static final int BEARER_TOKEN_MIN_LENGTH = 8;
+  public static final Pattern BEARER_TOKEN_PATTERN =
+      Pattern.compile("Bearer [a-zA-Z0-9_*\\-*\\.\\/]+$");
+
   // response keys
   public static final String TYPE = "type";
   public static final String TITLE = "title";

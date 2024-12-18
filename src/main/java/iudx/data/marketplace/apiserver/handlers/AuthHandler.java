@@ -72,7 +72,7 @@ public class AuthHandler implements Handler<RoutingContext> {
 
     if (path.equals(api.getVerifyUrl())) {
       // removes `bearer` from the token by trimming the leading and trailing spaces
-      token = request.headers().get(AUTHORIZATION_KEY);
+      token = request.headers().get(HEADER_BEARER_AUTHORIZATION);
       if (token.trim().split(" ").length == 2) {
         token = token.trim().split(" ")[1];
         authInfo.put(HEADER_TOKEN, token);
