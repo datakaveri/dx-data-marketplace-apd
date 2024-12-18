@@ -32,6 +32,7 @@ public class Constants {
   // request/response params
   public static final String CONTENT_TYPE = "content-type";
   public static final String APPLICATION_JSON = "application/json";
+
   // json fields
   public static final String JSON_TYPE = "type";
   public static final String JSON_TITLE = "title";
@@ -39,6 +40,7 @@ public class Constants {
   public static final String USERID = "userId";
   public static final String ROLE = "role";
   public static final String AUD = "aud";
+  public static final String USER = "user";
 
   public static final String IS_DELEGATE = "isDelegate";
 

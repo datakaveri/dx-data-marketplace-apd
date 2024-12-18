@@ -306,7 +306,7 @@ public class ApiServerVerticle extends AbstractVerticle {
   private void checkPolicyHandler(RoutingContext routingContext) {
     HttpServerResponse response = routingContext.response();
 
-    User user = routingContext.get("user");
+    User user = RoutingContextHelper.getUser(routingContext);
     String productVariantId = routingContext.request().getParam("productVariantId");
     policyService
         .checkPolicy(productVariantId, user)
@@ -428,7 +428,7 @@ public class ApiServerVerticle extends AbstractVerticle {
   private void getPoliciesHandler(RoutingContext routingContext) {
     HttpServerResponse response = routingContext.response();
 
-    User user = routingContext.get("user");
+    User user = RoutingContextHelper.getUser(routingContext);
     policyService
         .getPolicies(user)
         .onComplete(
@@ -446,7 +446,7 @@ public class ApiServerVerticle extends AbstractVerticle {
 
   private void handlePostLinkedAccount(RoutingContext routingContext) {
     JsonObject requestBody = routingContext.body().asJsonObject();
-    User user = routingContext.get("user");
+    User user = RoutingContextHelper.getUser(routingContext);
     HttpServerResponse response = routingContext.response();
     linkedAccountService
         .createLinkedAccount(requestBody, user)
@@ -468,7 +468,7 @@ public class ApiServerVerticle extends AbstractVerticle {
   private void handlePutLinkedAccount(RoutingContext routingContext) {
     JsonObject requestBody = routingContext.body().asJsonObject();
     HttpServerResponse response = routingContext.response();
-    User user = routingContext.get("user");
+    User user = RoutingContextHelper.getUser(routingContext);
 
     linkedAccountService
         .updateLinkedAccount(requestBody, user)
@@ -488,7 +488,7 @@ public class ApiServerVerticle extends AbstractVerticle {
 
   private void handleFetchLinkedAccount(RoutingContext routingContext) {
     HttpServerResponse response = routingContext.response();
-    User user = routingContext.get("user");
+    User user = RoutingContextHelper.getUser(routingContext);
     linkedAccountService
         .fetchLinkedAccount(user)
         .onComplete(
