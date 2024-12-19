@@ -76,7 +76,7 @@ public class ConsumerApis {
     router
         .get(api.getConsumerListProviders())
         .handler(providerValidationHandler)
-        .handler(accessHandler)
+        .handler(authHandler)
         .handler(accessHandler.setUserRolesForEndpoint(DxRole.CONSUMER, DxRole.DELEGATE))
         .handler(userInfoFromAuthHandler)
         .handler(this::listProviders)
