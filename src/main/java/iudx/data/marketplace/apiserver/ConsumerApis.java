@@ -14,14 +14,12 @@ import io.vertx.core.json.DecodeException;
 import io.vertx.core.json.JsonObject;
 import io.vertx.ext.web.Router;
 import io.vertx.ext.web.RoutingContext;
-import iudx.data.marketplace.apiserver.handlers.AccessHandler;
-import iudx.data.marketplace.apiserver.handlers.AuthHandler;
-import iudx.data.marketplace.apiserver.handlers.ExceptionHandler;
-import iudx.data.marketplace.apiserver.handlers.ValidationHandler;
+import iudx.data.marketplace.apiserver.handlers.*;
 import iudx.data.marketplace.apiserver.util.RequestType;
 import iudx.data.marketplace.aaaService.AuthClient;
 import iudx.data.marketplace.authenticator.AuthenticationService;
 import iudx.data.marketplace.authenticator.model.DxRole;
+import iudx.data.marketplace.authenticator.model.UserInfo;
 import iudx.data.marketplace.common.Api;
 import iudx.data.marketplace.common.HttpStatusCode;
 import iudx.data.marketplace.common.ResponseUrn;
@@ -44,6 +42,8 @@ public class ConsumerApis {
   private AuthClient authClient;
   private AuthenticationService authenticationService;
   private AccessHandler accessHandler;
+  private UserInfoFromAuthHandler userInfoFromAuthHandler;
+  private UserInfo userInfo;
 
   ConsumerApis(
       Vertx vertx,
@@ -66,6 +66,8 @@ public class ConsumerApis {
     ValidationHandler providerValidationHandler = new ValidationHandler(RequestType.PROVIDER);
     ExceptionHandler exceptionHandler = new ExceptionHandler();
     accessHandler = new AccessHandler();
+    userInfo = new UserInfo();
+    userInfoFromAuthHandler = new UserInfoFromAuthHandler(authClient, userInfo);
 
     consumerService = ConsumerService.createProxy(vertx, CONSUMER_SERVICE_ADDRESS);
 
@@ -74,6 +76,7 @@ public class ConsumerApis {
         .handler(providerValidationHandler)
         .handler(AuthHandler.create(authenticationService, api, postgresService, authClient))
         .handler(accessHandler.setUserRolesForEndpoint(DxRole.CONSUMER, DxRole.DELEGATE))
+        .handler(userInfoFromAuthHandler)
         .handler(this::listProviders)
         .failureHandler(exceptionHandler);
 
@@ -82,6 +85,7 @@ public class ConsumerApis {
         .handler(resourceValidationHandler)
         .handler(AuthHandler.create(authenticationService, api, postgresService, authClient))
         .handler(accessHandler.setUserRolesForEndpoint(DxRole.CONSUMER, DxRole.DELEGATE))
+        .handler(userInfoFromAuthHandler)
         .handler(this::listResources)
         .failureHandler(exceptionHandler);
 
@@ -90,6 +94,7 @@ public class ConsumerApis {
         .handler(resourceValidationHandler)
         .handler(AuthHandler.create(authenticationService, api, postgresService, authClient))
         .handler(accessHandler.setUserRolesForEndpoint(DxRole.CONSUMER,DxRole.DELEGATE))
+        .handler(userInfoFromAuthHandler)
         .handler(this::listProducts)
         .failureHandler(exceptionHandler);
 
@@ -100,6 +105,7 @@ public class ConsumerApis {
         .handler(purchaseValidationHandler)
         .handler(AuthHandler.create(authenticationService, api, postgresService, authClient))
         .handler(accessHandler.setUserRolesForEndpoint(DxRole.CONSUMER, DxRole.DELEGATE))
+        .handler(userInfoFromAuthHandler)
         .handler(this::listPurchases)
         .failureHandler(exceptionHandler);
 
@@ -110,6 +116,7 @@ public class ConsumerApis {
         .handler(productVariantHandler)
         .handler(AuthHandler.create(authenticationService, api, postgresService, authClient))
         .handler(accessHandler.setUserRolesForEndpoint(DxRole.CONSUMER, DxRole.DELEGATE))
+        .handler(userInfoFromAuthHandler)
         .handler(this::listProductVariants)
         .failureHandler(exceptionHandler);
 
@@ -120,6 +127,7 @@ public class ConsumerApis {
         .handler(orderValidationHandler)
         .handler(AuthHandler.create(authenticationService, api, postgresService, authClient))
         .handler(accessHandler.setUserRolesForEndpoint(DxRole.CONSUMER, DxRole.DELEGATE))
+        .handler(userInfoFromAuthHandler)
         .handler(this::createOrder)
         .failureHandler(exceptionHandler);
     return this.router;

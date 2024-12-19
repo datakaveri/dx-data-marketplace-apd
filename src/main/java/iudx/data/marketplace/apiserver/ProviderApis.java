@@ -16,14 +16,12 @@ import io.vertx.core.json.JsonObject;
 import io.vertx.ext.web.Router;
 import io.vertx.ext.web.RoutingContext;
 import iudx.data.marketplace.apiserver.exceptions.DxRuntimeException;
-import iudx.data.marketplace.apiserver.handlers.AccessHandler;
-import iudx.data.marketplace.apiserver.handlers.AuthHandler;
-import iudx.data.marketplace.apiserver.handlers.ExceptionHandler;
-import iudx.data.marketplace.apiserver.handlers.ValidationHandler;
+import iudx.data.marketplace.apiserver.handlers.*;
 import iudx.data.marketplace.apiserver.util.RequestType;
 import iudx.data.marketplace.aaaService.AuthClient;
 import iudx.data.marketplace.authenticator.AuthenticationService;
 import iudx.data.marketplace.authenticator.model.DxRole;
+import iudx.data.marketplace.authenticator.model.UserInfo;
 import iudx.data.marketplace.common.Api;
 import iudx.data.marketplace.common.HttpStatusCode;
 import iudx.data.marketplace.common.ResponseUrn;
@@ -48,6 +46,8 @@ public class ProviderApis {
   private AuthClient authClient;
   private AuthenticationService authenticationService;
   private AccessHandler accessHandler;
+  private UserInfo userInfo;
+  private UserInfoFromAuthHandler userInfoFromAuthHandler;
 
   ProviderApis(
       Vertx vertx,
@@ -69,6 +69,8 @@ public class ProviderApis {
     ValidationHandler productValidationHandler = new ValidationHandler(RequestType.PRODUCT);
     ExceptionHandler exceptionHandler = new ExceptionHandler();
     accessHandler = new AccessHandler();
+    userInfo = new UserInfo();
+    userInfoFromAuthHandler = new UserInfoFromAuthHandler(authClient, userInfo);
 
     productService = ProductService.createProxy(vertx, PRODUCT_SERVICE_ADDRESS);
     variantService = ProductVariantService.createProxy(vertx, PRODUCT_VARIANT_SERVICE_ADDRESS);
@@ -79,6 +81,7 @@ public class ProviderApis {
         .handler(productValidationHandler)
         .handler(AuthHandler.create(authenticationService, api, postgresService, authClient))
         .handler(accessHandler.setUserRolesForEndpoint(DxRole.PROVIDER, DxRole.DELEGATE))
+        .handler(userInfoFromAuthHandler)
         .handler(this::handleCreateProduct)
         .failureHandler(exceptionHandler);
 
@@ -87,6 +90,7 @@ public class ProviderApis {
         .handler(productValidationHandler)
         .handler(AuthHandler.create(authenticationService, api, postgresService, authClient))
         .handler(accessHandler.setUserRolesForEndpoint(DxRole.PROVIDER, DxRole.DELEGATE))
+        .handler(userInfoFromAuthHandler)
         .handler(this::handleDeleteProduct)
         .failureHandler(exceptionHandler);
     ValidationHandler resourceValidationHandler = new ValidationHandler(RequestType.RESOURCE);
@@ -96,6 +100,7 @@ public class ProviderApis {
         .handler(resourceValidationHandler)
         .handler(AuthHandler.create(authenticationService, api, postgresService, authClient))
         .handler(accessHandler.setUserRolesForEndpoint(DxRole.PROVIDER, DxRole.DELEGATE))
+        .handler(userInfoFromAuthHandler)
         .handler(this::listProducts)
         .failureHandler(exceptionHandler);
     ValidationHandler purchaseValidationHandler = new ValidationHandler(RequestType.PURCHASE);
@@ -105,6 +110,7 @@ public class ProviderApis {
         .handler(purchaseValidationHandler)
         .handler(AuthHandler.create(authenticationService, api, postgresService, authClient))
         .handler(accessHandler.setUserRolesForEndpoint(DxRole.PROVIDER, DxRole.DELEGATE))
+        .handler(userInfoFromAuthHandler)
         .handler(this::listPurchases)
         .failureHandler(exceptionHandler);
     ValidationHandler variantValidationHandler = new ValidationHandler(RequestType.PRODUCT_VARIANT);
@@ -114,6 +120,7 @@ public class ProviderApis {
         .handler(variantValidationHandler)
         .handler(AuthHandler.create(authenticationService, api, postgresService, authClient))
         .handler(accessHandler.setUserRolesForEndpoint(DxRole.PROVIDER, DxRole.DELEGATE))
+        .handler(userInfoFromAuthHandler)
         .handler(this::handleCreateProductVariant)
         .failureHandler(exceptionHandler);
 
@@ -122,6 +129,7 @@ public class ProviderApis {
         .handler(variantValidationHandler)
         .handler(AuthHandler.create(authenticationService, api, postgresService, authClient))
         .handler(accessHandler.setUserRolesForEndpoint(DxRole.PROVIDER, DxRole.DELEGATE))
+        .handler(userInfoFromAuthHandler)
         .handler(this::handleUpdateProductVariant)
         .failureHandler(exceptionHandler);
     ValidationHandler listVariantValidationHandler =
@@ -131,6 +139,7 @@ public class ProviderApis {
         .handler(listVariantValidationHandler)
         .handler(AuthHandler.create(authenticationService, api, postgresService, authClient))
         .handler(accessHandler.setUserRolesForEndpoint(DxRole.PROVIDER, DxRole.DELEGATE))
+        .handler(userInfoFromAuthHandler)
         .handler(this::handleGetProductVariants)
         .failureHandler(exceptionHandler);
     ValidationHandler deleteVariantValidationHandler =
@@ -141,6 +150,7 @@ public class ProviderApis {
         .handler(deleteVariantValidationHandler)
         .handler(AuthHandler.create(authenticationService, api, postgresService, authClient))
         .handler(accessHandler.setUserRolesForEndpoint(DxRole.PROVIDER, DxRole.DELEGATE))
+        .handler(userInfoFromAuthHandler)
         .handler(this::handleDeleteProductVariant)
         .failureHandler(exceptionHandler);
     return this.router;
