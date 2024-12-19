@@ -1,19 +1,13 @@
 package iudx.data.marketplace.authenticator;
-
 import static iudx.data.marketplace.apiserver.util.Constants.*;
-import static iudx.data.marketplace.apiserver.util.Constants.API_ENDPOINT;
-import static iudx.data.marketplace.authenticator.authorization.IudxRole.DELEGATE;
 import static iudx.data.marketplace.authenticator.util.Constants.*;
 import static iudx.data.marketplace.common.Constants.APD_URL;
 
-import io.vertx.core.AsyncResult;
 import io.vertx.core.Future;
-import io.vertx.core.Handler;
 import io.vertx.core.Promise;
 import io.vertx.core.json.JsonObject;
 import io.vertx.ext.auth.authentication.TokenCredentials;
 import io.vertx.ext.auth.jwt.JWTAuth;
-import iudx.data.marketplace.authenticator.authorization.*;
 import iudx.data.marketplace.authenticator.model.JwtData;
 import iudx.data.marketplace.common.Api;
 import org.apache.logging.log4j.LogManager;
@@ -37,54 +31,35 @@ public class AuthenticationServiceImpl implements AuthenticationService {
   }
 
   @Override
-  public AuthenticationService tokenIntrospect(
-      JsonObject request, JsonObject authenticationInfo, Handler<AsyncResult<JsonObject>> handler) {
-    String token = authenticationInfo.getString(TOKEN);
+  public Future<JwtData> tokenIntrospect(JsonObject authenticationInfo) {
+    Promise<JwtData> promise = Promise.promise();
+    String token = authenticationInfo.getString(HEADER_TOKEN);
     ResultContainer resultContainer = new ResultContainer();
-
+    /* token would can be of the type : Bearer <JWT-Token>, <JWT-Token> */
+    /* allowing both the tokens to be authenticated for now */
+    /* TODO: later, 401 error is thrown if the token does not contain Bearer keyword */
+    boolean isItABearerToken = token.contains(HEADER_TOKEN_BEARER);
+    if(isItABearerToken && token.trim().split(" ").length == 2)
+    {
+      String[] tokenWithoutBearer = token.split(HEADER_TOKEN_BEARER);
+      token = tokenWithoutBearer[1].replaceAll("\\s", "");
+    }
     Future<JwtData> jwtDecodeFuture = decodeJwt(token);
-    jwtDecodeFuture
+
+    Future<Boolean> validateJwtAccessFuture = jwtDecodeFuture
         .compose(
             decodeHandler -> {
               resultContainer.jwtData = decodeHandler;
               return validateJwtAccess(resultContainer.jwtData);
-            })
-        .compose(isValidJwtAccess -> validateAccess(resultContainer.jwtData, authenticationInfo))
-        .onSuccess(successHandler -> handler.handle(Future.succeededFuture(successHandler)))
-        .onFailure(
-            failureHandler -> {
-              LOGGER.error("error : " + failureHandler.getCause());
-              handler.handle(Future.failedFuture(failureHandler.getMessage()));
             });
-    return this;
-  }
+    validateJwtAccessFuture
+        .onSuccess(isValidJwt -> {
+          promise.complete(resultContainer.jwtData);
+        }).onFailure(failureHandler ->{
+          LOGGER.error("error : " + failureHandler.getMessage());
+          promise.fail(failureHandler.getLocalizedMessage());
+        });
 
-  Future<JsonObject> validateAccess(JwtData jwtData, JsonObject authInfo) {
-    LOGGER.info("Authorization check started");
-    Promise<JsonObject> promise = Promise.promise();
-    Method method = Method.valueOf(authInfo.getString(API_METHOD));
-    String api = authInfo.getString(API_ENDPOINT);
-    AuthorizationRequest authRequest = new AuthorizationRequest(method, api);
-
-    // converts the delegate user role to consumer or provider
-    IudxRole role = IudxRole.fromRole(jwtData);
-
-    AuthorizationStatergy authStrategy = AuthorizationContextFactory.create(role, apis);
-    LOGGER.info("strategy : " + authStrategy.getClass().getSimpleName());
-
-    JwtAuthorization jwtAuthStrategy = new JwtAuthorization(authStrategy);
-    if (jwtAuthStrategy.isAuthorized(authRequest, jwtData)) {
-      JsonObject jsonResponse = new JsonObject();
-      boolean isDelegate = jwtData.getRole().equalsIgnoreCase(DELEGATE.getRole());
-      jsonResponse.put(USERID, isDelegate ? jwtData.getDid() : jwtData.getSub());
-      jsonResponse.put(IS_DELEGATE, isDelegate);
-      jsonResponse.put(ROLE, role);
-      jsonResponse.put(AUD, jwtData.getAud());
-      promise.complete(jsonResponse);
-    } else {
-      LOGGER.info("Failed in authorization check.");
-      promise.fail("No access provided to endpoint");
-    }
     return promise.future();
   }
 
@@ -106,37 +81,37 @@ public class AuthenticationServiceImpl implements AuthenticationService {
   }
 
   @Override
-  public AuthenticationService tokenIntrospect4Verify(
-      JsonObject authInfo, Handler<AsyncResult<JsonObject>> handler) {
+  public Future<Void> tokenIntrospect4Verify(
+      JsonObject authInfo) {
     String token = authInfo.getString(TOKEN);
-
+    Promise<Void> promise = Promise.promise();
     Future<JwtData> jwtDecodeFuture = decodeJwt(token);
     jwtDecodeFuture
         .onSuccess(
             jwtData -> {
               if (jwtData.getSub() == null) {
                 LOGGER.error("No sub value in JWT");
-                handler.handle(Future.failedFuture("No sub value in JWT"));
+                promise.fail("No sub value in JWT");
               } else if (!(jwtData.getIss() != null && issuer.equalsIgnoreCase(jwtData.getIss()))) {
                 LOGGER.error("Incorrect issuer value in JWT");
-                handler.handle(Future.failedFuture("Incorrect issuer value in JWT"));
+                promise.fail("Incorrect issuer value in JWT");
               } else if (jwtData.getAud().isEmpty()) {
                 LOGGER.error("No audience value in JWT");
-                handler.handle(Future.failedFuture("No audience value in JWT"));
+                promise.fail("No audience value in JWT");
               } else if (!jwtData.getAud().equalsIgnoreCase(apdUrl)) {
                 LOGGER.error("Incorrect audience value in JWT");
-                handler.handle(Future.failedFuture("Incorrect subject value in JWT"));
+                promise.fail("Incorrect subject value in JWT");
               } else {
                 LOGGER.info("Auth token verified");
-                handler.handle(Future.succeededFuture());
+                promise.complete();
               }
             })
         .onFailure(
             failureHandler -> {
               LOGGER.error("Failed to decode the token : {}", failureHandler.getMessage());
-              handler.handle(Future.failedFuture(failureHandler.getMessage()));
+              promise.fail(failureHandler.getMessage());
             });
-    return this;
+    return promise.future();
   }
 
   Future<JwtData> decodeJwt(String jwtToken) {

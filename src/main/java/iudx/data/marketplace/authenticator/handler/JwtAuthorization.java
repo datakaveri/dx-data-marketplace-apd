@@ -1,8 +1,6 @@
-package iudx.data.marketplace.authenticator.authorization;
+package iudx.data.marketplace.authenticator.handler;
 
 import iudx.data.marketplace.authenticator.model.JwtData;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 
 public class JwtAuthorization {
 

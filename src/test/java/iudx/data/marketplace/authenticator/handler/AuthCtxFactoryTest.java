@@ -1,4 +1,4 @@
-package iudx.data.marketplace.authenticator.authorization;
+package iudx.data.marketplace.authenticator.handler;
 
 import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;

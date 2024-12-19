@@ -9,7 +9,7 @@ import io.vertx.core.*;
 import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
 import iudx.data.marketplace.apiserver.exceptions.DxRuntimeException;
-import iudx.data.marketplace.common.CatalogueService;
+import iudx.data.marketplace.catalogueService.CatalogueService;
 import iudx.data.marketplace.common.RespBuilder;
 import iudx.data.marketplace.common.ResponseUrn;
 import iudx.data.marketplace.policies.User;

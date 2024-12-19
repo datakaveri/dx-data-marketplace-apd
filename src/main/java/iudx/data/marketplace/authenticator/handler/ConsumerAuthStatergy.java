@@ -1,7 +1,7 @@
-package iudx.data.marketplace.authenticator.authorization;
+package iudx.data.marketplace.authenticator.handler;
 
-import static iudx.data.marketplace.authenticator.authorization.Method.GET;
-import static iudx.data.marketplace.authenticator.authorization.Method.POST;
+import static iudx.data.marketplace.authenticator.handler.Method.GET;
+import static iudx.data.marketplace.authenticator.handler.Method.POST;
 
 import iudx.data.marketplace.authenticator.model.JwtData;
 import iudx.data.marketplace.common.Api;

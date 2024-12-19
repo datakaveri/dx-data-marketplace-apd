@@ -10,6 +10,7 @@ import java.util.ArrayList;
 import java.util.List;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+/*TODO: set required to true for Bearer Authorization header later */
 
 public class ValidationHandlerFactory {
   private static final Logger LOGGER = LogManager.getLogger(ValidationHandlerFactory.class);
@@ -40,7 +41,7 @@ public class ValidationHandlerFactory {
         validator = getProviderIdValidators(parameters);
         break;
       case POLICY:
-        validator = getPolicyValidators(body);
+        validator = getPolicyValidators(body, parameters);
         break;
       case VERIFY:
         validator = getVerifyPolicyValidator(body);
@@ -49,16 +50,16 @@ public class ValidationHandlerFactory {
         validator = getOrderValidator(parameters);
         break;
       case VERIFY_PAYMENT:
-        validator = getVerfiyPaymentValidator(body);
+        validator = getVerfiyPaymentValidator(body, parameters);
         break;
       case POST_ACCOUNT:
-        validator = getPostLinkedAccountValidator(body, requestType);
+        validator = getPostLinkedAccountValidator(body, requestType, parameters);
         break;
       case PUT_ACCOUNT:
-        validator = getPutLinkedAccountValidator(body, requestType);
+        validator = getPutLinkedAccountValidator(body, requestType, parameters);
         break;
       case ORDER_PAID_WEBHOOK:
-        validator = getPaymentWebhookValidator(body);
+        validator = getPaymentWebhookValidator(body, parameters);
         break;
       case PURCHASE:
         validator = getPurchaseValidator(parameters);
@@ -78,17 +79,21 @@ public class ValidationHandlerFactory {
   private List<Validator> getCheckPolicyValidator(MultiMap parameters) {
     List<Validator> validators = new ArrayList<>();
     validators.add(new UuidTypeValidator(parameters.get(PRODUCT_VARIANT_ID), true));
+    validators.add(new BearerTokenTypeValidator(parameters.get(HEADER_BEARER_AUTHORIZATION), false));
+
     return validators;
   }
 
-  private List<Validator> getPaymentWebhookValidator(JsonObject body) {
+  private List<Validator> getPaymentWebhookValidator(JsonObject body, MultiMap parameters) {
     List<Validator> validators = new ArrayList<>();
+    validators.add(new BearerTokenTypeValidator(parameters.get(HEADER_BEARER_AUTHORIZATION), false));
     validators.add(new JsonSchemaTypeValidator(body, RequestType.ORDER_PAID_WEBHOOK));
     return validators;
   }
 
   private List<Validator> getConsumerProductVariantValidator(MultiMap parameters) {
     List<Validator> validators = new ArrayList<>();
+    validators.add(new BearerTokenTypeValidator(parameters.get(HEADER_BEARER_AUTHORIZATION), false));
 
     validators.add(new ProductIdTypeValidator(parameters.get("productId"), true));
     return validators;
@@ -96,6 +101,7 @@ public class ValidationHandlerFactory {
 
   private List<Validator> getPurchaseValidator(MultiMap parameters) {
     List<Validator> validators = new ArrayList<>();
+    validators.add(new BearerTokenTypeValidator(parameters.get(HEADER_BEARER_AUTHORIZATION), false));
 
     validators.add(new UuidTypeValidator(parameters.get("resourceId"), false));
     validators.add(new ProductIdTypeValidator(parameters.get("productId"), false));
@@ -103,26 +109,32 @@ public class ValidationHandlerFactory {
     return validators;
   }
 
-  private List<Validator> getVerfiyPaymentValidator(JsonObject body) {
+  private List<Validator> getVerfiyPaymentValidator(JsonObject body, MultiMap parameters) {
     List<Validator> validators = new ArrayList<>();
+    validators.add(new BearerTokenTypeValidator(parameters.get(HEADER_BEARER_AUTHORIZATION), false));
+
     validators.add(new JsonSchemaTypeValidator(body, RequestType.VERIFY_PAYMENT));
     return validators;
   }
 
-  private List<Validator> getPostLinkedAccountValidator(JsonObject body, RequestType requestType) {
+  private List<Validator> getPostLinkedAccountValidator(JsonObject body, RequestType requestType, MultiMap parameters) {
     List<Validator> validators = new ArrayList<>();
+    validators.add(new BearerTokenTypeValidator(parameters.get(HEADER_BEARER_AUTHORIZATION), false));
     validators.add(new JsonSchemaTypeValidator(body, requestType));
     return validators;
   }
 
-  private List<Validator> getPutLinkedAccountValidator(JsonObject body, RequestType requestType) {
+  private List<Validator> getPutLinkedAccountValidator(JsonObject body, RequestType requestType, MultiMap parameters) {
     List<Validator> validators = new ArrayList<>();
+    validators.add(new BearerTokenTypeValidator(parameters.get(HEADER_BEARER_AUTHORIZATION), false));
+
     validators.add(new JsonSchemaTypeValidator(body, requestType));
     return validators;
   }
 
   private List<Validator> getOrderValidator(MultiMap parameters) {
     List<Validator> validators = new ArrayList<>();
+    validators.add(new BearerTokenTypeValidator(parameters.get(HEADER_BEARER_AUTHORIZATION), false));
     validators.add(new UuidTypeValidator(parameters.get(PRODUCT_VARIANT_ID), true));
     return validators;
   }
@@ -133,14 +145,16 @@ public class ValidationHandlerFactory {
     return validators;
   }
 
-  private List<Validator> getPolicyValidators(final JsonObject body) {
+  private List<Validator> getPolicyValidators(final JsonObject body, MultiMap parameters) {
     List<Validator> validators = new ArrayList<>();
+    validators.add(new BearerTokenTypeValidator(parameters.get(HEADER_BEARER_AUTHORIZATION), false));
     validators.add(new UuidTypeValidator(body.getString(POLICY_ID), true));
     return validators;
   }
 
   private List<Validator> getResourceIdValidators(final MultiMap parameters) {
     List<Validator> validators = new ArrayList<>();
+    validators.add(new BearerTokenTypeValidator(parameters.get(HEADER_BEARER_AUTHORIZATION), false));
 
     validators.add(new UuidTypeValidator(parameters.get("resourceId"), false));
     validators.add(new UuidTypeValidator(parameters.get(PROVIDER_ID), false));
@@ -149,6 +163,7 @@ public class ValidationHandlerFactory {
 
   private List<Validator> getProviderIdValidators(final MultiMap parameters) {
     List<Validator> validators = new ArrayList<>();
+    validators.add(new BearerTokenTypeValidator(parameters.get(HEADER_BEARER_AUTHORIZATION), false));
 
     validators.add(new UuidTypeValidator(parameters.get(PROVIDER_ID), false));
     return validators;
@@ -157,6 +172,7 @@ public class ValidationHandlerFactory {
   private List<Validator> getProductValidators(
       final MultiMap parameters, final JsonObject body, final RequestType requestType) {
     List<Validator> validators = new ArrayList<>();
+    validators.add(new BearerTokenTypeValidator(parameters.get(HEADER_BEARER_AUTHORIZATION), false));
 
     if (body == null || body.isEmpty()) {
       validators.add(new ProductIdTypeValidator(parameters.get(PRODUCT_ID), true));
@@ -170,6 +186,7 @@ public class ValidationHandlerFactory {
   private List<Validator> getProductVariantValidators(
       final MultiMap parameters, final JsonObject body, final RequestType requestType) {
     List<Validator> validators = new ArrayList<>();
+    validators.add(new BearerTokenTypeValidator(parameters.get(HEADER_BEARER_AUTHORIZATION), false));
 
     if (body == null || body.isEmpty()) {
       validators.add(new UuidTypeValidator(parameters.get(PRODUCT_VARIANT_ID), false));
@@ -182,12 +199,14 @@ public class ValidationHandlerFactory {
 
   private List<Validator> getDeleteProductVariantValidators(final MultiMap parameters) {
     List<Validator> validators = new ArrayList<>();
+    validators.add(new BearerTokenTypeValidator(parameters.get(HEADER_BEARER_AUTHORIZATION), false));
     validators.add(new UuidTypeValidator(parameters.get(PRODUCT_VARIANT_ID), true));
     return validators;
   }
 
   private List<Validator> listProductVariantValidators(final MultiMap parameters) {
     List<Validator> validators = new ArrayList<>();
+    validators.add(new BearerTokenTypeValidator(parameters.get(HEADER_BEARER_AUTHORIZATION), false));
     validators.add(new ProductIdTypeValidator(parameters.get(PRODUCT_ID), true));
     return validators;
   }
