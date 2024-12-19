@@ -1,4 +1,4 @@
-package iudx.data.marketplace.common;
+package iudx.data.marketplace.catalogueService;
 
 import io.vertx.core.AsyncResult;
 import io.vertx.core.Handler;
@@ -11,7 +11,6 @@ import io.vertx.ext.web.client.HttpResponse;
 import io.vertx.ext.web.client.WebClient;
 import io.vertx.junit5.VertxExtension;
 import io.vertx.junit5.VertxTestContext;
-import iudx.data.marketplace.catalogueService.CatalogueService;
 import iudx.data.marketplace.configuration.Configuration;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
