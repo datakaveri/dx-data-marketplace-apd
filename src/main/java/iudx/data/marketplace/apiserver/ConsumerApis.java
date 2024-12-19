@@ -44,6 +44,7 @@ public class ConsumerApis {
   private AccessHandler accessHandler;
   private UserInfoFromAuthHandler userInfoFromAuthHandler;
   private UserInfo userInfo;
+  private AuthHandler authHandler;
 
   ConsumerApis(
       Vertx vertx,
@@ -68,13 +69,14 @@ public class ConsumerApis {
     accessHandler = new AccessHandler();
     userInfo = new UserInfo();
     userInfoFromAuthHandler = new UserInfoFromAuthHandler(authClient, userInfo);
+    authHandler = new AuthHandler(authenticationService);
 
     consumerService = ConsumerService.createProxy(vertx, CONSUMER_SERVICE_ADDRESS);
 
     router
         .get(api.getConsumerListProviders())
         .handler(providerValidationHandler)
-        .handler(AuthHandler.create(authenticationService, api, postgresService, authClient))
+        .handler(accessHandler)
         .handler(accessHandler.setUserRolesForEndpoint(DxRole.CONSUMER, DxRole.DELEGATE))
         .handler(userInfoFromAuthHandler)
         .handler(this::listProviders)
@@ -83,7 +85,7 @@ public class ConsumerApis {
     router
         .get(api.getConsumerListResourcePath())
         .handler(resourceValidationHandler)
-        .handler(AuthHandler.create(authenticationService, api, postgresService, authClient))
+        .handler(authHandler)
         .handler(accessHandler.setUserRolesForEndpoint(DxRole.CONSUMER, DxRole.DELEGATE))
         .handler(userInfoFromAuthHandler)
         .handler(this::listResources)
@@ -92,7 +94,7 @@ public class ConsumerApis {
     router
         .get(api.getConsumerListProducts())
         .handler(resourceValidationHandler)
-        .handler(AuthHandler.create(authenticationService, api, postgresService, authClient))
+        .handler(authHandler)
         .handler(accessHandler.setUserRolesForEndpoint(DxRole.CONSUMER,DxRole.DELEGATE))
         .handler(userInfoFromAuthHandler)
         .handler(this::listProducts)
@@ -103,7 +105,7 @@ public class ConsumerApis {
     router
         .get(api.getConsumerListPurchases())
         .handler(purchaseValidationHandler)
-        .handler(AuthHandler.create(authenticationService, api, postgresService, authClient))
+        .handler(authHandler)
         .handler(accessHandler.setUserRolesForEndpoint(DxRole.CONSUMER, DxRole.DELEGATE))
         .handler(userInfoFromAuthHandler)
         .handler(this::listPurchases)
@@ -114,7 +116,7 @@ public class ConsumerApis {
     router
         .get(api.getConsumerProductVariantPath())
         .handler(productVariantHandler)
-        .handler(AuthHandler.create(authenticationService, api, postgresService, authClient))
+        .handler(authHandler)
         .handler(accessHandler.setUserRolesForEndpoint(DxRole.CONSUMER, DxRole.DELEGATE))
         .handler(userInfoFromAuthHandler)
         .handler(this::listProductVariants)
@@ -125,7 +127,7 @@ public class ConsumerApis {
     router
         .post(CONSUMER_PATH + ORDERS_PATH + "/:productVariantId")
         .handler(orderValidationHandler)
-        .handler(AuthHandler.create(authenticationService, api, postgresService, authClient))
+        .handler(authHandler)
         .handler(accessHandler.setUserRolesForEndpoint(DxRole.CONSUMER, DxRole.DELEGATE))
         .handler(userInfoFromAuthHandler)
         .handler(this::createOrder)

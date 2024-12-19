@@ -48,6 +48,7 @@ public class ProviderApis {
   private AccessHandler accessHandler;
   private UserInfo userInfo;
   private UserInfoFromAuthHandler userInfoFromAuthHandler;
+  private AuthHandler authHandler;
 
   ProviderApis(
       Vertx vertx,
@@ -71,6 +72,7 @@ public class ProviderApis {
     accessHandler = new AccessHandler();
     userInfo = new UserInfo();
     userInfoFromAuthHandler = new UserInfoFromAuthHandler(authClient, userInfo);
+    authHandler = new AuthHandler(authenticationService);
 
     productService = ProductService.createProxy(vertx, PRODUCT_SERVICE_ADDRESS);
     variantService = ProductVariantService.createProxy(vertx, PRODUCT_VARIANT_SERVICE_ADDRESS);
@@ -79,7 +81,7 @@ public class ProviderApis {
         .post(api.getProviderProductPath())
         .consumes(APPLICATION_JSON)
         .handler(productValidationHandler)
-        .handler(AuthHandler.create(authenticationService, api, postgresService, authClient))
+        .handler(authHandler)
         .handler(accessHandler.setUserRolesForEndpoint(DxRole.PROVIDER, DxRole.DELEGATE))
         .handler(userInfoFromAuthHandler)
         .handler(this::handleCreateProduct)
@@ -88,7 +90,7 @@ public class ProviderApis {
     router
         .delete(api.getProviderProductPath())
         .handler(productValidationHandler)
-        .handler(AuthHandler.create(authenticationService, api, postgresService, authClient))
+        .handler(authHandler)
         .handler(accessHandler.setUserRolesForEndpoint(DxRole.PROVIDER, DxRole.DELEGATE))
         .handler(userInfoFromAuthHandler)
         .handler(this::handleDeleteProduct)
@@ -98,7 +100,7 @@ public class ProviderApis {
     router
         .get(api.getProviderListProductsPath())
         .handler(resourceValidationHandler)
-        .handler(AuthHandler.create(authenticationService, api, postgresService, authClient))
+        .handler(authHandler)
         .handler(accessHandler.setUserRolesForEndpoint(DxRole.PROVIDER, DxRole.DELEGATE))
         .handler(userInfoFromAuthHandler)
         .handler(this::listProducts)
@@ -108,7 +110,7 @@ public class ProviderApis {
     router
         .get(api.getProviderListPurchasesPath())
         .handler(purchaseValidationHandler)
-        .handler(AuthHandler.create(authenticationService, api, postgresService, authClient))
+        .handler(authHandler)
         .handler(accessHandler.setUserRolesForEndpoint(DxRole.PROVIDER, DxRole.DELEGATE))
         .handler(userInfoFromAuthHandler)
         .handler(this::listPurchases)
@@ -118,7 +120,7 @@ public class ProviderApis {
     router
         .post(api.getProviderProductVariantPath())
         .handler(variantValidationHandler)
-        .handler(AuthHandler.create(authenticationService, api, postgresService, authClient))
+        .handler(authHandler)
         .handler(accessHandler.setUserRolesForEndpoint(DxRole.PROVIDER, DxRole.DELEGATE))
         .handler(userInfoFromAuthHandler)
         .handler(this::handleCreateProductVariant)
@@ -127,7 +129,7 @@ public class ProviderApis {
     router
         .put(api.getProviderProductVariantPath())
         .handler(variantValidationHandler)
-        .handler(AuthHandler.create(authenticationService, api, postgresService, authClient))
+        .handler(authHandler)
         .handler(accessHandler.setUserRolesForEndpoint(DxRole.PROVIDER, DxRole.DELEGATE))
         .handler(userInfoFromAuthHandler)
         .handler(this::handleUpdateProductVariant)
@@ -137,7 +139,7 @@ public class ProviderApis {
     router
         .get(api.getProviderProductVariantPath())
         .handler(listVariantValidationHandler)
-        .handler(AuthHandler.create(authenticationService, api, postgresService, authClient))
+        .handler(authHandler)
         .handler(accessHandler.setUserRolesForEndpoint(DxRole.PROVIDER, DxRole.DELEGATE))
         .handler(userInfoFromAuthHandler)
         .handler(this::handleGetProductVariants)
@@ -148,7 +150,7 @@ public class ProviderApis {
     router
         .delete(api.getProviderProductVariantPath())
         .handler(deleteVariantValidationHandler)
-        .handler(AuthHandler.create(authenticationService, api, postgresService, authClient))
+        .handler(authHandler)
         .handler(accessHandler.setUserRolesForEndpoint(DxRole.PROVIDER, DxRole.DELEGATE))
         .handler(userInfoFromAuthHandler)
         .handler(this::handleDeleteProductVariant)

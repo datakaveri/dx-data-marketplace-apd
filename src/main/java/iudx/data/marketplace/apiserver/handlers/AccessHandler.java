@@ -26,6 +26,7 @@ public void handle(RoutingContext event) {
 
   private void handleWithRoles(RoutingContext event, DxRole[] roleForApi) {
     JwtData jwtData = RoutingContextHelper.getJwtData(event);
+    // converts the delegate user role to consumer or provider
     DxRole userRole = DxRole.fromRole(jwtData);
     boolean isUserAllowedToAccessApi = Arrays.asList(roleForApi).contains(userRole);
     if (!isUserAllowedToAccessApi) {

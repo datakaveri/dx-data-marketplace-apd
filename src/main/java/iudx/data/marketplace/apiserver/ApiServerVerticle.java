@@ -67,6 +67,7 @@ public class ApiServerVerticle extends AbstractVerticle {
   private UserInfoFromAuthHandler userInfoFromAuthHandler;
   private UserInfo userInfo;
   private VerifyAuthHandler verifyAuthHandler;
+  private AuthHandler authHandler;
 
 
   /**
@@ -114,6 +115,7 @@ public class ApiServerVerticle extends AbstractVerticle {
     accessHandler = new AccessHandler();
     userInfo = new UserInfo();
     userInfoFromAuthHandler = new UserInfoFromAuthHandler(authClient, userInfo);
+    authHandler = new AuthHandler(authenticationService);
     router = Router.router(vertx);
     verifyAuthHandler = new VerifyAuthHandler(authenticationService);
 
@@ -194,7 +196,7 @@ public class ApiServerVerticle extends AbstractVerticle {
 
     router
         .get(api.getPoliciesUrl())
-        .handler(AuthHandler.create(authenticationService, api, postgresService, authClient))
+        .handler(authHandler)
         .handler(accessHandler.setUserRolesForEndpoint(DxRole.CONSUMER, DxRole.PROVIDER, DxRole.DELEGATE))
         .handler(userInfoFromAuthHandler)
         .handler(this::getPoliciesHandler)
@@ -208,7 +210,7 @@ public class ApiServerVerticle extends AbstractVerticle {
     router
         .post(api.getVerifyUrl())
         .handler(verifyValidationHandler)
-        .handler(AuthHandler.create(authenticationService, api, postgresService, authClient))
+        .handler(authHandler)
         .handler(verifyAuthHandler)
         .handler(this::handleVerify)
         .failureHandler(exceptionHandler);
@@ -218,7 +220,7 @@ public class ApiServerVerticle extends AbstractVerticle {
     router
         .post(api.getVerifyPaymentApi())
         .handler(verifyPaymentValidationHandler)
-        .handler(AuthHandler.create(authenticationService, api, postgresService, authClient))
+        .handler(authHandler)
         .handler(accessHandler.setUserRolesForEndpoint(DxRole.CONSUMER, DxRole.DELEGATE))
         .handler(userInfoFromAuthHandler)
         .handler(this::handleVerifyPayment)
@@ -227,7 +229,7 @@ public class ApiServerVerticle extends AbstractVerticle {
     router
         .post(api.getLinkedAccountService())
         .handler(postLinkedAccountHandler)
-        .handler(AuthHandler.create(authenticationService, api, postgresService, authClient))
+        .handler(authHandler)
         .handler(accessHandler.setUserRolesForEndpoint(DxRole.PROVIDER, DxRole.DELEGATE))
         .handler(userInfoFromAuthHandler)
         .handler(this::handlePostLinkedAccount)
@@ -236,7 +238,7 @@ public class ApiServerVerticle extends AbstractVerticle {
     router
         .put(api.getLinkedAccountService())
         .handler(putLinkedAccountHandler)
-        .handler(AuthHandler.create(authenticationService, api, postgresService, authClient))
+        .handler(authHandler)
         .handler(accessHandler.setUserRolesForEndpoint( DxRole.PROVIDER, DxRole.DELEGATE))
         .handler(userInfoFromAuthHandler)
         .handler(this::handlePutLinkedAccount)
@@ -244,7 +246,7 @@ public class ApiServerVerticle extends AbstractVerticle {
 
     router
         .get(api.getLinkedAccountService())
-        .handler(AuthHandler.create(authenticationService, api, postgresService, authClient))
+        .handler(authHandler)
         .handler(accessHandler.setUserRolesForEndpoint( DxRole.PROVIDER, DxRole.DELEGATE))
         .handler(userInfoFromAuthHandler)
         .handler(this::handleFetchLinkedAccount)
@@ -253,7 +255,7 @@ public class ApiServerVerticle extends AbstractVerticle {
     router
         .get(api.getCheckPolicyPath())
         .handler(checkPolicyValidationHandler)
-        .handler(AuthHandler.create(authenticationService, api, postgresService, authClient))
+        .handler(authHandler)
         .handler(accessHandler.setUserRolesForEndpoint(DxRole.CONSUMER, DxRole.DELEGATE))
         .handler(userInfoFromAuthHandler)
         .handler(this::checkPolicyHandler)
