@@ -7,6 +7,7 @@ import io.vertx.core.json.JsonObject;
 import io.vertx.ext.web.RoutingContext;
 import iudx.data.marketplace.authenticator.model.JwtData;
 import iudx.data.marketplace.policies.User;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -33,7 +34,14 @@ public class RoutingContextHelper {
 
   public static String getToken(RoutingContext routingContext)
   {
-    return routingContext.request().headers().get(HEADER_BEARER_AUTHORIZATION);
+    /* Send Bearer <JWT-Token> if Authorization header is present */
+    /* Send <JWT-Token> if Authorization Header is not present and only token header is present */
+    boolean isBearerAuthHeaderPresent = routingContext.request().headers().contains(HEADER_BEARER_AUTHORIZATION);
+    if(isBearerAuthHeaderPresent && StringUtils.isNotBlank(routingContext.request().headers().get(HEADER_BEARER_AUTHORIZATION)))
+    {
+      return routingContext.request().headers().get(HEADER_BEARER_AUTHORIZATION);
+    }
+    return routingContext.request().headers().get(HEADER_TOKEN);
   }
 
   public static String getMethod(RoutingContext routingContext)
