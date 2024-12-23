@@ -33,7 +33,7 @@ public void handle(RoutingContext event) {
       event.fail(new DxRuntimeException(
           HttpStatusCode.UNAUTHORIZED.getValue(),
           ResponseUrn.INVALID_TOKEN_URN,
-          "No access provided to endpoint"));
+          HttpStatusCode.UNAUTHORIZED.getDescription()));
     }
     event.next();
   }
