@@ -68,7 +68,7 @@ public class ConsumerApis {
     ExceptionHandler exceptionHandler = new ExceptionHandler();
     accessHandler = new AccessHandler();
     userInfo = new UserInfo();
-    userInfoFromAuthHandler = new UserInfoFromAuthHandler(authClient, userInfo);
+    userInfoFromAuthHandler = new UserInfoFromAuthHandler(authClient, userInfo, postgresService);
     authHandler = new AuthHandler(authenticationService);
 
     consumerService = ConsumerService.createProxy(vertx, CONSUMER_SERVICE_ADDRESS);

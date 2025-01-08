@@ -71,7 +71,7 @@ public class ProviderApis {
     ExceptionHandler exceptionHandler = new ExceptionHandler();
     accessHandler = new AccessHandler();
     userInfo = new UserInfo();
-    userInfoFromAuthHandler = new UserInfoFromAuthHandler(authClient, userInfo);
+    userInfoFromAuthHandler = new UserInfoFromAuthHandler(authClient, userInfo, postgresService);
     authHandler = new AuthHandler(authenticationService);
 
     productService = ProductService.createProxy(vertx, PRODUCT_SERVICE_ADDRESS);

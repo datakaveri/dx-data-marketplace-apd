@@ -114,7 +114,7 @@ public class ApiServerVerticle extends AbstractVerticle {
     webhookService = WebhookService.createProxy(vertx, WEBHOOK_SERVICE_ADDRESS);
     accessHandler = new AccessHandler();
     userInfo = new UserInfo();
-    userInfoFromAuthHandler = new UserInfoFromAuthHandler(authClient, userInfo);
+    userInfoFromAuthHandler = new UserInfoFromAuthHandler(authClient, userInfo, postgresService);
     authHandler = new AuthHandler(authenticationService);
     router = Router.router(vertx);
     verifyAuthHandler = new VerifyAuthHandler(authenticationService);
