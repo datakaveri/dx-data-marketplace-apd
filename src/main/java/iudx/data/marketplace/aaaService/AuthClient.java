@@ -35,7 +35,7 @@ public class AuthClient {
 
   public Future<User> fetchUserInfo(UserInfo userInfo) {
     Promise<User> promise = Promise.promise();
-    String userId = userInfo.getUserId().toString();
+    String userId = userInfo.getUserIdAsString();
     String iudxRole = userInfo.getRole().getRole().toLowerCase();
     String resourceServer = userInfo.getAudience();
 

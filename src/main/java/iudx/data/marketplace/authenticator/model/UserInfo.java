@@ -12,6 +12,10 @@ public class UserInfo {
     return userId;
   }
 
+  public String getUserIdAsString(){
+    return userId.toString();
+  }
+
   public UserInfo setUserId(UUID userId) {
     this.userId = userId;
     return this;

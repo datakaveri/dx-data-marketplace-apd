@@ -89,18 +89,10 @@ public class AuthenticationServiceImpl implements AuthenticationService {
     jwtDecodeFuture
         .onSuccess(
             jwtData -> {
-              if (jwtData.getSub() == null) {
-                LOGGER.error("No sub value in JWT");
-                promise.fail("No sub value in JWT");
-              } else if (!(jwtData.getIss() != null && issuer.equalsIgnoreCase(jwtData.getIss()))) {
-                LOGGER.error("Incorrect issuer value in JWT");
-                promise.fail("Incorrect issuer value in JWT");
-              } else if (jwtData.getAud().isEmpty()) {
-                LOGGER.error("No audience value in JWT");
-                promise.fail("No audience value in JWT");
-              } else if (!jwtData.getAud().equalsIgnoreCase(apdUrl)) {
-                LOGGER.error("Incorrect audience value in JWT");
-                promise.fail("Incorrect subject value in JWT");
+              String errorMessage = validateJwt4Verify(jwtData);
+              if (errorMessage != null) {
+                LOGGER.error(errorMessage);
+                promise.fail(errorMessage);
               } else {
                 LOGGER.info("Auth token verified");
                 promise.complete();
@@ -108,10 +100,25 @@ public class AuthenticationServiceImpl implements AuthenticationService {
             })
         .onFailure(
             failureHandler -> {
-              LOGGER.error("Failed to decode the token : {}", failureHandler.getMessage());
-              promise.fail(failureHandler.getMessage());
+              String failure = String.format("Failed to decode the token: %s", failureHandler.getMessage());
+              LOGGER.error(failure);
+              promise.fail(failure);
             });
     return promise.future();
+  }
+
+  private String validateJwt4Verify(JwtData jwtData) {
+    if (jwtData.getSub() == null) {
+      return ("No sub value in JWT");
+    } else if (!(jwtData.getIss() != null && issuer.equalsIgnoreCase(jwtData.getIss()))) {
+      return ("Incorrect issuer value in JWT");
+    } else if (jwtData.getAud().isEmpty()) {
+      return ("No audience value in JWT");
+    } else if (!jwtData.getAud().equalsIgnoreCase(apdUrl)) {
+      return ("Incorrect audience value in JWT");
+    } else {
+      return null;
+    }
   }
 
   Future<JwtData> decodeJwt(String jwtToken) {
