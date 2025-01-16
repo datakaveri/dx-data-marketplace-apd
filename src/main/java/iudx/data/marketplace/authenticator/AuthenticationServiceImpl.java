@@ -35,15 +35,6 @@ public class AuthenticationServiceImpl implements AuthenticationService {
     Promise<JwtData> promise = Promise.promise();
     String token = authenticationInfo.getString(HEADER_TOKEN);
     ResultContainer resultContainer = new ResultContainer();
-    /* token would can be of the type : Bearer <JWT-Token>, <JWT-Token> */
-    /* allowing both the tokens to be authenticated for now */
-    /* TODO: later, 401 error is thrown if the token does not contain Bearer keyword */
-    boolean isItABearerToken = token.contains(HEADER_TOKEN_BEARER);
-    if(isItABearerToken && token.trim().split(" ").length == 2)
-    {
-      String[] tokenWithoutBearer = token.split(HEADER_TOKEN_BEARER);
-      token = tokenWithoutBearer[1].replaceAll("\\s", "");
-    }
     Future<JwtData> jwtDecodeFuture = decodeJwt(token);
 
     Future<Boolean> validateJwtAccessFuture = jwtDecodeFuture

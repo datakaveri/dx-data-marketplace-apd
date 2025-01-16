@@ -6,6 +6,7 @@ import static iudx.data.marketplace.common.Constants.AUTH_INFO;
 import static iudx.data.marketplace.common.Constants.CONSUMER_SERVICE_ADDRESS;
 import static iudx.data.marketplace.common.HttpStatusCode.BAD_REQUEST;
 
+import io.vertx.core.Handler;
 import io.vertx.core.MultiMap;
 import io.vertx.core.Vertx;
 import io.vertx.core.http.HttpServerRequest;
@@ -72,12 +73,13 @@ public class ConsumerApis {
     authHandler = new AuthHandler(authenticationService);
 
     consumerService = ConsumerService.createProxy(vertx, CONSUMER_SERVICE_ADDRESS);
+    Handler<RoutingContext> consumerApiAccessHandler = accessHandler.setUserRolesForEndpoint(DxRole.CONSUMER, DxRole.DELEGATE);
 
     router
         .get(api.getConsumerListProviders())
         .handler(providerValidationHandler)
         .handler(authHandler)
-        .handler(accessHandler.setUserRolesForEndpoint(DxRole.CONSUMER, DxRole.DELEGATE))
+        .handler(consumerApiAccessHandler)
         .handler(userInfoFromAuthHandler)
         .handler(this::listProviders)
         .failureHandler(exceptionHandler);
@@ -86,7 +88,7 @@ public class ConsumerApis {
         .get(api.getConsumerListResourcePath())
         .handler(resourceValidationHandler)
         .handler(authHandler)
-        .handler(accessHandler.setUserRolesForEndpoint(DxRole.CONSUMER, DxRole.DELEGATE))
+        .handler(consumerApiAccessHandler)
         .handler(userInfoFromAuthHandler)
         .handler(this::listResources)
         .failureHandler(exceptionHandler);
@@ -95,7 +97,7 @@ public class ConsumerApis {
         .get(api.getConsumerListProducts())
         .handler(resourceValidationHandler)
         .handler(authHandler)
-        .handler(accessHandler.setUserRolesForEndpoint(DxRole.CONSUMER,DxRole.DELEGATE))
+        .handler(consumerApiAccessHandler)
         .handler(userInfoFromAuthHandler)
         .handler(this::listProducts)
         .failureHandler(exceptionHandler);
@@ -106,7 +108,7 @@ public class ConsumerApis {
         .get(api.getConsumerListPurchases())
         .handler(purchaseValidationHandler)
         .handler(authHandler)
-        .handler(accessHandler.setUserRolesForEndpoint(DxRole.CONSUMER, DxRole.DELEGATE))
+        .handler(consumerApiAccessHandler)
         .handler(userInfoFromAuthHandler)
         .handler(this::listPurchases)
         .failureHandler(exceptionHandler);
@@ -117,7 +119,7 @@ public class ConsumerApis {
         .get(api.getConsumerProductVariantPath())
         .handler(productVariantHandler)
         .handler(authHandler)
-        .handler(accessHandler.setUserRolesForEndpoint(DxRole.CONSUMER, DxRole.DELEGATE))
+        .handler(consumerApiAccessHandler)
         .handler(userInfoFromAuthHandler)
         .handler(this::listProductVariants)
         .failureHandler(exceptionHandler);
@@ -128,7 +130,7 @@ public class ConsumerApis {
         .post(CONSUMER_PATH + ORDERS_PATH + "/:productVariantId")
         .handler(orderValidationHandler)
         .handler(authHandler)
-        .handler(accessHandler.setUserRolesForEndpoint(DxRole.CONSUMER, DxRole.DELEGATE))
+        .handler(consumerApiAccessHandler)
         .handler(userInfoFromAuthHandler)
         .handler(this::createOrder)
         .failureHandler(exceptionHandler);

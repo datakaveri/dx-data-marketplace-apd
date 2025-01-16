@@ -7,6 +7,7 @@ import static iudx.data.marketplace.common.Constants.PRODUCT_SERVICE_ADDRESS;
 import static iudx.data.marketplace.common.Constants.PRODUCT_VARIANT_SERVICE_ADDRESS;
 import static iudx.data.marketplace.common.HttpStatusCode.BAD_REQUEST;
 
+import io.vertx.core.Handler;
 import io.vertx.core.MultiMap;
 import io.vertx.core.Vertx;
 import io.vertx.core.http.HttpServerRequest;
@@ -45,7 +46,6 @@ public class ProviderApis {
   private String detail;
   private AuthClient authClient;
   private AuthenticationService authenticationService;
-  private AccessHandler accessHandler;
   private UserInfo userInfo;
   private UserInfoFromAuthHandler userInfoFromAuthHandler;
   private AuthHandler authHandler;
@@ -69,7 +69,7 @@ public class ProviderApis {
 
     ValidationHandler productValidationHandler = new ValidationHandler(RequestType.PRODUCT);
     ExceptionHandler exceptionHandler = new ExceptionHandler();
-    accessHandler = new AccessHandler();
+    Handler<RoutingContext> providerApiAccessHandler = new AccessHandler().setUserRolesForEndpoint(DxRole.PROVIDER, DxRole.DELEGATE);
     userInfo = new UserInfo();
     userInfoFromAuthHandler = new UserInfoFromAuthHandler(authClient, userInfo, postgresService);
     authHandler = new AuthHandler(authenticationService);
@@ -82,7 +82,7 @@ public class ProviderApis {
         .consumes(APPLICATION_JSON)
         .handler(productValidationHandler)
         .handler(authHandler)
-        .handler(accessHandler.setUserRolesForEndpoint(DxRole.PROVIDER, DxRole.DELEGATE))
+        .handler(providerApiAccessHandler)
         .handler(userInfoFromAuthHandler)
         .handler(this::handleCreateProduct)
         .failureHandler(exceptionHandler);
@@ -91,7 +91,7 @@ public class ProviderApis {
         .delete(api.getProviderProductPath())
         .handler(productValidationHandler)
         .handler(authHandler)
-        .handler(accessHandler.setUserRolesForEndpoint(DxRole.PROVIDER, DxRole.DELEGATE))
+        .handler(providerApiAccessHandler)
         .handler(userInfoFromAuthHandler)
         .handler(this::handleDeleteProduct)
         .failureHandler(exceptionHandler);
@@ -101,7 +101,7 @@ public class ProviderApis {
         .get(api.getProviderListProductsPath())
         .handler(resourceValidationHandler)
         .handler(authHandler)
-        .handler(accessHandler.setUserRolesForEndpoint(DxRole.PROVIDER, DxRole.DELEGATE))
+        .handler(providerApiAccessHandler)
         .handler(userInfoFromAuthHandler)
         .handler(this::listProducts)
         .failureHandler(exceptionHandler);
@@ -111,7 +111,7 @@ public class ProviderApis {
         .get(api.getProviderListPurchasesPath())
         .handler(purchaseValidationHandler)
         .handler(authHandler)
-        .handler(accessHandler.setUserRolesForEndpoint(DxRole.PROVIDER, DxRole.DELEGATE))
+        .handler(providerApiAccessHandler)
         .handler(userInfoFromAuthHandler)
         .handler(this::listPurchases)
         .failureHandler(exceptionHandler);
@@ -121,7 +121,7 @@ public class ProviderApis {
         .post(api.getProviderProductVariantPath())
         .handler(variantValidationHandler)
         .handler(authHandler)
-        .handler(accessHandler.setUserRolesForEndpoint(DxRole.PROVIDER, DxRole.DELEGATE))
+        .handler(providerApiAccessHandler)
         .handler(userInfoFromAuthHandler)
         .handler(this::handleCreateProductVariant)
         .failureHandler(exceptionHandler);
@@ -130,7 +130,7 @@ public class ProviderApis {
         .put(api.getProviderProductVariantPath())
         .handler(variantValidationHandler)
         .handler(authHandler)
-        .handler(accessHandler.setUserRolesForEndpoint(DxRole.PROVIDER, DxRole.DELEGATE))
+        .handler(providerApiAccessHandler)
         .handler(userInfoFromAuthHandler)
         .handler(this::handleUpdateProductVariant)
         .failureHandler(exceptionHandler);
@@ -140,7 +140,7 @@ public class ProviderApis {
         .get(api.getProviderProductVariantPath())
         .handler(listVariantValidationHandler)
         .handler(authHandler)
-        .handler(accessHandler.setUserRolesForEndpoint(DxRole.PROVIDER, DxRole.DELEGATE))
+        .handler(providerApiAccessHandler)
         .handler(userInfoFromAuthHandler)
         .handler(this::handleGetProductVariants)
         .failureHandler(exceptionHandler);
@@ -151,7 +151,7 @@ public class ProviderApis {
         .delete(api.getProviderProductVariantPath())
         .handler(deleteVariantValidationHandler)
         .handler(authHandler)
-        .handler(accessHandler.setUserRolesForEndpoint(DxRole.PROVIDER, DxRole.DELEGATE))
+        .handler(providerApiAccessHandler)
         .handler(userInfoFromAuthHandler)
         .handler(this::handleDeleteProductVariant)
         .failureHandler(exceptionHandler);
