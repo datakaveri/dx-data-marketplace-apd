@@ -1,4 +1,4 @@
-package iudx.data.marketplace.apiserver.handlers;
+package iudx.data.marketplace.authenticator.handlers;
 
 import io.vertx.core.Handler;
 import io.vertx.core.MultiMap;

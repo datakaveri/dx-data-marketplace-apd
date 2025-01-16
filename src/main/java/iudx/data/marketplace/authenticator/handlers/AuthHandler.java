@@ -1,10 +1,6 @@
-package iudx.data.marketplace.apiserver.handlers;
+package iudx.data.marketplace.authenticator.handlers;
 
 import static iudx.data.marketplace.apiserver.util.Constants.*;
-import static iudx.data.marketplace.authenticator.util.Constants.GET_USER;
-import static iudx.data.marketplace.authenticator.util.Constants.INSERT_USER_TABLE;
-import static iudx.data.marketplace.authenticator.util.Constants.TOKEN;
-import static iudx.data.marketplace.common.Constants.AUTH_INFO;
 import static iudx.data.marketplace.common.ResponseUrn.INVALID_TOKEN_URN;
 import static iudx.data.marketplace.common.ResponseUrn.RESOURCE_NOT_FOUND_URN;
 
@@ -12,18 +8,11 @@ import io.vertx.core.Future;
 import io.vertx.core.Handler;
 import io.vertx.core.Promise;
 import io.vertx.core.http.HttpServerRequest;
-import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
 import io.vertx.ext.web.RoutingContext;
-import iudx.data.marketplace.aaaService.AuthClient;
 import iudx.data.marketplace.authenticator.AuthenticationService;
-import iudx.data.marketplace.authenticator.model.DxRole;
 import iudx.data.marketplace.authenticator.model.JwtData;
-import iudx.data.marketplace.authenticator.model.UserInfo;
 import iudx.data.marketplace.common.*;
-import iudx.data.marketplace.policies.User;
-import iudx.data.marketplace.postgres.PostgresService;
-import java.util.UUID;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 

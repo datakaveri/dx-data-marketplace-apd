@@ -18,11 +18,11 @@ import io.vertx.ext.web.client.WebClientOptions;
 import io.vertx.ext.web.handler.BodyHandler;
 import io.vertx.ext.web.handler.CorsHandler;
 import io.vertx.ext.web.handler.TimeoutHandler;
-import iudx.data.marketplace.apiserver.handlers.*;
 import iudx.data.marketplace.apiserver.provider.linkedaccount.LinkedAccountService;
 import iudx.data.marketplace.apiserver.util.RequestType;
 import iudx.data.marketplace.aaaService.AuthClient;
 import iudx.data.marketplace.authenticator.AuthenticationService;
+import iudx.data.marketplace.authenticator.handlers.*;
 import iudx.data.marketplace.authenticator.model.DxRole;
 import iudx.data.marketplace.authenticator.model.UserInfo;
 import iudx.data.marketplace.common.*;
@@ -193,8 +193,8 @@ public class ApiServerVerticle extends AbstractVerticle {
     ValidationHandler postLinkedAccountHandler = new ValidationHandler(RequestType.POST_ACCOUNT);
     ValidationHandler putLinkedAccountHandler = new ValidationHandler(RequestType.PUT_ACCOUNT);
     Handler<RoutingContext> apiAccessHandler = new AccessHandler().setUserRolesForEndpoint(DxRole.CONSUMER, DxRole.PROVIDER, DxRole.DELEGATE);
-    Handler<RoutingContext> consumerApiAccessHandler = new AccessHandler().setUserRolesForEndpoint(DxRole.CONSUMER, DxRole.PROVIDER, DxRole.DELEGATE);
-    Handler<RoutingContext> providerApiAccessHandler = new AccessHandler().setUserRolesForEndpoint(DxRole.CONSUMER, DxRole.PROVIDER, DxRole.DELEGATE);
+    Handler<RoutingContext> consumerApiAccessHandler = new AccessHandler().setUserRolesForEndpoint(DxRole.CONSUMER, DxRole.DELEGATE);
+    Handler<RoutingContext> providerApiAccessHandler = new AccessHandler().setUserRolesForEndpoint(DxRole.PROVIDER, DxRole.DELEGATE);
 
     router
         .get(api.getPoliciesUrl())

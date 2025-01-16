@@ -1,4 +1,4 @@
-package iudx.data.marketplace.apiserver.handlers;
+package iudx.data.marketplace.authenticator.handlers;
 
 import static iudx.data.marketplace.apiserver.util.Constants.*;
 

@@ -2,7 +2,7 @@ package iudx.data.marketplace.authenticator;
 
 import io.vertx.core.buffer.Buffer;
 import iudx.data.marketplace.aaaService.AuthClient;
-import iudx.data.marketplace.apiserver.handlers.AuthHandler;
+import iudx.data.marketplace.authenticator.handlers.AuthHandler;
 import iudx.data.marketplace.apiserver.util.Role;
 import iudx.data.marketplace.authenticator.model.UserInfo;
 import iudx.data.marketplace.common.Api;

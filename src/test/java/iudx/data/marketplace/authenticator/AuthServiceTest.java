@@ -2,7 +2,6 @@ package iudx.data.marketplace.authenticator;
 
 import static iudx.data.marketplace.authenticator.util.Constants.TOKEN;
 import static iudx.data.marketplace.common.Constants.APD_URL;
-import static iudx.data.marketplace.common.Constants.PROVIDER_ID;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.mockito.ArgumentMatchers.any;
@@ -19,7 +18,6 @@ import io.vertx.junit5.VertxTestContext;
 
 import iudx.data.marketplace.common.Api;
 import iudx.data.marketplace.configuration.Configuration;
-import iudx.data.marketplace.authenticator.handler.Method;
 import iudx.data.marketplace.authenticator.model.JwtData;
 import iudx.data.marketplace.catalogueService.CatalogueService;
 import org.junit.jupiter.api.BeforeAll;
@@ -70,7 +68,7 @@ public class AuthServiceTest {
         new JsonObject()
             .put("token", JwtHelper.providerToken)
             .put("apiEndpoint", api.getProviderProductPath())
-            .put("method", Method.POST);
+            .put("method", "POST");
     return authInfo;
   }
 
