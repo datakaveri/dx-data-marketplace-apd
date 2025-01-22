@@ -141,7 +141,7 @@ public class ConsumerServiceTest {
 
     consumerService.listResources(
         consumer,
-        requestParams,
+        requestParams).onComplete(
         handler -> {
           if (handler.succeeded()) {
             verify(postgresService, times(1)).executePreparedQuery(anyString(), any(), any());
@@ -172,7 +172,7 @@ public class ConsumerServiceTest {
 
     consumerService.listResources(
         consumer,
-        request,
+        request).onComplete(
         handler -> {
           if (handler.succeeded()) {
             verify(postgresService, times(1)).executePreparedQuery(anyString(), any(), any());
@@ -204,7 +204,7 @@ public class ConsumerServiceTest {
 
     consumerService.listProviders(
         consumer,
-        requestParams,
+        requestParams).onComplete(
         handler -> {
           if (handler.succeeded()) {
             verify(postgresService, times(1)).executePreparedQuery(anyString(), any(), any());
@@ -236,7 +236,7 @@ public class ConsumerServiceTest {
 
     consumerService.listProviders(
         consumer,
-        request,
+        request).onComplete(
         handler -> {
           if (handler.succeeded()) {
             verify(postgresService, times(1)).executePreparedQuery(anyString(), any(), any());
@@ -269,7 +269,7 @@ public class ConsumerServiceTest {
 
     consumerService.listProducts(
         consumer,
-        requestParams,
+        requestParams).onComplete(
         handler -> {
           if (handler.succeeded()) {
             verify(postgresService, times(1)).executePreparedQuery(anyString(), any(), any());
@@ -302,7 +302,7 @@ public class ConsumerServiceTest {
 
     consumerService.listProducts(
         consumer,
-        request,
+        request).onComplete(
         handler -> {
           if (handler.succeeded()) {
             verify(postgresService, times(1)).executePreparedQuery(anyString(), any(), any());
@@ -336,7 +336,7 @@ public class ConsumerServiceTest {
 
     consumerService.listProducts(
         consumer,
-        request,
+        request).onComplete(
         handler -> {
           if (handler.succeeded()) {
             verify(postgresService, times(1)).executePreparedQuery(anyString(), any(), any());
@@ -371,7 +371,7 @@ public class ConsumerServiceTest {
 
     consumerServiceSpy.createOrder(
         request,
-        consumer,
+        consumer).onComplete(
         handler -> {
           if (handler.succeeded()) {
             assertEquals(new JsonObject().put(DETAIL, "Order created successfully"), handler.result());
@@ -391,7 +391,7 @@ public class ConsumerServiceTest {
     request.put(PRODUCT_VARIANT_ID, "pv-id");
     doAnswer(Answer -> Future.failedFuture("Expected Message")).when(consumerServiceSpy).getOrderRelatedInfo(anyString());
 
-    consumerServiceSpy.createOrder(request, consumer, handler -> {
+    consumerServiceSpy.createOrder(request, consumer).onComplete( handler -> {
       if(handler.succeeded()) {
         testContext.failNow("Unexpected Behaviour");
       } else {
@@ -420,7 +420,7 @@ public class ConsumerServiceTest {
         .getOrderRelatedInfo(anyString());
     doAnswer(Answer -> Future.failedFuture("Expected Razorpay Message")).when(razorPayService).createOrder(any());
 
-    consumerServiceSpy.createOrder(request, consumer, handler -> {
+    consumerServiceSpy.createOrder(request, consumer).onComplete( handler -> {
       if(handler.succeeded()) {
         testContext.failNow("Unexpected Behaviour");
       } else {
@@ -452,7 +452,7 @@ public class ConsumerServiceTest {
         .when(consumerServiceSpy)
         .generateOrderEntry(any(), anyString(), anyString());
 
-    consumerServiceSpy.createOrder(request, consumer, handler -> {
+    consumerServiceSpy.createOrder(request, consumer).onComplete( handler -> {
       if(handler.succeeded()) {
         testContext.failNow("Unexpected Behaviour");
       } else {
@@ -499,7 +499,7 @@ public class ConsumerServiceTest {
     when(asyncResult.result()).thenReturn(request);
     consumerService.listPurchase(
         consumer,
-        request,
+        request).onComplete(
         handler -> {
           if (handler.succeeded()) {
 
@@ -591,7 +591,7 @@ public class ConsumerServiceTest {
         when(asyncResult.result()).thenReturn(request);
     consumerService.listPurchase(
         consumer,
-        request,
+        request).onComplete(
         handler -> {
           if (handler.failed()) {
             assertEquals(expectedFailureMessage, handler.cause().getMessage());
@@ -620,7 +620,7 @@ public class ConsumerServiceTest {
         when(asyncResult.succeeded()).thenReturn(false);
     consumerService.listPurchase(
         consumer,
-        request,
+        request).onComplete(
         handler -> {
           if (handler.failed()) {
               String expected = new RespBuilder()
@@ -652,7 +652,7 @@ public class ConsumerServiceTest {
         when(consumer.getResourceServerUrl()).thenReturn("dummyRsUrl");
         consumerService.listPurchase(
                 consumer,
-                request,
+                request).onComplete(
                 handler -> {
                     if (handler.failed()) {
                         String expected = new RespBuilder()
@@ -683,7 +683,7 @@ public class ConsumerServiceTest {
 
     consumerService.listProductVariants(
         consumer,
-        request,
+        request).onComplete(
         handler -> {
           if (handler.succeeded()) {
 
@@ -709,10 +709,9 @@ public class ConsumerServiceTest {
     when(asyncResult.succeeded()).thenReturn(true);
     when(asyncResult.result()).thenReturn(jsonMock);
     when(jsonMock.getJsonArray(anyString())).thenReturn(jsonArray);
-
     consumerService.listProductVariants(
         consumer,
-        request,
+        request).onComplete(
         handler -> {
           if (handler.failed()) {
             String expectedFailureMessage =
@@ -743,9 +742,7 @@ public class ConsumerServiceTest {
         when(asyncResult.cause()).thenReturn(throwable);
         when(throwable.getMessage()).thenReturn(failureMessage);
 
-        consumerService.listProductVariants(
-                consumer,
-                request,
+        consumerService.listProductVariants(consumer,request).onComplete(
                 handler -> {
                     if (handler.failed()) {
                         String expectedFailureMessage =

@@ -60,9 +60,10 @@ public class ConsumerServiceImpl implements ConsumerService {
   }
 
   @Override
-  public ConsumerService listResources(
-      User consumer, JsonObject request, Handler<AsyncResult<JsonObject>> handler) {
+  public Future<JsonObject> listResources(
+      User consumer, JsonObject request) {
 
+    Promise<JsonObject> promise = Promise.promise();
     String resourceTable = config.getJsonArray(TABLES).getString(1);
     JsonObject params = new JsonObject();
     String resourceServerUrl = consumer.getResourceServerUrl();
@@ -84,18 +85,20 @@ public class ConsumerServiceImpl implements ConsumerService {
         params,
         pgHandler -> {
           if (pgHandler.succeeded()) {
-            handler.handle(Future.succeededFuture(pgHandler.result()));
+            promise.complete(pgHandler.result());
           } else {
             LOGGER.error("get resources failed");
-            handler.handle(Future.failedFuture(pgHandler.cause()));
+            promise.fail(pgHandler.cause());
           }
         });
-    return this;
+    return promise.future();
   }
 
   @Override
-  public ConsumerService listProviders(
-      User consumer, JsonObject request, Handler<AsyncResult<JsonObject>> handler) {
+  public Future<JsonObject> listProviders(
+      User consumer, JsonObject request) {
+    Promise<JsonObject> promise = Promise.promise();
+
     JsonObject params = new JsonObject();
     String resourceServerUrl = consumer.getResourceServerUrl();
     params.put("resourceServerUrl", resourceServerUrl);
@@ -113,18 +116,19 @@ public class ConsumerServiceImpl implements ConsumerService {
         params,
         pgHandler -> {
           if (pgHandler.succeeded()) {
-            handler.handle(Future.succeededFuture(pgHandler.result()));
+            promise.complete(pgHandler.result());
           } else {
             LOGGER.error("get providers failed");
-            handler.handle(Future.failedFuture(pgHandler.cause()));
+            promise.fail(pgHandler.cause());
           }
         });
-    return this;
+    return promise.future();
   }
 
   @Override
-  public ConsumerService listProducts(
-      User consumer, JsonObject request, Handler<AsyncResult<JsonObject>> handler) {
+  public Future<JsonObject> listProducts(
+      User consumer, JsonObject request) {
+    Promise<JsonObject> promise = Promise.promise();
     String productTable = config.getJsonArray(TABLES).getString(0);
     String resourceTable = config.getJsonArray(TABLES).getString(1);
     String productResourceRelationTable = config.getJsonArray(TABLES).getString(2);
@@ -158,20 +162,20 @@ public class ConsumerServiceImpl implements ConsumerService {
         pgHandler -> {
           if (pgHandler.succeeded()) {
             LOGGER.debug(pgHandler.result());
-            handler.handle(Future.succeededFuture(pgHandler.result()));
+            promise.complete(pgHandler.result());
           } else {
             LOGGER.error("get resources failed");
-            handler.handle(Future.failedFuture(pgHandler.cause()));
+            promise.fail(pgHandler.cause());
           }
         });
-    return this;
+    return promise.future();
   }
 
   @Override
-  public ConsumerService createOrder(
-      JsonObject request, User user, Handler<AsyncResult<JsonObject>> handler) {
+  public Future<JsonObject> createOrder(
+      JsonObject request, User user) {
     //    String resourceServerUrl = user.getResourceServerUrl();
-
+    Promise<JsonObject> promise = Promise.promise();
     String variantId = request.getString(PRODUCT_VARIANT_ID);
     String consumerId = user.getUserId();
     LOGGER.debug(variantId);
@@ -185,22 +189,20 @@ public class ConsumerServiceImpl implements ConsumerService {
             completeHandler -> {
               if (completeHandler.succeeded()) {
                 LOGGER.info("order created");
-                handler.handle(
-                    Future.succeededFuture(
-                        completeHandler.result().put(DETAIL, "Order created successfully")));
+                promise.complete(completeHandler.result().put(DETAIL, "Order created successfully"));
               } else {
                 LOGGER.info("order creation failed");
-                handler.handle(Future.failedFuture(completeHandler.cause()));
+                promise.fail(completeHandler.cause());
               }
             });
 
-    return this;
+    return promise.future();
   }
 
   @Override
-  public ConsumerService listPurchase(
-      User user, JsonObject request, Handler<AsyncResult<JsonObject>> handler) {
-
+  public Future<JsonObject> listPurchase(
+      User user, JsonObject request) {
+    Promise<JsonObject> promise = Promise.promise();
     String resourceId = request.getString("resourceId");
     String productId = request.getString("productId");
     String orderId = request.getString("orderId");
@@ -237,10 +239,10 @@ public class ConsumerServiceImpl implements ConsumerService {
                       .put(TYPE, ResponseUrn.SUCCESS_URN.getUrn())
                       .put(TITLE, ResponseUrn.SUCCESS_URN.getMessage())
                       .put(RESULTS, pgHandler.result());
-              handler.handle(Future.succeededFuture(response));
+              promise.complete(response);
 
             } else {
-              handler.handle(Future.failedFuture(pgHandler.cause().getMessage()));
+              promise.fail(pgHandler.cause().getMessage());
             }
           });
     } catch (DxRuntimeException exception) {
@@ -251,10 +253,10 @@ public class ConsumerServiceImpl implements ConsumerService {
               .withTitle(ResponseUrn.BAD_REQUEST_URN.getUrn())
               .withDetail("Invalid payment status")
               .getResponse();
-      handler.handle(Future.failedFuture(failureMessage));
+      promise.fail(failureMessage);
     }
 
-    return this;
+    return promise.future();
   }
 
   public Future<JsonArray> executePurchaseQuery(
@@ -319,8 +321,9 @@ public class ConsumerServiceImpl implements ConsumerService {
   }
 
   @Override
-  public ConsumerService listProductVariants(
-      User user, JsonObject request, Handler<AsyncResult<JsonObject>> handler) {
+  public Future<JsonObject> listProductVariants(
+      User user, JsonObject request) {
+    Promise<JsonObject> promise = Promise.promise();
     String productId = request.getString("productId");
     String resourceServerUrl = user.getResourceServerUrl();
 
@@ -337,7 +340,7 @@ public class ConsumerServiceImpl implements ConsumerService {
             boolean isResponseEmpty = pgHandler.result().getJsonArray(RESULTS).isEmpty();
             if (!isResponseEmpty) {
               LOGGER.info("Product variants fetched successfully");
-              handler.handle(Future.succeededFuture(pgHandler.result()));
+              promise.complete(pgHandler.result());
             } else {
               LOGGER.info("Response from DB is empty while fetching " + "product variant");
               String failureMessage =
@@ -346,7 +349,7 @@ public class ConsumerServiceImpl implements ConsumerService {
                       .withTitle(ResponseUrn.RESOURCE_NOT_FOUND_URN.getUrn())
                       .withDetail("Product variants not found")
                       .getResponse();
-              handler.handle(Future.failedFuture(failureMessage));
+              promise.fail(failureMessage);
             }
           } else {
             LOGGER.error(
@@ -358,10 +361,10 @@ public class ConsumerServiceImpl implements ConsumerService {
                     .withDetail(
                         "Product variants could not be fetched as there was internal server error")
                     .getResponse();
-            handler.handle(Future.failedFuture(failureMessage));
+            promise.fail(failureMessage);
           }
         });
-    return this;
+    return promise.future();
   }
 
   Future<JsonObject> generateOrderEntry(JsonObject orderInfo, String variantId, String consumerId) {

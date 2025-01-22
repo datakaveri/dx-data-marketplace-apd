@@ -152,7 +152,7 @@ public class ConsumerApis {
 
     consumerService.createOrder(
         requestBody,
-        user,
+        user).onComplete(
         handler -> {
           if (handler.succeeded()) {
             handleSuccessResponse(routingContext, 201, handler.result());
@@ -175,7 +175,7 @@ public class ConsumerApis {
 
     consumerService.listProviders(
         consumer,
-        requestBody,
+        requestBody).onComplete(
         handler -> {
           if (handler.succeeded()) {
             if (handler.result().getJsonArray(RESULTS).isEmpty()) {
@@ -202,7 +202,7 @@ public class ConsumerApis {
 
     consumerService.listResources(
         consumer,
-        requestBody,
+        requestBody).onComplete(
         handler -> {
           if (handler.succeeded()) {
             if (handler.result().getJsonArray(RESULTS).isEmpty()) {
@@ -225,7 +225,7 @@ public class ConsumerApis {
 
     consumerService.listProductVariants(
         consumer,
-        requestJson,
+        requestJson).onComplete(
         handler -> {
           if (handler.succeeded()) {
             handleSuccessResponse(
@@ -249,7 +249,7 @@ public class ConsumerApis {
 
     consumerService.listProducts(
         consumer,
-        requestBody,
+        requestBody).onComplete(
         handler -> {
           if (handler.succeeded()) {
             if (handler.result().getJsonArray(RESULTS).isEmpty()) {
@@ -277,7 +277,7 @@ public class ConsumerApis {
 
     consumerService.listPurchase(
         consumer,
-        requestJson,
+        requestJson).onComplete(
         handler -> {
           if (handler.succeeded()) {
             handleSuccessResponse(
