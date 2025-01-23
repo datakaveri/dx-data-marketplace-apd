@@ -72,7 +72,7 @@ public class TestFetchPolicyUsingPvId {
               }
             })
         .when(postgresService)
-        .executeQuery(anyString(), any());
+        .executeQuery(anyString());
 
     lenient()
         .doAnswer(
@@ -84,7 +84,7 @@ public class TestFetchPolicyUsingPvId {
               }
             })
         .when(postgresService)
-        .checkPolicy(anyString(), any(JsonObject.class), any());
+        .checkPolicy(anyString(), any(JsonObject.class));
     vertxTestContext.completeNow();
   }
 

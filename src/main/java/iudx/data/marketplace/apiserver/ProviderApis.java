@@ -166,7 +166,7 @@ public class ProviderApis {
 
     productService.createProduct(
         user,
-        requestBody,
+        requestBody).onComplete(
         handler -> {
           if (handler.succeeded()) {
             handleSuccessResponse(routingContext, 201, handler.result());
@@ -199,7 +199,7 @@ public class ProviderApis {
     User user = routingContext.get("user");
     productService.deleteProduct(
         user,
-        requestBody,
+        requestBody).onComplete(
         handler -> {
           if (handler.succeeded()) {
             handleSuccessResponse(routingContext, 200, handler.result());
@@ -230,7 +230,7 @@ public class ProviderApis {
 
     productService.listProducts(
         user,
-        requestBody,
+        requestBody).onComplete(
         handler -> {
           if (handler.succeeded()) {
             if (handler.result().getJsonArray(RESULTS).isEmpty()) {
@@ -257,7 +257,7 @@ public class ProviderApis {
             .put("paymentStatus", paymentStatus);
     variantService.listPurchase(
         provider,
-        requestJson,
+        requestJson).onComplete(
         handler -> {
           if (handler.succeeded()) {
             handleSuccessResponse(
@@ -276,7 +276,7 @@ public class ProviderApis {
 
     variantService.createProductVariant(
         user,
-        requestBody,
+        requestBody).onComplete(
         handler -> {
           if (handler.succeeded()) {
             handleSuccessResponse(routingContext, 201, handler.result());
@@ -307,7 +307,7 @@ public class ProviderApis {
 
     variantService.updateProductVariant(
         user,
-        requestBody,
+        requestBody).onComplete(
         handler -> {
           if (handler.succeeded()) {
             handleSuccessResponse(routingContext, 200, handler.result());
@@ -330,7 +330,7 @@ public class ProviderApis {
 
     variantService.listProductVariants(
         user,
-        requestBody,
+        requestBody).onComplete(
         handler -> {
           if (handler.succeeded()) {
             handleSuccessResponse(routingContext, 200, handler.result());
@@ -351,7 +351,7 @@ public class ProviderApis {
 
     variantService.deleteProductVariant(
         user,
-        requestBody,
+        requestBody).onComplete(
         handler -> {
           if (handler.succeeded()) {
             handleSuccessResponse(routingContext, 200, handler.result());

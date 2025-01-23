@@ -82,7 +82,7 @@ public class ConsumerServiceImpl implements ConsumerService {
     LOGGER.debug("List resources query : {}", query);
     pgService.executePreparedQuery(
         query.toString(),
-        params,
+        params).onComplete(
         pgHandler -> {
           if (pgHandler.succeeded()) {
             promise.complete(pgHandler.result());
@@ -113,7 +113,7 @@ public class ConsumerServiceImpl implements ConsumerService {
 
     pgService.executePreparedQuery(
         query.toString(),
-        params,
+        params).onComplete(
         pgHandler -> {
           if (pgHandler.succeeded()) {
             promise.complete(pgHandler.result());
@@ -158,7 +158,7 @@ public class ConsumerServiceImpl implements ConsumerService {
 
     pgService.executePreparedQuery(
         query.toString(),
-        params,
+        params).onComplete(
         pgHandler -> {
           if (pgHandler.succeeded()) {
             LOGGER.debug(pgHandler.result());
@@ -263,7 +263,7 @@ public class ConsumerServiceImpl implements ConsumerService {
       String query, String resourceId, String productId, User user) {
     Promise<JsonArray> promise = Promise.promise();
     pgService.executeQuery(
-        query,
+        query).onComplete(
         queryHandler -> {
           if (queryHandler.succeeded()) {
             LOGGER.debug("Fetched invoice related information from postgres successfully");
@@ -334,7 +334,7 @@ public class ConsumerServiceImpl implements ConsumerService {
     LOGGER.debug("Query to list product variants : {}", query);
     pgService.executePreparedQuery(
         query,
-        params,
+        params).onComplete(
         pgHandler -> {
           if (pgHandler.succeeded()) {
             boolean isResponseEmpty = pgHandler.result().getJsonArray(RESULTS).isEmpty();
@@ -373,7 +373,7 @@ public class ConsumerServiceImpl implements ConsumerService {
 
     LOGGER.debug(orderInfo);
     pgService.executeTransaction(
-        queryContainer.queries,
+        queryContainer.queries).onComplete(
         pgHandler -> {
           if (pgHandler.succeeded()) {
             LOGGER.info("order created : {}", pgHandler.result());
@@ -466,7 +466,7 @@ public class ConsumerServiceImpl implements ConsumerService {
 
     pgService.executePreparedQuery(
         query.toString(),
-        params,
+        params).onComplete(
         pgHandler -> {
           if (pgHandler.succeeded() && !pgHandler.result().getJsonArray(RESULTS).isEmpty()) {
             LOGGER.info("variant for order : {}", pgHandler.result());

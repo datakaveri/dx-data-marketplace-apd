@@ -111,7 +111,7 @@ public class TestFetchLinkedAccount {
               }
             })
         .when(postgresService)
-        .executeQuery(anyString(), any());
+        .executeQuery(anyString());
 
     account
         .initiateFetchingLinkedAccount(provider)
@@ -163,7 +163,7 @@ public class TestFetchLinkedAccount {
               }
             })
             .when(postgresService)
-            .executeQuery(anyString(), any());
+            .executeQuery(anyString());
 
     account
             .initiateFetchingLinkedAccount(provider)
@@ -205,7 +205,7 @@ public class TestFetchLinkedAccount {
               }
             })
             .when(postgresService)
-            .executeQuery(anyString(), any());
+            .executeQuery(anyString());
 
     account
             .initiateFetchingLinkedAccount(provider)

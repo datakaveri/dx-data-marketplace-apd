@@ -106,7 +106,7 @@ public class TestUpdateLinkedAccount {
               }
             })
         .when(postgresService)
-        .executeQuery(anyString(), any());
+        .executeQuery(anyString());
     when(auditingService.handleAuditLogs(
             any(User.class), any(JsonObject.class), anyString(), anyString()))
         .thenReturn(Future.succeededFuture());
@@ -155,7 +155,7 @@ public class TestUpdateLinkedAccount {
               }
             })
         .when(postgresService)
-        .executeQuery(anyString(), any());
+        .executeQuery(anyString());
 
     account
         .initiateUpdatingLinkedAccount(request, provider)
@@ -197,7 +197,7 @@ public class TestUpdateLinkedAccount {
               }
             })
         .when(postgresService)
-        .executeQuery(anyString(), any());
+        .executeQuery(anyString());
 
     account
         .initiateUpdatingLinkedAccount(request, provider)
@@ -248,7 +248,7 @@ public class TestUpdateLinkedAccount {
               }
             })
         .when(postgresService)
-        .executeQuery(anyString(), any());
+        .executeQuery(anyString());
 
     account
         .initiateUpdatingLinkedAccount(request, provider)

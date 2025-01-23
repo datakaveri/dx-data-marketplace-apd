@@ -145,7 +145,7 @@ public class TestGetPolicy {
                             }
                         })
                 .when(postgresService)
-                .executeQuery(anyString(), any());
+                .executeQuery(anyString());
         vertxTestContext.completeNow();
     }
 

@@ -138,7 +138,7 @@ public class GetPolicy {
   private Future<JsonObject> executeGetPolicy(String query, JsonObject information, Role role) {
     Promise<JsonObject> promise = Promise.promise();
     postgresService.executeQuery(
-        query,
+        query).onComplete(
         handler -> {
           if (handler.succeeded()) {
             boolean isResultFromDbEmpty = handler.result().getJsonArray(RESULTS).isEmpty();

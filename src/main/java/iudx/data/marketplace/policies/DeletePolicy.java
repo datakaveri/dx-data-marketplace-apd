@@ -58,7 +58,7 @@ public class DeletePolicy {
 
     postgresService.executePreparedQuery(
         query,
-        param,
+        param).onComplete(
         queryHandler -> {
           if (queryHandler.succeeded()) {
             /* policy has expired */
@@ -118,7 +118,7 @@ public class DeletePolicy {
     JsonObject param = new JsonObject().put("$1", policyUuid.toString());
     postgresService.executePreparedQuery(
         query,
-        param,
+        param).onComplete(
         queryHandler -> {
           if (queryHandler.succeeded()) {
             if (queryHandler.result().getJsonArray(RESULT).isEmpty()) {

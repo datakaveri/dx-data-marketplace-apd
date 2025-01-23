@@ -94,7 +94,7 @@ public class ConsumerServiceTest {
                           }
                       })
               .when(postgresService)
-              .executeQuery(anyString(), any());
+              .executeQuery(anyString());
       lenient()
               .doAnswer(
                       new Answer<AsyncResult<JsonObject>>() {
@@ -105,7 +105,7 @@ public class ConsumerServiceTest {
                           }
                       })
               .when(postgresService)
-              .executePreparedQuery(anyString(), any(),any());
+              .executePreparedQuery(anyString(), any());
       lenient()
               .doAnswer(
                       new Answer<AsyncResult<JsonObject>>() {
@@ -116,7 +116,7 @@ public class ConsumerServiceTest {
                           }
                       })
               .when(postgresService)
-              .executeTransaction(anyList(), any());
+              .executeTransaction(anyList());
     testContext.completeNow();
   }
 
@@ -137,14 +137,14 @@ public class ConsumerServiceTest {
               }
             })
         .when(postgresService)
-        .executePreparedQuery(anyString(), any(), any());
+        .executePreparedQuery(anyString(), any());
 
     consumerService.listResources(
         consumer,
         requestParams).onComplete(
         handler -> {
           if (handler.succeeded()) {
-            verify(postgresService, times(1)).executePreparedQuery(anyString(), any(), any());
+            verify(postgresService, times(1)).executePreparedQuery(anyString(), any());
             testContext.completeNow();
           } else {
             testContext.failNow("create variant test failed");
@@ -168,14 +168,14 @@ public class ConsumerServiceTest {
               }
             })
         .when(postgresService)
-        .executePreparedQuery(anyString(), any(), any());
+        .executePreparedQuery(anyString(), any());
 
     consumerService.listResources(
         consumer,
         request).onComplete(
         handler -> {
           if (handler.succeeded()) {
-            verify(postgresService, times(1)).executePreparedQuery(anyString(), any(), any());
+            verify(postgresService, times(1)).executePreparedQuery(anyString(), any());
             testContext.failNow(handler.cause());
           } else {
             testContext.completeNow();
@@ -200,14 +200,14 @@ public class ConsumerServiceTest {
               }
             })
         .when(postgresService)
-        .executePreparedQuery(anyString(), any(), any());
+        .executePreparedQuery(anyString(), any());
 
     consumerService.listProviders(
         consumer,
         requestParams).onComplete(
         handler -> {
           if (handler.succeeded()) {
-            verify(postgresService, times(1)).executePreparedQuery(anyString(), any(), any());
+            verify(postgresService, times(1)).executePreparedQuery(anyString(), any());
             testContext.completeNow();
           } else {
             testContext.failNow("create variant test failed");
@@ -232,14 +232,14 @@ public class ConsumerServiceTest {
               }
             })
         .when(postgresService)
-        .executePreparedQuery(anyString(), any(), any());
+        .executePreparedQuery(anyString(), any());
 
     consumerService.listProviders(
         consumer,
         request).onComplete(
         handler -> {
           if (handler.succeeded()) {
-            verify(postgresService, times(1)).executePreparedQuery(anyString(), any(), any());
+            verify(postgresService, times(1)).executePreparedQuery(anyString(), any());
             testContext.failNow(handler.cause());
           } else {
             testContext.completeNow();
@@ -265,14 +265,14 @@ public class ConsumerServiceTest {
               }
             })
         .when(postgresService)
-        .executePreparedQuery(anyString(), any(), any());
+        .executePreparedQuery(anyString(), any());
 
     consumerService.listProducts(
         consumer,
         requestParams).onComplete(
         handler -> {
           if (handler.succeeded()) {
-            verify(postgresService, times(1)).executePreparedQuery(anyString(), any(), any());
+            verify(postgresService, times(1)).executePreparedQuery(anyString(), any());
             testContext.completeNow();
           } else {
             testContext.failNow("create variant test failed");
@@ -298,14 +298,14 @@ public class ConsumerServiceTest {
               }
             })
         .when(postgresService)
-        .executePreparedQuery(anyString(), any(), any());
+        .executePreparedQuery(anyString(), any());
 
     consumerService.listProducts(
         consumer,
         request).onComplete(
         handler -> {
           if (handler.succeeded()) {
-            verify(postgresService, times(1)).executePreparedQuery(anyString(), any(), any());
+            verify(postgresService, times(1)).executePreparedQuery(anyString(), any());
             testContext.failNow(handler.cause());
           } else {
             testContext.completeNow();
@@ -332,14 +332,14 @@ public class ConsumerServiceTest {
               }
             })
         .when(postgresService)
-        .executePreparedQuery(anyString(), any(), any());
+        .executePreparedQuery(anyString(), any());
 
     consumerService.listProducts(
         consumer,
         request).onComplete(
         handler -> {
           if (handler.succeeded()) {
-            verify(postgresService, times(1)).executePreparedQuery(anyString(), any(), any());
+            verify(postgresService, times(1)).executePreparedQuery(anyString(), any());
             testContext.completeNow();
           } else {
             testContext.failNow(handler.cause());
@@ -689,7 +689,7 @@ public class ConsumerServiceTest {
 
             assertNotNull(handler.result());
             assertEquals(jsonMock, handler.result());
-            verify(postgresService, times(1)).executePreparedQuery(anyString(), any(), any());
+            verify(postgresService, times(1)).executePreparedQuery(anyString(), any());
             verify(consumer, times(1)).getResourceServerUrl();
             vertxTestContext.completeNow();
           } else {
@@ -721,7 +721,7 @@ public class ConsumerServiceTest {
                     .withDetail("Product variants not found")
                     .getResponse();
             assertEquals(expectedFailureMessage, handler.cause().getMessage());
-            verify(postgresService, times(1)).executePreparedQuery(anyString(), any(), any());
+            verify(postgresService, times(1)).executePreparedQuery(anyString(), any());
             verify(consumer, times(1)).getResourceServerUrl();
             vertxTestContext.completeNow();
           } else {
@@ -752,7 +752,7 @@ public class ConsumerServiceTest {
                                         .withDetail("Product variants could not be fetched as there was internal server error")
                                         .getResponse();
                         assertEquals(expectedFailureMessage, handler.cause().getMessage());
-                        verify(postgresService, times(1)).executePreparedQuery(anyString(), any(), any());
+                        verify(postgresService, times(1)).executePreparedQuery(anyString(), any());
                         verify(consumer, times(1)).getResourceServerUrl();
                         vertxTestContext.completeNow();
                     } else {

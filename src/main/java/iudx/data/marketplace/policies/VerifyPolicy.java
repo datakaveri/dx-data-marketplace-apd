@@ -90,7 +90,7 @@ public class VerifyPolicy {
     Promise<JsonObject> promise = Promise.promise();
     postgresService.executePreparedQuery(
         query,
-        params,
+        params).onComplete(
         handler -> {
           if (handler.failed()) {
             LOGGER.error(

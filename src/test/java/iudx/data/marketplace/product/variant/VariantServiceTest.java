@@ -85,7 +85,7 @@ public class VariantServiceTest {
                       }
                     })
             .when(postgresService)
-            .executeQuery(anyString(), any());
+            .executeQuery(anyString());
     lenient()
             .doAnswer(
                     new Answer<AsyncResult<JsonObject>>() {
@@ -96,7 +96,7 @@ public class VariantServiceTest {
                       }
                     })
             .when(postgresService)
-            .executePreparedQuery(anyString(), any(),any());
+            .executePreparedQuery(anyString(), any());
     testContext.completeNow();
   }
 
@@ -134,7 +134,7 @@ public class VariantServiceTest {
               }
             })
             .when(postgresService)
-            .executeCountQuery(anyString(), any(Handler.class));
+            .executeCountQuery(anyString());
 
     doAnswer(
             new Answer<AsyncResult<JsonObject>>() {
@@ -147,11 +147,11 @@ public class VariantServiceTest {
               }
             })
             .when(postgresService)
-            .executeQuery(anyString(), any(Handler.class));
+            .executeQuery(anyString());
 
     variantServiceImpl.createProductVariant(
             provider,
-            request,
+            request).onComplete(
             handler -> {
               if (handler.succeeded()) {
                 assertEquals(ResponseUrn.SUCCESS_URN.getUrn(), handler.result().getString(TYPE));
@@ -198,7 +198,7 @@ public class VariantServiceTest {
         ((Handler<AsyncResult<JsonObject>>) invocationOnMock.getArgument(1)).handle(asyncResult);
         return null;
       }
-    }).when(postgresService).executeQuery(any(),any());
+    }).when(postgresService).executeQuery(any());
 
     doAnswer(new Answer<AsyncResult<JsonObject>>() {
       @Override
@@ -206,12 +206,12 @@ public class VariantServiceTest {
         ((Handler<AsyncResult<JsonObject>>) invocationOnMock.getArgument(2)).handle(asyncResult);
         return null;
       }
-    }).when(variantServiceSpy).createProductVariant(any(),any(), any());
+    }).when(variantServiceSpy).createProductVariant(any(),any());
 
 
-    variantServiceSpy.updateProductVariant(provider, jsonObjectMock, handler -> {
+    variantServiceSpy.updateProductVariant(provider, jsonObjectMock).onComplete( handler -> {
       if(handler.succeeded()) {
-        verify(variantServiceSpy, times(1)).createProductVariant(any(),any(), any());
+        verify(variantServiceSpy, times(1)).createProductVariant(any(),any());
         verify(variantServiceSpy, times(1)).updateProductVariantStatus(anyString(),anyString());
         testContext.completeNow();
       } else {
@@ -228,7 +228,7 @@ public class VariantServiceTest {
     when(jsonObjectMock.getString(PRODUCT_VARIANT_ID)).thenReturn("someDummyValue");
     doAnswer(Answer -> Future.succeededFuture(result)).when(variantServiceSpy).updateProductVariantStatus(anyString());
 
-    variantServiceSpy.deleteProductVariant(provider, jsonObjectMock, handler -> {
+    variantServiceSpy.deleteProductVariant(provider, jsonObjectMock).onComplete( handler -> {
       if(handler.succeeded()) {
         verify(variantServiceSpy, times(1)).updateProductVariantStatus(anyString());
         testContext.completeNow();
@@ -252,11 +252,11 @@ public class VariantServiceTest {
         ((Handler<AsyncResult<JsonObject>>) invocationOnMock.getArgument(1)).handle(asyncResult);
         return null;
       }
-    }).when(postgresService).executeQuery(anyString(),any());
+    }).when(postgresService).executeQuery(anyString());
 
     variantServiceSpy.updateProductVariantStatus(anyString()).onComplete(handler -> {
       if(handler.succeeded()) {
-        verify(postgresService, times(1)).executeQuery(anyString(),any());
+        verify(postgresService, times(1)).executeQuery(anyString());
         testContext.completeNow();
       } else {
         testContext.failNow("update status test failed");
@@ -274,11 +274,11 @@ public class VariantServiceTest {
         ((Handler<AsyncResult<JsonObject>>) invocationOnMock.getArgument(1)).handle(asyncResult);
         return null;
       }
-    }).when(postgresService).executeQuery(anyString(),any());
+    }).when(postgresService).executeQuery(anyString());
 
     variantServiceSpy.getProductDetails(anyString(), anyString()).onComplete(handler -> {
       if(handler.succeeded()) {
-        verify(postgresService, times(1)).executeQuery(anyString(),any());
+        verify(postgresService, times(1)).executeQuery(anyString());
         testContext.completeNow();
       } else {
         testContext.failNow("get product details test failed");
@@ -346,7 +346,7 @@ public class VariantServiceTest {
     when(asyncResult.result()).thenReturn(request);
     variantServiceImpl.listPurchase(
         provider,
-        request,
+        request).onComplete(
         handler -> {
           if (handler.succeeded()) {
 
@@ -417,7 +417,7 @@ public class VariantServiceTest {
     when(asyncResult.result()).thenReturn(request);
     variantServiceImpl.listPurchase(
             provider,
-            request,
+            request).onComplete(
             handler -> {
               if (handler.failed()) {
                 assertEquals(expectedFailureMessage, handler.cause().getMessage());
@@ -446,7 +446,7 @@ public class VariantServiceTest {
     when(asyncResult.succeeded()).thenReturn(false);
     variantServiceImpl.listPurchase(
             provider,
-            request,
+            request).onComplete(
             handler -> {
               if (handler.failed()) {
                 String expected = new RespBuilder()
@@ -478,7 +478,7 @@ public class VariantServiceTest {
     when(provider.getResourceServerUrl()).thenReturn("dummyRsUrl");
     variantServiceImpl.listPurchase(
             provider,
-            request,
+            request).onComplete(
             handler -> {
               if (handler.failed()) {
                 String expected = new RespBuilder()
@@ -511,12 +511,12 @@ public class VariantServiceTest {
 
     variantServiceImpl.listProductVariants(
             provider,
-            request,
+            request).onComplete(
             handler -> {
               if (handler.succeeded()) {
                 assertNotNull(handler.result());
                 assertEquals(jsonMock, handler.result());
-                verify(postgresService, times(1)).executePreparedQuery(anyString(), any(), any());
+                verify(postgresService, times(1)).executePreparedQuery(anyString(), any());
                 verify(provider, times(1)).getResourceServerUrl();
                 vertxTestContext.completeNow();
 
@@ -544,7 +544,7 @@ public class VariantServiceTest {
 
     variantServiceImpl.listProductVariants(
         provider,
-        request,
+        request).onComplete(
         handler -> {
           if (handler.failed()) {
             String expectedFailureMessage = new RespBuilder()
@@ -553,7 +553,7 @@ public class VariantServiceTest {
                     .withDetail("Product variants not found")
                     .getResponse();
             assertEquals(expectedFailureMessage, handler.cause().getMessage());
-            verify(postgresService, times(1)).executePreparedQuery(anyString(), any(), any());
+            verify(postgresService, times(1)).executePreparedQuery(anyString(), any());
             verify(provider, times(1)).getResourceServerUrl();
             vertxTestContext.completeNow();
 
@@ -578,7 +578,7 @@ public class VariantServiceTest {
 
     variantServiceImpl.listProductVariants(
             provider,
-            request,
+            request).onComplete(
             handler -> {
               if (handler.failed()) {
                 String expectedFailureMessage =
@@ -588,7 +588,7 @@ public class VariantServiceTest {
                                 .withDetail("Product variants not found")
                                 .getResponse();
                 assertEquals(expectedFailureMessage, handler.cause().getMessage());
-                verify(postgresService, times(1)).executePreparedQuery(anyString(), any(), any());
+                verify(postgresService, times(1)).executePreparedQuery(anyString(), any());
                 verify(provider, times(1)).getResourceServerUrl();
                 vertxTestContext.completeNow();
               } else {
@@ -610,7 +610,7 @@ public class VariantServiceTest {
 
     variantServiceImpl.listProductVariants(
             provider,
-            request,
+            request).onComplete(
             handler -> {
               if (handler.failed()) {
                 String expectedFailureMessage =
@@ -620,7 +620,7 @@ public class VariantServiceTest {
                                 .withDetail("Internal Server Error")
                                 .getResponse();
                 assertEquals(expectedFailureMessage, handler.cause().getMessage());
-                verify(postgresService, times(1)).executePreparedQuery(anyString(), any(), any());
+                verify(postgresService, times(1)).executePreparedQuery(anyString(), any());
                 verify(provider, times(1)).getResourceServerUrl();
                 vertxTestContext.completeNow();
               } else {
@@ -644,7 +644,7 @@ public class VariantServiceTest {
 
     variantServiceImpl.createProductVariant(
         provider,
-        request,
+        request).onComplete(
         handler -> {
           System.out.println(handler);
           if (handler.failed()) {
@@ -678,7 +678,7 @@ public class VariantServiceTest {
 
     variantServiceImpl.createProductVariant(
             provider,
-            request,
+            request).onComplete(
             handler -> {
               if (handler.failed()) {
                 String expected =
@@ -711,7 +711,7 @@ public class VariantServiceTest {
 
     variantServiceImpl.createProductVariant(
             provider,
-            request,
+            request).onComplete(
             handler -> {
               if (handler.failed()) {
                 String expected =
@@ -744,7 +744,7 @@ public class VariantServiceTest {
 
     variantServiceImpl.createProductVariant(
             provider,
-            request,
+            request).onComplete(
             handler -> {
               if (handler.failed()) {
                 String expected =
@@ -775,7 +775,7 @@ public class VariantServiceTest {
             .put(PRODUCT_VARIANT_NAME, "variant3");
     variantServiceImpl.updateProductVariant(
         provider,
-        request,
+        request).onComplete(
         handler -> {
           if (handler.failed()) {
             String expectedFailureMessage = new RespBuilder()
@@ -785,7 +785,7 @@ public class VariantServiceTest {
                             "Product Variant cannot be updated as the product is in INACTIVE state or product is not found")
                     .getResponse();
             assertEquals(expectedFailureMessage, handler.cause().getMessage());
-            verify(postgresService, times(1)).executeQuery(anyString(), any());
+            verify(postgresService, times(1)).executeQuery(anyString());
             vertxTestContext.completeNow();
 
           } else {
@@ -805,7 +805,7 @@ public class VariantServiceTest {
             .put(PRODUCT_ID, "someDummyProductId")
             .put(RESULTS, new JsonArray().add(new JsonObject().put("status", "active").put("provider_id", "dummyProviderId")))
             .put(PRODUCT_VARIANT_NAME, "variant3");
-    assertThrows(DxRuntimeException.class, () -> variantServiceImpl.updateProductVariant(provider, request, handler));
+    assertThrows(DxRuntimeException.class, () -> variantServiceImpl.updateProductVariant(provider, request));
     vertxTestContext.completeNow();
   }
 }

@@ -350,6 +350,6 @@ public void mockDbExecution()
                     }
                   })
           .when(postgresService)
-          .executePreparedQuery(anyString(), any(),any());
+          .executePreparedQuery(anyString(), any());
 }
 }

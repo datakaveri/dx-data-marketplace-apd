@@ -60,7 +60,7 @@ public class WebhookServiceImpl implements WebhookService {
 
     postgresService.executePreparedQuery(
         query.toString(),
-        params,
+        params).onComplete(
         pgHandler -> {
           if (pgHandler.succeeded()) {
             LOGGER.debug("Result after updating : {}", pgHandler.result().encode());

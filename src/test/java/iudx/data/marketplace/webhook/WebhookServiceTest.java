@@ -59,7 +59,7 @@ public class WebhookServiceTest {
               }
             })
         .when(postgresService)
-        .executePreparedQuery(anyString(), any(), any());
+        .executePreparedQuery(anyString(), any());
     lenient().when(asyncResult.result()).thenReturn(mockResult);
     lenient().when(mockResult.encode()).thenReturn("Some result from database");
 
@@ -78,7 +78,7 @@ public class WebhookServiceTest {
         .onSuccess(
             ar -> {
               verify(postgresService, times(++expectedInvocationsPostgresService))
-                  .executePreparedQuery(anyString(), any(), any());
+                  .executePreparedQuery(anyString(), any());
               verify(policyService, times(++expectedInvocationsPolicyService))
                   .createPolicy(anyString());
               testContext.completeNow();
@@ -97,7 +97,7 @@ public class WebhookServiceTest {
         .onFailure(
             ar -> {
               verify(postgresService, times(++expectedInvocationsPostgresService))
-                  .executePreparedQuery(anyString(), any(), any());
+                  .executePreparedQuery(anyString(), any());
               verify(policyService, times(expectedInvocationsPolicyService))
                   .createPolicy(anyString());
               testContext.completeNow();
@@ -118,7 +118,7 @@ public class WebhookServiceTest {
         .onFailure(
             ar -> {
               verify(postgresService, times(++expectedInvocationsPostgresService))
-                  .executePreparedQuery(anyString(), any(), any());
+                  .executePreparedQuery(anyString(), any());
               verify(policyService, times(++expectedInvocationsPolicyService))
                   .createPolicy(anyString());
               testContext.completeNow();
@@ -134,7 +134,7 @@ public class WebhookServiceTest {
         .recordPaymentFailure("dummyOrderId")
         .onSuccess(ar -> {
           verify(postgresService, times(++expectedInvocationsPostgresService))
-              .executePreparedQuery(anyString(), any(), any());
+              .executePreparedQuery(anyString(), any());
           verify(policyService, times(expectedInvocationsPolicyService))
               .createPolicy(anyString());
           testContext.completeNow();
@@ -150,7 +150,7 @@ public class WebhookServiceTest {
     webhookServiceSpy.updatePaymentStatusForInvoice("dummyOrderId", PaymentStatus.SUCCESSFUL)
         .onSuccess(ar -> {
           verify(postgresService, times(++expectedInvocationsPostgresService))
-              .executePreparedQuery(anyString(), any(), any());
+              .executePreparedQuery(anyString(), any());
           verify(policyService, times(expectedInvocationsPolicyService))
               .createPolicy(anyString());
           testContext.completeNow();

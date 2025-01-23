@@ -110,7 +110,7 @@ public class UserInfoFromAuthHandler implements Handler<RoutingContext> {
             .put("$4", user.getLastName());
     pgService.executePreparedQuery(
         INSERT_USER_TABLE,
-        params,
+        params).onComplete(
         handler -> {
           if (handler.succeeded()) {
             LOGGER.debug("User inserted ");

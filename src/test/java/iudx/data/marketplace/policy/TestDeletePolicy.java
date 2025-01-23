@@ -62,7 +62,7 @@ public class TestDeletePolicy {
               }
             })
         .when(postgresService)
-        .executePreparedQuery(anyString(), any(), any());
+        .executePreparedQuery(anyString(), any());
     lenient()
         .when(
             auditingService.handleAuditLogs(

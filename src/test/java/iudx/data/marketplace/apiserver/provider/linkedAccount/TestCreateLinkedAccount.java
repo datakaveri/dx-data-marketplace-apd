@@ -106,7 +106,7 @@ public class TestCreateLinkedAccount {
               }
             })
         .when(postgresService)
-        .executeQuery(anyString(), any());
+        .executeQuery(anyString());
     when(auditingService.handleAuditLogs(
             any(User.class), any(JsonObject.class), anyString(), anyString()))
         .thenReturn(Future.succeededFuture());
@@ -155,7 +155,7 @@ public class TestCreateLinkedAccount {
               }
             })
             .when(postgresService)
-            .executeQuery(anyString(), any());
+            .executeQuery(anyString());
 
     account
             .initiateCreatingLinkedAccount(request, provider)

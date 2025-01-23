@@ -312,7 +312,7 @@ public class RazorPayServiceImpl implements RazorPayService {
 
     postgresService.executePreparedQuery(
         query.toString(),
-        params,
+        params).onComplete(
         pgHandler -> {
           if (pgHandler.succeeded()) {
             promise.complete(pgHandler.result());
