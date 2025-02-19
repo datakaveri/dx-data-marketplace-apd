@@ -53,8 +53,7 @@ public class RoutingContextHelper {
     /* allowing both the tokens to be authenticated for now */
     /* TODO: later, 401 error is thrown if the token does not contain Bearer keyword */
     String token = routingContext.request().headers().get(HEADER_BEARER_AUTHORIZATION);
-    boolean isBearerAuthHeaderPresent =
-        routingContext.request().headers().contains(HEADER_BEARER_AUTHORIZATION);
+    boolean isBearerAuthHeaderPresent = token != null && token.contains(HEADER_TOKEN_BEARER);
     if (isBearerAuthHeaderPresent && token.trim().split(" ").length == 2) {
       String[] tokenWithoutBearer = token.split(HEADER_TOKEN_BEARER);
       token = tokenWithoutBearer[1].replaceAll("\\s", "");
