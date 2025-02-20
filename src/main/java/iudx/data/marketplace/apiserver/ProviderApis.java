@@ -16,11 +16,15 @@ import io.vertx.core.json.DecodeException;
 import io.vertx.core.json.JsonObject;
 import io.vertx.ext.web.Router;
 import io.vertx.ext.web.RoutingContext;
+import iudx.data.marketplace.aaaService.AuthClient;
 import iudx.data.marketplace.apiserver.exceptions.DxRuntimeException;
 import iudx.data.marketplace.apiserver.util.RequestType;
-import iudx.data.marketplace.aaaService.AuthClient;
 import iudx.data.marketplace.authenticator.AuthenticationService;
 import iudx.data.marketplace.authenticator.handlers.*;
+import iudx.data.marketplace.authenticator.handlers.authentication.AuthHandler;
+import iudx.data.marketplace.authenticator.handlers.authentication.TokenIntrospectHandler;
+import iudx.data.marketplace.authenticator.handlers.authorization.AuthorizationHandler;
+import iudx.data.marketplace.authenticator.handlers.authorization.UserInfoFromAuthHandler;
 import iudx.data.marketplace.authenticator.model.DxRole;
 import iudx.data.marketplace.authenticator.model.UserInfo;
 import iudx.data.marketplace.common.Api;
@@ -69,10 +73,12 @@ public class ProviderApis {
 
     ValidationHandler productValidationHandler = new ValidationHandler(RequestType.PRODUCT);
     ExceptionHandler exceptionHandler = new ExceptionHandler();
-    Handler<RoutingContext> providerApiAccessHandler = new AccessHandler().setUserRolesForEndpoint(DxRole.PROVIDER, DxRole.DELEGATE);
+    Handler<RoutingContext> providerApiAccessHandler =
+        new AuthorizationHandler().setUserRolesForEndpoint(DxRole.PROVIDER, DxRole.DELEGATE);
     userInfo = new UserInfo();
     userInfoFromAuthHandler = new UserInfoFromAuthHandler(authClient, userInfo, postgresService);
     authHandler = new AuthHandler(authenticationService);
+    Handler<RoutingContext> tokenIntrospectHandler = new TokenIntrospectHandler().validateToken();
 
     productService = ProductService.createProxy(vertx, PRODUCT_SERVICE_ADDRESS);
     variantService = ProductVariantService.createProxy(vertx, PRODUCT_VARIANT_SERVICE_ADDRESS);
@@ -82,6 +88,7 @@ public class ProviderApis {
         .consumes(APPLICATION_JSON)
         .handler(productValidationHandler)
         .handler(authHandler)
+        .handler(tokenIntrospectHandler)
         .handler(providerApiAccessHandler)
         .handler(userInfoFromAuthHandler)
         .handler(this::handleCreateProduct)
@@ -91,6 +98,7 @@ public class ProviderApis {
         .delete(api.getProviderProductPath())
         .handler(productValidationHandler)
         .handler(authHandler)
+        .handler(tokenIntrospectHandler)
         .handler(providerApiAccessHandler)
         .handler(userInfoFromAuthHandler)
         .handler(this::handleDeleteProduct)
@@ -101,6 +109,7 @@ public class ProviderApis {
         .get(api.getProviderListProductsPath())
         .handler(resourceValidationHandler)
         .handler(authHandler)
+        .handler(tokenIntrospectHandler)
         .handler(providerApiAccessHandler)
         .handler(userInfoFromAuthHandler)
         .handler(this::listProducts)
@@ -111,6 +120,7 @@ public class ProviderApis {
         .get(api.getProviderListPurchasesPath())
         .handler(purchaseValidationHandler)
         .handler(authHandler)
+        .handler(tokenIntrospectHandler)
         .handler(providerApiAccessHandler)
         .handler(userInfoFromAuthHandler)
         .handler(this::listPurchases)
@@ -121,6 +131,7 @@ public class ProviderApis {
         .post(api.getProviderProductVariantPath())
         .handler(variantValidationHandler)
         .handler(authHandler)
+        .handler(tokenIntrospectHandler)
         .handler(providerApiAccessHandler)
         .handler(userInfoFromAuthHandler)
         .handler(this::handleCreateProductVariant)
@@ -130,6 +141,7 @@ public class ProviderApis {
         .put(api.getProviderProductVariantPath())
         .handler(variantValidationHandler)
         .handler(authHandler)
+        .handler(tokenIntrospectHandler)
         .handler(providerApiAccessHandler)
         .handler(userInfoFromAuthHandler)
         .handler(this::handleUpdateProductVariant)
@@ -140,6 +152,7 @@ public class ProviderApis {
         .get(api.getProviderProductVariantPath())
         .handler(listVariantValidationHandler)
         .handler(authHandler)
+        .handler(tokenIntrospectHandler)
         .handler(providerApiAccessHandler)
         .handler(userInfoFromAuthHandler)
         .handler(this::handleGetProductVariants)
@@ -151,6 +164,7 @@ public class ProviderApis {
         .delete(api.getProviderProductVariantPath())
         .handler(deleteVariantValidationHandler)
         .handler(authHandler)
+        .handler(tokenIntrospectHandler)
         .handler(providerApiAccessHandler)
         .handler(userInfoFromAuthHandler)
         .handler(this::handleDeleteProductVariant)
@@ -164,31 +178,33 @@ public class ProviderApis {
     requestBody.put(AUTH_INFO, authInfo);
     User user = routingContext.get("user");
 
-    productService.createProduct(
-        user,
-        requestBody).onComplete(
-        handler -> {
-          if (handler.succeeded()) {
-            handleSuccessResponse(routingContext, 201, handler.result());
-          } else {
-            String errorMessage = handler.cause().getMessage();
-            if (errorMessage.contains(ResponseUrn.RESOURCE_ALREADY_EXISTS_URN.getUrn())) {
-              routingContext.fail(
-                  new DxRuntimeException(
-                      409,
-                      ResponseUrn.RESOURCE_ALREADY_EXISTS_URN,
-                      ResponseUrn.RESOURCE_ALREADY_EXISTS_URN.getMessage()));
-            } else if (errorMessage.contains(ResponseUrn.INTERNAL_SERVER_ERR_URN.getMessage())) {
-              routingContext.fail(
-                  new DxRuntimeException(500, ResponseUrn.INTERNAL_SERVER_ERR_URN, errorMessage));
-            } else if (errorMessage.contains(ResponseUrn.FORBIDDEN_URN.getUrn())) {
-              handleFailureResponse(
-                  routingContext, errorMessage, HttpStatusCode.FORBIDDEN.getValue());
-            } else {
-              handleFailureResponse(routingContext, handler.cause());
-            }
-          }
-        });
+    productService
+        .createProduct(user, requestBody)
+        .onComplete(
+            handler -> {
+              if (handler.succeeded()) {
+                handleSuccessResponse(routingContext, 201, handler.result());
+              } else {
+                String errorMessage = handler.cause().getMessage();
+                if (errorMessage.contains(ResponseUrn.RESOURCE_ALREADY_EXISTS_URN.getUrn())) {
+                  routingContext.fail(
+                      new DxRuntimeException(
+                          409,
+                          ResponseUrn.RESOURCE_ALREADY_EXISTS_URN,
+                          ResponseUrn.RESOURCE_ALREADY_EXISTS_URN.getMessage()));
+                } else if (errorMessage.contains(
+                    ResponseUrn.INTERNAL_SERVER_ERR_URN.getMessage())) {
+                  routingContext.fail(
+                      new DxRuntimeException(
+                          500, ResponseUrn.INTERNAL_SERVER_ERR_URN, errorMessage));
+                } else if (errorMessage.contains(ResponseUrn.FORBIDDEN_URN.getUrn())) {
+                  handleFailureResponse(
+                      routingContext, errorMessage, HttpStatusCode.FORBIDDEN.getValue());
+                } else {
+                  handleFailureResponse(routingContext, handler.cause());
+                }
+              }
+            });
   }
 
   private void handleDeleteProduct(RoutingContext routingContext) {
@@ -197,25 +213,25 @@ public class ProviderApis {
     JsonObject authInfo = (JsonObject) routingContext.data().get(AUTH_INFO);
     requestBody.put(AUTH_INFO, authInfo);
     User user = routingContext.get("user");
-    productService.deleteProduct(
-        user,
-        requestBody).onComplete(
-        handler -> {
-          if (handler.succeeded()) {
-            handleSuccessResponse(routingContext, 200, handler.result());
-          } else {
-            String errorMessage = handler.cause().getMessage();
-            if (errorMessage.equalsIgnoreCase(ResponseUrn.RESOURCE_NOT_FOUND_URN.getUrn())) {
-              routingContext.fail(
-                  new DxRuntimeException(
-                      404,
-                      ResponseUrn.RESOURCE_NOT_FOUND_URN,
-                      ResponseUrn.RESOURCE_NOT_FOUND_URN.getMessage()));
-            } else {
-              handleFailureResponse(routingContext, handler.cause());
-            }
-          }
-        });
+    productService
+        .deleteProduct(user, requestBody)
+        .onComplete(
+            handler -> {
+              if (handler.succeeded()) {
+                handleSuccessResponse(routingContext, 200, handler.result());
+              } else {
+                String errorMessage = handler.cause().getMessage();
+                if (errorMessage.equalsIgnoreCase(ResponseUrn.RESOURCE_NOT_FOUND_URN.getUrn())) {
+                  routingContext.fail(
+                      new DxRuntimeException(
+                          404,
+                          ResponseUrn.RESOURCE_NOT_FOUND_URN,
+                          ResponseUrn.RESOURCE_NOT_FOUND_URN.getMessage()));
+                } else {
+                  handleFailureResponse(routingContext, handler.cause());
+                }
+              }
+            });
   }
 
   private void listProducts(RoutingContext routingContext) {
@@ -228,20 +244,20 @@ public class ProviderApis {
     JsonObject authInfo = (JsonObject) routingContext.data().get(AUTH_INFO);
     requestBody.put(AUTH_INFO, authInfo);
 
-    productService.listProducts(
-        user,
-        requestBody).onComplete(
-        handler -> {
-          if (handler.succeeded()) {
-            if (handler.result().getJsonArray(RESULTS).isEmpty()) {
-              handleSuccessResponse(routingContext, 204, handler.result());
-            } else {
-              handleSuccessResponse(routingContext, 200, handler.result());
-            }
-          } else {
-            handleFailureResponse(routingContext, handler.cause());
-          }
-        });
+    productService
+        .listProducts(user, requestBody)
+        .onComplete(
+            handler -> {
+              if (handler.succeeded()) {
+                if (handler.result().getJsonArray(RESULTS).isEmpty()) {
+                  handleSuccessResponse(routingContext, 204, handler.result());
+                } else {
+                  handleSuccessResponse(routingContext, 200, handler.result());
+                }
+              } else {
+                handleFailureResponse(routingContext, handler.cause());
+              }
+            });
   }
 
   private void listPurchases(RoutingContext routingContext) {
@@ -255,17 +271,17 @@ public class ProviderApis {
             .put("resourceId", resourceId)
             .put("productId", productId)
             .put("paymentStatus", paymentStatus);
-    variantService.listPurchase(
-        provider,
-        requestJson).onComplete(
-        handler -> {
-          if (handler.succeeded()) {
-            handleSuccessResponse(
-                routingContext, HttpStatusCode.SUCCESS.getValue(), handler.result());
-          } else {
-            handleFailure(routingContext, handler.cause().getMessage());
-          }
-        });
+    variantService
+        .listPurchase(provider, requestJson)
+        .onComplete(
+            handler -> {
+              if (handler.succeeded()) {
+                handleSuccessResponse(
+                    routingContext, HttpStatusCode.SUCCESS.getValue(), handler.result());
+              } else {
+                handleFailure(routingContext, handler.cause().getMessage());
+              }
+            });
   }
 
   private void handleCreateProductVariant(RoutingContext routingContext) {
@@ -274,29 +290,29 @@ public class ProviderApis {
     requestBody.put(AUTH_INFO, authInfo);
     User user = routingContext.get("user");
 
-    variantService.createProductVariant(
-        user,
-        requestBody).onComplete(
-        handler -> {
-          if (handler.succeeded()) {
-            handleSuccessResponse(routingContext, 201, handler.result());
-          } else {
-            String errMessage = handler.cause().getMessage();
-            if (errMessage.equalsIgnoreCase(ResponseUrn.RESOURCE_ALREADY_EXISTS_URN.getUrn())) {
-              routingContext.fail(
-                  new DxRuntimeException(
-                      409,
-                      ResponseUrn.RESOURCE_ALREADY_EXISTS_URN,
-                      ResponseUrn.RESOURCE_ALREADY_EXISTS_URN.getMessage()));
+    variantService
+        .createProductVariant(user, requestBody)
+        .onComplete(
+            handler -> {
+              if (handler.succeeded()) {
+                handleSuccessResponse(routingContext, 201, handler.result());
+              } else {
+                String errMessage = handler.cause().getMessage();
+                if (errMessage.equalsIgnoreCase(ResponseUrn.RESOURCE_ALREADY_EXISTS_URN.getUrn())) {
+                  routingContext.fail(
+                      new DxRuntimeException(
+                          409,
+                          ResponseUrn.RESOURCE_ALREADY_EXISTS_URN,
+                          ResponseUrn.RESOURCE_ALREADY_EXISTS_URN.getMessage()));
 
-            } else if (errMessage.contains(ResponseUrn.FORBIDDEN_URN.getUrn())) {
-              handleFailureResponse(
-                  routingContext, errMessage, HttpStatusCode.FORBIDDEN.getValue());
-            } else {
-              handleFailureResponse(routingContext, handler.cause());
-            }
-          }
-        });
+                } else if (errMessage.contains(ResponseUrn.FORBIDDEN_URN.getUrn())) {
+                  handleFailureResponse(
+                      routingContext, errMessage, HttpStatusCode.FORBIDDEN.getValue());
+                } else {
+                  handleFailureResponse(routingContext, handler.cause());
+                }
+              }
+            });
   }
 
   private void handleUpdateProductVariant(RoutingContext routingContext) {
@@ -305,16 +321,16 @@ public class ProviderApis {
     requestBody.put(AUTH_INFO, authInfo);
     User user = routingContext.get("user");
 
-    variantService.updateProductVariant(
-        user,
-        requestBody).onComplete(
-        handler -> {
-          if (handler.succeeded()) {
-            handleSuccessResponse(routingContext, 200, handler.result());
-          } else {
-            handleFailureResponse(routingContext, handler.cause());
-          }
-        });
+    variantService
+        .updateProductVariant(user, requestBody)
+        .onComplete(
+            handler -> {
+              if (handler.succeeded()) {
+                handleSuccessResponse(routingContext, 200, handler.result());
+              } else {
+                handleFailureResponse(routingContext, handler.cause());
+              }
+            });
   }
 
   private void handleGetProductVariants(RoutingContext routingContext) {
@@ -328,16 +344,16 @@ public class ProviderApis {
 
     requestBody.put(AUTH_INFO, authInfo);
 
-    variantService.listProductVariants(
-        user,
-        requestBody).onComplete(
-        handler -> {
-          if (handler.succeeded()) {
-            handleSuccessResponse(routingContext, 200, handler.result());
-          } else {
-            handleFailure(routingContext, handler.cause().getMessage());
-          }
-        });
+    variantService
+        .listProductVariants(user, requestBody)
+        .onComplete(
+            handler -> {
+              if (handler.succeeded()) {
+                handleSuccessResponse(routingContext, 200, handler.result());
+              } else {
+                handleFailure(routingContext, handler.cause().getMessage());
+              }
+            });
   }
 
   private void handleDeleteProductVariant(RoutingContext routingContext) {
@@ -349,16 +365,16 @@ public class ProviderApis {
             .put(PRODUCT_VARIANT_ID, request.getParam(PRODUCT_VARIANT_ID));
     User user = routingContext.get("user");
 
-    variantService.deleteProductVariant(
-        user,
-        requestBody).onComplete(
-        handler -> {
-          if (handler.succeeded()) {
-            handleSuccessResponse(routingContext, 200, handler.result());
-          } else {
-            handleFailure(routingContext, handler.cause().getMessage());
-          }
-        });
+    variantService
+        .deleteProductVariant(user, requestBody)
+        .onComplete(
+            handler -> {
+              if (handler.succeeded()) {
+                handleSuccessResponse(routingContext, 200, handler.result());
+              } else {
+                handleFailure(routingContext, handler.cause().getMessage());
+              }
+            });
   }
 
   private void handleFailureResponse(RoutingContext routingContext, Throwable cause) {

@@ -14,9 +14,10 @@ public final class JwtData {
   private Integer iat;
   private String iid;
   private String role;
-  private String did;
-  private String drl;
   private JsonObject cons;
+  private String drl;
+  private String did;
+  private String expiry;
 
   public JwtData() {
     super();
@@ -27,18 +28,12 @@ public final class JwtData {
     setAccessToken(json.getString("access_token"));
   }
 
-  public JsonObject toJson() {
-    JsonObject json = new JsonObject();
-    JwtDataConverter.toJson(this, json);
-    return json;
+  public String getDrl() {
+    return drl;
   }
 
-  public String getAccessToken() {
-    return accessToken;
-  }
-
-  public void setAccessToken(String accessToken) {
-    this.accessToken = accessToken;
+  public void setDrl(String drl) {
+    this.drl = drl;
   }
 
   public String getDid() {
@@ -49,12 +44,26 @@ public final class JwtData {
     this.did = did;
   }
 
-  public String getDrl() {
-    return drl;
+  public JsonObject toJson() {
+    JsonObject json = new JsonObject();
+    JwtDataConverter.toJson(this, json);
+    return json;
   }
 
-  public void setDrl(String drl) {
-    this.drl = drl;
+  public String getExpiry() {
+    return this.expiry;
+  }
+
+  public void setExpiry(String exp) {
+    this.expiry = exp;
+  }
+
+  public String getAccessToken() {
+    return accessToken;
+  }
+
+  public void setAccessToken(String accessToken) {
+    this.accessToken = accessToken;
   }
 
   public String getSub() {
@@ -145,6 +154,8 @@ public final class JwtData {
         + drl
         + ", did="
         + did
+        + ", expiry="
+        + expiry
         + "]";
   }
 }

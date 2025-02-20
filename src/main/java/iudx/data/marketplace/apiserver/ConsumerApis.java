@@ -19,6 +19,10 @@ import iudx.data.marketplace.apiserver.util.RequestType;
 import iudx.data.marketplace.aaaService.AuthClient;
 import iudx.data.marketplace.authenticator.AuthenticationService;
 import iudx.data.marketplace.authenticator.handlers.*;
+import iudx.data.marketplace.authenticator.handlers.authentication.AuthHandler;
+import iudx.data.marketplace.authenticator.handlers.authentication.TokenIntrospectHandler;
+import iudx.data.marketplace.authenticator.handlers.authorization.AuthorizationHandler;
+import iudx.data.marketplace.authenticator.handlers.authorization.UserInfoFromAuthHandler;
 import iudx.data.marketplace.authenticator.model.DxRole;
 import iudx.data.marketplace.authenticator.model.UserInfo;
 import iudx.data.marketplace.common.Api;
@@ -42,10 +46,10 @@ public class ConsumerApis {
   private PostgresService postgresService;
   private AuthClient authClient;
   private AuthenticationService authenticationService;
-  private AccessHandler accessHandler;
   private UserInfoFromAuthHandler userInfoFromAuthHandler;
   private UserInfo userInfo;
   private AuthHandler authHandler;
+  private AuthorizationHandler authorizationHandler;
 
   ConsumerApis(
       Vertx vertx,
@@ -67,18 +71,21 @@ public class ConsumerApis {
     ValidationHandler resourceValidationHandler = new ValidationHandler(RequestType.RESOURCE);
     ValidationHandler providerValidationHandler = new ValidationHandler(RequestType.PROVIDER);
     ExceptionHandler exceptionHandler = new ExceptionHandler();
-    accessHandler = new AccessHandler();
+    authorizationHandler = new AuthorizationHandler();
+
     userInfo = new UserInfo();
     userInfoFromAuthHandler = new UserInfoFromAuthHandler(authClient, userInfo, postgresService);
     authHandler = new AuthHandler(authenticationService);
 
     consumerService = ConsumerService.createProxy(vertx, CONSUMER_SERVICE_ADDRESS);
-    Handler<RoutingContext> consumerApiAccessHandler = accessHandler.setUserRolesForEndpoint(DxRole.CONSUMER, DxRole.DELEGATE);
+    Handler<RoutingContext> consumerApiAccessHandler = authorizationHandler.setUserRolesForEndpoint(DxRole.CONSUMER, DxRole.DELEGATE);
+    Handler<RoutingContext> tokenIntrospectHandler = new TokenIntrospectHandler().validateToken();
 
     router
         .get(api.getConsumerListProviders())
         .handler(providerValidationHandler)
         .handler(authHandler)
+        .handler(tokenIntrospectHandler)
         .handler(consumerApiAccessHandler)
         .handler(userInfoFromAuthHandler)
         .handler(this::listProviders)
@@ -88,6 +95,7 @@ public class ConsumerApis {
         .get(api.getConsumerListResourcePath())
         .handler(resourceValidationHandler)
         .handler(authHandler)
+        .handler(tokenIntrospectHandler)
         .handler(consumerApiAccessHandler)
         .handler(userInfoFromAuthHandler)
         .handler(this::listResources)
@@ -97,6 +105,7 @@ public class ConsumerApis {
         .get(api.getConsumerListProducts())
         .handler(resourceValidationHandler)
         .handler(authHandler)
+        .handler(tokenIntrospectHandler)
         .handler(consumerApiAccessHandler)
         .handler(userInfoFromAuthHandler)
         .handler(this::listProducts)
@@ -108,6 +117,7 @@ public class ConsumerApis {
         .get(api.getConsumerListPurchases())
         .handler(purchaseValidationHandler)
         .handler(authHandler)
+        .handler(tokenIntrospectHandler)
         .handler(consumerApiAccessHandler)
         .handler(userInfoFromAuthHandler)
         .handler(this::listPurchases)
@@ -119,6 +129,7 @@ public class ConsumerApis {
         .get(api.getConsumerProductVariantPath())
         .handler(productVariantHandler)
         .handler(authHandler)
+        .handler(tokenIntrospectHandler)
         .handler(consumerApiAccessHandler)
         .handler(userInfoFromAuthHandler)
         .handler(this::listProductVariants)
@@ -130,6 +141,7 @@ public class ConsumerApis {
         .post(CONSUMER_PATH + ORDERS_PATH + "/:productVariantId")
         .handler(orderValidationHandler)
         .handler(authHandler)
+        .handler(tokenIntrospectHandler)
         .handler(consumerApiAccessHandler)
         .handler(userInfoFromAuthHandler)
         .handler(this::createOrder)

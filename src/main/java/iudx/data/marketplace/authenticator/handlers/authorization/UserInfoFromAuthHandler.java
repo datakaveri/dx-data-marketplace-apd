@@ -1,4 +1,4 @@
-package iudx.data.marketplace.authenticator.handlers;
+package iudx.data.marketplace.authenticator.handlers.authorization;
 
 import static iudx.data.marketplace.authenticator.model.DxRole.DELEGATE;
 import static iudx.data.marketplace.authenticator.util.Constants.INSERT_USER_TABLE;
