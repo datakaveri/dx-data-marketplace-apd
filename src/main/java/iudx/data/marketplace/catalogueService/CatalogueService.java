@@ -7,6 +7,7 @@ import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
 import io.vertx.ext.web.client.WebClient;
 import io.vertx.ext.web.client.WebClientOptions;
+import iudx.data.marketplace.common.ResponseUrn;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -63,6 +64,11 @@ public class CatalogueService {
                     catItemHandler.result().bodyAsJsonObject().getJsonArray("results");
                 if (!response.isEmpty()) {
                   JsonObject result = response.getJsonObject(0);
+                  if (result.getJsonArray("type").contains(TYPE_RG)) {
+                    LOGGER.error("Given id is invalid - it is group level resource");
+                    promise.fail("Given id is invalid - it is group level resource");
+                    return;
+                  }
                   if (result.getJsonArray("type").contains(TYPE_PROVIDER)) {
                     itemDetails
                         .put("type", TYPE_PROVIDER)
