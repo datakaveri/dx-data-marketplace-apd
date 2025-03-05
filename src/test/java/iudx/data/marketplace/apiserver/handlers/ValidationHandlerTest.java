@@ -115,9 +115,10 @@ public class ValidationHandlerTest {
     when(routingContext.body()).thenReturn(requestBody);
     when(routingContext.body().asJsonObject()).thenReturn(req);
     when(routingContext.pathParams()).thenReturn(hashMap);
+    when(routingContext.request().headers()).thenReturn(map);
     validationHandler = new ValidationHandler(requestType);
     validationHandler.handle(routingContext);
-    verify(routingContext, times(numberOfInvocations)).request();
+    verify(routingContext, times(numberOfInvocations*2)).request();
     verify(routingContext, times(numberOfInvocations)).body();
     testContext.completeNow();
   }

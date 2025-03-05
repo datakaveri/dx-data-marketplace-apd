@@ -4,9 +4,10 @@ import static iudx.data.marketplace.common.Constants.*;
 
 import io.vertx.core.AbstractVerticle;
 import io.vertx.serviceproxy.ServiceBinder;
-import iudx.data.marketplace.auditing.AuditingService;
+import iudx.data.marketplace.auditing.service.AuditingService;
 import iudx.data.marketplace.common.Api;
-import iudx.data.marketplace.postgres.PostgresService;
+import iudx.data.marketplace.policies.service.*;
+import iudx.data.marketplace.postgres.service.PostgresService;
 
 public class PolicyVerticle extends AbstractVerticle {
 

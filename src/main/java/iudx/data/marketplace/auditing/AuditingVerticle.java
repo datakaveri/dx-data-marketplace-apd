@@ -1,5 +1,7 @@
 package iudx.data.marketplace.auditing;
 
+import iudx.data.marketplace.auditing.service.AuditingService;
+import iudx.data.marketplace.auditing.service.AuditingServiceImpl;
 import static iudx.data.marketplace.common.Constants.AUDITING_SERVICE_ADDRESS;
 
 import io.vertx.core.AbstractVerticle;
@@ -10,8 +12,8 @@ import io.vertx.ext.web.client.WebClientOptions;
 import io.vertx.rabbitmq.RabbitMQClient;
 import io.vertx.rabbitmq.RabbitMQOptions;
 import io.vertx.serviceproxy.ServiceBinder;
-import iudx.data.marketplace.auditing.databroker.DataBrokerService;
-import iudx.data.marketplace.auditing.databroker.DataBrokerServiceImpl;
+import iudx.data.marketplace.auditing.databrokerService.DataBrokerService;
+import iudx.data.marketplace.auditing.databrokerService.DataBrokerServiceImpl;
 
 public class AuditingVerticle extends AbstractVerticle {
 

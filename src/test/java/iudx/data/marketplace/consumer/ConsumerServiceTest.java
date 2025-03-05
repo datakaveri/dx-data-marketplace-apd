@@ -3,6 +3,7 @@ package iudx.data.marketplace.consumer;
 import static iudx.data.marketplace.apiserver.util.Constants.*;
 import static iudx.data.marketplace.common.Constants.PROVIDER_ID;
 import static iudx.data.marketplace.common.Constants.RESOURCE_ID;
+import iudx.data.marketplace.consumer.service.ConsumerServiceImpl;
 import static iudx.data.marketplace.consumer.util.Constants.*;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -22,9 +23,9 @@ import iudx.data.marketplace.common.HttpStatusCode;
 import iudx.data.marketplace.common.RespBuilder;
 import iudx.data.marketplace.common.ResponseUrn;
 import iudx.data.marketplace.common.Util;
-import iudx.data.marketplace.policies.User;
-import iudx.data.marketplace.postgres.PostgresService;
-import iudx.data.marketplace.razorpay.RazorPayService;
+import iudx.data.marketplace.policies.service.model.User;
+import iudx.data.marketplace.postgres.service.PostgresService;
+import iudx.data.marketplace.razorpay.service.RazorPayService;
 import java.util.stream.Stream;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -84,39 +85,9 @@ public class ConsumerServiceTest {
     config = new JsonObject().put(TABLES, tableArray);
     consumerService = new ConsumerServiceImpl(config, postgresService, razorPayService, util);
     consumerServiceSpy = spy(consumerService);
-      lenient()
-              .doAnswer(
-                      new Answer<AsyncResult<JsonObject>>() {
-                          @Override
-                          public AsyncResult<JsonObject> answer(InvocationOnMock arg1) throws Throwable {
-                              ((Handler<AsyncResult<JsonObject>>) arg1.getArgument(1)).handle(asyncResult);
-                              return null;
-                          }
-                      })
-              .when(postgresService)
-              .executeQuery(anyString());
-      lenient()
-              .doAnswer(
-                      new Answer<AsyncResult<JsonObject>>() {
-                          @Override
-                          public AsyncResult<JsonObject> answer(InvocationOnMock arg2) throws Throwable {
-                              ((Handler<AsyncResult<JsonObject>>) arg2.getArgument(2)).handle(asyncResult);
-                              return null;
-                          }
-                      })
-              .when(postgresService)
-              .executePreparedQuery(anyString(), any());
-      lenient()
-              .doAnswer(
-                      new Answer<AsyncResult<JsonObject>>() {
-                          @Override
-                          public AsyncResult<JsonObject> answer(InvocationOnMock arg1) throws Throwable {
-                              ((Handler<AsyncResult<JsonObject>>) arg1.getArgument(1)).handle(asyncResult);
-                              return null;
-                          }
-                      })
-              .when(postgresService)
-              .executeTransaction(anyList());
+//    when(postgresService.executeQuery(anyString())).thenReturn(Future.succeededFuture());
+//    when(postgresService.executePreparedQuery(anyString(), any())).thenReturn(Future.succeededFuture());
+//    when(postgresService.executeTransaction(anyList())).thenReturn(Future.succeededFuture());
     testContext.completeNow();
   }
 
@@ -124,20 +95,7 @@ public class ConsumerServiceTest {
   @MethodSource("queryParams")
   @DisplayName("Test list Resources - Success ")
   public void testListResourcesSuccess(JsonObject requestParams, VertxTestContext testContext) {
-
-    when(asyncResult.succeeded()).thenReturn(true);
-    doAnswer(
-            new Answer<AsyncResult<JsonObject>>() {
-              @Override
-              public AsyncResult<JsonObject> answer(InvocationOnMock invocationOnMock)
-                  throws Throwable {
-                ((Handler<AsyncResult<JsonObject>>) invocationOnMock.getArgument(2))
-                    .handle(asyncResult);
-                return null;
-              }
-            })
-        .when(postgresService)
-        .executePreparedQuery(anyString(), any());
+    when(postgresService.executePreparedQuery(anyString(), any())).thenReturn(Future.succeededFuture());
 
     consumerService.listResources(
         consumer,
@@ -156,19 +114,7 @@ public class ConsumerServiceTest {
   @DisplayName("Test list Resources - Failed")
   public void testListResourceFailed(VertxTestContext testContext) {
     request.put(PROVIDER_ID, "iid");
-    when(asyncResult.succeeded()).thenReturn(false);
-    doAnswer(
-            new Answer<AsyncResult<JsonObject>>() {
-              @Override
-              public AsyncResult<JsonObject> answer(InvocationOnMock invocationOnMock)
-                  throws Throwable {
-                ((Handler<AsyncResult<JsonObject>>) invocationOnMock.getArgument(2))
-                    .handle(asyncResult);
-                return null;
-              }
-            })
-        .when(postgresService)
-        .executePreparedQuery(anyString(), any());
+    when(postgresService.executePreparedQuery(anyString(),any())).thenReturn(Future.failedFuture(failureMessage));
 
     consumerService.listResources(
         consumer,
@@ -188,19 +134,7 @@ public class ConsumerServiceTest {
   @DisplayName("Test list Providers - Success ")
   public void testListProviders(JsonObject requestParams, VertxTestContext testContext) {
 
-    when(asyncResult.succeeded()).thenReturn(true);
-    doAnswer(
-            new Answer<AsyncResult<JsonObject>>() {
-              @Override
-              public AsyncResult<JsonObject> answer(InvocationOnMock invocationOnMock)
-                  throws Throwable {
-                ((Handler<AsyncResult<JsonObject>>) invocationOnMock.getArgument(2))
-                    .handle(asyncResult);
-                return null;
-              }
-            })
-        .when(postgresService)
-        .executePreparedQuery(anyString(), any());
+    when(postgresService.executePreparedQuery(anyString(),any())).thenReturn(Future.succeededFuture(jsonMock));
 
     consumerService.listProviders(
         consumer,
@@ -218,21 +152,8 @@ public class ConsumerServiceTest {
   @Test
   @DisplayName("Test list Providers - Failed")
   public void testListProvidersFailed2(VertxTestContext testContext) {
-
-    when(asyncResult.succeeded()).thenReturn(false);
     consumerService = new ConsumerServiceImpl(config, postgresService, razorPayService, util);
-    doAnswer(
-            new Answer<AsyncResult<JsonObject>>() {
-              @Override
-              public AsyncResult<JsonObject> answer(InvocationOnMock invocationOnMock)
-                  throws Throwable {
-                ((Handler<AsyncResult<JsonObject>>) invocationOnMock.getArgument(2))
-                    .handle(asyncResult);
-                return null;
-              }
-            })
-        .when(postgresService)
-        .executePreparedQuery(anyString(), any());
+    when(postgresService.executePreparedQuery(anyString(),any())).thenReturn(Future.failedFuture("Failure from DB"));
 
     consumerService.listProviders(
         consumer,
@@ -253,19 +174,7 @@ public class ConsumerServiceTest {
   public void testListProducts(JsonObject requestParams, VertxTestContext testContext) {
 
     tableArray.add("table name");
-    when(asyncResult.succeeded()).thenReturn(true);
-    doAnswer(
-            new Answer<AsyncResult<JsonObject>>() {
-              @Override
-              public AsyncResult<JsonObject> answer(InvocationOnMock invocationOnMock)
-                  throws Throwable {
-                ((Handler<AsyncResult<JsonObject>>) invocationOnMock.getArgument(2))
-                    .handle(asyncResult);
-                return null;
-              }
-            })
-        .when(postgresService)
-        .executePreparedQuery(anyString(), any());
+    when(postgresService.executePreparedQuery(anyString(),any())).thenReturn(Future.succeededFuture(jsonMock));
 
     consumerService.listProducts(
         consumer,
@@ -286,19 +195,7 @@ public class ConsumerServiceTest {
 
     tableArray.add("table name");
     request.put(RESOURCE_ID, "did");
-    when(asyncResult.succeeded()).thenReturn(false);
-    doAnswer(
-            new Answer<AsyncResult<JsonObject>>() {
-              @Override
-              public AsyncResult<JsonObject> answer(InvocationOnMock invocationOnMock)
-                  throws Throwable {
-                ((Handler<AsyncResult<JsonObject>>) invocationOnMock.getArgument(2))
-                    .handle(asyncResult);
-                return null;
-              }
-            })
-        .when(postgresService)
-        .executePreparedQuery(anyString(), any());
+    when(postgresService.executePreparedQuery(anyString(), any())).thenReturn(Future.failedFuture(failureMessage));
 
     consumerService.listProducts(
         consumer,
@@ -319,20 +216,8 @@ public class ConsumerServiceTest {
 
     tableArray.add("table name");
     request.put(PROVIDER_ID, "pid");
-    when(asyncResult.succeeded()).thenReturn(true);
     consumerService = new ConsumerServiceImpl(config, postgresService, razorPayService, util);
-    doAnswer(
-            new Answer<AsyncResult<JsonObject>>() {
-              @Override
-              public AsyncResult<JsonObject> answer(InvocationOnMock invocationOnMock)
-                  throws Throwable {
-                ((Handler<AsyncResult<JsonObject>>) invocationOnMock.getArgument(2))
-                    .handle(asyncResult);
-                return null;
-              }
-            })
-        .when(postgresService)
-        .executePreparedQuery(anyString(), any());
+    when(postgresService.executePreparedQuery(anyString(), any())).thenReturn(Future.succeededFuture(request));
 
     consumerService.listProducts(
         consumer,
@@ -495,8 +380,8 @@ public class ConsumerServiceTest {
     when(consumer.getEmailId()).thenReturn("dummyConsumerEmailId");
     when(consumer.getFirstName()).thenReturn("dummyConsumerFirstName");
     when(consumer.getLastName()).thenReturn("dummyConsumerLastName");
-    when(asyncResult.succeeded()).thenReturn(true);
-    when(asyncResult.result()).thenReturn(request);
+    when(postgresService.executeQuery(anyString())).thenReturn(Future.succeededFuture(request));
+
     consumerService.listPurchase(
         consumer,
         request).onComplete(
@@ -587,8 +472,7 @@ public class ConsumerServiceTest {
 
         when(consumer.getResourceServerUrl()).thenReturn("dummyRsUrl");
         when(consumer.getUserId()).thenReturn("someUserId");
-        when(asyncResult.succeeded()).thenReturn(true);
-        when(asyncResult.result()).thenReturn(request);
+      when(postgresService.executeQuery(anyString())).thenReturn(Future.succeededFuture(request));
     consumerService.listPurchase(
         consumer,
         request).onComplete(
@@ -617,8 +501,9 @@ public class ConsumerServiceTest {
 
         when(consumer.getResourceServerUrl()).thenReturn("dummyRsUrl");
         when(consumer.getUserId()).thenReturn("someUserId");
-        when(asyncResult.succeeded()).thenReturn(false);
-    consumerService.listPurchase(
+      when(postgresService.executeQuery(anyString())).thenReturn(Future.failedFuture(failureMessage));
+
+      consumerService.listPurchase(
         consumer,
         request).onComplete(
         handler -> {
@@ -677,8 +562,7 @@ public class ConsumerServiceTest {
 
     JsonArray jsonArray = new JsonArray().add("abcd");
     request.put("productId", "someDummyProductId").put("resourceServerUrl", "abcd");
-    when(asyncResult.succeeded()).thenReturn(true);
-    when(asyncResult.result()).thenReturn(jsonMock);
+    when(postgresService.executePreparedQuery(anyString(),any())).thenReturn(Future.succeededFuture(jsonMock));
     when(jsonMock.getJsonArray(anyString())).thenReturn(jsonArray);
 
     consumerService.listProductVariants(
@@ -706,8 +590,7 @@ public class ConsumerServiceTest {
 
     JsonArray jsonArray = new JsonArray();
     request.put("productId", "someDummyProductId").put("resourceServerUrl", "abcd");
-    when(asyncResult.succeeded()).thenReturn(true);
-    when(asyncResult.result()).thenReturn(jsonMock);
+    when(postgresService.executePreparedQuery(anyString(), any())).thenReturn(Future.succeededFuture(jsonMock));
     when(jsonMock.getJsonArray(anyString())).thenReturn(jsonArray);
     consumerService.listProductVariants(
         consumer,
@@ -738,9 +621,7 @@ public class ConsumerServiceTest {
 
         JsonArray jsonArray = new JsonArray();
         request.put("productId", "someDummyProductId").put("resourceServerUrl", "abcd");
-        when(asyncResult.succeeded()).thenReturn(false);
-        when(asyncResult.cause()).thenReturn(throwable);
-        when(throwable.getMessage()).thenReturn(failureMessage);
+      when(postgresService.executePreparedQuery(anyString(),any())).thenReturn(Future.failedFuture(failureMessage));
 
         consumerService.listProductVariants(consumer,request).onComplete(
                 handler -> {
@@ -766,8 +647,7 @@ public class ConsumerServiceTest {
   @DisplayName("Test generate order entry method : Success")
   public void testGenerateOrderEntry(VertxTestContext vertxTestContext) {
 
-    when(asyncResult.succeeded()).thenReturn(true);
-    when(asyncResult.result()).thenReturn(request);
+    when(postgresService.executeTransaction(anyList())).thenReturn(Future.succeededFuture(request));
     request.put(
         TRANSFERS,
         new JsonArray()
@@ -807,9 +687,7 @@ public class ConsumerServiceTest {
   @DisplayName("Test generate order entry method when query execution failed: Failure")
   public void testGenerateOrderEntryFailure(VertxTestContext vertxTestContext) {
 
-    when(asyncResult.succeeded()).thenReturn(false);
-    when(asyncResult.cause()).thenReturn(throwable);
-    when(throwable.getMessage()).thenReturn(failureMessage);
+    when(postgresService.executeTransaction(anyList())).thenReturn(Future.failedFuture(failureMessage));
     request.put(
         TRANSFERS,
         new JsonArray()
@@ -842,8 +720,7 @@ public class ConsumerServiceTest {
   public void testGetOrderRelatedInfoSuccess(VertxTestContext vertxTestContext) {
 
     JsonArray jsonArray = new JsonArray().add("some random value");
-    when(asyncResult.succeeded()).thenReturn(true);
-    when(asyncResult.result()).thenReturn(jsonMock);
+    when(postgresService.executePreparedQuery(anyString(),any())).thenReturn(Future.succeededFuture(jsonMock));
     when(jsonMock.getJsonArray(anyString())).thenReturn(jsonArray);
 
     consumerService
@@ -867,9 +744,8 @@ public class ConsumerServiceTest {
   public void testGetOrderRelatedInfoWithEmptyResponse(VertxTestContext vertxTestContext) {
 
     JsonArray jsonArray = new JsonArray();
-    when(asyncResult.succeeded()).thenReturn(true);
-    when(asyncResult.result()).thenReturn(jsonMock);
     when(jsonMock.getJsonArray(anyString())).thenReturn(jsonArray);
+    when(postgresService.executePreparedQuery(anyString(), any())).thenReturn(Future.succeededFuture(jsonMock));
 
     consumerService
         .getOrderRelatedInfo("somePvId")
@@ -895,9 +771,7 @@ public class ConsumerServiceTest {
   @Test
   @DisplayName("Test getOrderRelatedInfo method failure in DB execution: Failure")
   public void testGetOrderRelatedInfoFailure(VertxTestContext vertxTestContext) {
-    when(asyncResult.succeeded()).thenReturn(false);
-    when(asyncResult.cause()).thenReturn(throwable);
-    when(throwable.getMessage()).thenReturn(failureMessage);
+    when(postgresService.executePreparedQuery(anyString(), any())).thenReturn(Future.failedFuture(failureMessage));
 
     consumerService
         .getOrderRelatedInfo("somePvId")

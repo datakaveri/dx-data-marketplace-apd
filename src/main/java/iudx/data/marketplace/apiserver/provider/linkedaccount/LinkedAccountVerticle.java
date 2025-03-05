@@ -1,14 +1,15 @@
 package iudx.data.marketplace.apiserver.provider.linkedaccount;
 
+import iudx.data.marketplace.apiserver.provider.linkedaccount.service.*;
 import static iudx.data.marketplace.common.Constants.*;
 
 import io.vertx.core.AbstractVerticle;
 import io.vertx.core.Promise;
 import io.vertx.serviceproxy.ServiceBinder;
-import iudx.data.marketplace.auditing.AuditingService;
+import iudx.data.marketplace.auditing.service.AuditingService;
 import iudx.data.marketplace.common.Api;
-import iudx.data.marketplace.postgres.PostgresService;
-import iudx.data.marketplace.razorpay.RazorPayService;
+import iudx.data.marketplace.postgres.service.PostgresService;
+import iudx.data.marketplace.razorpay.service.RazorPayService;
 
 public class LinkedAccountVerticle extends AbstractVerticle {
   //  private static final Logger LOGGER = LogManager.getLogger(LinkedAccountVerticle.class);

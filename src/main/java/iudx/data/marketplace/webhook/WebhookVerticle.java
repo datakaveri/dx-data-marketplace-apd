@@ -5,8 +5,10 @@ import static iudx.data.marketplace.product.util.Constants.TABLES;
 
 import io.vertx.core.AbstractVerticle;
 import io.vertx.serviceproxy.ServiceBinder;
-import iudx.data.marketplace.policies.PolicyService;
-import iudx.data.marketplace.postgres.PostgresService;
+import iudx.data.marketplace.policies.service.PolicyService;
+import iudx.data.marketplace.postgres.service.PostgresService;
+import iudx.data.marketplace.webhook.service.WebhookService;
+import iudx.data.marketplace.webhook.service.WebhookServiceImpl;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 

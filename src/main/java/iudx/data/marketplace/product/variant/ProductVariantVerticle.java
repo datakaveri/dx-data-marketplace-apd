@@ -8,7 +8,9 @@ import io.vertx.core.eventbus.MessageConsumer;
 import io.vertx.core.json.JsonObject;
 import io.vertx.serviceproxy.ServiceBinder;
 import iudx.data.marketplace.common.Util;
-import iudx.data.marketplace.postgres.PostgresService;
+import iudx.data.marketplace.postgres.service.PostgresService;
+import iudx.data.marketplace.product.variantService.ProductVariantService;
+import iudx.data.marketplace.product.variantService.ProductVariantServiceImpl;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 

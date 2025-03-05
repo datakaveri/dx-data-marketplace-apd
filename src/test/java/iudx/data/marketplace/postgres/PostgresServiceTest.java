@@ -8,6 +8,7 @@ import io.vertx.pgclient.PgConnectOptions;
 import io.vertx.pgclient.PgPool;
 import io.vertx.sqlclient.PoolOptions;
 import iudx.data.marketplace.configuration.Configuration;
+import iudx.data.marketplace.postgres.service.PostgresServiceImpl;
 import iudx.data.marketplace.product.util.Constants;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;

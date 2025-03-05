@@ -10,7 +10,7 @@ import io.vertx.core.json.JsonObject;
 import io.vertx.ext.web.client.HttpResponse;
 import io.vertx.ext.web.client.WebClient;
 import iudx.data.marketplace.authenticator.model.UserInfo;
-import iudx.data.marketplace.policies.User;
+import iudx.data.marketplace.policies.service.model.User;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 

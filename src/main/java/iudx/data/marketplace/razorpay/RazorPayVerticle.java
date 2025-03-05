@@ -2,8 +2,8 @@ package iudx.data.marketplace.razorpay;
 
 import static iudx.data.marketplace.common.Constants.POSTGRES_SERVICE_ADDRESS;
 import static iudx.data.marketplace.common.Constants.RAZORPAY_SERVICE_ADDRESS;
-import static iudx.data.marketplace.razorpay.Constants.RAZORPAY_KEY;
-import static iudx.data.marketplace.razorpay.Constants.RAZORPAY_SECRET;
+import static iudx.data.marketplace.razorpay.util.Constants.RAZORPAY_KEY;
+import static iudx.data.marketplace.razorpay.util.Constants.RAZORPAY_SECRET;
 
 import com.razorpay.RazorpayClient;
 import com.razorpay.RazorpayException;
@@ -11,7 +11,9 @@ import io.vertx.core.AbstractVerticle;
 import io.vertx.core.eventbus.MessageConsumer;
 import io.vertx.core.json.JsonObject;
 import io.vertx.serviceproxy.ServiceBinder;
-import iudx.data.marketplace.postgres.PostgresService;
+import iudx.data.marketplace.postgres.service.PostgresService;
+import iudx.data.marketplace.razorpay.service.RazorPayService;
+import iudx.data.marketplace.razorpay.service.RazorPayServiceImpl;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 

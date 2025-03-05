@@ -2,7 +2,7 @@ package iudx.data.marketplace.common;
 
 import io.vertx.core.json.JsonObject;
 import iudx.data.marketplace.apiserver.util.Role;
-import iudx.data.marketplace.policies.User;
+import iudx.data.marketplace.policies.service.model.User;
 import java.util.List;
 
 public class Util {

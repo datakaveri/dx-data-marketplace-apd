@@ -2,11 +2,11 @@ package iudx.data.marketplace.authenticator;
 
 import io.vertx.core.buffer.Buffer;
 import iudx.data.marketplace.aaaService.AuthClient;
-import iudx.data.marketplace.authenticator.handlers.AuthHandler;
 import iudx.data.marketplace.apiserver.util.Role;
+import iudx.data.marketplace.authenticator.handlers.authentication.AuthHandler;
 import iudx.data.marketplace.authenticator.model.UserInfo;
 import iudx.data.marketplace.common.Api;
-import iudx.data.marketplace.policies.User;
+import iudx.data.marketplace.policies.service.model.User;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.junit.jupiter.api.Disabled;
