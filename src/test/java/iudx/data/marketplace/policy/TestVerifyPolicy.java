@@ -91,7 +91,7 @@ public class TestVerifyPolicy {
               }
             })
         .when(postgresService)
-        .executePreparedQuery(anyString(), any(), any());
+        .executePreparedQuery(anyString(), any());
     vertxTestContext.completeNow();
   }
 

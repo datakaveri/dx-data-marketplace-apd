@@ -5,6 +5,7 @@ import io.vertx.codegen.annotations.GenIgnore;
 import io.vertx.codegen.annotations.ProxyGen;
 import io.vertx.codegen.annotations.VertxGen;
 import io.vertx.core.AsyncResult;
+import io.vertx.core.Future;
 import io.vertx.core.Handler;
 import io.vertx.core.Vertx;
 import io.vertx.core.json.JsonObject;
@@ -31,36 +32,30 @@ public interface ProductVariantService {
    * marketplace.
    *
    * @param request which is a JsonObject
-   * @param handler which is a Request Handler
-   * @return ProductVariantService which is a service
+   * @return Future of json object
    */
-  @Fluent
-  ProductVariantService createProductVariant(
-      User user, JsonObject request, Handler<AsyncResult<JsonObject>> handler);
+  Future<JsonObject> createProductVariant(
+      User user, JsonObject request);
 
   /**
    * The updateProductVariant method implements the update of a product variant on the IUDX data
    * marketplace.
    *
    * @param request which is a JsonObject
-   * @param handler which is a Request Handler
-   * @return ProductVariantService which is a service
+   * @return Future of json object
    */
-  @Fluent
-  ProductVariantService updateProductVariant(
-      User user, JsonObject request, Handler<AsyncResult<JsonObject>> handler);
+  Future<JsonObject> updateProductVariant(
+      User user, JsonObject request);
 
   /**
    * The deleteProductVariant method implements the soft delete of a product variant on the IUDX
    * data marketplace.
    *
    * @param request which is a JsonObject
-   * @param handler which is a Request Handler
-   * @return ProductVariantService which is a service
+   * @return Future of json object
    */
-  @Fluent
-  ProductVariantService deleteProductVariant(
-      User user, JsonObject request, Handler<AsyncResult<JsonObject>> handler);
+  Future<JsonObject> deleteProductVariant(
+      User user, JsonObject request);
 
   /**
    * The listProductVariant method implements the fetch of product variant(s) on the IUDX data
@@ -68,12 +63,10 @@ public interface ProductVariantService {
    *
    * @param user which is the calling user Object
    * @param request which is a JsonObject
-   * @param handler which is a Request Handler
-   * @return ProductVariantService which is a service
+   * @return Future of json object
    */
-  @Fluent
-  ProductVariantService listProductVariants(
-      User user, JsonObject request, Handler<AsyncResult<JsonObject>> handler);
+  Future<JsonObject> listProductVariants(
+      User user, JsonObject request);
 
   /**
    * List purchase will fetch invoice related info, provider, consumer and product variant related
@@ -83,10 +76,8 @@ public interface ProductVariantService {
    *
    * @param user Provider user
    * @param request query param if any
-   * @param handler Asynchronous JsonObject handler that contains the list of purchases
-   * @return ProductVariantService which is a service
+   * @return Future of json object that contains the list of purchases
    */
-  @Fluent
-  ProductVariantService listPurchase(
-      User user, JsonObject request, Handler<AsyncResult<JsonObject>> handler);
+  Future<JsonObject> listPurchase(
+      User user, JsonObject request);
 }

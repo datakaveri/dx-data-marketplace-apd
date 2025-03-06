@@ -5,6 +5,7 @@ import io.vertx.codegen.annotations.GenIgnore;
 import io.vertx.codegen.annotations.ProxyGen;
 import io.vertx.codegen.annotations.VertxGen;
 import io.vertx.core.AsyncResult;
+import io.vertx.core.Future;
 import io.vertx.core.Handler;
 import io.vertx.core.Vertx;
 import io.vertx.core.json.JsonObject;
@@ -43,21 +44,17 @@ public interface PostgresService {
    * The executeQuery implements single query operations with the database.
    *
    * @param query which is a String
-   * @param handler which is a Request Handler
-   * @return PostgresService which is a service
+   * @return Future json object to return the response from postgres
    */
-  @Fluent
-  PostgresService executeQuery(final String query, Handler<AsyncResult<JsonObject>> handler);
+  Future<JsonObject> executeQuery(final String query);
 
   /**
    * The executeCountQuery implements a count of records operation on the database.
    *
    * @param query which is a String
-   * @param handler which is a Request Handler
-   * @return PostgresService which is a service
+   * @return Future json object to return the response from postgres
    */
-  @Fluent
-  PostgresService executeCountQuery(final String query, Handler<AsyncResult<JsonObject>> handler);
+  Future<JsonObject> executeCountQuery(final String query);
 
   /**
    * The executePreparedQuery implements a single query operation with configurable queryParams on
@@ -65,26 +62,24 @@ public interface PostgresService {
    *
    * @param query which is a String
    * @param queryparams which is a JsonObject
-   * @param handler which is a Request Handler
-   * @return PostgresService which is a service
+]   * @return Future json object to return the response from postgres
    */
-  @Fluent
-  PostgresService executePreparedQuery(
-      final String query, final JsonObject queryparams, Handler<AsyncResult<JsonObject>> handler);
+
+  Future<JsonObject> executePreparedQuery(
+      final String query, final JsonObject queryparams);
 
   /**
    * The executeTransaction implements a transaction operation(with multiple queries) on the
    * database.
    *
    * @param queries which is a List of String
-   * @param handler which is a Request Handler
-   * @return PostgresService which ia a service
+]   * @return Future json object to return the response from postgres
    */
-  @Fluent
-  PostgresService executeTransaction(
-      final List<String> queries, Handler<AsyncResult<JsonObject>> handler);
 
-  @Fluent
-  PostgresService checkPolicy(
-      final String query, final JsonObject param, Handler<AsyncResult<JsonObject>> handler);
+  Future<JsonObject> executeTransaction(
+      final List<String> queries);
+
+
+  Future<JsonObject> checkPolicy(
+      final String query, final JsonObject param);
 }

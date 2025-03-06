@@ -34,7 +34,7 @@ public class FetchPolicyUsingPvId {
     LOG.info("checking if product variant : {} exists", productVariantId);
 
     postgresService.executeQuery(
-        fetchProductVariantQuery,
+        fetchProductVariantQuery).onComplete(
         pvExistenceHandler -> {
           if (pvExistenceHandler.succeeded()) {
             /* check if result is empty */
@@ -71,7 +71,7 @@ public class FetchPolicyUsingPvId {
                 LOG.info("Checking if policy is existing...");
                 postgresService.checkPolicy(
                     FETCH_POLICY,
-                    params,
+                    params).onComplete(
                     policyExistenceQuery -> {
                       if (policyExistenceQuery.succeeded()) {
                         promise.complete(policyExistenceQuery.result());

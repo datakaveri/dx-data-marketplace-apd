@@ -1,4 +1,4 @@
-package iudx.data.marketplace.apiserver.handlers;
+package iudx.data.marketplace.authenticator.handlers;
 
 import io.vertx.core.Handler;
 import io.vertx.core.MultiMap;
@@ -30,9 +30,10 @@ public class ValidationHandler implements Handler<RoutingContext> {
     MultiMap parameters = context.request().params();
     JsonObject body = context.body().asJsonObject();
     Map<String, String> pathParams = context.pathParams();
+    MultiMap headerParams = context.request().headers();
     parameters.addAll(pathParams);
 
-    List<Validator> validations = validationFactory.build(requestType, parameters, body);
+    List<Validator> validations = validationFactory.build(requestType, parameters, body,headerParams);
     for (Validator validator : Optional.ofNullable(validations).orElse(Collections.emptyList())) {
       LOGGER.debug("validator : " + validator.getClass().getName());
       validator.isValid();

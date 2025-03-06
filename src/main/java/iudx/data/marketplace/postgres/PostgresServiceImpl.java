@@ -71,8 +71,9 @@ public class PostgresServiceImpl implements PostgresService {
   }
 
   @Override
-  public PostgresService executeQuery(
-      final String query, Handler<AsyncResult<JsonObject>> handler) {
+  public Future<JsonObject> executeQuery(
+      final String query) {
+    Promise<JsonObject> promise = Promise.promise();
 
     Collector<Row, ?, List<JsonObject>> rowCollector =
         Collectors.mapping(row -> row.toJson(), Collectors.toList());
@@ -90,7 +91,7 @@ public class PostgresServiceImpl implements PostgresService {
                       .withTitle(ResponseUrn.SUCCESS_URN.getMessage())
                       .withResult(result)
                       .getJsonResponse();
-              handler.handle(Future.succeededFuture(responseJson));
+              promise.complete(responseJson);
             })
         .onFailure(
             failureHandler -> {
@@ -101,13 +102,14 @@ public class PostgresServiceImpl implements PostgresService {
                       .withTitle(ResponseUrn.DB_ERROR_URN.getMessage())
                       .withDetail(failureHandler.getLocalizedMessage())
                       .getResponse();
-              handler.handle(Future.failedFuture(response));
+              promise.fail(response);
             });
-    return this;
+    return promise.future();
   }
 
-  public PostgresService executeCountQuery(
-      final String query, Handler<AsyncResult<JsonObject>> handler) {
+  public Future<JsonObject> executeCountQuery(
+      final String query) {
+    Promise<JsonObject> promise = Promise.promise();
 
     client
         .withConnection(
@@ -115,7 +117,7 @@ public class PostgresServiceImpl implements PostgresService {
                 connection.query(query).execute().map(rows -> rows.iterator().next().getInteger(0)))
         .onSuccess(
             count -> {
-              handler.handle(Future.succeededFuture(new JsonObject().put("totalHits", count)));
+              promise.complete(new JsonObject().put("totalHits", count));
             })
         .onFailure(
             failureHandler -> {
@@ -126,14 +128,15 @@ public class PostgresServiceImpl implements PostgresService {
                       .withTitle(ResponseUrn.DB_ERROR_URN.getMessage())
                       .withDetail(failureHandler.getLocalizedMessage())
                       .getResponse();
-              handler.handle(Future.failedFuture(response));
+              promise.fail(response);
             });
-    return this;
+    return promise.future();
   }
 
   @Override
-  public PostgresService executeTransaction(
-      final List<String> queries, Handler<AsyncResult<JsonObject>> handler) {
+  public Future<JsonObject> executeTransaction(
+      final List<String> queries) {
+    Promise<JsonObject> promise = Promise.promise();
 
     client
         .withTransaction(
@@ -150,7 +153,7 @@ public class PostgresServiceImpl implements PostgresService {
                         .withType(ResponseUrn.SUCCESS_URN.getUrn())
                         .withTitle(ResponseUrn.SUCCESS_URN.getMessage())
                         .getJsonResponse();
-                handler.handle(Future.succeededFuture(responseJson));
+                promise.complete(responseJson);
               } else {
                 LOGGER.debug("transaction failed");
                 LOGGER.debug("Failure : {}", completeHandler.cause().getMessage());
@@ -160,19 +163,19 @@ public class PostgresServiceImpl implements PostgresService {
                         .withTitle(ResponseUrn.DB_ERROR_URN.getMessage())
                         .withDetail(completeHandler.cause().getMessage())
                         .getResponse();
-                handler.handle(Future.failedFuture(response));
+                promise.fail(response);
               }
             });
-    return this;
+    return promise.future();
   }
 
   // TODO : prepared query works only for String parameters, due to service proxy restriction with
   // allowed type as arguments. needs to work with TupleBuilder class which will parse other types
   // like date appropriately to match with postgres types
   @Override
-  public PostgresService executePreparedQuery(
-      final String query, final JsonObject queryParams, Handler<AsyncResult<JsonObject>> handler) {
-
+  public Future<JsonObject> executePreparedQuery(
+      final String query, final JsonObject queryParams) {
+    Promise<JsonObject> promise = Promise.promise();
     List<Object> params = new ArrayList<Object>(queryParams.getMap().values());
 
     Tuple tuple = Tuple.from(params);
@@ -197,7 +200,7 @@ public class PostgresServiceImpl implements PostgresService {
                       .withTitle(ResponseUrn.SUCCESS_URN.getMessage())
                       .withResult(response)
                       .getJsonResponse();
-              handler.handle(Future.succeededFuture(responseJson));
+              promise.complete(responseJson);
             })
         .onFailure(
             failureHandler -> {
@@ -208,15 +211,16 @@ public class PostgresServiceImpl implements PostgresService {
                       .withTitle(ResponseUrn.DB_ERROR_URN.getMessage())
                       .withDetail(failureHandler.getLocalizedMessage())
                       .getResponse();
-              handler.handle(Future.failedFuture(response));
+              promise.fail(response);
             });
-    return this;
+    return promise.future();
   }
 
   @Override
-  public PostgresService checkPolicy(
-      final String query, final JsonObject queryParams, Handler<AsyncResult<JsonObject>> handler) {
+  public Future<JsonObject> checkPolicy(
+      final String query, final JsonObject queryParams) {
 
+    Promise<JsonObject> promise = Promise.promise();
     JsonArray resourceIds = queryParams.getJsonArray("$1");
     String consumerEmailId = queryParams.getString("$2");
 
@@ -250,9 +254,8 @@ public class PostgresServiceImpl implements PostgresService {
                                 .withType(HttpStatusCode.NO_CONTENT.getValue())
                                 .withTitle(HttpStatusCode.NO_CONTENT.getUrn())
                                 .getJsonResponse());
-                handler.handle(
-                    Future.succeededFuture(
-                        response.put(STATUS_CODE, HttpStatusCode.NO_CONTENT.getValue())));
+                promise.complete(
+                        response.put(STATUS_CODE, HttpStatusCode.NO_CONTENT.getValue()));
 
               } else {
                 List<String> resourceId =
@@ -275,7 +278,7 @@ public class PostgresServiceImpl implements PostgresService {
                                         + " from the product variant")
                                 .getJsonResponse())
                         .put(STATUS_CODE, HttpStatusCode.SUCCESS.getValue());
-                handler.handle(Future.succeededFuture(responseJson));
+                promise.complete(responseJson);
               }
             })
         .onFailure(
@@ -287,8 +290,8 @@ public class PostgresServiceImpl implements PostgresService {
                       .withTitle(ResponseUrn.DB_ERROR_URN.getUrn())
                       .withDetail(ResponseUrn.INTERNAL_SERVER_ERR_URN.getMessage())
                       .getResponse();
-              handler.handle(Future.failedFuture(response));
+              promise.fail(response);
             });
-    return this;
+    return promise.future();
   }
 }

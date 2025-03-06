@@ -6,6 +6,7 @@ import static iudx.data.marketplace.common.Constants.AUTH_INFO;
 import static iudx.data.marketplace.common.Constants.CONSUMER_SERVICE_ADDRESS;
 import static iudx.data.marketplace.common.HttpStatusCode.BAD_REQUEST;
 
+import io.vertx.core.Handler;
 import io.vertx.core.MultiMap;
 import io.vertx.core.Vertx;
 import io.vertx.core.http.HttpServerRequest;
@@ -14,12 +15,16 @@ import io.vertx.core.json.DecodeException;
 import io.vertx.core.json.JsonObject;
 import io.vertx.ext.web.Router;
 import io.vertx.ext.web.RoutingContext;
-import iudx.data.marketplace.apiserver.handlers.AuthHandler;
-import iudx.data.marketplace.apiserver.handlers.ExceptionHandler;
-import iudx.data.marketplace.apiserver.handlers.ValidationHandler;
 import iudx.data.marketplace.apiserver.util.RequestType;
-import iudx.data.marketplace.authenticator.AuthClient;
+import iudx.data.marketplace.aaaService.AuthClient;
 import iudx.data.marketplace.authenticator.AuthenticationService;
+import iudx.data.marketplace.authenticator.handlers.*;
+import iudx.data.marketplace.authenticator.handlers.authentication.AuthHandler;
+import iudx.data.marketplace.authenticator.handlers.authentication.TokenIntrospectHandler;
+import iudx.data.marketplace.authenticator.handlers.authorization.AuthorizationHandler;
+import iudx.data.marketplace.authenticator.handlers.authorization.UserInfoFromAuthHandler;
+import iudx.data.marketplace.authenticator.model.DxRole;
+import iudx.data.marketplace.authenticator.model.UserInfo;
 import iudx.data.marketplace.common.Api;
 import iudx.data.marketplace.common.HttpStatusCode;
 import iudx.data.marketplace.common.ResponseUrn;
@@ -41,6 +46,10 @@ public class ConsumerApis {
   private PostgresService postgresService;
   private AuthClient authClient;
   private AuthenticationService authenticationService;
+  private UserInfoFromAuthHandler userInfoFromAuthHandler;
+  private UserInfo userInfo;
+  private AuthHandler authHandler;
+  private AuthorizationHandler authorizationHandler;
 
   ConsumerApis(
       Vertx vertx,
@@ -62,27 +71,43 @@ public class ConsumerApis {
     ValidationHandler resourceValidationHandler = new ValidationHandler(RequestType.RESOURCE);
     ValidationHandler providerValidationHandler = new ValidationHandler(RequestType.PROVIDER);
     ExceptionHandler exceptionHandler = new ExceptionHandler();
+    authorizationHandler = new AuthorizationHandler();
+
+    userInfo = new UserInfo();
+    userInfoFromAuthHandler = new UserInfoFromAuthHandler(authClient, userInfo, postgresService);
+    authHandler = new AuthHandler(authenticationService);
 
     consumerService = ConsumerService.createProxy(vertx, CONSUMER_SERVICE_ADDRESS);
+    Handler<RoutingContext> consumerApiAccessHandler = authorizationHandler.setUserRolesForEndpoint(DxRole.CONSUMER, DxRole.DELEGATE);
+    Handler<RoutingContext> tokenIntrospectHandler = new TokenIntrospectHandler().validateToken();
 
     router
         .get(api.getConsumerListProviders())
         .handler(providerValidationHandler)
-        .handler(AuthHandler.create(authenticationService, api, postgresService, authClient))
+        .handler(authHandler)
+        .handler(tokenIntrospectHandler)
+        .handler(consumerApiAccessHandler)
+        .handler(userInfoFromAuthHandler)
         .handler(this::listProviders)
         .failureHandler(exceptionHandler);
 
     router
         .get(api.getConsumerListResourcePath())
         .handler(resourceValidationHandler)
-        .handler(AuthHandler.create(authenticationService, api, postgresService, authClient))
+        .handler(authHandler)
+        .handler(tokenIntrospectHandler)
+        .handler(consumerApiAccessHandler)
+        .handler(userInfoFromAuthHandler)
         .handler(this::listResources)
         .failureHandler(exceptionHandler);
 
     router
         .get(api.getConsumerListProducts())
         .handler(resourceValidationHandler)
-        .handler(AuthHandler.create(authenticationService, api, postgresService, authClient))
+        .handler(authHandler)
+        .handler(tokenIntrospectHandler)
+        .handler(consumerApiAccessHandler)
+        .handler(userInfoFromAuthHandler)
         .handler(this::listProducts)
         .failureHandler(exceptionHandler);
 
@@ -91,7 +116,10 @@ public class ConsumerApis {
     router
         .get(api.getConsumerListPurchases())
         .handler(purchaseValidationHandler)
-        .handler(AuthHandler.create(authenticationService, api, postgresService, authClient))
+        .handler(authHandler)
+        .handler(tokenIntrospectHandler)
+        .handler(consumerApiAccessHandler)
+        .handler(userInfoFromAuthHandler)
         .handler(this::listPurchases)
         .failureHandler(exceptionHandler);
 
@@ -100,7 +128,10 @@ public class ConsumerApis {
     router
         .get(api.getConsumerProductVariantPath())
         .handler(productVariantHandler)
-        .handler(AuthHandler.create(authenticationService, api, postgresService, authClient))
+        .handler(authHandler)
+        .handler(tokenIntrospectHandler)
+        .handler(consumerApiAccessHandler)
+        .handler(userInfoFromAuthHandler)
         .handler(this::listProductVariants)
         .failureHandler(exceptionHandler);
 
@@ -109,7 +140,10 @@ public class ConsumerApis {
     router
         .post(CONSUMER_PATH + ORDERS_PATH + "/:productVariantId")
         .handler(orderValidationHandler)
-        .handler(AuthHandler.create(authenticationService, api, postgresService, authClient))
+        .handler(authHandler)
+        .handler(tokenIntrospectHandler)
+        .handler(consumerApiAccessHandler)
+        .handler(userInfoFromAuthHandler)
         .handler(this::createOrder)
         .failureHandler(exceptionHandler);
     return this.router;
@@ -130,7 +164,7 @@ public class ConsumerApis {
 
     consumerService.createOrder(
         requestBody,
-        user,
+        user).onComplete(
         handler -> {
           if (handler.succeeded()) {
             handleSuccessResponse(routingContext, 201, handler.result());
@@ -153,7 +187,7 @@ public class ConsumerApis {
 
     consumerService.listProviders(
         consumer,
-        requestBody,
+        requestBody).onComplete(
         handler -> {
           if (handler.succeeded()) {
             if (handler.result().getJsonArray(RESULTS).isEmpty()) {
@@ -180,7 +214,7 @@ public class ConsumerApis {
 
     consumerService.listResources(
         consumer,
-        requestBody,
+        requestBody).onComplete(
         handler -> {
           if (handler.succeeded()) {
             if (handler.result().getJsonArray(RESULTS).isEmpty()) {
@@ -203,7 +237,7 @@ public class ConsumerApis {
 
     consumerService.listProductVariants(
         consumer,
-        requestJson,
+        requestJson).onComplete(
         handler -> {
           if (handler.succeeded()) {
             handleSuccessResponse(
@@ -227,7 +261,7 @@ public class ConsumerApis {
 
     consumerService.listProducts(
         consumer,
-        requestBody,
+        requestBody).onComplete(
         handler -> {
           if (handler.succeeded()) {
             if (handler.result().getJsonArray(RESULTS).isEmpty()) {
@@ -255,7 +289,7 @@ public class ConsumerApis {
 
     consumerService.listPurchase(
         consumer,
-        requestJson,
+        requestJson).onComplete(
         handler -> {
           if (handler.succeeded()) {
             handleSuccessResponse(

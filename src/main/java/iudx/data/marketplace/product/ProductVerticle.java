@@ -6,7 +6,7 @@ import io.vertx.core.AbstractVerticle;
 import io.vertx.core.eventbus.MessageConsumer;
 import io.vertx.core.json.JsonObject;
 import io.vertx.serviceproxy.ServiceBinder;
-import iudx.data.marketplace.common.CatalogueService;
+import iudx.data.marketplace.catalogueService.CatalogueService;
 import iudx.data.marketplace.postgres.PostgresService;
 import iudx.data.marketplace.razorpay.RazorPayService;
 import org.apache.logging.log4j.LogManager;

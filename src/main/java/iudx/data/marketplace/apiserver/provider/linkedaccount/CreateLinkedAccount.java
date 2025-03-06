@@ -223,7 +223,7 @@ public class CreateLinkedAccount {
     /* set status as "CREATED" */
     setStatus("CREATED");
     postgresService.executeQuery(
-        finalQuery,
+        finalQuery).onComplete(
         handler -> {
           if (handler.succeeded()) {
             LOGGER.info(

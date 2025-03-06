@@ -6,6 +6,7 @@ import static iudx.data.marketplace.common.Constants.*;
 import static iudx.data.marketplace.common.HttpStatusCode.BAD_REQUEST;
 
 import io.vertx.core.AbstractVerticle;
+import io.vertx.core.Handler;
 import io.vertx.core.http.*;
 import io.vertx.core.json.DecodeException;
 import io.vertx.core.json.JsonObject;
@@ -17,13 +18,17 @@ import io.vertx.ext.web.client.WebClientOptions;
 import io.vertx.ext.web.handler.BodyHandler;
 import io.vertx.ext.web.handler.CorsHandler;
 import io.vertx.ext.web.handler.TimeoutHandler;
-import iudx.data.marketplace.apiserver.handlers.AuthHandler;
-import iudx.data.marketplace.apiserver.handlers.ExceptionHandler;
-import iudx.data.marketplace.apiserver.handlers.ValidationHandler;
+import iudx.data.marketplace.aaaService.AuthClient;
 import iudx.data.marketplace.apiserver.provider.linkedaccount.LinkedAccountService;
 import iudx.data.marketplace.apiserver.util.RequestType;
-import iudx.data.marketplace.authenticator.AuthClient;
 import iudx.data.marketplace.authenticator.AuthenticationService;
+import iudx.data.marketplace.authenticator.handlers.*;
+import iudx.data.marketplace.authenticator.handlers.authentication.AuthHandler;
+import iudx.data.marketplace.authenticator.handlers.authentication.TokenIntrospectHandler;
+import iudx.data.marketplace.authenticator.handlers.authorization.AuthorizationHandler;
+import iudx.data.marketplace.authenticator.handlers.authorization.UserInfoFromAuthHandler;
+import iudx.data.marketplace.authenticator.model.DxRole;
+import iudx.data.marketplace.authenticator.model.UserInfo;
 import iudx.data.marketplace.common.*;
 import iudx.data.marketplace.policies.PolicyService;
 import iudx.data.marketplace.policies.User;
@@ -63,6 +68,9 @@ public class ApiServerVerticle extends AbstractVerticle {
   private AuthenticationService authenticationService;
   private LinkedAccountService linkedAccountService;
   private WebhookService webhookService;
+  private UserInfoFromAuthHandler userInfoFromAuthHandler;
+  private UserInfo userInfo;
+  private AuthHandler authHandler;
 
   /**
    * This method is used to start the Verticle. It deploys a verticle in a cluster, reads the
@@ -83,6 +91,7 @@ public class ApiServerVerticle extends AbstractVerticle {
     allowedHeaders.add(HEADER_ORIGIN);
     allowedHeaders.add(HEADER_REFERER);
     allowedHeaders.add(HEADER_ALLOW_ORIGIN);
+    allowedHeaders.add(HEADER_BEARER_AUTHORIZATION);
 
     Set<HttpMethod> allowedMethods = new HashSet<>();
     allowedMethods.add(HttpMethod.GET);
@@ -95,7 +104,6 @@ public class ApiServerVerticle extends AbstractVerticle {
     webClientOptions.setTrustAll(false).setVerifyHost(true).setSsl(true);
     webClient = WebClient.create(vertx, webClientOptions);
 
-
     /* Initialize service proxy */
     policyService = PolicyService.createProxy(vertx, POLICY_SERVICE_ADDRESS);
     postgresService = PostgresService.createProxy(vertx, POSTGRES_SERVICE_ADDRESS);
@@ -105,6 +113,9 @@ public class ApiServerVerticle extends AbstractVerticle {
     authenticationService = AuthenticationService.createProxy(vertx, AUTH_SERVICE_ADDRESS);
     linkedAccountService = LinkedAccountService.createProxy(vertx, LINKED_ACCOUNT_ADDRESS);
     webhookService = WebhookService.createProxy(vertx, WEBHOOK_SERVICE_ADDRESS);
+    userInfo = new UserInfo();
+    userInfoFromAuthHandler = new UserInfoFromAuthHandler(authClient, userInfo, postgresService);
+    authHandler = new AuthHandler(authenticationService);
     router = Router.router(vertx);
 
     router
@@ -174,6 +185,7 @@ public class ApiServerVerticle extends AbstractVerticle {
         .subRouter(
             new ConsumerApis(vertx, router, api, postgresService, authClient, authenticationService)
                 .init());
+    String audience = config().getString("audience");
 
     ExceptionHandler exceptionHandler = new ExceptionHandler();
     ValidationHandler checkPolicyValidationHandler =
@@ -181,10 +193,23 @@ public class ApiServerVerticle extends AbstractVerticle {
     ValidationHandler verifyValidationHandler = new ValidationHandler(RequestType.VERIFY);
     ValidationHandler postLinkedAccountHandler = new ValidationHandler(RequestType.POST_ACCOUNT);
     ValidationHandler putLinkedAccountHandler = new ValidationHandler(RequestType.PUT_ACCOUNT);
+    Handler<RoutingContext> apiAccessHandler =
+        new AuthorizationHandler()
+            .setUserRolesForEndpoint(DxRole.CONSUMER, DxRole.PROVIDER, DxRole.DELEGATE);
+    Handler<RoutingContext> consumerApiAccessHandler =
+        new AuthorizationHandler().setUserRolesForEndpoint(DxRole.CONSUMER, DxRole.DELEGATE);
+    Handler<RoutingContext> providerApiAccessHandler =
+        new AuthorizationHandler().setUserRolesForEndpoint(DxRole.PROVIDER, DxRole.DELEGATE);
+    Handler<RoutingContext> tokenIntrospectHandler = new TokenIntrospectHandler().validateToken();
+    Handler<RoutingContext> kcTokenIntrospectHandler =
+        new TokenIntrospectHandler().validateKeycloakToken(audience);
 
     router
         .get(api.getPoliciesUrl())
-        .handler(AuthHandler.create(authenticationService, api, postgresService, authClient))
+        .handler(authHandler)
+        .handler(tokenIntrospectHandler)
+        .handler(apiAccessHandler)
+        .handler(userInfoFromAuthHandler)
         .handler(this::getPoliciesHandler)
         .failureHandler(exceptionHandler);
 
@@ -196,7 +221,8 @@ public class ApiServerVerticle extends AbstractVerticle {
     router
         .post(api.getVerifyUrl())
         .handler(verifyValidationHandler)
-        .handler(AuthHandler.create(authenticationService, api, postgresService, authClient))
+        .handler(authHandler)
+        .handler(kcTokenIntrospectHandler)
         .handler(this::handleVerify)
         .failureHandler(exceptionHandler);
 
@@ -205,34 +231,49 @@ public class ApiServerVerticle extends AbstractVerticle {
     router
         .post(api.getVerifyPaymentApi())
         .handler(verifyPaymentValidationHandler)
-        .handler(AuthHandler.create(authenticationService, api, postgresService, authClient))
+        .handler(authHandler)
+        .handler(tokenIntrospectHandler)
+        .handler(consumerApiAccessHandler)
+        .handler(userInfoFromAuthHandler)
         .handler(this::handleVerifyPayment)
         .failureHandler(exceptionHandler);
 
     router
         .post(api.getLinkedAccountService())
         .handler(postLinkedAccountHandler)
-        .handler(AuthHandler.create(authenticationService, api, postgresService, authClient))
+        .handler(authHandler)
+        .handler(tokenIntrospectHandler)
+        .handler(providerApiAccessHandler)
+        .handler(userInfoFromAuthHandler)
         .handler(this::handlePostLinkedAccount)
         .failureHandler(exceptionHandler);
 
     router
         .put(api.getLinkedAccountService())
         .handler(putLinkedAccountHandler)
-        .handler(AuthHandler.create(authenticationService, api, postgresService, authClient))
+        .handler(authHandler)
+        .handler(tokenIntrospectHandler)
+        .handler(providerApiAccessHandler)
+        .handler(userInfoFromAuthHandler)
         .handler(this::handlePutLinkedAccount)
         .failureHandler(exceptionHandler);
 
     router
         .get(api.getLinkedAccountService())
-        .handler(AuthHandler.create(authenticationService, api, postgresService, authClient))
+        .handler(authHandler)
+        .handler(tokenIntrospectHandler)
+        .handler(providerApiAccessHandler)
+        .handler(userInfoFromAuthHandler)
         .handler(this::handleFetchLinkedAccount)
         .failureHandler(exceptionHandler);
 
     router
         .get(api.getCheckPolicyPath())
         .handler(checkPolicyValidationHandler)
-        .handler(AuthHandler.create(authenticationService, api, postgresService, authClient))
+        .handler(authHandler)
+        .handler(tokenIntrospectHandler)
+        .handler(consumerApiAccessHandler)
+        .handler(userInfoFromAuthHandler)
         .handler(this::checkPolicyHandler)
         .failureHandler(exceptionHandler);
 
@@ -305,7 +346,7 @@ public class ApiServerVerticle extends AbstractVerticle {
   private void checkPolicyHandler(RoutingContext routingContext) {
     HttpServerResponse response = routingContext.response();
 
-    User user = routingContext.get("user");
+    User user = RoutingContextHelper.getUser(routingContext);
     String productVariantId = routingContext.request().getParam("productVariantId");
     policyService
         .checkPolicy(productVariantId, user)
@@ -427,7 +468,7 @@ public class ApiServerVerticle extends AbstractVerticle {
   private void getPoliciesHandler(RoutingContext routingContext) {
     HttpServerResponse response = routingContext.response();
 
-    User user = routingContext.get("user");
+    User user = RoutingContextHelper.getUser(routingContext);
     policyService
         .getPolicies(user)
         .onComplete(
@@ -445,7 +486,7 @@ public class ApiServerVerticle extends AbstractVerticle {
 
   private void handlePostLinkedAccount(RoutingContext routingContext) {
     JsonObject requestBody = routingContext.body().asJsonObject();
-    User user = routingContext.get("user");
+    User user = RoutingContextHelper.getUser(routingContext);
     HttpServerResponse response = routingContext.response();
     linkedAccountService
         .createLinkedAccount(requestBody, user)
@@ -467,7 +508,7 @@ public class ApiServerVerticle extends AbstractVerticle {
   private void handlePutLinkedAccount(RoutingContext routingContext) {
     JsonObject requestBody = routingContext.body().asJsonObject();
     HttpServerResponse response = routingContext.response();
-    User user = routingContext.get("user");
+    User user = RoutingContextHelper.getUser(routingContext);
 
     linkedAccountService
         .updateLinkedAccount(requestBody, user)
@@ -487,7 +528,7 @@ public class ApiServerVerticle extends AbstractVerticle {
 
   private void handleFetchLinkedAccount(RoutingContext routingContext) {
     HttpServerResponse response = routingContext.response();
-    User user = routingContext.get("user");
+    User user = RoutingContextHelper.getUser(routingContext);
     linkedAccountService
         .fetchLinkedAccount(user)
         .onComplete(
@@ -532,7 +573,6 @@ public class ApiServerVerticle extends AbstractVerticle {
   private void handleSuccessResponse(HttpServerResponse response, int statusCode, String result) {
     response.putHeader(CONTENT_TYPE, APPLICATION_JSON).setStatusCode(statusCode).end(result);
   }
-
 
   /**
    * Handles Failed HTTP Response

@@ -171,7 +171,7 @@ public class CreatePolicy {
     Promise<JsonObject> promise = Promise.promise();
     LOGGER.debug("Query : {}", query);
     postgresService.executeQuery(
-        query,
+        query).onComplete(
         pgHandler -> {
           if (pgHandler.succeeded()) {
             LOGGER.debug("success response : " + pgHandler.result().encodePrettily());
@@ -200,7 +200,7 @@ public class CreatePolicy {
     Promise<Boolean> promise = Promise.promise();
     LOGGER.debug("Queries : {}", queries);
     postgresService.executeTransaction(
-        queries,
+        queries).onComplete(
         pgHandler -> {
           if (pgHandler.succeeded()) {
             LOGGER.info("Policies inserted successfully for order : {}", orderId);

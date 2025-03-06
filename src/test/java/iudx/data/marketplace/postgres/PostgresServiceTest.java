@@ -101,7 +101,7 @@ public class PostgresServiceTest {
 
     String expected = "{\"type\":\"urn:dx:dmp:success\",\"title\":\"Success\",\"results\":[]}";
     pgService.executeQuery(
-            stringBuilder.toString(),
+            stringBuilder.toString()).onComplete(
             handler -> {
               if (handler.succeeded()) {
                 assertEquals(expected, handler.result().toString());
@@ -132,7 +132,7 @@ public class PostgresServiceTest {
                             .replace("$4", "ACTIVE"));
 
     String expected = "{\"type\":\"urn:dx:dmp:DatabaseError\",\"title\":\"Database error\",\"detail\":\"ERROR: duplicate key value violates unique constraint \\\"product_pk\\\" (23505)\"}";
-    pgService.executeQuery(stringBuilder.toString(), handler -> {
+    pgService.executeQuery(stringBuilder.toString()).onComplete( handler -> {
       if(handler.failed()) {
         assertEquals(expected,handler.cause().getMessage());
         testContext.completeNow();
@@ -148,7 +148,7 @@ public class PostgresServiceTest {
   public void testExecuteCountQuery(VertxTestContext testContext) {
     StringBuilder stringBuilder = new StringBuilder(Constants.SELECT_PRODUCT_QUERY.replace("$0", table).replace("$1", "b2c27f3f-2524-4a84-816e-91f9ab23f837").replace("$2", "urn:datakaveri.org:b2c27f3f-2524-4a84-816e-91f9ab23f837:testProduct1"));
 
-    pgService.executeCountQuery(stringBuilder.toString(), handler -> {
+    pgService.executeCountQuery(stringBuilder.toString()).onComplete( handler -> {
       if(handler.succeeded()) {
         JsonObject result = handler.result();
         LOGGER.info(result.encodePrettily());
@@ -168,7 +168,7 @@ public class PostgresServiceTest {
     String query = "select count(*) from nosuchtable";
 
     String expected = "{\"type\":\"urn:dx:dmp:DatabaseError\",\"title\":\"Database error\",\"detail\":\"ERROR: relation \\\"nosuchtable\\\" does not exist (42P01)\"}";
-    pgService.executeCountQuery(query, handler -> {
+    pgService.executeCountQuery(query).onComplete( handler -> {
       if(handler.failed()) {
         assertEquals(expected,handler.cause().getMessage());
         testContext.completeNow();
@@ -185,7 +185,7 @@ public class PostgresServiceTest {
     JsonObject params = new JsonObject().put(Constants.STATUS, "INACTIVE").put(Constants.PRODUCT_ID, "product-id-alter");
 
     String expected = "{\"type\":\"urn:dx:dmp:success\",\"title\":\"Success\",\"results\":[]}";
-    pgService.executePreparedQuery(Constants.DELETE_PRODUCT_QUERY.replace("$0", table), params, handler -> {
+    pgService.executePreparedQuery(Constants.DELETE_PRODUCT_QUERY.replace("$0", table), params).onComplete( handler -> {
       if(handler.succeeded()) {
         assertEquals(expected, handler.result().toString());
         assertTrue(handler.result().containsKey("type"));
@@ -205,7 +205,7 @@ public class PostgresServiceTest {
   @DisplayName("test execute prepared query - failure")
   public void testExecutePrepQueryFailure(VertxTestContext testContext) {
 
-    pgService.executePreparedQuery(Constants.DELETE_PRODUCT_QUERY.replace("$0", table), new JsonObject(), handler -> {
+    pgService.executePreparedQuery(Constants.DELETE_PRODUCT_QUERY.replace("$0", table), new JsonObject()).onComplete( handler -> {
       if(handler.failed()) {
         testContext.completeNow();
       } else {
@@ -222,7 +222,7 @@ public class PostgresServiceTest {
     queries.add(Constants.INSERT_P_R_REL_QUERY.replace("$0", pdTable).replace("$1", "urn:datakaveri.org:b2c27f3f-2524-4a84-816e-91f9ab23f837:testProduct1").replace("$2", "a347c5b6-5281-4749-9eab-89784d8f8f9a"));
 
     String expected = "{\"type\":\"urn:dx:dmp:success\",\"title\":\"Success\"}";
-    pgService.executeTransaction(queries, handler -> {
+    pgService.executeTransaction(queries).onComplete( handler -> {
       LOGGER.info(handler);
       if(handler.succeeded()) {
         assertEquals(expected, handler.result().toString());
@@ -241,7 +241,7 @@ public class PostgresServiceTest {
     queries.add(Constants.INSERT_P_R_REL_QUERY.replace("$0", pdTable).replace("$1", "product-id-alter").replace("$2", "resource-id-some"));
     queries.add(Constants.INSERT_P_R_REL_QUERY.replace("$0", pdTable).replace("$1", "product-id-alter").replace("$2", "resource-id-thing"));
 
-    pgService.executeTransaction(queries, handler -> {
+    pgService.executeTransaction(queries).onComplete( handler -> {
       if(handler.failed()) {
         testContext.completeNow();
       } else {

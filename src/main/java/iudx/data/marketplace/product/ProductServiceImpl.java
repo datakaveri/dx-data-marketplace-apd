@@ -9,7 +9,7 @@ import io.vertx.core.*;
 import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
 import iudx.data.marketplace.apiserver.exceptions.DxRuntimeException;
-import iudx.data.marketplace.common.CatalogueService;
+import iudx.data.marketplace.catalogueService.CatalogueService;
 import iudx.data.marketplace.common.RespBuilder;
 import iudx.data.marketplace.common.ResponseUrn;
 import iudx.data.marketplace.policies.User;
@@ -74,9 +74,9 @@ public class ProductServiceImpl implements ProductService {
   }
 
   @Override
-  public ProductService createProduct(
-      User user, JsonObject request, Handler<AsyncResult<JsonObject>> handler) {
-
+  public Future<JsonObject> createProduct(
+      User user, JsonObject request) {
+Promise<JsonObject> promise = Promise.promise();
     JsonArray resourceDetails = new JsonArray();
     String providerId = user.getUserId();
     String productId =
@@ -129,14 +129,14 @@ public class ProductServiceImpl implements ProductService {
                     .getString("ownerUserId")
                     .equalsIgnoreCase(providerId)) {
 
-                  handler.handle(
-                      Future.failedFuture(
+
+                      promise.fail(
                           new RespBuilder()
                               .withType(ResponseUrn.FORBIDDEN_URN.getUrn())
                               .withTitle(ResponseUrn.FORBIDDEN_URN.getMessage())
                               .withDetail(
                                   "The user with given token does not own the resource listed")
-                              .getResponse()));
+                              .getResponse());
                 } else {
                   request
                       .put(PROVIDER_NAME, completeHandler.result().getString(PROVIDER_NAME, ""))
@@ -147,7 +147,7 @@ public class ProductServiceImpl implements ProductService {
 
                   /* Finally Create the Product */
                   pgService.executeTransaction(
-                      queries,
+                      queries).onComplete(
                       pgHandler -> {
                         if (pgHandler.succeeded()) {
                           JsonObject result =
@@ -157,10 +157,10 @@ public class ProductServiceImpl implements ProductService {
                                   .withResult(new JsonObject().put(PRODUCT_ID, productId))
                                   .withDetail("Product created successfully")
                                   .getJsonResponse();
-                          handler.handle(Future.succeededFuture(result));
+                          promise.complete(result);
                         } else {
                           LOGGER.error(pgHandler.cause());
-                          handler.handle(Future.failedFuture(pgHandler.cause()));
+                          promise.fail(pgHandler.cause());
                         }
                       });
                 }
@@ -184,11 +184,11 @@ public class ProductServiceImpl implements ProductService {
                           .withDetail("Product already exists")
                           .getResponse();
                 }
-                handler.handle(Future.failedFuture(failureMessage));
+                promise.fail(failureMessage);
               }
             });
 
-    return this;
+    return promise.future();
   }
 
   private List<Future> fetchItemDetailsFromCat(
@@ -226,7 +226,7 @@ public class ProductServiceImpl implements ProductService {
 
     LOGGER.debug("checkQuery: {}", query);
     pgService.executeCountQuery(
-        query.toString(),
+        query.toString()).onComplete(
         handler -> {
           if (handler.succeeded()) {
             if (handler.result().getInteger("totalHits") != 0) {
@@ -243,8 +243,9 @@ public class ProductServiceImpl implements ProductService {
   }
 
   @Override
-  public ProductService deleteProduct(
-      User user, JsonObject request, Handler<AsyncResult<JsonObject>> handler) {
+  public Future<JsonObject> deleteProduct(
+      User user, JsonObject request) {
+    Promise<JsonObject> promise = Promise.promise();
 
     String providerId = user.getUserId();
     String productId = request.getString(PRODUCT_ID);
@@ -260,12 +261,12 @@ public class ProductServiceImpl implements ProductService {
               LOGGER.error(existsHandler.result());
               if (!existsHandler.result()) {
                 LOGGER.error("deletion failed");
-                handler.handle(Future.failedFuture(ResponseUrn.RESOURCE_NOT_FOUND_URN.getUrn()));
+                promise.fail(ResponseUrn.RESOURCE_NOT_FOUND_URN.getUrn());
               } else {
 
                 pgService.executePreparedQuery(
                     DELETE_PRODUCT_QUERY.replace("$0", productTableName),
-                    params,
+                    params).onComplete(
                     pgHandler -> {
                       if (pgHandler.succeeded()) {
                         if (!pgHandler.result().getJsonArray(RESULTS).isEmpty()) {
@@ -275,7 +276,7 @@ public class ProductServiceImpl implements ProductService {
 
                           pgService.executePreparedQuery(
                               DELETE_PV_QUERY,
-                              deleteProductVariantParams,
+                              deleteProductVariantParams).onComplete(
                               deleteProductVariantHandler -> {
                                 if (deleteProductVariantHandler.succeeded()) {
                                   LOGGER.info(
@@ -286,8 +287,8 @@ public class ProductServiceImpl implements ProductService {
                                           .withType(ResponseUrn.SUCCESS_URN.getUrn())
                                           .withTitle(ResponseUrn.SUCCESS_URN.getMessage())
                                           .withDetail("Successfully deleted");
-                                  handler.handle(
-                                      Future.succeededFuture(respBuilder.getJsonResponse()));
+
+                                      promise.complete(respBuilder.getJsonResponse());
                                 } else {
                                   LOGGER.error(
                                       "Failed to delete product variants : "
@@ -299,7 +300,7 @@ public class ProductServiceImpl implements ProductService {
                                               ResponseUrn.INTERNAL_SERVER_ERR_URN.getMessage())
                                           .withDetail(
                                               "Something went wrong while deleting the product variants");
-                                  handler.handle(Future.failedFuture(respBuilder.getResponse()));
+                                  promise.fail(respBuilder.getResponse());
                                 }
                               });
 
@@ -311,22 +312,23 @@ public class ProductServiceImpl implements ProductService {
                                   .withTitle(ResponseUrn.BAD_REQUEST_URN.getMessage())
                                   .withDetail(
                                       "Product cannot be deleted, as it was deleted previously");
-                          handler.handle(Future.failedFuture(respBuilder.getResponse()));
+                          promise.fail(respBuilder.getResponse());
                         }
 
                       } else {
                         LOGGER.error("deletion failed");
-                        handler.handle(Future.failedFuture(pgHandler.cause()));
+                        promise.fail(pgHandler.cause());
                       }
                     });
               }
             });
-    return this;
+    return promise.future();
   }
 
   @Override
-  public ProductService listProducts(
-      User user, JsonObject request, Handler<AsyncResult<JsonObject>> handler) {
+  public Future<JsonObject> listProducts(
+      User user, JsonObject request) {
+    Promise<JsonObject> promise = Promise.promise();
 
     String providerId = user.getUserId();
     String resourceServerUrl = user.getResourceServerUrl();
@@ -345,16 +347,16 @@ public class ProductServiceImpl implements ProductService {
     LOGGER.debug(query);
     pgService.executePreparedQuery(
         query,
-        params,
+        params).onComplete(
         pgHandler -> {
           if (pgHandler.succeeded()) {
-            handler.handle(Future.succeededFuture(pgHandler.result()));
+            promise.complete(pgHandler.result());
           } else {
             LOGGER.error("list failed");
-            handler.handle(Future.failedFuture(pgHandler.cause()));
+            promise.fail(pgHandler.cause());
           }
         });
-    return this;
+    return promise.future();
   }
 
   /**
@@ -416,7 +418,7 @@ public class ProductServiceImpl implements ProductService {
 
     String finalQuery = query.replace("$1", providerId);
     pgService.executeQuery(
-        finalQuery,
+        finalQuery).onComplete(
         handler -> {
           if (handler.succeeded()) {
             /*  check if response is empty*/
@@ -456,7 +458,7 @@ public class ProductServiceImpl implements ProductService {
     Promise<Boolean> promise = Promise.promise();
     String finalQuery = query.replace("$1", providerId);
     pgService.executeQuery(
-        finalQuery,
+        finalQuery).onComplete(
         handler -> {
           if (handler.succeeded()) {
             /*  check if response is empty*/

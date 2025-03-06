@@ -148,7 +148,7 @@ public class UpdateLinkedAccount {
     Promise<JsonObject> promise = Promise.promise();
     String finalQuery = query.replace("$1", providerId).replace("$2", emailId);
     postgresService.executeQuery(
-        finalQuery,
+        finalQuery).onComplete(
         handler -> {
           if (handler.succeeded()) {
             boolean isResultEmpty = handler.result().getJsonArray(RESULTS).isEmpty();
@@ -197,7 +197,7 @@ public class UpdateLinkedAccount {
             .replace("$5", email);
 
     postgresService.executeQuery(
-        finalQuery,
+        finalQuery).onComplete(
         handler -> {
           if (handler.succeeded()) {
             boolean isResultEmpty = handler.result().getJsonArray(RESULTS).isEmpty();

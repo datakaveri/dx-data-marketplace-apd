@@ -144,7 +144,7 @@ public class FetchLinkedAccount {
     String finalQuery = query.replace("$1", providerId).replace("$2", resourceServerUrl);
     LOGGER.debug("Final query : " + finalQuery);
     postgresService.executeQuery(
-        finalQuery,
+        finalQuery).onComplete(
         handler -> {
           if (handler.succeeded()) {
             if (!handler.result().getJsonArray(RESULTS).isEmpty()) {

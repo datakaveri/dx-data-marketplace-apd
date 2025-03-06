@@ -18,7 +18,9 @@ public class Constants {
 
   // Header params
   public static final String HEADER_TOKEN = "token";
-  public static final String AUTHORIZATION_KEY = "Authorization";
+  public static final String HEADER_BEARER_AUTHORIZATION = "Authorization";
+  public static final String HEADER_TOKEN_BEARER = "Bearer";
+
 
   public static final String HEADER_HOST = "Host";
   public static final String HEADER_ACCEPT = "Accept";
@@ -32,6 +34,7 @@ public class Constants {
   // request/response params
   public static final String CONTENT_TYPE = "content-type";
   public static final String APPLICATION_JSON = "application/json";
+
   // json fields
   public static final String JSON_TYPE = "type";
   public static final String JSON_TITLE = "title";
@@ -39,6 +42,7 @@ public class Constants {
   public static final String USERID = "userId";
   public static final String ROLE = "role";
   public static final String AUD = "aud";
+  public static final String USER = "user";
 
   public static final String IS_DELEGATE = "isDelegate";
 
@@ -105,6 +109,10 @@ public class Constants {
       Pattern.compile(
           "[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-4[a-fA-F0-9]{3}-[89abAB][a-fA-F0-9]{3}-[a-fA-F0-9]{12}");
   public static final Pattern ORDER_ID_PATTERN = Pattern.compile("order_[a-zA-Z0-9]+");
+  public static final int BEARER_TOKEN_MIN_LENGTH = 8;
+  public static final Pattern BEARER_TOKEN_PATTERN =
+      Pattern.compile("Bearer [a-zA-Z0-9_*\\-*\\.\\/]+$");
+
   // response keys
   public static final String TYPE = "type";
   public static final String TITLE = "title";

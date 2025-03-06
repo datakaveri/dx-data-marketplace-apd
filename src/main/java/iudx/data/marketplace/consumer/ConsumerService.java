@@ -5,6 +5,7 @@ import io.vertx.codegen.annotations.GenIgnore;
 import io.vertx.codegen.annotations.ProxyGen;
 import io.vertx.codegen.annotations.VertxGen;
 import io.vertx.core.AsyncResult;
+import io.vertx.core.Future;
 import io.vertx.core.Handler;
 import io.vertx.core.Vertx;
 import io.vertx.core.json.JsonObject;
@@ -31,48 +32,40 @@ public interface ConsumerService {
    *
    * @param consumer as User object
    * @param request which is a JsonObject
-   * @param handler which is a Request Handler
    * @return ConsumerService which is a service
    */
-  @Fluent
-  ConsumerService listResources(
-      User consumer, JsonObject request, Handler<AsyncResult<JsonObject>> handler);
+  Future<JsonObject> listResources(
+      User consumer, JsonObject request);
 
   /**
    * The listProviders method fetches all or one providers available on the IUDX marketplace
    *
    * @param consumer as User object
    * @param request which is a JsonObject
-   * @param handler which is a Request Handler
    * @return ConsumerService which is a service
    */
-  @Fluent
-  ConsumerService listProviders(
-      User consumer, JsonObject request, Handler<AsyncResult<JsonObject>> handler);
+  Future<JsonObject> listProviders(
+      User consumer, JsonObject request);
 
   /**
    * The listProducts method fetches some or all products available on the IUDX marketplace
    *
    * @param consumer as User object
    * @param request which is a JsonObject
-   * @param handler which is a Request Handler
-   * @return ConsumerService which is a service
+   * @return Future json object
    */
-  @Fluent
-  ConsumerService listProducts(
-      User consumer, JsonObject request, Handler<AsyncResult<JsonObject>> handler);
+  Future<JsonObject> listProducts(
+      User consumer, JsonObject request);
 
   /**
    * The createOrder method creates an order for the consumer against a product variant
    *
    * @param request to Create order as Json object containing product variant ID
    * @param user Consumer User
-   * @param handler which is a Request Handler
-   * @return ConsumerService which is a service
+   * @return Future json object
    */
-  @Fluent
-  ConsumerService createOrder(
-      JsonObject request, User user, Handler<AsyncResult<JsonObject>> handler);
+  Future<JsonObject> createOrder(
+      JsonObject request, User user);
 
   /**
    * The listProductVariants method fetches all the <b>ACTIVE</b> product variants of a given
@@ -80,12 +73,10 @@ public interface ConsumerService {
    *
    * @param user as consumer User object
    * @param request containing the productId of a given product
-   * @param handler AsyncResult JsonObject request handler
-   * @return ConsumerService object
+   * @return Future json object
    */
-  @Fluent
-  ConsumerService listProductVariants(
-      User user, JsonObject request, Handler<AsyncResult<JsonObject>> handler);
+  Future<JsonObject> listProductVariants(
+      User user, JsonObject request);
 
   /**
    * List purchase will fetch invoice related info, provider, consumer and product variant related
@@ -95,10 +86,8 @@ public interface ConsumerService {
    *
    * @param user Consumer user
    * @param request query param if any
-   * @param handler Asynchronous JsonObject handler that contains the list of purchases
-   * @return ConsumerService which is a service
+   * @return Future json object that contains the list of purchases
    */
-  @Fluent
-  ConsumerService listPurchase(
-      User user, JsonObject request, Handler<AsyncResult<JsonObject>> handler);
+  Future<JsonObject> listPurchase(
+      User user, JsonObject request);
 }

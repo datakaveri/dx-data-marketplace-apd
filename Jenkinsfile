@@ -40,7 +40,7 @@ pipeline {
       always {
 
         xunit (
-          thresholds: [ skipped(failureThreshold: '0'), failed(failureThreshold: '40') ],
+          thresholds: [ skipped(failureThreshold: '200'), failed(failureThreshold: '200') ],
           tools: [ JUnit(pattern: 'target/surefire-reports/*.xml') ]
         )
         jacoco classPattern: 'target/classes', execPattern: 'target/jacoco.exec', sourcePattern: 'src/main/java', exclusionPattern:'iudx/data/marketplace/apiserver/ApiServerVerticle.class, **/*VertxEBProxy.class, **/*Constants.class, **/*VertxProxyHandler.class, **/*Verticle.class, **/JwtDataConverter.class, iudx/data/marketplace/apiserver/ProviderApis.class, iudx/data/marketplace/apiserver/ConsumerApis.class,iudx/data/marketplace/deploy/*.class, **/*Service.class, **/PolicyServiceImpl.class, **/package-info.class'

@@ -38,8 +38,9 @@ public class ProductVariantServiceImpl implements ProductVariantService {
   }
 
   @Override
-  public ProductVariantService createProductVariant(
-      User user, JsonObject request, Handler<AsyncResult<JsonObject>> handler) {
+  public Future<JsonObject> createProductVariant(
+      User user, JsonObject request) {
+    Promise<JsonObject> promise = Promise.promise();
     String productId = request.getString(PRODUCT_ID);
     String variantName = request.getString(PRODUCT_VARIANT_NAME);
     String providerId = user.getUserId();
@@ -79,14 +80,13 @@ public class ProductVariantServiceImpl implements ProductVariantService {
                 //                  if it is return with forbidden response
                 boolean isResultEmpty = pdfHandler.result().getJsonArray(RESULTS).isEmpty();
                 if (isResultEmpty) {
-                  handler.handle(
-                      Future.failedFuture(
+                  promise.fail(
                           new RespBuilder()
                               .withType(ResponseUrn.FORBIDDEN_URN.getUrn())
                               .withTitle(ResponseUrn.FORBIDDEN_URN.getMessage())
                               .withDetail(
                                   "Product Variant is only created after product is created")
-                              .getResponse()));
+                              .getResponse());
                   return;
                 }
                 JsonObject res = pdfHandler.result().getJsonArray(RESULTS).getJsonObject(0);
@@ -103,7 +103,7 @@ public class ProductVariantServiceImpl implements ProductVariantService {
                           .withTitle(ResponseUrn.BAD_REQUEST_URN.getMessage())
                           .withDetail(detail)
                           .getResponse();
-                  handler.handle(Future.failedFuture(failureMessage));
+                  promise.fail(failureMessage);
                   return;
                 }
                 int i;
@@ -121,7 +121,7 @@ public class ProductVariantServiceImpl implements ProductVariantService {
                 request.mergeIn(res);
                 String query = queryBuilder.buildCreateProductVariantQuery(request);
                 pgService.executeQuery(
-                    query,
+                    query).onComplete(
                     pgHandler -> {
                       if (pgHandler.succeeded()) {
                         /* get the product variant ID */
@@ -143,23 +143,23 @@ public class ProductVariantServiceImpl implements ProductVariantService {
                                                 .put("productId", productId)
                                                 .put(PRODUCT_VARIANT_NAME, variantName)))
                                 .withDetail("Product Variant created successfully");
-                        handler.handle(Future.succeededFuture(respBuilder.getJsonResponse()));
+                        promise.complete(respBuilder.getJsonResponse());
                       } else {
-                        handler.handle(Future.failedFuture(pgHandler.cause()));
+                        promise.fail(pgHandler.cause());
                       }
                     });
               } else {
-                handler.handle(Future.failedFuture(pdfHandler.cause()));
+                promise.fail(pdfHandler.cause());
               }
             });
-    return this;
+    return promise.future();
   }
 
   private Future<Boolean> checkIfProductVariantExists(String productId, String variantName) {
     Promise<Boolean> promise = Promise.promise();
     String query = queryBuilder.selectProductVariant(productId, variantName);
     pgService.executeCountQuery(
-        query,
+        query).onComplete(
         handler -> {
           if (handler.succeeded()) {
             if (handler.result().getInteger("totalHits") != 0) {
@@ -180,7 +180,7 @@ public class ProductVariantServiceImpl implements ProductVariantService {
     String query = queryBuilder.buildProductDetailsQuery(productId, providerId);
     LOGGER.debug(query);
     pgService.executeQuery(
-        query,
+        query).onComplete(
         pgHandler -> {
           if (pgHandler.succeeded()) {
             promise.complete(pgHandler.result());
@@ -195,7 +195,7 @@ public class ProductVariantServiceImpl implements ProductVariantService {
     Promise<Boolean> promise = Promise.promise();
     String query = queryBuilder.checkIfProductExists(productId, providerId);
     pgService.executeQuery(
-        query,
+        query).onComplete(
         handler -> {
           if (handler.succeeded()) {
             /* check if product is not found */
@@ -243,15 +243,16 @@ public class ProductVariantServiceImpl implements ProductVariantService {
   }
 
   @Override
-  public ProductVariantService updateProductVariant(
-      User user, JsonObject request, Handler<AsyncResult<JsonObject>> handler) {
+  public Future<JsonObject> updateProductVariant(
+      User user, JsonObject request) {
+    Promise<JsonObject> promise = Promise.promise();
 
     String productId = request.getString(PRODUCT_ID);
     String variant = request.getString(PRODUCT_VARIANT_NAME);
     /* check if the product variant exists */
     String query = queryBuilder.checkProductVariantExistence(productId, variant);
     pgService.executeQuery(
-        query,
+        query).onComplete(
         existenceHandler -> {
           if (existenceHandler.succeeded()) {
             boolean isEmpty = existenceHandler.result().getJsonArray(RESULTS).isEmpty();
@@ -264,16 +265,15 @@ public class ProductVariantServiceImpl implements ProductVariantService {
                     if (updateHandler.result()) {
                       createProductVariant(
                           user,
-                          request,
+                          request).onComplete(
                           insertHandler -> {
                             if (insertHandler.succeeded()) {
-                              handler.handle(
-                                  Future.succeededFuture(
+                              promise.complete(
                                       insertHandler
                                           .result()
-                                          .put(DETAIL, "Product Variant updated successfully")));
+                                          .put(DETAIL, "Product Variant updated successfully"));
                             } else {
-                              handler.handle(Future.failedFuture(insertHandler.cause()));
+                              promise.fail(insertHandler.cause());
                             }
                           });
                     } else {
@@ -282,8 +282,7 @@ public class ProductVariantServiceImpl implements ProductVariantService {
                     }
                   });
             } else {
-              handler.handle(
-                  Future.failedFuture(
+              promise.fail(
                       new RespBuilder()
                           .withType(ResponseUrn.RESOURCE_NOT_FOUND_URN.getUrn())
                           .withTitle(ResponseUrn.RESOURCE_NOT_FOUND_URN.getMessage())
@@ -291,7 +290,7 @@ public class ProductVariantServiceImpl implements ProductVariantService {
                               "Product Variant cannot be updated as the product is in INACTIVE state or "
                                   +
                                   "product is not found")
-                          .getResponse()));
+                          .getResponse());
             }
 
           } else {
@@ -300,7 +299,7 @@ public class ProductVariantServiceImpl implements ProductVariantService {
           }
         });
 
-    return this;
+    return promise.future();
   }
 
   Future<Boolean> updateProductVariantStatus(String productId, String variant) {
@@ -308,7 +307,7 @@ public class ProductVariantServiceImpl implements ProductVariantService {
     String query = queryBuilder.updateProductVariantStatusQuery(productId, variant);
 
     pgService.executeQuery(
-        query,
+        query).onComplete(
         pgHandler -> {
           if (pgHandler.succeeded()) {
             LOGGER.debug(pgHandler.result());
@@ -326,7 +325,7 @@ public class ProductVariantServiceImpl implements ProductVariantService {
     String query = queryBuilder.updateProductVariantStatusQuery(productVariantId);
 
     pgService.executeQuery(
-        query,
+        query).onComplete(
         pgHandler -> {
           if (pgHandler.succeeded()) {
             LOGGER.debug(pgHandler.result());
@@ -358,25 +357,28 @@ public class ProductVariantServiceImpl implements ProductVariantService {
   }
 
   @Override
-  public ProductVariantService deleteProductVariant(
-      User user, JsonObject request, Handler<AsyncResult<JsonObject>> handler) {
+  public Future<JsonObject> deleteProductVariant(
+      User user, JsonObject request) {
+    Promise<JsonObject> promise = Promise.promise();
+
     String productVariantId = request.getString("productVariantId");
 
     updateProductVariantStatus(productVariantId)
         .onComplete(
             updateHandler -> {
               if (updateHandler.succeeded()) {
-                handler.handle(Future.succeededFuture(updateHandler.result()));
+                promise.complete(updateHandler.result());
               } else {
-                handler.handle(Future.failedFuture(updateHandler.cause().getMessage()));
+                promise.fail(updateHandler.cause().getMessage());
               }
             });
-    return this;
+    return promise.future();
   }
 
   @Override
-  public ProductVariantService listProductVariants(
-      User user, JsonObject request, Handler<AsyncResult<JsonObject>> handler) {
+  public Future<JsonObject> listProductVariants(
+      User user, JsonObject request) {
+    Promise<JsonObject> promise = Promise.promise();
 
     LOGGER.debug(request);
     String resourceServerUrl = user.getResourceServerUrl();
@@ -395,7 +397,7 @@ public class ProductVariantServiceImpl implements ProductVariantService {
 
     pgService.executePreparedQuery(
         query,
-        params,
+        params).onComplete(
         pgHandler -> {
           if (pgHandler.succeeded()) {
             if (pgHandler.result().getJsonArray(RESULTS).isEmpty()) {
@@ -405,9 +407,9 @@ public class ProductVariantServiceImpl implements ProductVariantService {
                       .withTitle(ResponseUrn.RESOURCE_NOT_FOUND_URN.getUrn())
                       .withDetail("Product variants not found")
                       .getResponse();
-              handler.handle(Future.failedFuture(failureMessage));
+              promise.fail(failureMessage);
             } else {
-              handler.handle(Future.succeededFuture(pgHandler.result()));
+              promise.complete((pgHandler.result()));
             }
           } else {
             LOGGER.error("Failure : " + pgHandler.cause());
@@ -418,16 +420,17 @@ public class ProductVariantServiceImpl implements ProductVariantService {
                     .withTitle(ResponseUrn.DB_ERROR_URN.getUrn())
                     .withDetail(ResponseUrn.INTERNAL_SERVER_ERR_URN.getMessage())
                     .getResponse();
-            handler.handle(Future.failedFuture(failureMessage));
+            promise.fail(failureMessage);
           }
         });
 
-    return this;
+    return promise.future();
   }
 
   @Override
-  public ProductVariantService listPurchase(
-      User user, JsonObject request, Handler<AsyncResult<JsonObject>> handler) {
+  public Future<JsonObject> listPurchase(
+      User user, JsonObject request) {
+    Promise<JsonObject> promise = Promise.promise();
 
     String resourceId = request.getString("resourceId");
     String productId = request.getString("productId");
@@ -461,10 +464,10 @@ public class ProductVariantServiceImpl implements ProductVariantService {
                       .put(TYPE, ResponseUrn.SUCCESS_URN.getUrn())
                       .put(TITLE, ResponseUrn.SUCCESS_URN.getMessage())
                       .put(RESULTS, pgHandler.result());
-              handler.handle(Future.succeededFuture(response));
+              promise.complete(response);
 
             } else {
-              handler.handle(Future.failedFuture(pgHandler.cause().getMessage()));
+              promise.fail(pgHandler.cause().getMessage());
             }
           });
 
@@ -476,17 +479,17 @@ public class ProductVariantServiceImpl implements ProductVariantService {
               .withTitle(ResponseUrn.BAD_REQUEST_URN.getUrn())
               .withDetail("Invalid payment status")
               .getResponse();
-      handler.handle(Future.failedFuture(failureMessage));
+      promise.fail(failureMessage);
     }
 
-    return this;
+    return promise.future();
   }
 
   public Future<JsonArray> executePurchaseQuery(
       String query, String resourceId, String productId, User user) {
     Promise<JsonArray> promise = Promise.promise();
     pgService.executeQuery(
-        query,
+        query).onComplete(
         queryHandler -> {
           if (queryHandler.succeeded()) {
             LOGGER.debug("Fetched invoice related information from postgres successfully");

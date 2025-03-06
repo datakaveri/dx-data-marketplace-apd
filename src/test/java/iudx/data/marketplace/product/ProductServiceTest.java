@@ -8,7 +8,7 @@ import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
 import io.vertx.junit5.VertxExtension;
 import io.vertx.junit5.VertxTestContext;
-import iudx.data.marketplace.common.CatalogueService;
+import iudx.data.marketplace.catalogueService.CatalogueService;
 import iudx.data.marketplace.common.ResponseUrn;
 import iudx.data.marketplace.configuration.Configuration;
 import iudx.data.marketplace.policies.User;
@@ -18,7 +18,6 @@ import iudx.data.marketplace.razorpay.RazorPayService;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -91,7 +90,7 @@ public class ProductServiceTest {
               }
             })
         .when(postgresService)
-        .executeQuery(anyString(), any());
+        .executeQuery(anyString());
 
     doAnswer(
             new Answer<AsyncResult<JsonObject>>() {
@@ -102,7 +101,7 @@ public class ProductServiceTest {
               }
             })
         .when(postgresService)
-        .executeCountQuery(anyString(), any());
+        .executeCountQuery(anyString());
 
     doAnswer(
             new Answer<AsyncResult<JsonObject>>() {
@@ -113,7 +112,7 @@ public class ProductServiceTest {
               }
             })
         .when(postgresService)
-        .executeTransaction(anyList(), any());
+        .executeTransaction(anyList());
     doAnswer(
             Answer ->
                 Future.succeededFuture(
@@ -130,7 +129,7 @@ public class ProductServiceTest {
 
     productServiceImpl.createProduct(
         user,
-        request,
+        request).onComplete(
         handler -> {
           if (handler.succeeded()) {
             JsonObject actual = handler.result();
@@ -170,7 +169,7 @@ public class ProductServiceTest {
               }
             })
         .when(postgresService)
-        .executeCountQuery(anyString(), any());
+        .executeCountQuery(anyString());
 
     doAnswer(
             new Answer<AsyncResult<JsonObject>>() {
@@ -181,11 +180,11 @@ public class ProductServiceTest {
               }
             })
         .when(postgresService)
-        .executePreparedQuery(anyString(), any(), any());
+        .executePreparedQuery(anyString(), any());
 
     productServiceImpl.deleteProduct(
             user,
-        request,
+        request).onComplete(
         handler -> {
           if (handler.succeeded()) {
               LOGGER.info("handler.result().encodePrettily() : " + handler.result().encodePrettily());
@@ -218,14 +217,14 @@ public class ProductServiceTest {
               }
             })
         .when(postgresService)
-        .executePreparedQuery(anyString(), any(), any());
+        .executePreparedQuery(anyString(), any());
 
     productServiceImpl.listProducts(
             user,
-        new JsonObject(),
+        new JsonObject()).onComplete(
         handler -> {
           if (handler.succeeded()) {
-            verify(postgresService, times(1)).executePreparedQuery(anyString(), any(), any());
+            verify(postgresService, times(1)).executePreparedQuery(anyString(), any());
             testContext.completeNow();
           } else {
             testContext.failNow("list products test failed");
@@ -251,14 +250,14 @@ public class ProductServiceTest {
               }
             })
         .when(postgresService)
-        .executeCountQuery(anyString(), any());
+        .executeCountQuery(anyString());
 
     productServiceImpl
         .checkIfProductExists(anyString(), anyString())
         .onComplete(
             handler -> {
               if (handler.succeeded()) {
-                verify(postgresService, times(1)).executeCountQuery(anyString(), any());
+                verify(postgresService, times(1)).executeCountQuery(anyString());
                 testContext.completeNow();
               } else {
                 testContext.failNow("product exists future test failed");

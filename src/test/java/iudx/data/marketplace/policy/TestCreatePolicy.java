@@ -70,7 +70,7 @@ public class TestCreatePolicy {
                     }
                 })
                 .when(postgresService)
-                .executeQuery(anyString(), any());
+                .executeQuery(anyString());
         lenient().doAnswer(
                         new Answer<AsyncResult<JsonObject>>() {
                             @Override
@@ -80,7 +80,7 @@ public class TestCreatePolicy {
                             }
                         })
                 .when(postgresService)
-                .executeTransaction(anyList(), any());
+                .executeTransaction(anyList());
 
         lenient().when(auditingService.handleAuditLogs(any(User.class),any(JsonObject.class), anyString(), anyString()))
                         .thenReturn(Future.succeededFuture(aVoid));
@@ -124,8 +124,8 @@ public class TestCreatePolicy {
                 verify(auditingService, times(1))
                     .handleAuditLogs(
                         any(User.class), any(JsonObject.class), anyString(), anyString());
-                verify(postgresService, times(1)).executeQuery(anyString(), any());
-                verify(postgresService, atLeast(1)).executeTransaction(anyList(), any());
+                verify(postgresService, times(1)).executeQuery(anyString());
+                verify(postgresService, atLeast(1)).executeTransaction(anyList());
                 vertxTestContext.completeNow();
               } else {
                 vertxTestContext.failNow("Failed to create policy");
@@ -168,8 +168,8 @@ public class TestCreatePolicy {
                         handler -> {
                             LOGGER.info("handler : " + handler);
                             if (handler.failed()) {
-                                verify(postgresService, times(1)).executeQuery(anyString(), any());
-                                verify(postgresService, atLeast(1)).executeTransaction(anyList(), any());
+                                verify(postgresService, times(1)).executeQuery(anyString());
+                                verify(postgresService, atLeast(1)).executeTransaction(anyList());
                                 assertEquals("Error : Some failure message", handler.cause().getMessage());
                                 vertxTestContext.completeNow();
                             } else {
@@ -209,7 +209,7 @@ public class TestCreatePolicy {
                         handler -> {
                             LOGGER.info("handler : " + handler);
                             if (handler.failed()) {
-                                verify(postgresService, times(1)).executeQuery(anyString(), any());
+                                verify(postgresService, times(1)).executeQuery(anyString());
                                 assertEquals("Error : No payment found for the given order", handler.cause().getMessage());
                                 vertxTestContext.completeNow();
                             } else {
@@ -247,7 +247,7 @@ public class TestCreatePolicy {
                         handler -> {
                             LOGGER.info("handler : " + handler);
                             if (handler.failed()) {
-                                verify(postgresService, times(1)).executeQuery(anyString(), any());
+                                verify(postgresService, times(1)).executeQuery(anyString());
                                 assertEquals("Error : Some failure message", handler.cause().getMessage());
                                 vertxTestContext.completeNow();
                             } else {

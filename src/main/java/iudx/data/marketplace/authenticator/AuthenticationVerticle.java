@@ -1,5 +1,6 @@
 package iudx.data.marketplace.authenticator;
 
+import static iudx.data.marketplace.authenticator.util.Constants.AUTH_JWKS_PATH;
 import static iudx.data.marketplace.common.Constants.AUTH_SERVICE_ADDRESS;
 import static iudx.data.marketplace.common.Constants.JWT_LEEWAY_TIME;
 
@@ -9,24 +10,34 @@ import io.vertx.core.Promise;
 import io.vertx.core.Vertx;
 import io.vertx.core.eventbus.MessageConsumer;
 import io.vertx.core.json.JsonObject;
-import io.vertx.ext.auth.PubSecKeyOptions;
 import io.vertx.ext.auth.jwt.JWTAuth;
 import io.vertx.ext.auth.jwt.JWTAuthOptions;
 import io.vertx.ext.web.client.WebClient;
 import io.vertx.ext.web.client.WebClientOptions;
 import io.vertx.serviceproxy.ServiceBinder;
-import iudx.data.marketplace.common.Api;
+import java.util.ArrayList;
+import java.util.List;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+/**
+ * The Authentication Verticle.
+ *
+ * <h1>Authentication Verticle</h1>
+ *
+ * <p>The Authentication Verticle implementation in the IUDX ACL-APD Server exposes the
+ * {@link iudx.data.marketplace.authenticator.AuthenticationService } over the Vert.x Event Bus.
+ *
+ * @version 1.0
+ * @since 2020-05-31
+ */
 public class AuthenticationVerticle extends AbstractVerticle {
-  private static final Logger LOGGER = LogManager.getLogger(AuthenticationVerticle.class);
 
-  private AuthenticationService authenticationService;
+  private static final Logger LOGGER = LogManager.getLogger(AuthenticationVerticle.class);
+  private AuthenticationService jwtAuthenticationService;
   private ServiceBinder binder;
   private MessageConsumer<JsonObject> consumer;
   private WebClient webClient;
-  private Api api;
 
   static WebClient createWebClient(Vertx vertx, JsonObject config) {
     return createWebClient(vertx, config, false);
@@ -54,13 +65,13 @@ public class AuthenticationVerticle extends AbstractVerticle {
     getJwtPublicKey(vertx, config())
         .onSuccess(
             handler -> {
-              String cert = handler;
+              List<JsonObject> jwks = new ArrayList<>();
+              jwks.add(handler);
               binder = new ServiceBinder(vertx);
 
               JWTAuthOptions jwtAuthOptions = new JWTAuthOptions();
               jwtAuthOptions.getJWTOptions().setLeeway(JWT_LEEWAY_TIME);
-              jwtAuthOptions.addPubSecKey(
-                  new PubSecKeyOptions().setAlgorithm("ES256").setBuffer(cert));
+              jwtAuthOptions.setJwks(jwks);
               /*
                * Default jwtIgnoreExpiry is false. If set through config, then that value is taken
                */
@@ -70,21 +81,18 @@ public class AuthenticationVerticle extends AbstractVerticle {
               if (jwtIgnoreExpiry) {
                 jwtAuthOptions.getJWTOptions().setIgnoreExpiration(true).setLeeway(JWT_LEEWAY_TIME);
                 LOGGER.warn(
-                    "JWT ignore expiration set to true, do not set IgnoreExpiration in production!!");
+                    "JWT ignore expiration set to true, "
+                        + "do not set IgnoreExpiration in production!!");
               }
+              jwtAuthOptions.getJWTOptions().setIssuer(config().getString("issuer"));
               JWTAuth jwtAuth = JWTAuth.create(vertx, jwtAuthOptions);
-
-              /*CatalogueService catalogueService = new CatalogueService(vertx, config());*/
-              api = Api.getInstance(config().getString("dxApiBasePath"));
-              authenticationService = new AuthenticationServiceImpl(jwtAuth, config(), api);
+              jwtAuthenticationService = new JwtAuthenticationServiceImpl(jwtAuth);
 
               /* Publish the Authentication service with the Event Bus against an address. */
               consumer =
                   binder
                       .setAddress(AUTH_SERVICE_ADDRESS)
-                      .register(AuthenticationService.class, authenticationService);
-
-              LOGGER.info("Authentication verticle deployed");
+                      .register(AuthenticationService.class, jwtAuthenticationService);
             })
         .onFailure(
             handler -> {
@@ -98,18 +106,21 @@ public class AuthenticationVerticle extends AbstractVerticle {
     binder.unregister(consumer);
   }
 
-  private Future<String> getJwtPublicKey(Vertx vertx, JsonObject config) {
-    Promise<String> promise = Promise.promise();
+  private Future<JsonObject> getJwtPublicKey(Vertx vertx, JsonObject config) {
+    Promise<JsonObject> promise = Promise.promise();
     webClient = createWebClient(vertx, config);
+    String authCert = config.getString("dxAuthBasePath") + AUTH_JWKS_PATH;
     webClient
-        .get(443, config.getString("authHost"), "/auth/v1/cert")
+        .get(443, config.getString("authHost"), authCert)
         .send(
             handler -> {
               if (handler.succeeded()) {
                 JsonObject json = handler.result().bodyAsJsonObject();
-                promise.complete(json.getString("cert"));
+                JsonObject keySet = json.getJsonArray("keys").getJsonObject(0);
+                promise.complete(keySet);
               } else {
-                promise.fail("fail to get JWT public key");
+                LOGGER.error("failed to get jwks : {}", handler.cause().getMessage());
+                promise.fail(handler.cause().getMessage());
               }
             });
     return promise.future();

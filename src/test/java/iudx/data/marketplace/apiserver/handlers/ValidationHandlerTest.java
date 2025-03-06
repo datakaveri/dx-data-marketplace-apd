@@ -10,6 +10,7 @@ import io.vertx.ext.web.RoutingContext;
 import io.vertx.junit5.VertxExtension;
 import io.vertx.junit5.VertxTestContext;
 import iudx.data.marketplace.apiserver.util.RequestType;
+import iudx.data.marketplace.authenticator.handlers.ValidationHandler;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
