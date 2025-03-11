@@ -26,9 +26,9 @@ import org.apache.logging.log4j.Logger;
 public class CreateLinkedAccount {
   private static final Logger LOGGER = LogManager.getLogger(CreateLinkedAccount.class);
   private static final SecureRandom random = new SecureRandom();
-  private PostgresService postgresService;
-  private Api api;
-  private AuditingService auditingService;
+  private final PostgresService postgresService;
+  private final Api api;
+  private final AuditingService auditingService;
   private String legalBusinessName;
   private String customerFacingBusinessName;
   private String phoneNumber;
@@ -37,7 +37,7 @@ public class CreateLinkedAccount {
   private String providerId;
   private String status;
   private String accountProductId;
-  private RazorPayService razorPayService;
+  private final RazorPayService razorPayService;
   private String businessType;
 
   public CreateLinkedAccount(

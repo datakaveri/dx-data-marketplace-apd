@@ -20,7 +20,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 public class UpdateLinkedAccount {
-  private static Logger LOGGER = LogManager.getLogger(UpdateLinkedAccount.class);
+  private static final Logger LOGGER = LogManager.getLogger(UpdateLinkedAccount.class);
   PostgresService postgresService;
   Api api;
   AuditingService auditingService;

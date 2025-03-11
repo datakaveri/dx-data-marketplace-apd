@@ -10,7 +10,7 @@ import org.apache.logging.log4j.Logger;
 
 public class DataBrokerServiceImpl implements DataBrokerService {
   private static final Logger LOGGER = LogManager.getLogger(DataBrokerServiceImpl.class);
-  private RabbitMQClient rabbitWebclient;
+  private final RabbitMQClient rabbitWebclient;
 
   public DataBrokerServiceImpl(RabbitMQClient rabbitWebclient) {
     this.rabbitWebclient = rabbitWebclient;

@@ -18,8 +18,8 @@ import org.apache.logging.log4j.Logger;
 
 public class AuditingServiceImpl implements AuditingService {
   private static final Logger LOGGER = LogManager.getLogger(AuditingServiceImpl.class);
-  private DataBrokerService dataBrokerService;
-  private QueryBuilder queryBuilder;
+  private final DataBrokerService dataBrokerService;
+  private final QueryBuilder queryBuilder;
 
   public AuditingServiceImpl(DataBrokerService dataBrokerService, JsonObject config) {
     this.dataBrokerService = dataBrokerService;

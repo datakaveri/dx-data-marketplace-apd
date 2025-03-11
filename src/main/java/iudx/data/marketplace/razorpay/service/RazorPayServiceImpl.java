@@ -1,5 +1,7 @@
 package iudx.data.marketplace.razorpay.service;
 
+import io.vertx.core.json.JsonArray;
+import io.vertx.serviceproxy.HelperUtils;
 import static iudx.data.marketplace.apiserver.provider.linkedaccount.util.Constants.ACCOUNT_TYPE;
 import static iudx.data.marketplace.apiserver.provider.linkedaccount.util.Constants.FAILURE_MESSAGE;
 import static iudx.data.marketplace.product.util.Constants.*;
@@ -25,7 +27,7 @@ import org.json.JSONObject;
 public class RazorPayServiceImpl implements RazorPayService {
 
   private static final Map<String, String> errorMap = ErrorMessageBuilder.initialiseMap();
-  private static Logger LOGGER = LogManager.getLogger(RazorPayServiceImpl.class);
+  private static final Logger LOGGER = LogManager.getLogger(RazorPayServiceImpl.class);
   private final PostgresService postgresService;
   private final String razorPaySecret;
   private final String paymentTable;
@@ -86,7 +88,7 @@ public class RazorPayServiceImpl implements RazorPayService {
       Object reason = responseError.get(REASON);
       LOGGER.debug(JSONObject.NULL.equals(reason));
       if (!JSONObject.NULL.equals(reason)) {
-        LOGGER.error("razorpay error : ", responseError);
+        LOGGER.error("razorpay error : {}", responseError);
         String message;
         switch (reason.toString()) {
           case "amount_less_than_minimum_amount":
@@ -235,7 +237,8 @@ public class RazorPayServiceImpl implements RazorPayService {
           razorpayAccountProductId);
       promise.complete(new JsonObject().put("razorpayAccountProductId", razorpayAccountProductId));
     } catch (RazorpayException e) {
-      e.printStackTrace();
+      JsonArray stackTrace = HelperUtils.convertStackTrace(e);
+      LOGGER.error("Stack trace is : {}", stackTrace.toString());
       LOGGER.error("Razorpay error message: {}", e.getMessage());
       /*handle error messages from Razorpay*/
       String razorpayError = e.getMessage().toLowerCase();
@@ -267,7 +270,8 @@ public class RazorPayServiceImpl implements RazorPayService {
         promise.fail(detail);
       }
     } catch (RazorpayException e) {
-      e.printStackTrace();
+      JsonArray stackTrace = HelperUtils.convertStackTrace(e);
+      LOGGER.error("Stack trace is : {}", stackTrace.toString());
       LOGGER.error("Razorpay error message: {}", e.getMessage());
       /*handle error messages from Razorpay*/
       String razorpayError = e.getMessage().toLowerCase();

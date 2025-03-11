@@ -18,7 +18,7 @@ public class ValidationHandler implements Handler<RoutingContext> {
 
   private static final Logger LOGGER = LogManager.getLogger(ValidationHandler.class);
 
-  private RequestType requestType;
+  private final RequestType requestType;
 
   public ValidationHandler(RequestType requestType) {
     this.requestType = requestType;

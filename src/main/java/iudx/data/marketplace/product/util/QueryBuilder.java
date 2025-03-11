@@ -69,7 +69,7 @@ public class QueryBuilder {
                   .replace("$2", ((JsonObject) resource).getString(RESOURCE_ID)));
         });
 
-    LOGGER.debug("Queries : " + queries);
+    LOGGER.debug("Queries : {}" , queries);
     return queries;
   }
 
@@ -111,7 +111,7 @@ public class QueryBuilder {
     // UUID for each product variant.
     String pvId = supplier.get();
 
-    LOGGER.debug("request is : " + request.encodePrettily());
+    LOGGER.debug("request is : {}" , request.encodePrettily());
     StringBuilder query =
         new StringBuilder(
             INSERT_PV_QUERY
@@ -152,7 +152,7 @@ public class QueryBuilder {
                 .replace("$3", Status.ACTIVE.toString())
                 .replace("$4", Status.INACTIVE.toString()));
 
-    LOGGER.debug("Query : " + query);
+    LOGGER.debug("Query : {}" , query);
     return query.toString();
   }
 
@@ -201,7 +201,7 @@ public class QueryBuilder {
     request.put(PRIMARY_KEY, primaryKey);
     request.put(ORIGIN, ORIGIN_SERVER);
 
-    LOGGER.debug("Info: Request " + request);
+    LOGGER.debug("Info: Request {}" , request);
     return request;
   }
 
@@ -232,7 +232,7 @@ public class QueryBuilder {
                   .replace("$3", rsUrl));
     }
     query.append(" \n ORDER BY I.modified_at DESC ");
-    LOGGER.debug("Query :" + query);
+    LOGGER.debug("Query :{}" , query);
     return query.toString();
   }
 
@@ -263,7 +263,7 @@ public class QueryBuilder {
                   .replace("$3", rsUrl));
     }
     query.append(" \n ORDER BY I.modified_at DESC ");
-    LOGGER.debug("Query :" + query);
+    LOGGER.debug("Query :{}" , query);
     return query.toString();
   }
 
@@ -295,7 +295,7 @@ public class QueryBuilder {
     }
 
     query.append(" \n ORDER BY I.modified_at DESC ");
-    LOGGER.debug("Query :" + query);
+    LOGGER.debug("Query :{}" , query);
     return query.toString();
   }
 
@@ -335,7 +335,7 @@ public class QueryBuilder {
     }
 
     query.append(" \n ORDER BY I.modified_at DESC ");
-    LOGGER.debug("Query :" + query);
+    LOGGER.debug("Query :{}" , query);
     return query.toString();
   }
 
@@ -375,7 +375,7 @@ public class QueryBuilder {
                   .replace("$3", rsUrl));
     }
     query.append(" \n ORDER BY I.modified_at DESC ");
-    LOGGER.debug("Query :" + query);
+    LOGGER.debug("Query :{}" , query);
     return query.toString();
   }
 
@@ -417,7 +417,7 @@ public class QueryBuilder {
                   .replace("$3", rsUrl));
     }
     query.append(" \n ORDER BY I.modified_at DESC ");
-    LOGGER.debug("Query :" + query);
+    LOGGER.debug("Query :{}" , query);
     return query.toString();
   }
 }

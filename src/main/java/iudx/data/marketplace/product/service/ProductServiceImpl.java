@@ -26,11 +26,11 @@ public class ProductServiceImpl implements ProductService {
   private static final Logger LOGGER = LogManager.getLogger(ProductServiceImpl.class);
   private final PostgresService pgService;
   private final String productTableName;
-  private CatalogueService catService;
-  private QueryBuilder queryBuilder;
-  private RazorPayService razorPayService;
-  private boolean isAccountActivationCheckBeingDone;
-  private String apdUrl;
+  private final CatalogueService catService;
+  private final QueryBuilder queryBuilder;
+  private final RazorPayService razorPayService;
+  private final boolean isAccountActivationCheckBeingDone;
+  private final String apdUrl;
 
   public ProductServiceImpl(
       JsonObject config,
@@ -48,7 +48,7 @@ public class ProductServiceImpl implements ProductService {
   }
 
   private static boolean isSameProviderForAll(JsonArray resourceDetails) {
-    LOGGER.debug("resourceDetails : " + resourceDetails);
+    LOGGER.debug("resourceDetails : {}", resourceDetails);
     String providerOfFirstResource = resourceDetails.getJsonObject(0).getString(PROVIDER);
     boolean sameProviderForAll = true;
     for (int i = 1; i < resourceDetails.size() && sameProviderForAll; i++) {
@@ -447,7 +447,7 @@ Promise<JsonObject> promise = Promise.promise();
             }
           } else {
             LOGGER.info(
-                "Failed to fetch razorpay details of provider : " + handler.cause().getMessage());
+                "Failed to fetch razorpay details of provider : {}" , handler.cause().getMessage());
             promise.fail(FAILURE_MESSAGE + "Internal Server Error");
           }
         });

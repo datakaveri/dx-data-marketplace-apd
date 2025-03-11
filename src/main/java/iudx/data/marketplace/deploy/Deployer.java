@@ -27,6 +27,7 @@ import io.vertx.micrometer.Label;
 import io.vertx.micrometer.MicrometerMetricsOptions;
 import io.vertx.micrometer.VertxPrometheusOptions;
 import io.vertx.micrometer.backends.BackendRegistries;
+import io.vertx.serviceproxy.HelperUtils;
 import io.vertx.spi.cluster.hazelcast.HazelcastClusterManager;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
@@ -102,7 +103,7 @@ public class Deployer {
             LOGGER.info("Deployed " + moduleName);
             recursiveDeploy(vertx, configs, i + 1);
           } else {
-            LOGGER.fatal("Failed to deploy " + moduleName + " cause:", ar.cause());
+            LOGGER.fatal("Failed to deploy {} cause: {}", moduleName, ar.cause());
           }
         });
   }
@@ -130,7 +131,7 @@ public class Deployer {
             .orElse(new JsonObject());
 
     if (config.isEmpty()) {
-      LOGGER.fatal("Failed to deploy " + moduleName + " cause: Not Found");
+      LOGGER.fatal("Failed to deploy {} cause: Not Found",moduleName );
       return;
     }
     // get common configs and add this to config object
@@ -141,7 +142,7 @@ public class Deployer {
         new DeploymentOptions().setInstances(numInstances).setConfig(config);
     boolean isWorkerVerticle = config.getBoolean("isWorkerVerticle");
     if (isWorkerVerticle) {
-      LOGGER.info("worker verticle : " + config.getString("id"));
+      LOGGER.info("worker verticle : {}", config.getString("id"));
       deploymentOptions.setWorkerPoolName(config.getString("threadPoolName"));
       deploymentOptions.setWorkerPoolSize(config.getInteger("threadPoolSize"));
       deploymentOptions.setWorker(true);
@@ -364,17 +365,17 @@ public class Deployer {
     CountDownLatch latchVerticles = new CountDownLatch(deployIdSet.size());
     CountDownLatch latchCluster = new CountDownLatch(1);
     CountDownLatch latchVertx = new CountDownLatch(1);
-    LOGGER.debug("number of verticles being undeployed are:" + deployIdSet.size());
+    LOGGER.debug("number of verticles being undeployed are:{}", deployIdSet.size());
     // shutdown verticles
     for (String deploymentId : deployIdSet) {
       vertxInstance.undeploy(
           deploymentId,
           handler -> {
             if (handler.succeeded()) {
-              LOGGER.debug(deploymentId + " verticle  successfully Undeployed");
+              LOGGER.debug("{} verticle  successfully Undeployed",deploymentId);
               latchVerticles.countDown();
             } else {
-              LOGGER.warn(deploymentId + "Undeploy failed!");
+              LOGGER.warn("{} Undeploy failed!",deploymentId);
             }
           });
     }
@@ -385,7 +386,8 @@ public class Deployer {
       return;
 
     } catch (Exception e) {
-      e.printStackTrace();
+      JsonArray stackTrace = HelperUtils.convertStackTrace(e);
+      LOGGER.error("Stack trace is : {}", stackTrace.toString());
     }
 
     try {
@@ -401,7 +403,8 @@ public class Deployer {
             }
           });
     } catch (Exception e) {
-      e.printStackTrace();
+      JsonArray stackTrace = HelperUtils.convertStackTrace(e);
+      LOGGER.error("Stack trace is : {}", stackTrace.toString());
     }
 
     try {
@@ -414,7 +417,8 @@ public class Deployer {
         LOGGER.warn("Unable to shutdown log4j2");
       }
     } catch (Exception e) {
-      e.printStackTrace();
+      JsonArray stackTrace = HelperUtils.convertStackTrace(e);
+      LOGGER.error("Stack trace is : {}", stackTrace.toString());
     }
   }
 }

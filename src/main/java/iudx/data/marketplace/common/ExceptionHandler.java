@@ -1,13 +1,13 @@
 package iudx.data.marketplace.common;
 
-import io.vertx.core.json.JsonArray;
-import io.vertx.serviceproxy.HelperUtils;
 import static iudx.data.marketplace.apiserver.util.Constants.*;
 
 import io.vertx.core.Handler;
 import io.vertx.core.json.DecodeException;
+import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
 import io.vertx.ext.web.RoutingContext;
+import io.vertx.serviceproxy.HelperUtils;
 import iudx.data.marketplace.apiserver.exceptions.DxRuntimeException;
 import org.apache.http.HttpStatus;
 import org.apache.logging.log4j.LogManager;
@@ -26,7 +26,7 @@ public class ExceptionHandler implements Handler<RoutingContext> {
 
     if (failure instanceof DxRuntimeException) {
       DxRuntimeException exception = (DxRuntimeException) failure;
-      LOGGER.error(exception.getUrn().getUrn() + " : " + exception.getMessage());
+      LOGGER.error("{} : {}", exception.getUrn().getUrn(), exception.getMessage());
       HttpStatusCode code = HttpStatusCode.getByValue(exception.getStatusCode());
 
       String response =
@@ -91,7 +91,7 @@ public class ExceptionHandler implements Handler<RoutingContext> {
    */
   public void handleDecodeException(RoutingContext routingContext) {
 
-    LOGGER.error("Error: Invalid Json payload: " + routingContext.failure().getLocalizedMessage());
+    LOGGER.error("Error: Invalid Json payload: {}" , routingContext.failure().getLocalizedMessage());
     String response = "";
 
     if (routingContext.request().uri().startsWith(PROVIDER_PATH)) {
@@ -121,7 +121,7 @@ public class ExceptionHandler implements Handler<RoutingContext> {
   public void handleClassCastException(RoutingContext routingContext) {
 
     LOGGER.error(
-        "Error: Invalid request payload; " + routingContext.failure().getLocalizedMessage());
+        "Error: Invalid request payload; {}" , routingContext.failure().getLocalizedMessage());
 
     routingContext
         .response()
