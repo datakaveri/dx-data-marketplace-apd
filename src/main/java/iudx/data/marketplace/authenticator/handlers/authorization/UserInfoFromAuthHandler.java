@@ -1,6 +1,6 @@
 package iudx.data.marketplace.authenticator.handlers.authorization;
 
-import static iudx.data.marketplace.authenticator.model.DxRole.DELEGATE;
+import static iudx.data.marketplace.authenticator.service.model.DxRole.DELEGATE;
 import static iudx.data.marketplace.authenticator.util.Constants.INSERT_USER_TABLE;
 import static iudx.data.marketplace.common.ResponseUrn.*;
 
@@ -11,9 +11,9 @@ import io.vertx.core.json.JsonObject;
 import io.vertx.ext.web.RoutingContext;
 import iudx.data.marketplace.aaaService.AuthClient;
 import iudx.data.marketplace.apiserver.exceptions.DxRuntimeException;
-import iudx.data.marketplace.authenticator.model.DxRole;
-import iudx.data.marketplace.authenticator.model.JwtData;
-import iudx.data.marketplace.authenticator.model.UserInfo;
+import iudx.data.marketplace.authenticator.service.model.DxRole;
+import iudx.data.marketplace.authenticator.service.model.JwtData;
+import iudx.data.marketplace.authenticator.service.model.UserInfo;
 import iudx.data.marketplace.common.HttpStatusCode;
 import iudx.data.marketplace.common.RoutingContextHelper;
 import iudx.data.marketplace.policies.service.model.User;

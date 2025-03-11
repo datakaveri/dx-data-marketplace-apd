@@ -1,10 +1,10 @@
-package iudx.data.marketplace.authenticator;
+package iudx.data.marketplace.authenticator.service;
 
 import io.vertx.core.Future;
 import io.vertx.core.Promise;
 import io.vertx.ext.auth.authentication.TokenCredentials;
 import io.vertx.ext.auth.jwt.JWTAuth;
-import iudx.data.marketplace.authenticator.model.JwtData;
+import iudx.data.marketplace.authenticator.service.model.JwtData;
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneId;

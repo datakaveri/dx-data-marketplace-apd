@@ -1,4 +1,4 @@
-package iudx.data.marketplace.apiserver;
+package iudx.data.marketplace.consumer.controller;
 
 import static iudx.data.marketplace.apiserver.response.ResponseUtil.generateResponse;
 import static iudx.data.marketplace.apiserver.util.Constants.*;
@@ -15,19 +15,16 @@ import io.vertx.core.json.DecodeException;
 import io.vertx.core.json.JsonObject;
 import io.vertx.ext.web.Router;
 import io.vertx.ext.web.RoutingContext;
-import iudx.data.marketplace.apiserver.util.RequestType;
 import iudx.data.marketplace.aaaService.AuthClient;
-import iudx.data.marketplace.authenticator.AuthenticationService;
-import iudx.data.marketplace.authenticator.handlers.*;
+import iudx.data.marketplace.apiserver.util.RequestType;
 import iudx.data.marketplace.authenticator.handlers.authentication.AuthHandler;
 import iudx.data.marketplace.authenticator.handlers.authentication.TokenIntrospectHandler;
 import iudx.data.marketplace.authenticator.handlers.authorization.AuthorizationHandler;
 import iudx.data.marketplace.authenticator.handlers.authorization.UserInfoFromAuthHandler;
-import iudx.data.marketplace.authenticator.model.DxRole;
-import iudx.data.marketplace.authenticator.model.UserInfo;
-import iudx.data.marketplace.common.Api;
-import iudx.data.marketplace.common.HttpStatusCode;
-import iudx.data.marketplace.common.ResponseUrn;
+import iudx.data.marketplace.authenticator.service.AuthenticationService;
+import iudx.data.marketplace.authenticator.service.model.DxRole;
+import iudx.data.marketplace.authenticator.service.model.UserInfo;
+import iudx.data.marketplace.common.*;
 import iudx.data.marketplace.consumer.service.ConsumerService;
 import iudx.data.marketplace.policies.service.model.User;
 import iudx.data.marketplace.postgres.service.PostgresService;
@@ -40,18 +37,13 @@ public class ConsumerApis {
 
   private final Vertx vertx;
   private final Router router;
-
+  private final Api api;
+  private final PostgresService postgresService;
+  private final AuthClient authClient;
+  private final AuthenticationService authenticationService;
   private ConsumerService consumerService;
-  private Api api;
-  private PostgresService postgresService;
-  private AuthClient authClient;
-  private AuthenticationService authenticationService;
-  private UserInfoFromAuthHandler userInfoFromAuthHandler;
-  private UserInfo userInfo;
-  private AuthHandler authHandler;
-  private AuthorizationHandler authorizationHandler;
 
-  ConsumerApis(
+  public ConsumerApis(
       Vertx vertx,
       Router router,
       Api apis,
@@ -66,16 +58,17 @@ public class ConsumerApis {
     this.authenticationService = authenticationService;
   }
 
-  Router init() {
+  public Router init() {
 
     ValidationHandler resourceValidationHandler = new ValidationHandler(RequestType.RESOURCE);
     ValidationHandler providerValidationHandler = new ValidationHandler(RequestType.PROVIDER);
     ExceptionHandler exceptionHandler = new ExceptionHandler();
-    authorizationHandler = new AuthorizationHandler();
+    AuthorizationHandler authorizationHandler = new AuthorizationHandler();
 
-    userInfo = new UserInfo();
-    userInfoFromAuthHandler = new UserInfoFromAuthHandler(authClient, userInfo, postgresService);
-    authHandler = new AuthHandler(authenticationService);
+    UserInfo userInfo = new UserInfo();
+    UserInfoFromAuthHandler userInfoFromAuthHandler =
+        new UserInfoFromAuthHandler(authClient, userInfo, postgresService);
+    AuthHandler authHandler = new AuthHandler(authenticationService);
 
     consumerService = ConsumerService.createProxy(vertx, CONSUMER_SERVICE_ADDRESS);
     Handler<RoutingContext> consumerApiAccessHandler = authorizationHandler.setUserRolesForEndpoint(DxRole.CONSUMER, DxRole.DELEGATE);

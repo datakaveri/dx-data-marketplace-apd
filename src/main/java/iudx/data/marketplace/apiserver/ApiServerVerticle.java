@@ -1,40 +1,27 @@
 package iudx.data.marketplace.apiserver;
 
-import static iudx.data.marketplace.apiserver.response.ResponseUtil.generateResponse;
 import static iudx.data.marketplace.apiserver.util.Constants.*;
 import static iudx.data.marketplace.common.Constants.*;
-import static iudx.data.marketplace.common.HttpStatusCode.BAD_REQUEST;
 
 import io.vertx.core.AbstractVerticle;
-import io.vertx.core.Handler;
 import io.vertx.core.http.*;
-import io.vertx.core.json.DecodeException;
-import io.vertx.core.json.JsonObject;
 import io.vertx.ext.web.Route;
 import io.vertx.ext.web.Router;
-import io.vertx.ext.web.RoutingContext;
 import io.vertx.ext.web.client.WebClient;
 import io.vertx.ext.web.client.WebClientOptions;
 import io.vertx.ext.web.handler.BodyHandler;
 import io.vertx.ext.web.handler.CorsHandler;
 import io.vertx.ext.web.handler.TimeoutHandler;
 import iudx.data.marketplace.aaaService.AuthClient;
-import iudx.data.marketplace.apiserver.provider.linkedaccount.service.LinkedAccountService;
-import iudx.data.marketplace.apiserver.util.RequestType;
-import iudx.data.marketplace.authenticator.AuthenticationService;
-import iudx.data.marketplace.authenticator.handlers.*;
-import iudx.data.marketplace.authenticator.handlers.authentication.AuthHandler;
-import iudx.data.marketplace.authenticator.handlers.authentication.TokenIntrospectHandler;
-import iudx.data.marketplace.authenticator.handlers.authorization.AuthorizationHandler;
-import iudx.data.marketplace.authenticator.handlers.authorization.UserInfoFromAuthHandler;
-import iudx.data.marketplace.authenticator.model.DxRole;
-import iudx.data.marketplace.authenticator.model.UserInfo;
+import iudx.data.marketplace.apiserver.provider.controller.ProviderApis;
+import iudx.data.marketplace.apiserver.provider.linkedaccount.controller.LinkedAccountController;
+import iudx.data.marketplace.authenticator.service.AuthenticationService;
 import iudx.data.marketplace.common.*;
-import iudx.data.marketplace.policies.service.PolicyService;
-import iudx.data.marketplace.policies.service.model.User;
+import iudx.data.marketplace.consumer.controller.ConsumerApis;
+import iudx.data.marketplace.consumer.controller.PaymentVerificationController;
+import iudx.data.marketplace.policies.controller.PolicyController;
 import iudx.data.marketplace.postgres.service.PostgresService;
-import iudx.data.marketplace.razorpay.service.RazorPayService;
-import iudx.data.marketplace.webhook.service.WebhookService;
+import iudx.data.marketplace.webhook.controller.WebhookController;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.stream.Stream;
@@ -55,22 +42,14 @@ import org.apache.logging.log4j.Logger;
 public class ApiServerVerticle extends AbstractVerticle {
 
   private static final Logger LOGGER = LogManager.getLogger(ApiServerVerticle.class);
-  private PolicyService policyService;
   private HttpServer server;
   private Router router;
-  private String detail;
   private int port;
   private PostgresService postgresService;
-  private RazorPayService razorPayService;
   private AuthClient authClient;
   private WebClient webClient;
   private WebClientOptions webClientOptions;
   private AuthenticationService authenticationService;
-  private LinkedAccountService linkedAccountService;
-  private WebhookService webhookService;
-  private UserInfoFromAuthHandler userInfoFromAuthHandler;
-  private UserInfo userInfo;
-  private AuthHandler authHandler;
 
   /**
    * This method is used to start the Verticle. It deploys a verticle in a cluster, reads the
@@ -105,17 +84,10 @@ public class ApiServerVerticle extends AbstractVerticle {
     webClient = WebClient.create(vertx, webClientOptions);
 
     /* Initialize service proxy */
-    policyService = PolicyService.createProxy(vertx, POLICY_SERVICE_ADDRESS);
     postgresService = PostgresService.createProxy(vertx, POSTGRES_SERVICE_ADDRESS);
-    razorPayService = RazorPayService.createProxy(vertx, RAZORPAY_SERVICE_ADDRESS);
 
     authClient = new AuthClient(config(), webClient);
     authenticationService = AuthenticationService.createProxy(vertx, AUTH_SERVICE_ADDRESS);
-    linkedAccountService = LinkedAccountService.createProxy(vertx, LINKED_ACCOUNT_ADDRESS);
-    webhookService = WebhookService.createProxy(vertx, WEBHOOK_SERVICE_ADDRESS);
-    userInfo = new UserInfo();
-    userInfoFromAuthHandler = new UserInfoFromAuthHandler(authClient, userInfo, postgresService);
-    authHandler = new AuthHandler(authenticationService);
     router = Router.router(vertx);
 
     router
@@ -174,7 +146,7 @@ public class ApiServerVerticle extends AbstractVerticle {
     server = vertx.createHttpServer(serverOptions);
     server.requestHandler(router).listen(port);
     Api api = Api.getInstance(config().getString("dxApiBasePath"));
-
+    String audience = config().getString("audience");
     router
         .route(PROVIDER_PATH + "/*")
         .subRouter(
@@ -185,127 +157,40 @@ public class ApiServerVerticle extends AbstractVerticle {
         .subRouter(
             new ConsumerApis(vertx, router, api, postgresService, authClient, authenticationService)
                 .init());
-    String audience = config().getString("audience");
-
-    ExceptionHandler exceptionHandler = new ExceptionHandler();
-    ValidationHandler checkPolicyValidationHandler =
-        new ValidationHandler(RequestType.CHECK_POLICY);
-    ValidationHandler verifyValidationHandler = new ValidationHandler(RequestType.VERIFY);
-    ValidationHandler postLinkedAccountHandler = new ValidationHandler(RequestType.POST_ACCOUNT);
-    ValidationHandler putLinkedAccountHandler = new ValidationHandler(RequestType.PUT_ACCOUNT);
-    Handler<RoutingContext> apiAccessHandler =
-        new AuthorizationHandler()
-            .setUserRolesForEndpoint(DxRole.CONSUMER, DxRole.PROVIDER, DxRole.DELEGATE);
-    Handler<RoutingContext> consumerApiAccessHandler =
-        new AuthorizationHandler().setUserRolesForEndpoint(DxRole.CONSUMER, DxRole.DELEGATE);
-    Handler<RoutingContext> providerApiAccessHandler =
-        new AuthorizationHandler().setUserRolesForEndpoint(DxRole.PROVIDER, DxRole.DELEGATE);
-    Handler<RoutingContext> tokenIntrospectHandler = new TokenIntrospectHandler().validateToken();
-    Handler<RoutingContext> kcTokenIntrospectHandler =
-        new TokenIntrospectHandler().validateKeycloakToken(audience);
+    router
+        .route(POLICIES_API + "/*")
+        .subRouter(new PolicyController(router, api, vertx, audience, authClient).policyHandler());
+    router
+        .route(CHECK_POLICY_PATH + "/*")
+        .subRouter(
+            new PolicyController(router, api, vertx, audience, authClient).checkPolicyHandler());
+    router
+        .route(VERIFY_PATH + "/*")
+        .subRouter(new PolicyController(router, api, vertx, audience, authClient).verifyHandler());
 
     router
-        .get(api.getPoliciesUrl())
-        .handler(authHandler)
-        .handler(tokenIntrospectHandler)
-        .handler(apiAccessHandler)
-        .handler(userInfoFromAuthHandler)
-        .handler(this::getPoliciesHandler)
-        .failureHandler(exceptionHandler);
+        .route(ACCOUNTS_API + "/*")
+        .subRouter(new LinkedAccountController(router, api, vertx, authClient).init());
+    router
+        .route(PAYMENT_AUTHORIZED_PATH + "/*")
+        .subRouter(new WebhookController(router, vertx).paymentAuthorizedHandler());
+    router
+        .route(ORDER_PAID_WEBHOOK_PATH + "/*")
+        .subRouter(new WebhookController(router, vertx).orderPaidHandler());
+    router
+        .route(PAYMENTS_FAILED_PATH + "/*")
+        .subRouter(new WebhookController(router, vertx).paymentFailedHandler());
+
+    router
+        .route(VERIFY_PAYMENTS_PATH + "/*")
+        .subRouter(new PaymentVerificationController(router, api, vertx, authClient).init());
 
     //    router
     //        .post(api.getProductUserMapsPath())
     //        .handler(this::mapUserToProduct)
     //        .failureHandler(exceptionHandler);
 
-    router
-        .post(api.getVerifyUrl())
-        .handler(verifyValidationHandler)
-        .handler(authHandler)
-        .handler(kcTokenIntrospectHandler)
-        .handler(this::handleVerify)
-        .failureHandler(exceptionHandler);
-
-    ValidationHandler verifyPaymentValidationHandler =
-        new ValidationHandler(RequestType.VERIFY_PAYMENT);
-    router
-        .post(api.getVerifyPaymentApi())
-        .handler(verifyPaymentValidationHandler)
-        .handler(authHandler)
-        .handler(tokenIntrospectHandler)
-        .handler(consumerApiAccessHandler)
-        .handler(userInfoFromAuthHandler)
-        .handler(this::handleVerifyPayment)
-        .failureHandler(exceptionHandler);
-
-    router
-        .post(api.getLinkedAccountService())
-        .handler(postLinkedAccountHandler)
-        .handler(authHandler)
-        .handler(tokenIntrospectHandler)
-        .handler(providerApiAccessHandler)
-        .handler(userInfoFromAuthHandler)
-        .handler(this::handlePostLinkedAccount)
-        .failureHandler(exceptionHandler);
-
-    router
-        .put(api.getLinkedAccountService())
-        .handler(putLinkedAccountHandler)
-        .handler(authHandler)
-        .handler(tokenIntrospectHandler)
-        .handler(providerApiAccessHandler)
-        .handler(userInfoFromAuthHandler)
-        .handler(this::handlePutLinkedAccount)
-        .failureHandler(exceptionHandler);
-
-    router
-        .get(api.getLinkedAccountService())
-        .handler(authHandler)
-        .handler(tokenIntrospectHandler)
-        .handler(providerApiAccessHandler)
-        .handler(userInfoFromAuthHandler)
-        .handler(this::handleFetchLinkedAccount)
-        .failureHandler(exceptionHandler);
-
-    router
-        .get(api.getCheckPolicyPath())
-        .handler(checkPolicyValidationHandler)
-        .handler(authHandler)
-        .handler(tokenIntrospectHandler)
-        .handler(consumerApiAccessHandler)
-        .handler(userInfoFromAuthHandler)
-        .handler(this::checkPolicyHandler)
-        .failureHandler(exceptionHandler);
-
-    /*Webhook routes */
-
-    ValidationHandler orderPaidRequestValidationHandler =
-        new ValidationHandler(RequestType.ORDER_PAID_WEBHOOK);
-    router
-        .post("/order-paid-webhooks")
-        .handler(this::handleWebhookSignatureValidation)
-        .handler(orderPaidRequestValidationHandler)
-        .handler(this::orderPaidRequestHandler)
-        .failureHandler(exceptionHandler);
-
-    ValidationHandler paymentAuthorizedRequestValidationHandler =
-        new ValidationHandler(RequestType.PAYMENT_AUTHORIZED_WEBHOOK);
-    router
-        .post("/payment-authorized")
-        .handler(this::handleWebhookSignatureValidation)
-        .handler(paymentAuthorizedRequestValidationHandler)
-        .handler(this::paymentAuthorizedRequestHandler);
-
-    ValidationHandler paymentFailedRequestValidationHandler =
-        new ValidationHandler(RequestType.PAYMENT_FAILED_WEBHOOK);
-    router
-        .post("/payments-failed")
-        .handler(this::handleWebhookSignatureValidation)
-        .handler(paymentFailedRequestValidationHandler)
-        .handler(this::paymentFailedRequestHandler);
-
     //  Documentation routes
-
     /* Static Resource Handler */
     /* Get openapiv3 spec */
     router
@@ -328,7 +213,7 @@ public class ApiServerVerticle extends AbstractVerticle {
 
     printDeployedEndpoints(router);
     /* Print the deployed endpoints */
-    LOGGER.info("API server deployed on: " + port);
+    LOGGER.info("API server deployed on: {}", port);
   }
 
   /**
@@ -343,120 +228,6 @@ public class ApiServerVerticle extends AbstractVerticle {
     port = config().getInteger("httpPort") == null ? 8080 : config().getInteger("httpPort");
   }
 
-  private void checkPolicyHandler(RoutingContext routingContext) {
-    HttpServerResponse response = routingContext.response();
-
-    User user = RoutingContextHelper.getUser(routingContext);
-    String productVariantId = routingContext.request().getParam("productVariantId");
-    policyService
-        .checkPolicy(productVariantId, user)
-        .onComplete(
-            handler -> {
-              if (handler.succeeded()) {
-                int statusCode = handler.result().getInteger(STATUS_CODE);
-                String result = handler.result().getJsonObject(RESULTS).encode();
-                handleSuccessResponse(response, statusCode, result);
-              } else {
-                handleFailureResponse(routingContext, handler.cause().getMessage());
-              }
-            });
-  }
-
-  private void handleWebhookSignatureValidation(RoutingContext routingContext) {
-
-    JsonObject requestBody = routingContext.body().asJsonObject();
-    HttpServerRequest request = routingContext.request();
-    String xrazorpaySignature = request.headers().get(HEADER_X_RAZORPAY_SIGNATURE);
-
-    razorPayService
-        .webhookSignatureValidator(requestBody, xrazorpaySignature)
-        .onSuccess(
-            requestValidated -> {
-              LOGGER.debug("Request Validated");
-              routingContext.next();
-            })
-        .onFailure(
-            requestInvalidated -> {
-              LOGGER.error("Request Validation Failed");
-              routingContext.next();
-            });
-  }
-
-  private void paymentFailedRequestHandler(RoutingContext routingContext) {
-
-    JsonObject requestBody = routingContext.body().asJsonObject();
-    HttpServerResponse response = routingContext.response();
-
-    LOGGER.debug(requestBody);
-    String orderId =
-        requestBody
-            .getJsonObject(RAZORPAY_PAYLOAD)
-            .getJsonObject(RAZORPAY_PAYMENT)
-            .getJsonObject(RAZORPAY_ENTITY)
-            .getString(RAZORPAY_ORDER_ID, "");
-    webhookService
-        .recordPaymentFailure(orderId)
-        .onSuccess(
-            statusUpdated -> {
-              handleSuccessResponse(response, 200, "Payment status updated");
-            })
-        .onFailure(
-            statusUpdateFailed -> {
-              handleFailureResponse(routingContext, statusUpdateFailed.getMessage());
-            });
-  }
-
-  private void paymentAuthorizedRequestHandler(RoutingContext routingContext) {
-
-    JsonObject requestBody = routingContext.body().asJsonObject();
-    HttpServerResponse response = routingContext.response();
-
-    LOGGER.debug(requestBody);
-
-    handleSuccessResponse(response, 200, requestBody.encode());
-  }
-
-  private void orderPaidRequestHandler(RoutingContext routingContext) {
-
-    JsonObject requestBody = routingContext.body().asJsonObject();
-    HttpServerResponse response = routingContext.response();
-
-    String orderId =
-        requestBody
-            .getJsonObject(RAZORPAY_PAYLOAD)
-            .getJsonObject(RAZORPAY_ORDER)
-            .getJsonObject(RAZORPAY_ENTITY)
-            .getString(RAZORPAY_ID, "");
-
-    webhookService
-        .recordOrderPaid(orderId)
-        .onSuccess(
-            policyCreated -> {
-              handleSuccessResponse(response, 200, policyCreated.encode());
-            })
-        .onFailure(
-            policyCreationFailed -> {
-              handleFailureResponse(routingContext, policyCreationFailed.getMessage());
-            });
-  }
-
-  private void handleVerifyPayment(RoutingContext routingContext) {
-
-    JsonObject requestBody = routingContext.body().asJsonObject();
-    HttpServerResponse response = routingContext.response();
-
-    razorPayService
-        .verifyPayment(requestBody)
-        .onSuccess(
-            paymentVerified -> {
-              handleSuccessResponse(response, 200, paymentVerified.encode());
-            })
-        .onFailure(
-            verifyFailed -> {
-              handleResponse(response, BAD_REQUEST.getValue(), verifyFailed.getMessage());
-            });
-  }
-
   private void printDeployedEndpoints(Router router) {
     for (Route route : router.getRoutes()) {
       if (route.getPath() != null) {
@@ -465,177 +236,5 @@ public class ApiServerVerticle extends AbstractVerticle {
     }
   }
 
-  private void getPoliciesHandler(RoutingContext routingContext) {
-    HttpServerResponse response = routingContext.response();
-
-    User user = RoutingContextHelper.getUser(routingContext);
-    policyService
-        .getPolicies(user)
-        .onComplete(
-            handler -> {
-              if (handler.succeeded()) {
-                String result = handler.result().getJsonObject(RESULT).encode();
-                handleSuccessResponse(response, handler.result().getInteger(STATUS_CODE), result);
-              } else {
-                handleFailureResponse(routingContext, handler.cause().getMessage());
-              }
-            });
-  }
-
   //  private void mapUserToProduct(RoutingContext routingContext) {}
-
-  private void handlePostLinkedAccount(RoutingContext routingContext) {
-    JsonObject requestBody = routingContext.body().asJsonObject();
-    User user = RoutingContextHelper.getUser(routingContext);
-    HttpServerResponse response = routingContext.response();
-    linkedAccountService
-        .createLinkedAccount(requestBody, user)
-        .onComplete(
-            handler -> {
-              if (handler.succeeded()) {
-                LOGGER.info("Linked account created successfully ");
-                handleSuccessResponse(
-                    response, HttpStatusCode.SUCCESS.getValue(), handler.result().toString());
-
-              } else {
-                LOGGER.error(
-                    "Linked account could not be created {}", handler.cause().getMessage());
-                handleFailureResponse(routingContext, handler.cause().getMessage());
-              }
-            });
-  }
-
-  private void handlePutLinkedAccount(RoutingContext routingContext) {
-    JsonObject requestBody = routingContext.body().asJsonObject();
-    HttpServerResponse response = routingContext.response();
-    User user = RoutingContextHelper.getUser(routingContext);
-
-    linkedAccountService
-        .updateLinkedAccount(requestBody, user)
-        .onComplete(
-            handler -> {
-              if (handler.succeeded()) {
-                LOGGER.info("Linked account updated successfully ");
-                handleSuccessResponse(
-                    response, HttpStatusCode.SUCCESS.getValue(), handler.result().toString());
-              } else {
-                LOGGER.error(
-                    "Linked account could not be updated {}", handler.cause().getMessage());
-                handleFailureResponse(routingContext, handler.cause().getMessage());
-              }
-            });
-  }
-
-  private void handleFetchLinkedAccount(RoutingContext routingContext) {
-    HttpServerResponse response = routingContext.response();
-    User user = RoutingContextHelper.getUser(routingContext);
-    linkedAccountService
-        .fetchLinkedAccount(user)
-        .onComplete(
-            handler -> {
-              if (handler.succeeded()) {
-                LOGGER.info("Linked account fetched successfully ");
-                handleSuccessResponse(
-                    response, HttpStatusCode.SUCCESS.getValue(), handler.result().toString());
-              } else {
-                LOGGER.error(
-                    "Linked account could not be fetched {}", handler.cause().getMessage());
-                handleFailureResponse(routingContext, handler.cause().getMessage());
-              }
-            });
-  }
-
-  private void handleVerify(RoutingContext routingContext) {
-    JsonObject requestBody = routingContext.body().asJsonObject();
-    HttpServerResponse response = routingContext.response();
-    policyService
-        .verifyPolicy(requestBody)
-        .onComplete(
-            handler -> {
-              if (handler.succeeded()) {
-                LOGGER.info("Policy verified successfully ");
-                handleSuccessResponse(
-                    response, HttpStatusCode.SUCCESS.getValue(), handler.result().toString());
-              } else {
-                LOGGER.error("Policy could not be verified {}", handler.cause().getMessage());
-                handleFailureResponse(routingContext, handler.cause().getMessage());
-              }
-            });
-  }
-
-  /**
-   * Handles HTTP Success response from the server
-   *
-   * @param response HttpServerResponse object
-   * @param statusCode statusCode to respond with
-   * @param result respective result returned from the service
-   */
-  private void handleSuccessResponse(HttpServerResponse response, int statusCode, String result) {
-    response.putHeader(CONTENT_TYPE, APPLICATION_JSON).setStatusCode(statusCode).end(result);
-  }
-
-  /**
-   * Handles Failed HTTP Response
-   *
-   * @param routingContext Routing context object
-   * @param failureMessage Failure message for response
-   */
-  private void handleFailureResponse(RoutingContext routingContext, String failureMessage) {
-    HttpServerResponse response = routingContext.response();
-    LOGGER.debug("Failure Message : {} ", failureMessage);
-
-    try {
-      JsonObject jsonObject = new JsonObject(failureMessage);
-      int type = jsonObject.getInteger(TYPE);
-      String title = jsonObject.getString(TITLE);
-
-      HttpStatusCode status = HttpStatusCode.getByValue(type);
-
-      ResponseUrn urn;
-
-      // get the urn by either type or title
-      if (title != null) {
-        urn = ResponseUrn.fromCode(title);
-      } else {
-
-        urn = ResponseUrn.fromCode(String.valueOf(type));
-      }
-      if (jsonObject.getString(DETAIL) != null) {
-        detail = jsonObject.getString(DETAIL);
-        response
-            .putHeader(CONTENT_TYPE, APPLICATION_JSON)
-            .setStatusCode(type)
-            .end(generateResponse(status, urn, detail).toString());
-      } else {
-        response
-            .putHeader(CONTENT_TYPE, APPLICATION_JSON)
-            .setStatusCode(type)
-            .end(generateResponse(status, urn).toString());
-      }
-
-    } catch (DecodeException exception) {
-      LOGGER.error("Error : Expecting JSON from backend service [ jsonFormattingException ] ");
-      handleResponse(response, BAD_REQUEST, ResponseUrn.BACKING_SERVICE_FORMAT_URN);
-    }
-  }
-
-  private void handleResponse(HttpServerResponse response, int statusCode, String result) {
-    response.putHeader(CONTENT_TYPE, APPLICATION_JSON).setStatusCode(statusCode).end(result);
-  }
-
-  private void handleResponse(
-      HttpServerResponse response, HttpStatusCode statusCode, ResponseUrn urn) {
-    handleResponse(response, statusCode, urn, statusCode.getDescription());
-  }
-
-  private void handleResponse(
-      HttpServerResponse response,
-      HttpStatusCode statusCode,
-      ResponseUrn urn,
-      String failureMessage) {
-    response
-        .putHeader(CONTENT_TYPE, APPLICATION_JSON)
-        .setStatusCode(statusCode.getValue())
-        .end(generateResponse(statusCode, urn, failureMessage).toString());
-  }
 }

@@ -3,7 +3,7 @@ package iudx.data.marketplace.authenticator.handlers.authentication;
 import io.vertx.core.Handler;
 import io.vertx.ext.web.RoutingContext;
 import iudx.data.marketplace.apiserver.exceptions.DxRuntimeException;
-import iudx.data.marketplace.authenticator.model.JwtData;
+import iudx.data.marketplace.authenticator.service.model.JwtData;
 import iudx.data.marketplace.common.HttpStatusCode;
 import iudx.data.marketplace.common.ResponseUrn;
 import iudx.data.marketplace.common.RoutingContextHelper;

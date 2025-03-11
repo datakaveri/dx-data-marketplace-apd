@@ -1,11 +1,11 @@
-package iudx.data.marketplace.authenticator;
+package iudx.data.marketplace.authenticator.service;
 
 import io.vertx.codegen.annotations.GenIgnore;
 import io.vertx.codegen.annotations.ProxyGen;
 import io.vertx.codegen.annotations.VertxGen;
 import io.vertx.core.Future;
 import io.vertx.core.Vertx;
-import iudx.data.marketplace.authenticator.model.JwtData;
+import iudx.data.marketplace.authenticator.service.model.JwtData;
 
 /**
  * The Authentication Service.

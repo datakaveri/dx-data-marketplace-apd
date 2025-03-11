@@ -1,7 +1,8 @@
-package iudx.data.marketplace.apiserver;
+package iudx.data.marketplace.apiserver.provider.controller;
 
 import static iudx.data.marketplace.apiserver.response.ResponseUtil.generateResponse;
 import static iudx.data.marketplace.apiserver.util.Constants.*;
+import iudx.data.marketplace.common.*;
 import static iudx.data.marketplace.common.Constants.AUTH_INFO;
 import static iudx.data.marketplace.common.Constants.PRODUCT_SERVICE_ADDRESS;
 import static iudx.data.marketplace.common.Constants.PRODUCT_VARIANT_SERVICE_ADDRESS;
@@ -19,17 +20,13 @@ import io.vertx.ext.web.RoutingContext;
 import iudx.data.marketplace.aaaService.AuthClient;
 import iudx.data.marketplace.apiserver.exceptions.DxRuntimeException;
 import iudx.data.marketplace.apiserver.util.RequestType;
-import iudx.data.marketplace.authenticator.AuthenticationService;
-import iudx.data.marketplace.authenticator.handlers.*;
+import iudx.data.marketplace.authenticator.service.AuthenticationService;
 import iudx.data.marketplace.authenticator.handlers.authentication.AuthHandler;
 import iudx.data.marketplace.authenticator.handlers.authentication.TokenIntrospectHandler;
 import iudx.data.marketplace.authenticator.handlers.authorization.AuthorizationHandler;
 import iudx.data.marketplace.authenticator.handlers.authorization.UserInfoFromAuthHandler;
-import iudx.data.marketplace.authenticator.model.DxRole;
-import iudx.data.marketplace.authenticator.model.UserInfo;
-import iudx.data.marketplace.common.Api;
-import iudx.data.marketplace.common.HttpStatusCode;
-import iudx.data.marketplace.common.ResponseUrn;
+import iudx.data.marketplace.authenticator.service.model.DxRole;
+import iudx.data.marketplace.authenticator.service.model.UserInfo;
 import iudx.data.marketplace.policies.service.model.User;
 import iudx.data.marketplace.postgres.service.PostgresService;
 import iudx.data.marketplace.product.service.ProductService;
@@ -54,7 +51,7 @@ public class ProviderApis {
   private UserInfoFromAuthHandler userInfoFromAuthHandler;
   private AuthHandler authHandler;
 
-  ProviderApis(
+  public ProviderApis(
       Vertx vertx,
       Router router,
       Api apis,
@@ -69,7 +66,7 @@ public class ProviderApis {
     this.authenticationService = authenticationService;
   }
 
-  Router init() {
+  public Router init() {
 
     ValidationHandler productValidationHandler = new ValidationHandler(RequestType.PRODUCT);
     ExceptionHandler exceptionHandler = new ExceptionHandler();

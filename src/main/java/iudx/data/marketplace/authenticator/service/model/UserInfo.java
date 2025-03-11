@@ -1,4 +1,4 @@
-package iudx.data.marketplace.authenticator.model;
+package iudx.data.marketplace.authenticator.service.model;
 
 import java.util.UUID;
 

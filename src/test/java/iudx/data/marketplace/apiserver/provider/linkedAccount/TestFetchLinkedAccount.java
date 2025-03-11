@@ -31,7 +31,7 @@ import static org.mockito.Mockito.when;
 
 @ExtendWith({MockitoExtension.class, VertxExtension.class})
 public class TestFetchLinkedAccount {
-  private static Logger LOGGER = LogManager.getLogger(TestUpdateLinkedAccount.class);
+  private static Logger LOGGER = LogManager.getLogger(TestFetchLinkedAccount.class);
   @Mock PostgresService postgresService;
   @Mock Api api;
   @Mock User provider;

@@ -18,7 +18,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 public class RazorPayVerticle extends AbstractVerticle {
-  private static final Logger LOGGER = LogManager.getLogger(AbstractVerticle.class);
+  private static final Logger LOGGER = LogManager.getLogger(RazorPayVerticle.class);
   private MessageConsumer<JsonObject> consumer;
   private ServiceBinder binder;
   private PostgresService postgresService;

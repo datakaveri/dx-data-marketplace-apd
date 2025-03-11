@@ -1,5 +1,7 @@
-package iudx.data.marketplace.authenticator.handlers;
+package iudx.data.marketplace.common;
 
+import io.vertx.core.json.JsonArray;
+import io.vertx.serviceproxy.HelperUtils;
 import static iudx.data.marketplace.apiserver.util.Constants.*;
 
 import io.vertx.core.Handler;
@@ -7,9 +9,6 @@ import io.vertx.core.json.DecodeException;
 import io.vertx.core.json.JsonObject;
 import io.vertx.ext.web.RoutingContext;
 import iudx.data.marketplace.apiserver.exceptions.DxRuntimeException;
-import iudx.data.marketplace.common.HttpStatusCode;
-import iudx.data.marketplace.common.RespBuilder;
-import iudx.data.marketplace.common.ResponseUrn;
 import org.apache.http.HttpStatus;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -22,6 +21,8 @@ public class ExceptionHandler implements Handler<RoutingContext> {
   public void handle(RoutingContext routingContext) {
 
     Throwable failure = routingContext.failure();
+    JsonArray stackTrace = HelperUtils.convertStackTrace(failure);
+    LOGGER.error("Failure stack trace : {}", stackTrace.encode());
 
     if (failure instanceof DxRuntimeException) {
       DxRuntimeException exception = (DxRuntimeException) failure;

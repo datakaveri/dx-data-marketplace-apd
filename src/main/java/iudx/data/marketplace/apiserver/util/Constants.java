@@ -82,6 +82,9 @@ public class Constants {
   public static final String VERIFY_PAYMENTS_PATH = "/verify-payment";
   public static final String ACCOUNTS_API = "/account";
   public static final String CHECK_POLICY_PATH = "/check";
+  public static final String PAYMENTS_FAILED_PATH = "/payments-failed";
+  public static final String PAYMENT_AUTHORIZED_PATH = "/payment-authorized";
+  public static final String ORDER_PAID_WEBHOOK_PATH = "/order-paid-webhooks";
 
   // query parameters | request body
 
