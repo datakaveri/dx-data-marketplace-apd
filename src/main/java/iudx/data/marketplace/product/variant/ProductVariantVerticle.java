@@ -18,15 +18,12 @@ public class ProductVariantVerticle extends AbstractVerticle {
   public static final Logger LOGGER = LogManager.getLogger(ProductVariantVerticle.class);
   private MessageConsumer<JsonObject> consumer;
   private ServiceBinder binder;
-  private PostgresService postgresService;
-  private ProductVariantService variantService;
-  private Util util;
 
   @Override
   public void start() throws Exception {
-    postgresService = PostgresService.createProxy(vertx, POSTGRES_SERVICE_ADDRESS);
-    util = new Util();
-    variantService = new ProductVariantServiceImpl(config(), postgresService, util);
+    PostgresService postgresService = PostgresService.createProxy(vertx, POSTGRES_SERVICE_ADDRESS);
+    Util util = new Util();
+    ProductVariantService variantService = new ProductVariantServiceImpl(config(), postgresService, util);
 
     binder = new ServiceBinder(vertx);
     consumer =

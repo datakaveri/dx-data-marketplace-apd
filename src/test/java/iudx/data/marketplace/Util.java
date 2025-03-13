@@ -6,8 +6,8 @@ import io.vertx.core.Vertx;
 import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
 import io.vertx.pgclient.PgConnectOptions;
-import io.vertx.pgclient.PgPool;
 import io.vertx.serviceproxy.HelperUtils;
+import io.vertx.sqlclient.Pool;
 import io.vertx.sqlclient.PoolOptions;
 import io.vertx.sqlclient.Row;
 import io.vertx.sqlclient.Tuple;
@@ -65,7 +65,7 @@ public class Util {
     private Tuple purchaseTuple;
     private PgConnectOptions connectOptions;
     private PoolOptions poolOptions;
-    private PgPool pool;
+    private Pool pool;
 
     private PostgresServiceImpl postgresService;
     public static UUID generateRandomUuid() {
@@ -121,7 +121,7 @@ public class Util {
         this.poolOptions = new PoolOptions().setMaxSize(25);
         if (container.isRunning()) {
             LOG.info("container is running....");
-            this.pool = PgPool.pool(vertx, connectOptions, poolOptions);
+            this.pool = Pool.pool(vertx, connectOptions, poolOptions);
             postgresService = new PostgresServiceImpl(pool);
 
 //            Flyway flyway =

@@ -42,14 +42,10 @@ public class ProviderApis {
   private final Router router;
   private ProductService productService;
   private ProductVariantService variantService;
-  private Api api;
-  private PostgresService postgresService;
-  private String detail;
-  private AuthClient authClient;
-  private AuthenticationService authenticationService;
-  private UserInfo userInfo;
-  private UserInfoFromAuthHandler userInfoFromAuthHandler;
-  private AuthHandler authHandler;
+  private final Api api;
+  private final PostgresService postgresService;
+  private final AuthClient authClient;
+  private final AuthenticationService authenticationService;
 
   public ProviderApis(
       Vertx vertx,
@@ -72,9 +68,10 @@ public class ProviderApis {
     ExceptionHandler exceptionHandler = new ExceptionHandler();
     Handler<RoutingContext> providerApiAccessHandler =
         new AuthorizationHandler().setUserRolesForEndpoint(DxRole.PROVIDER, DxRole.DELEGATE);
-    userInfo = new UserInfo();
-    userInfoFromAuthHandler = new UserInfoFromAuthHandler(authClient, userInfo, postgresService);
-    authHandler = new AuthHandler(authenticationService);
+    UserInfo userInfo = new UserInfo();
+    UserInfoFromAuthHandler userInfoFromAuthHandler =
+        new UserInfoFromAuthHandler(authClient, userInfo, postgresService);
+    AuthHandler authHandler = new AuthHandler(authenticationService);
     Handler<RoutingContext> tokenIntrospectHandler = new TokenIntrospectHandler().validateToken();
 
     productService = ProductService.createProxy(vertx, PRODUCT_SERVICE_ADDRESS);
@@ -412,7 +409,7 @@ public class ProviderApis {
         urn = ResponseUrn.fromCode(String.valueOf(type));
       }
       if (jsonObject.getString(DETAIL) != null) {
-        detail = jsonObject.getString(DETAIL);
+        String detail = jsonObject.getString(DETAIL);
         response
             .putHeader(CONTENT_TYPE, APPLICATION_JSON)
             .setStatusCode(type)

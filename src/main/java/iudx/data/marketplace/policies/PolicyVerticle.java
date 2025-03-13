@@ -11,29 +11,18 @@ import iudx.data.marketplace.postgres.service.PostgresService;
 
 public class PolicyVerticle extends AbstractVerticle {
 
-  private PostgresService postgresServiceImpl;
-  private PolicyServiceImpl policyService;
-  private DeletePolicy deletePolicy;
-  private CreatePolicy createPolicy;
-  private VerifyPolicy verifyPolicy;
-  private GetPolicy getPolicy;
-  private AuditingService auditingService;
-  private Api api;
-  private FetchPolicyUsingPvId fetchPolicyUsingPvId;
-
   @Override
   public void start() {
-    postgresServiceImpl = PostgresService.createProxy(vertx, POSTGRES_SERVICE_ADDRESS);
-    auditingService = AuditingService.createProxy(vertx, AUDITING_SERVICE_ADDRESS);
-    api = Api.getInstance(config().getString("dxApiBasePath"));
-    deletePolicy = new DeletePolicy(postgresServiceImpl, auditingService, api);
-    getPolicy = new GetPolicy(postgresServiceImpl);
-    createPolicy = new CreatePolicy(postgresServiceImpl, auditingService, api);
-    verifyPolicy = new VerifyPolicy(postgresServiceImpl);
-    fetchPolicyUsingPvId = new FetchPolicyUsingPvId(postgresServiceImpl);
-    policyService =
-        new PolicyServiceImpl(
-            deletePolicy, createPolicy, getPolicy, verifyPolicy, fetchPolicyUsingPvId);
+    PostgresService postgresServiceImpl = PostgresService.createProxy(vertx, POSTGRES_SERVICE_ADDRESS);
+    AuditingService auditingService = AuditingService.createProxy(vertx, AUDITING_SERVICE_ADDRESS);
+    Api api = Api.getInstance(config().getString("dxApiBasePath"));
+    DeletePolicy deletePolicy = new DeletePolicy(postgresServiceImpl, auditingService, api);
+    GetPolicy getPolicy = new GetPolicy(postgresServiceImpl);
+    CreatePolicy createPolicy = new CreatePolicy(postgresServiceImpl, auditingService, api);
+    VerifyPolicy verifyPolicy = new VerifyPolicy(postgresServiceImpl);
+    FetchPolicyUsingPvId fetchPolicyUsingPvId = new FetchPolicyUsingPvId(postgresServiceImpl);
+    PolicyServiceImpl policyService = new PolicyServiceImpl(
+        deletePolicy, createPolicy, getPolicy, verifyPolicy, fetchPolicyUsingPvId);
 
     new ServiceBinder(vertx)
         .setAddress(POLICY_SERVICE_ADDRESS)

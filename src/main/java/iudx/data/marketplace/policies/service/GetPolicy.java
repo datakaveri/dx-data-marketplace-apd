@@ -130,7 +130,7 @@ public class GetPolicy {
   }
 
   /**
-   * Executes the respective queries by using the vertx PgPool instance
+   * Executes the respective queries by using the vertx Pool instance
    *
    * @param query String query to be executed
    * @param information Information to be added in the response

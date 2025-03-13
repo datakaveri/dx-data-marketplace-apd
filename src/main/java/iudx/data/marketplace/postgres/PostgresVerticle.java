@@ -6,8 +6,8 @@ import io.vertx.core.AbstractVerticle;
 import io.vertx.core.eventbus.MessageConsumer;
 import io.vertx.core.json.JsonObject;
 import io.vertx.pgclient.PgConnectOptions;
-import io.vertx.pgclient.PgPool;
 import io.vertx.serviceproxy.ServiceBinder;
+import io.vertx.sqlclient.Pool;
 import io.vertx.sqlclient.PoolOptions;
 import iudx.data.marketplace.postgres.service.PostgresService;
 import iudx.data.marketplace.postgres.service.PostgresServiceImpl;
@@ -19,30 +19,17 @@ public class PostgresVerticle extends AbstractVerticle {
   private MessageConsumer<JsonObject> consumer;
   private ServiceBinder binder;
 
-  private PgConnectOptions connectOptions;
-  private PoolOptions poolOptions;
-  private PgPool pool;
-
-  private String databaseIp;
-  private int databasePort;
-  private String databaseName;
-  private String databaseUserName;
-  private String databasePassword;
-  private int poolSize;
-
-  private PostgresService pgService;
-
   @Override
   public void start() throws Exception {
 
-    databaseIp = config().getString("databaseIP");
-    databasePort = config().getInteger("databasePort");
-    databaseName = config().getString("databaseName");
-    databaseUserName = config().getString("databaseUserName");
-    databasePassword = config().getString("databasePassword");
-    poolSize = config().getInteger("poolSize");
+    String databaseIp = config().getString("databaseIP");
+    int databasePort = config().getInteger("databasePort");
+    String databaseName = config().getString("databaseName");
+    String databaseUserName = config().getString("databaseUserName");
+    String databasePassword = config().getString("databasePassword");
+    int poolSize = config().getInteger("poolSize");
 
-    this.connectOptions =
+    PgConnectOptions connectOptions =
         new PgConnectOptions()
             .setPort(databasePort)
             .setHost(databaseIp)
@@ -52,10 +39,10 @@ public class PostgresVerticle extends AbstractVerticle {
             .setReconnectAttempts(2)
             .setReconnectInterval(1000L);
 
-    this.poolOptions = new PoolOptions().setMaxSize(poolSize);
-    this.pool = PgPool.pool(vertx, connectOptions, poolOptions);
+    PoolOptions poolOptions = new PoolOptions().setMaxSize(poolSize);
+    Pool pool = Pool.pool(vertx, connectOptions, poolOptions);
 
-    pgService = new PostgresServiceImpl(this.pool);
+    PostgresService pgService = new PostgresServiceImpl(pool);
 
     binder = new ServiceBinder(vertx);
     consumer =

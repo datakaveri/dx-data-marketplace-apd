@@ -39,7 +39,6 @@ public class AuthenticationVerticle extends AbstractVerticle {
   private AuthenticationService jwtAuthenticationService;
   private ServiceBinder binder;
   private MessageConsumer<JsonObject> consumer;
-  private WebClient webClient;
 
   static WebClient createWebClient(Vertx vertx, JsonObject config) {
     return createWebClient(vertx, config, false);
@@ -110,7 +109,7 @@ public class AuthenticationVerticle extends AbstractVerticle {
 
   private Future<JsonObject> getJwtPublicKey(Vertx vertx, JsonObject config) {
     Promise<JsonObject> promise = Promise.promise();
-    webClient = createWebClient(vertx, config);
+    WebClient webClient = createWebClient(vertx, config);
     String authCert = config.getString("dxAuthBasePath") + AUTH_JWKS_PATH;
     webClient
         .get(443, config.getString("authHost"), authCert)

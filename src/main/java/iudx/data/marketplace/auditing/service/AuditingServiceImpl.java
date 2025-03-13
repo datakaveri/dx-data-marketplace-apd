@@ -44,7 +44,7 @@ public class AuditingServiceImpl implements AuditingService {
     auditLog.put(ISO_TIME, isoTime);
 
     Promise<Void> promise = Promise.promise();
-    LOGGER.debug("AuditLog: " + auditLog);
+    LOGGER.debug("AuditLog: {}" , auditLog);
     this.insertAuditLogIntoRmq(auditLog)
         .onComplete(
             handler -> {
@@ -52,7 +52,7 @@ public class AuditingServiceImpl implements AuditingService {
                 LOGGER.info("Audit data published into RMQ.");
                 promise.complete();
               } else {
-                LOGGER.error("failed: " + handler.cause().getMessage());
+                LOGGER.error("failed: {}", handler.cause().getMessage());
                 promise.complete();
               }
             });

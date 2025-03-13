@@ -1,5 +1,6 @@
 package iudx.data.marketplace.postgres.service;
 
+import io.vertx.sqlclient.Pool;
 import static iudx.data.marketplace.apiserver.util.Constants.RESULTS;
 import static iudx.data.marketplace.apiserver.util.Constants.STATUS_CODE;
 
@@ -7,7 +8,6 @@ import io.vertx.core.Future;
 import io.vertx.core.Promise;
 import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
-import io.vertx.pgclient.PgPool;
 import io.vertx.sqlclient.Row;
 import io.vertx.sqlclient.SqlConnection;
 import io.vertx.sqlclient.Tuple;
@@ -26,9 +26,9 @@ import org.apache.logging.log4j.Logger;
 public class PostgresServiceImpl implements PostgresService {
   private static final Logger LOGGER = LogManager.getLogger(PostgresServiceImpl.class);
 
-  private final PgPool client;
+  private final Pool client;
 
-  public PostgresServiceImpl(final PgPool pgclient) {
+  public PostgresServiceImpl(final Pool pgclient) {
     this.client = pgclient;
   }
 

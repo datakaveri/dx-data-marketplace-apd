@@ -21,8 +21,8 @@ public class ValidationHandlerFactory {
       final MultiMap parameters,
       final JsonObject body,
       MultiMap header) {
-    LOGGER.debug("getValidation4Context() started for : " + requestType);
-    LOGGER.debug("type : " + requestType);
+    LOGGER.debug("getValidation4Context() started for : {}" , requestType);
+    LOGGER.debug("type : {}" , requestType);
     List<Validator> validator = null;
 
     switch (requestType) {

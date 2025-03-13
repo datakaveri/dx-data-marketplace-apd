@@ -21,19 +21,16 @@ public class RazorPayVerticle extends AbstractVerticle {
   private static final Logger LOGGER = LogManager.getLogger(RazorPayVerticle.class);
   private MessageConsumer<JsonObject> consumer;
   private ServiceBinder binder;
-  private PostgresService postgresService;
-  private RazorPayService razorPayService;
-
-  private RazorpayClient razorpayClient;
 
   @Override
   public void start() throws RazorpayException {
-    postgresService = PostgresService.createProxy(vertx, POSTGRES_SERVICE_ADDRESS);
+    PostgresService postgresService = PostgresService.createProxy(vertx, POSTGRES_SERVICE_ADDRESS);
 
     String razorPayKey = config().getString(RAZORPAY_KEY);
     String razorPaySecret = config().getString(RAZORPAY_SECRET);
 
     Boolean enableLogging = config().getBoolean("enableLogging", false);
+    RazorpayClient razorpayClient;
     if (enableLogging) {
       LOGGER.warn("RazorPay enable logging set to true, do not set in production!!");
       razorpayClient = new RazorpayClient(razorPayKey, razorPaySecret, true);
@@ -41,7 +38,7 @@ public class RazorPayVerticle extends AbstractVerticle {
       razorpayClient = new RazorpayClient(razorPayKey, razorPaySecret);
     }
 
-    razorPayService = new RazorPayServiceImpl(razorpayClient, postgresService, config());
+    RazorPayService razorPayService = new RazorPayServiceImpl(razorpayClient, postgresService, config());
 
     binder = new ServiceBinder(vertx);
     consumer =

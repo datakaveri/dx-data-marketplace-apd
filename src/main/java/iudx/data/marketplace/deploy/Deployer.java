@@ -11,6 +11,7 @@ import io.micrometer.core.instrument.binder.jvm.JvmMemoryMetrics;
 import io.micrometer.core.instrument.binder.jvm.JvmThreadMetrics;
 import io.micrometer.core.instrument.binder.system.ProcessorMetrics;
 import io.vertx.core.DeploymentOptions;
+import io.vertx.core.ThreadingModel;
 import io.vertx.core.Vertx;
 import io.vertx.core.VertxOptions;
 import io.vertx.core.cli.CLI;
@@ -54,6 +55,7 @@ import org.apache.logging.log4j.core.LoggerContext;
  *   <li>--modules/-m : comma separated list of module names to deploy, by default all is used to
  *       deploy every verticle
  * </ul>
+ *
  * Replace the fatjar file with respective path to fat jar for clustered or non-clustered mode
  * Replace the configs with the respective path to config.json
  *
@@ -64,7 +66,6 @@ import org.apache.logging.log4j.core.LoggerContext;
 public class Deployer {
   private static final Logger LOGGER = LogManager.getLogger(Deployer.class);
   private static Vertx vertxInstance;
-  private static ClusterManager mgr;
 
   /**
    * Recursively deploy all modules.
@@ -87,10 +88,10 @@ public class Deployer {
 
     boolean isWorkerVerticle = moduleConfigurations.getBoolean("isWorkerVerticle");
     if (isWorkerVerticle) {
-      LOGGER.info("worker verticle : " + moduleConfigurations.getString("id"));
+      LOGGER.info("worker verticle : {}", moduleConfigurations.getString("id"));
       deploymentOptions.setWorkerPoolName(moduleConfigurations.getString("threadPoolName"));
       deploymentOptions.setWorkerPoolSize(moduleConfigurations.getInteger("threadPoolSize"));
-      deploymentOptions.setWorker(true);
+      deploymentOptions.setThreadingModel(ThreadingModel.WORKER);
       deploymentOptions.setMaxWorkerExecuteTime(30L);
       deploymentOptions.setMaxWorkerExecuteTimeUnit(TimeUnit.MINUTES);
     }
@@ -100,7 +101,7 @@ public class Deployer {
         deploymentOptions,
         ar -> {
           if (ar.succeeded()) {
-            LOGGER.info("Deployed " + moduleName);
+            LOGGER.info("Deployed {}", moduleName);
             recursiveDeploy(vertx, configs, i + 1);
           } else {
             LOGGER.fatal("Failed to deploy {} cause: {}", moduleName, ar.cause());
@@ -131,7 +132,7 @@ public class Deployer {
             .orElse(new JsonObject());
 
     if (config.isEmpty()) {
-      LOGGER.fatal("Failed to deploy {} cause: Not Found",moduleName );
+      LOGGER.fatal("Failed to deploy {} cause: Not Found", moduleName);
       return;
     }
     // get common configs and add this to config object
@@ -145,7 +146,7 @@ public class Deployer {
       LOGGER.info("worker verticle : {}", config.getString("id"));
       deploymentOptions.setWorkerPoolName(config.getString("threadPoolName"));
       deploymentOptions.setWorkerPoolSize(config.getInteger("threadPoolSize"));
-      deploymentOptions.setWorker(true);
+      deploymentOptions.setThreadingModel(ThreadingModel.WORKER);
       deploymentOptions.setMaxWorkerExecuteTime(30L);
       deploymentOptions.setMaxWorkerExecuteTimeUnit(TimeUnit.MINUTES);
     }
@@ -155,11 +156,11 @@ public class Deployer {
         deploymentOptions,
         ar -> {
           if (ar.succeeded()) {
-            LOGGER.info("Deployed " + moduleName);
+            LOGGER.info("Deployed {}", moduleName);
             modules.remove(0);
             recursiveDeploy(vertx, configs, modules);
           } else {
-            LOGGER.fatal("Failed to deploy " + moduleName + " cause:", ar.cause());
+            LOGGER.fatal("Failed to deploy {} cause: {}", moduleName, ar.cause());
           }
         });
   }
@@ -182,7 +183,7 @@ public class Deployer {
       LOGGER.fatal("Couldn't read configuration file");
       return;
     }
-    if (config.length() < 1) {
+    if (config.isEmpty()) {
       LOGGER.fatal("Couldn't read configuration file");
       return;
     }
@@ -282,37 +283,37 @@ public class Deployer {
       LOGGER.fatal("Couldn't read configuration file");
       return;
     }
-    if (config.length() < 1) {
+    if (config.isEmpty()) {
       LOGGER.fatal("Couldn't read configuration file");
       return;
     }
     JsonObject configuration = new JsonObject(config);
     List<String> zookeepers = configuration.getJsonArray("zookeepers").getList();
     String clusterId = configuration.getString("clusterId");
-    mgr = getClusterManager(host, zookeepers, clusterId);
+    ClusterManager mgr = getClusterManager(host, zookeepers, clusterId);
     EventBusOptions ebOptions = new EventBusOptions().setClusterPublicHost(host);
     VertxOptions options =
-        new VertxOptions()
-            .setClusterManager(mgr)
-            .setEventBusOptions(ebOptions)
-            .setMetricsOptions(getMetricsOptions());
-    LOGGER.debug("metrics-options" + options.getMetricsOptions());
-    Vertx.clusteredVertx(
-        options,
-        res -> {
-          if (res.succeeded()) {
-            vertxInstance = res.result();
-            LOGGER.debug(vertxInstance.isMetricsEnabled());
-            setJvmMetrics();
-            if (modules.isEmpty()) {
-              recursiveDeploy(vertxInstance, configuration, 0);
-            } else {
-              recursiveDeploy(vertxInstance, configuration, modules);
-            }
-          } else {
-            LOGGER.fatal("Could not join cluster");
-          }
-        });
+        new VertxOptions().setEventBusOptions(ebOptions).setMetricsOptions(getMetricsOptions());
+    LOGGER.debug("metrics-options {}", options.getMetricsOptions());
+    Vertx.builder()
+        .withClusterManager(mgr)
+        .with(options)
+        .buildClustered()
+        .onSuccess(
+            vertx -> {
+              setVertxInstance(vertx);
+              LOGGER.debug(vertxInstance.isMetricsEnabled());
+              setJvmMetrics();
+              if (modules.isEmpty()) {
+                recursiveDeploy(vertxInstance, configuration, 0);
+              } else {
+                recursiveDeploy(vertxInstance, configuration, modules);
+              }
+            })
+        .onFailure(
+            throwable -> {
+              LOGGER.fatal("Could not join cluster : {}", HelperUtils.convertStackTrace(throwable));
+            });
   }
 
   public static ClusterManager getClusterManager(
@@ -372,10 +373,10 @@ public class Deployer {
           deploymentId,
           handler -> {
             if (handler.succeeded()) {
-              LOGGER.debug("{} verticle  successfully Undeployed",deploymentId);
+              LOGGER.debug("{} verticle  successfully Undeployed", deploymentId);
               latchVerticles.countDown();
             } else {
-              LOGGER.warn("{} Undeploy failed!",deploymentId);
+              LOGGER.warn("{} Undeploy failed!", deploymentId);
             }
           });
     }

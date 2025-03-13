@@ -14,31 +14,21 @@ import iudx.data.marketplace.razorpay.service.RazorPayService;
 public class LinkedAccountVerticle extends AbstractVerticle {
   //  private static final Logger LOGGER = LogManager.getLogger(LinkedAccountVerticle.class);
 
-  private PostgresService postgresService;
-  private LinkedAccountServiceImpl linkedAccountService;
-  private CreateLinkedAccount createLinkedAccount;
-  private FetchLinkedAccount fetchLinkedAccount;
-  private UpdateLinkedAccount updateLinkedAccount;
-  private AuditingService auditingService;
-
-  private Api api;
-  private RazorPayService razorPayService;
-
   @Override
   public void start(Promise<Void> startPromise) throws Exception {
-    postgresService = PostgresService.createProxy(vertx, POSTGRES_SERVICE_ADDRESS);
-    api = Api.getInstance(config().getString("dxApiBasePath"));
-    auditingService = AuditingService.createProxy(vertx, AUDITING_SERVICE_ADDRESS);
+    PostgresService postgresService = PostgresService.createProxy(vertx, POSTGRES_SERVICE_ADDRESS);
+    Api api = Api.getInstance(config().getString("dxApiBasePath"));
+    AuditingService auditingService = AuditingService.createProxy(vertx, AUDITING_SERVICE_ADDRESS);
 
-    razorPayService = RazorPayService.createProxy(vertx, RAZORPAY_SERVICE_ADDRESS);
+    RazorPayService razorPayService = RazorPayService.createProxy(vertx, RAZORPAY_SERVICE_ADDRESS);
 
-    createLinkedAccount =
+    CreateLinkedAccount createLinkedAccount =
         new CreateLinkedAccount(postgresService, api, auditingService, razorPayService);
 
-    fetchLinkedAccount = new FetchLinkedAccount(postgresService, api, razorPayService);
-    updateLinkedAccount =
+    FetchLinkedAccount fetchLinkedAccount = new FetchLinkedAccount(postgresService, api, razorPayService);
+    UpdateLinkedAccount updateLinkedAccount =
         new UpdateLinkedAccount(postgresService, api, auditingService, razorPayService);
-    linkedAccountService =
+    LinkedAccountServiceImpl linkedAccountService =
         new LinkedAccountServiceImpl(createLinkedAccount, fetchLinkedAccount, updateLinkedAccount);
 
     new ServiceBinder(vertx)
