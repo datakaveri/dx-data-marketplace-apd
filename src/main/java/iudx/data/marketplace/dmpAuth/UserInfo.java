@@ -1,5 +1,6 @@
-package iudx.data.marketplace.authenticator.service.model;
+package iudx.data.marketplace.dmpAuth;
 
+import iudx.data.marketplace.authenticator.service.model.DxRole;
 import java.util.UUID;
 
 public class UserInfo {

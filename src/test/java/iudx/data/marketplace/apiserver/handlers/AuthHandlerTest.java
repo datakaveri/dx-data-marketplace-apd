@@ -13,7 +13,7 @@ import io.vertx.ext.web.RoutingContext;
 import io.vertx.junit5.VertxExtension;
 import io.vertx.junit5.VertxTestContext;
 import iudx.data.marketplace.Util;
-import iudx.data.marketplace.aaaService.AuthClient;
+import iudx.data.marketplace.dmpAuth.aaaService.AuthClient;
 import iudx.data.marketplace.authenticator.service.AuthenticationService;
 import iudx.data.marketplace.authenticator.handlers.authentication.AuthHandler;
 import iudx.data.marketplace.common.Api;

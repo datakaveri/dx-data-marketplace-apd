@@ -1,11 +1,10 @@
 package iudx.data.marketplace.authenticator;
 
 import io.vertx.core.buffer.Buffer;
-import io.vertx.sqlclient.Pool;
-import iudx.data.marketplace.aaaService.AuthClient;
+import iudx.data.marketplace.dmpAuth.aaaService.AuthClient;
 import iudx.data.marketplace.apiserver.util.Role;
 import iudx.data.marketplace.authenticator.handlers.authentication.AuthHandler;
-import iudx.data.marketplace.authenticator.service.model.UserInfo;
+import iudx.data.marketplace.dmpAuth.UserInfo;
 import iudx.data.marketplace.authenticator.service.AuthenticationService;
 import iudx.data.marketplace.common.Api;
 import iudx.data.marketplace.policies.service.model.User;

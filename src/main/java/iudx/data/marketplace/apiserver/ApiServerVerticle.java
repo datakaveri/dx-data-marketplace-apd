@@ -12,7 +12,7 @@ import io.vertx.ext.web.client.WebClientOptions;
 import io.vertx.ext.web.handler.BodyHandler;
 import io.vertx.ext.web.handler.CorsHandler;
 import io.vertx.ext.web.handler.TimeoutHandler;
-import iudx.data.marketplace.aaaService.AuthClient;
+import iudx.data.marketplace.dmpAuth.aaaService.AuthClient;
 import iudx.data.marketplace.apiserver.provider.controller.ProviderApis;
 import iudx.data.marketplace.apiserver.provider.linkedaccount.controller.LinkedAccountController;
 import iudx.data.marketplace.authenticator.service.AuthenticationService;
