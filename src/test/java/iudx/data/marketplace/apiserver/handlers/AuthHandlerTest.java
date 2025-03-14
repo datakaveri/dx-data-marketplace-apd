@@ -13,12 +13,12 @@ import io.vertx.ext.web.RoutingContext;
 import io.vertx.junit5.VertxExtension;
 import io.vertx.junit5.VertxTestContext;
 import iudx.data.marketplace.Util;
-import iudx.data.marketplace.aaaService.AuthClient;
-import iudx.data.marketplace.authenticator.AuthenticationService;
-import iudx.data.marketplace.authenticator.handlers.AuthHandler;
+import iudx.data.marketplace.dmpAuth.aaaService.AuthClient;
+import iudx.data.marketplace.authenticator.service.AuthenticationService;
+import iudx.data.marketplace.authenticator.handlers.authentication.AuthHandler;
 import iudx.data.marketplace.common.Api;
-import iudx.data.marketplace.policies.User;
-import iudx.data.marketplace.postgres.PostgresServiceImpl;
+import iudx.data.marketplace.policies.service.model.User;
+import iudx.data.marketplace.postgres.service.PostgresServiceImpl;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;
@@ -115,20 +115,12 @@ public class AuthHandlerTest {
     when(ctx.request().method().toString()).thenReturn("POST");
     when(asyncResult.succeeded()).thenReturn(true);
     when(asyncResult.result()).thenReturn(jsonObject);
-    doAnswer(new Answer<AsyncResult<JsonObject>>() {
-      @Override
-      public AsyncResult<JsonObject> answer(InvocationOnMock arg0) throws Throwable {
-        ((Handler<AsyncResult<JsonObject>>) arg0.getArgument(2)).handle(asyncResult);
-        return null;
-      }
-    }).when(authenticator).tokenIntrospect(any());
 
     authHandler.handle(ctx);
 
     assertEquals("/provider/product", ctx.request().path());
     assertEquals("token", ctx.request().headers().get(HEADER_TOKEN));
     assertEquals("POST", ctx.request().method().toString());
-    verify(authenticator, times(1)).tokenIntrospect(any());
     verify(jsonObject, times(1)).getString(anyString());
 
     testContext.completeNow();
@@ -153,20 +145,12 @@ public class AuthHandlerTest {
     when(httpServerResponse.putHeader(anyString(), anyString())).thenReturn(httpServerResponse);
     when(httpServerResponse.setStatusCode(401)).thenReturn(httpServerResponse);
     when(httpServerResponse.end(anyString())).thenReturn(voidFuture);
-    doAnswer(new Answer<AsyncResult<JsonObject>>() {
-      @Override
-      public AsyncResult<JsonObject> answer(InvocationOnMock arg0) throws Throwable {
-        ((Handler<AsyncResult<JsonObject>>) arg0.getArgument(2)).handle(asyncResult);
-        return null;
-      }
-    }).when(authenticator).tokenIntrospect(any());
 
     authHandler.handle(ctx);
 
     assertEquals("/provider/product", ctx.request().path());
     assertEquals("token", ctx.request().headers().get(HEADER_TOKEN));
     assertEquals("POST", ctx.request().method().toString());
-    verify(authenticator, times(1)).tokenIntrospect(any());
     verify(jsonObject, times(0)).getValue(anyString());
     verify(httpServerResponse, times(1)).setStatusCode(anyInt());
     verify(httpServerResponse, times(1)).putHeader(anyString(), anyString());
@@ -194,20 +178,12 @@ public class AuthHandlerTest {
     when(httpServerResponse.putHeader(anyString(), anyString())).thenReturn(httpServerResponse);
     when(httpServerResponse.setStatusCode(404)).thenReturn(httpServerResponse);
     when(httpServerResponse.end(anyString())).thenReturn(voidFuture);
-    doAnswer(new Answer<AsyncResult<JsonObject>>() {
-      @Override
-      public AsyncResult<JsonObject> answer(InvocationOnMock arg0) throws Throwable {
-        ((Handler<AsyncResult<JsonObject>>) arg0.getArgument(2)).handle(asyncResult);
-        return null;
-      }
-    }).when(authenticator).tokenIntrospect(any());
 
     authHandler.handle(ctx);
 
     assertEquals("/provider/product", ctx.request().path());
     assertEquals("token", ctx.request().headers().get(HEADER_TOKEN));
     assertEquals("POST", ctx.request().method().toString());
-    verify(authenticator, times(1)).tokenIntrospect(any());
     verify(jsonObject, times(0)).getValue(anyString());
     verify(httpServerResponse, times(1)).setStatusCode(anyInt());
     verify(httpServerResponse, times(1)).putHeader(anyString(), anyString());
@@ -265,20 +241,11 @@ public class AuthHandlerTest {
     when(map.get(anyString())).thenReturn("Dummy Token");
     when(asyncResult.succeeded()).thenReturn(true);
     when(asyncResult.result()).thenReturn(jsonObject);
-    doAnswer(new Answer<AsyncResult<JsonObject>>() {
-      @Override
-      public AsyncResult<JsonObject> answer(InvocationOnMock arg0) throws Throwable {
-        ((Handler<AsyncResult<JsonObject>>) arg0.getArgument(2)).handle(asyncResult);
-        return null;
-      }
-    }).when(authenticator).tokenIntrospect(any());
-
     authHandler.handle(routingContext);
 
     assertEquals(path, routingContext.request().path());
     assertEquals("Dummy Token", routingContext.request().headers().get(HEADER_TOKEN));
     assertEquals("someMethod", routingContext.request().method().toString());
-    verify(authenticator, times(1)).tokenIntrospect(any());
     verify(routingContext, times(2)).body();
 
     vertxTestContext.completeNow();
@@ -307,20 +274,11 @@ public class AuthHandlerTest {
     when(httpServerRequest.headers()).thenReturn(map);
     when(map.get(anyString())).thenReturn("Dummy Token");
     when(asyncResult.succeeded()).thenReturn(true);
-    doAnswer(new Answer<AsyncResult<JsonObject>>() {
-      @Override
-      public AsyncResult<JsonObject> answer(InvocationOnMock arg1) throws Throwable {
-        ((Handler<AsyncResult<JsonObject>>) arg1.getArgument(1)).handle(asyncResult);
-        return null;
-      }
-    }).when(authenticator).tokenIntrospect4Verify(any());
-
     authHandler.handle(routingContext);
 
     assertEquals(api.getVerifyUrl(), routingContext.request().path());
     assertEquals("Dummy Token", routingContext.request().headers().get(HEADER_TOKEN));
     assertEquals("someMethod", routingContext.request().method().toString());
-    verify(authenticator, times(1)).tokenIntrospect4Verify(any());
     verify(routingContext, times(2)).body();
 
     vertxTestContext.completeNow();

@@ -1,5 +1,7 @@
 package iudx.data.marketplace.webhook;
 
+import iudx.data.marketplace.webhook.service.WebhookService;
+import iudx.data.marketplace.webhook.service.WebhookServiceImpl;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.*;
@@ -11,15 +13,14 @@ import io.vertx.core.json.JsonObject;
 import io.vertx.junit5.VertxExtension;
 import io.vertx.junit5.VertxTestContext;
 import iudx.data.marketplace.consumer.util.PaymentStatus;
-import iudx.data.marketplace.policies.PolicyService;
-import iudx.data.marketplace.postgres.PostgresService;
+import iudx.data.marketplace.policies.service.PolicyService;
+import iudx.data.marketplace.postgres.service.PostgresService;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.Mock;
 import org.mockito.invocation.InvocationOnMock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.mockito.stubbing.Answer;
@@ -48,19 +49,7 @@ public class WebhookServiceTest {
     expectedInvocationsPolicyService = 0;
     webhookService = new WebhookServiceImpl(postgresService, policyService, "dummyInvoiceTable");
     webhookServiceSpy = (WebhookServiceImpl) spy(webhookService);
-    doAnswer(
-            new Answer<AsyncResult<JsonObject>>() {
-              @Override
-              public AsyncResult<JsonObject> answer(InvocationOnMock invocationOnMock)
-                  throws Throwable {
-                ((Handler<AsyncResult<JsonObject>>) invocationOnMock.getArgument(2))
-                    .handle(asyncResult);
-                return null;
-              }
-            })
-        .when(postgresService)
-        .executePreparedQuery(anyString(), any());
-    lenient().when(asyncResult.result()).thenReturn(mockResult);
+    when(postgresService.executePreparedQuery(anyString(),any())).thenReturn(Future.succeededFuture(mockResult));
     lenient().when(mockResult.encode()).thenReturn("Some result from database");
 
     testContext.completeNow();
@@ -98,7 +87,7 @@ public class WebhookServiceTest {
             ar -> {
               verify(postgresService, times(++expectedInvocationsPostgresService))
                   .executePreparedQuery(anyString(), any());
-              verify(policyService, times(expectedInvocationsPolicyService))
+              verify(policyService, times(++expectedInvocationsPolicyService))
                   .createPolicy(anyString());
               testContext.completeNow();
             });
@@ -135,7 +124,7 @@ public class WebhookServiceTest {
         .onSuccess(ar -> {
           verify(postgresService, times(++expectedInvocationsPostgresService))
               .executePreparedQuery(anyString(), any());
-          verify(policyService, times(expectedInvocationsPolicyService))
+          verify(policyService, times(expectedInvocationsPolicyService++))
               .createPolicy(anyString());
           testContext.completeNow();
         })

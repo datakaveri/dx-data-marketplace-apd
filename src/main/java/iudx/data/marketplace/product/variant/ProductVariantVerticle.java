@@ -8,7 +8,9 @@ import io.vertx.core.eventbus.MessageConsumer;
 import io.vertx.core.json.JsonObject;
 import io.vertx.serviceproxy.ServiceBinder;
 import iudx.data.marketplace.common.Util;
-import iudx.data.marketplace.postgres.PostgresService;
+import iudx.data.marketplace.postgres.service.PostgresService;
+import iudx.data.marketplace.product.variantService.ProductVariantService;
+import iudx.data.marketplace.product.variantService.ProductVariantServiceImpl;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -16,15 +18,12 @@ public class ProductVariantVerticle extends AbstractVerticle {
   public static final Logger LOGGER = LogManager.getLogger(ProductVariantVerticle.class);
   private MessageConsumer<JsonObject> consumer;
   private ServiceBinder binder;
-  private PostgresService postgresService;
-  private ProductVariantService variantService;
-  private Util util;
 
   @Override
   public void start() throws Exception {
-    postgresService = PostgresService.createProxy(vertx, POSTGRES_SERVICE_ADDRESS);
-    util = new Util();
-    variantService = new ProductVariantServiceImpl(config(), postgresService, util);
+    PostgresService postgresService = PostgresService.createProxy(vertx, POSTGRES_SERVICE_ADDRESS);
+    Util util = new Util();
+    ProductVariantService variantService = new ProductVariantServiceImpl(config(), postgresService, util);
 
     binder = new ServiceBinder(vertx);
     consumer =

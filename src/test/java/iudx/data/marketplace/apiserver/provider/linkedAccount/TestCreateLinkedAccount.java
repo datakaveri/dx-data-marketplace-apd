@@ -2,18 +2,17 @@ package iudx.data.marketplace.apiserver.provider.linkedAccount;
 
 import io.vertx.core.AsyncResult;
 import io.vertx.core.Future;
-import io.vertx.core.Handler;
 import io.vertx.core.json.JsonObject;
 import io.vertx.junit5.VertxExtension;
 import io.vertx.junit5.VertxTestContext;
-import iudx.data.marketplace.apiserver.provider.linkedaccount.CreateLinkedAccount;
-import iudx.data.marketplace.auditing.AuditingService;
+import iudx.data.marketplace.apiserver.provider.linkedaccount.service.CreateLinkedAccount;
+import iudx.data.marketplace.auditing.service.AuditingService;
 import iudx.data.marketplace.common.Api;
 import iudx.data.marketplace.common.HttpStatusCode;
 import iudx.data.marketplace.common.ResponseUrn;
-import iudx.data.marketplace.policies.User;
-import iudx.data.marketplace.postgres.PostgresService;
-import iudx.data.marketplace.razorpay.RazorPayService;
+import iudx.data.marketplace.policies.service.model.User;
+import iudx.data.marketplace.postgres.service.PostgresService;
+import iudx.data.marketplace.razorpay.service.RazorPayService;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.junit.jupiter.api.BeforeEach;
@@ -21,16 +20,13 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
-import org.mockito.invocation.InvocationOnMock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.mockito.stubbing.Answer;
 
 import static iudx.data.marketplace.apiserver.provider.linkedaccount.util.Constants.FAILURE_MESSAGE;
 import static iudx.data.marketplace.apiserver.util.Constants.*;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.when;
 
 @ExtendWith({MockitoExtension.class, VertxExtension.class})
@@ -95,18 +91,8 @@ public class TestCreateLinkedAccount {
         .thenReturn(Future.succeededFuture(resultFromRzp));
     when(razorPayService.requestProductConfiguration(any(JsonObject.class)))
         .thenReturn(Future.succeededFuture(resultFromRzp));
-    when(asyncResult.succeeded()).thenReturn(true);
+    when(postgresService.executeQuery(anyString())).thenReturn(Future.succeededFuture(resultFromRzp));
 
-    doAnswer(
-            new Answer<AsyncResult<JsonObject>>() {
-              @Override
-              public AsyncResult<JsonObject> answer(InvocationOnMock arg1) throws Throwable {
-                ((Handler<AsyncResult<JsonObject>>) arg1.getArgument(1)).handle(asyncResult);
-                return null;
-              }
-            })
-        .when(postgresService)
-        .executeQuery(anyString());
     when(auditingService.handleAuditLogs(
             any(User.class), any(JsonObject.class), anyString(), anyString()))
         .thenReturn(Future.succeededFuture());
@@ -142,20 +128,7 @@ public class TestCreateLinkedAccount {
             .thenReturn(Future.succeededFuture(resultFromRzp));
     when(razorPayService.requestProductConfiguration(any(JsonObject.class)))
             .thenReturn(Future.succeededFuture(resultFromRzp));
-    when(asyncResult.succeeded()).thenReturn(false);
-    when(asyncResult.cause()).thenReturn(throwable);
-    when(throwable.getMessage()).thenReturn("Some dummy failure message");
-
-    doAnswer(
-            new Answer<AsyncResult<JsonObject>>() {
-              @Override
-              public AsyncResult<JsonObject> answer(InvocationOnMock arg1) throws Throwable {
-                ((Handler<AsyncResult<JsonObject>>) arg1.getArgument(1)).handle(asyncResult);
-                return null;
-              }
-            })
-            .when(postgresService)
-            .executeQuery(anyString());
+    when(postgresService.executeQuery(anyString())).thenReturn(Future.failedFuture("Some dummy failure message"));
 
     account
             .initiateCreatingLinkedAccount(request, provider)

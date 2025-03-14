@@ -3,14 +3,16 @@ package iudx.data.marketplace;
 import io.vertx.core.Future;
 import io.vertx.core.Promise;
 import io.vertx.core.Vertx;
+import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
 import io.vertx.pgclient.PgConnectOptions;
-import io.vertx.pgclient.PgPool;
+import io.vertx.serviceproxy.HelperUtils;
+import io.vertx.sqlclient.Pool;
 import io.vertx.sqlclient.PoolOptions;
 import io.vertx.sqlclient.Row;
 import io.vertx.sqlclient.Tuple;
-import iudx.data.marketplace.postgres.PostgresService;
-import iudx.data.marketplace.postgres.PostgresServiceImpl;
+import iudx.data.marketplace.postgres.service.PostgresService;
+import iudx.data.marketplace.postgres.service.PostgresServiceImpl;
 //import org.flywaydb.core.Flyway;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -18,7 +20,6 @@ import org.testcontainers.containers.PostgreSQLContainer;
 
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Map;
 import java.util.UUID;
 import java.util.stream.Collector;
 import java.util.stream.Collectors;
@@ -64,7 +65,7 @@ public class Util {
     private Tuple purchaseTuple;
     private PgConnectOptions connectOptions;
     private PoolOptions poolOptions;
-    private PgPool pool;
+    private Pool pool;
 
     private PostgresServiceImpl postgresService;
     public static UUID generateRandomUuid() {
@@ -120,7 +121,7 @@ public class Util {
         this.poolOptions = new PoolOptions().setMaxSize(25);
         if (container.isRunning()) {
             LOG.info("container is running....");
-            this.pool = PgPool.pool(vertx, connectOptions, poolOptions);
+            this.pool = Pool.pool(vertx, connectOptions, poolOptions);
             postgresService = new PostgresServiceImpl(pool);
 
 //            Flyway flyway =
@@ -215,7 +216,8 @@ public class Util {
             }
             else
             {
-                handler.cause().printStackTrace();
+                JsonArray stackTrace = HelperUtils.convertStackTrace(handler.cause());
+                LOG.error("Stack trace is : {}", stackTrace.toString());
                 LOG.error("Failed : " + handler.cause());
                 promise.fail(handler.cause().getMessage());
             }
@@ -342,7 +344,8 @@ public class Util {
                         })
                 .onFailure(
                         failureHandler -> {
-                            failureHandler.printStackTrace();
+                            JsonArray stackTrace = HelperUtils.convertStackTrace(failureHandler);
+                            LOG.error("Stack trace is : {}", stackTrace.toString());
                             promise.fail("Failure due to: " + failureHandler.getCause().getMessage());
                         });
         return promise.future();
@@ -367,7 +370,8 @@ public class Util {
                         })
                 .onFailure(
                         failureHandler -> {
-                            failureHandler.printStackTrace();
+                            JsonArray stackTrace = HelperUtils.convertStackTrace(failureHandler);
+                            LOG.error("Stack trace is : {}", stackTrace.toString());
                             promise.fail("Failure due to: " + failureHandler.getCause().getMessage());
                         });
         return promise.future();

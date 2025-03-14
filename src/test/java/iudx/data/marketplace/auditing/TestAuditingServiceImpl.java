@@ -1,9 +1,9 @@
 package iudx.data.marketplace.auditing;
 
 import static iudx.data.marketplace.apiserver.util.Constants.USER_ID;
+import iudx.data.marketplace.auditing.service.AuditingServiceImpl;
 import static iudx.data.marketplace.auditing.util.Constants.EPOCH_TIME;
 import static iudx.data.marketplace.auditing.util.Constants.ISO_TIME;
-import static iudx.data.marketplace.product.util.Constants.TABLES;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.mockito.ArgumentMatchers.any;
@@ -14,7 +14,6 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import io.vertx.core.Future;
-import io.vertx.core.Vertx;
 import io.vertx.core.http.HttpMethod;
 import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
@@ -24,9 +23,8 @@ import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.time.temporal.ChronoUnit;
 
-import iudx.data.marketplace.auditing.databroker.DataBrokerService;
-import iudx.data.marketplace.policies.User;
-import org.junit.jupiter.api.BeforeAll;
+import iudx.data.marketplace.auditing.databrokerService.DataBrokerService;
+import iudx.data.marketplace.policies.service.model.User;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;

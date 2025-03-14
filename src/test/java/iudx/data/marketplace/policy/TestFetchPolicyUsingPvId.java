@@ -1,6 +1,7 @@
 package iudx.data.marketplace.policy;
 
 import io.vertx.core.AsyncResult;
+import io.vertx.core.Future;
 import io.vertx.core.Handler;
 import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
@@ -11,10 +12,9 @@ import iudx.data.marketplace.apiserver.util.Role;
 import iudx.data.marketplace.common.HttpStatusCode;
 import iudx.data.marketplace.common.RespBuilder;
 import iudx.data.marketplace.common.ResponseUrn;
-import iudx.data.marketplace.policies.CreatePolicy;
-import iudx.data.marketplace.policies.FetchPolicyUsingPvId;
-import iudx.data.marketplace.policies.User;
-import iudx.data.marketplace.postgres.PostgresService;
+import iudx.data.marketplace.policies.service.FetchPolicyUsingPvId;
+import iudx.data.marketplace.policies.service.model.User;
+import iudx.data.marketplace.postgres.service.PostgresService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -62,29 +62,6 @@ public class TestFetchPolicyUsingPvId {
     this.consumer = new User(getUserDetails());
     this.pvId = Util.generateRandomUuid().toString();
     this.fetchPolicyUsingPvId = new FetchPolicyUsingPvId(postgresService);
-    lenient()
-        .doAnswer(
-            new Answer<AsyncResult<JsonObject>>() {
-              @Override
-              public AsyncResult<JsonObject> answer(InvocationOnMock arg1) throws Throwable {
-                ((Handler<AsyncResult<JsonObject>>) arg1.getArgument(1)).handle(asyncResult);
-                return null;
-              }
-            })
-        .when(postgresService)
-        .executeQuery(anyString());
-
-    lenient()
-        .doAnswer(
-            new Answer<AsyncResult<JsonObject>>() {
-              @Override
-              public AsyncResult<JsonObject> answer(InvocationOnMock arg2) throws Throwable {
-                ((Handler<AsyncResult<JsonObject>>) arg2.getArgument(2)).handle(asyncResult);
-                return null;
-              }
-            })
-        .when(postgresService)
-        .checkPolicy(anyString(), any(JsonObject.class));
     vertxTestContext.completeNow();
   }
 
@@ -114,14 +91,14 @@ public class TestFetchPolicyUsingPvId {
             .withTitle(ResponseUrn.SUCCESS_URN.getMessage())
             .withDetail(detail)
             .getJsonResponse();
-    when(asyncResult.succeeded()).thenReturn(true);
-    when(asyncResult.result()).thenReturn(jsonObjectMock, jsonObjectMock, jsonObjectMock, expected);
     when(jsonObjectMock.getJsonArray(anyString())).thenReturn(jsonArrayMock);
     when(jsonArrayMock.isEmpty()).thenReturn(false);
     when(jsonArrayMock.encode()).thenReturn("Some dummy string");
     when(jsonArrayMock.getJsonObject(anyInt())).thenReturn(jsonObjectMock);
     when(jsonObjectMock.getString(RS_SERVER_URL)).thenReturn(this.resourceServerUrl);
     when(jsonObjectMock.getJsonArray("resources")).thenReturn(resources);
+    when(postgresService.executeQuery(anyString())).thenReturn(Future.succeededFuture(jsonObjectMock));
+    when(postgresService.checkPolicy(anyString(),any())).thenReturn(Future.succeededFuture(expected));
 
     this.fetchPolicyUsingPvId
         .checkIfPolicyExists(pvId, consumer)
@@ -130,9 +107,6 @@ public class TestFetchPolicyUsingPvId {
               if (handler.succeeded()) {
 
                 assertEquals(expected, handler.result());
-                verify(asyncResult, times(4)).result();
-                verify(asyncResult, times(2)).succeeded();
-
                 vertxTestContext.completeNow();
 
               } else {
@@ -148,24 +122,20 @@ public class TestFetchPolicyUsingPvId {
     JsonObject jsonObject = new JsonObject().put("id", Util.generateRandomUuid());
     JsonArray resources = new JsonArray();
     resources.add(jsonObject);
-    when(asyncResult.succeeded()).thenReturn(true, false);
-    when(asyncResult.result()).thenReturn(jsonObjectMock);
     when(jsonObjectMock.getJsonArray(anyString())).thenReturn(jsonArrayMock);
     when(jsonArrayMock.isEmpty()).thenReturn(false);
     when(jsonArrayMock.encode()).thenReturn("Some dummy string");
     when(jsonArrayMock.getJsonObject(anyInt())).thenReturn(jsonObjectMock);
     when(jsonObjectMock.getString(RS_SERVER_URL)).thenReturn(this.resourceServerUrl);
     when(jsonObjectMock.getJsonArray("resources")).thenReturn(resources);
-    when(asyncResult.cause()).thenReturn(throwable);
-    when(throwable.getMessage()).thenReturn("Some dummy failure message from DB");
-
+    when(postgresService.executeQuery(anyString())).thenReturn(Future.succeededFuture(jsonObjectMock));
+    when(postgresService.checkPolicy(anyString(),any())).thenReturn(Future.failedFuture("Some dummy failure message from DB"));
     this.fetchPolicyUsingPvId
         .checkIfPolicyExists(pvId, consumer)
         .onComplete(
             handler -> {
               if (handler.failed()) {
                 assertEquals("Some dummy failure message from DB", handler.cause().getMessage());
-                verify(asyncResult, times(3)).result();
                 vertxTestContext.completeNow();
 
               } else {
@@ -180,14 +150,13 @@ public class TestFetchPolicyUsingPvId {
     JsonObject jsonObject = new JsonObject().put("id", Util.generateRandomUuid());
     JsonArray resources = new JsonArray();
     resources.add(jsonObject);
-    when(asyncResult.succeeded()).thenReturn(true, false);
-    when(asyncResult.result()).thenReturn(jsonObjectMock);
     when(jsonObjectMock.getJsonArray(anyString())).thenReturn(jsonArrayMock);
     when(jsonArrayMock.isEmpty()).thenReturn(false);
     when(jsonArrayMock.encode()).thenReturn("Some dummy string");
     when(jsonArrayMock.getJsonObject(anyInt())).thenReturn(jsonObjectMock);
     when(jsonObjectMock.getString(RS_SERVER_URL)).thenReturn("some.other.resource.server");
     when(jsonObjectMock.getJsonArray("resources")).thenReturn(resources);
+    when(postgresService.executeQuery(anyString())).thenReturn(Future.succeededFuture(jsonObjectMock));
 
     this.fetchPolicyUsingPvId
         .checkIfPolicyExists(pvId, consumer)
@@ -201,8 +170,6 @@ public class TestFetchPolicyUsingPvId {
                         .withDetail(ResponseUrn.FORBIDDEN_URN.getMessage())
                         .getResponse();
                 assertEquals(expected, handler.cause().getMessage());
-                verify(asyncResult, times(3)).result();
-                verify(asyncResult, times(1)).succeeded();
                 vertxTestContext.completeNow();
 
               } else {
@@ -217,10 +184,10 @@ public class TestFetchPolicyUsingPvId {
     JsonObject jsonObject = new JsonObject().put("id", Util.generateRandomUuid());
     JsonArray resources = new JsonArray();
     resources.add(jsonObject);
-    when(asyncResult.succeeded()).thenReturn(true);
-    when(asyncResult.result()).thenReturn(jsonObjectMock);
     when(jsonObjectMock.getJsonArray(anyString())).thenReturn(jsonArrayMock);
     when(jsonArrayMock.isEmpty()).thenReturn(true);
+    when(postgresService.executeQuery(anyString())).thenReturn(Future.succeededFuture(jsonObjectMock));
+
     this.fetchPolicyUsingPvId
         .checkIfPolicyExists(pvId, consumer)
         .onComplete(
@@ -233,8 +200,6 @@ public class TestFetchPolicyUsingPvId {
                         .withDetail("Product variant not found")
                         .getResponse();
                 assertEquals(expected, handler.cause().getMessage());
-                verify(asyncResult, times(1)).result();
-                verify(asyncResult, times(1)).succeeded();
                 vertxTestContext.completeNow();
 
               } else {
@@ -249,9 +214,8 @@ public class TestFetchPolicyUsingPvId {
     JsonObject jsonObject = new JsonObject().put("id", Util.generateRandomUuid());
     JsonArray resources = new JsonArray();
     resources.add(jsonObject);
-    when(asyncResult.succeeded()).thenReturn(false);
-    when(throwable.getMessage()).thenReturn("Some failure message from DB");
-    when(asyncResult.cause()).thenReturn(throwable);
+    when(postgresService.executeQuery(anyString())).thenReturn(Future.failedFuture("Some failure message from DB"));
+
     this.fetchPolicyUsingPvId
         .checkIfPolicyExists(pvId, consumer)
         .onComplete(
@@ -264,8 +228,6 @@ public class TestFetchPolicyUsingPvId {
                         .withDetail(ResponseUrn.INTERNAL_SERVER_ERR_URN.getMessage())
                         .getResponse();
                 assertEquals(expected, handler.cause().getMessage());
-                verify(asyncResult, times(1)).cause();
-                verify(asyncResult, times(1)).succeeded();
                 vertxTestContext.completeNow();
 
               } else {

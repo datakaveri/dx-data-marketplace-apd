@@ -11,10 +11,12 @@ import io.vertx.junit5.VertxTestContext;
 import iudx.data.marketplace.catalogueService.CatalogueService;
 import iudx.data.marketplace.common.ResponseUrn;
 import iudx.data.marketplace.configuration.Configuration;
-import iudx.data.marketplace.policies.User;
-import iudx.data.marketplace.postgres.PostgresService;
+import iudx.data.marketplace.policies.service.model.User;
+import iudx.data.marketplace.postgres.service.PostgresService;
+import iudx.data.marketplace.product.service.ProductServiceImpl;
 import iudx.data.marketplace.product.util.QueryBuilder;
-import iudx.data.marketplace.razorpay.RazorPayService;
+import iudx.data.marketplace.razorpay.service.RazorPayService;
+import java.util.UUID;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.junit.jupiter.api.BeforeAll;
@@ -73,46 +75,16 @@ public class ProductServiceTest {
     when(user.getResourceServerUrl()).thenReturn("someResourceServerUrl");
     when(request.getString(anyString())).thenReturn("dummyValue");
     when(request.getString("status")).thenReturn("ACTIVATED");
-    when(asyncResult.succeeded()).thenReturn(true);
     when(request.getInteger("totalHits")).thenReturn(0);
-    when(asyncResult.result()).thenReturn(request);
     when(request.getJsonArray(anyString())).thenReturn(jsonArray);
     when(jsonArray.isEmpty()).thenReturn(false);
     when(jsonArray.getJsonObject(anyInt())).thenReturn(request);
     when(request.getJsonArray(RESOURCE_IDS)).thenReturn(new JsonArray().add("abcd").add("abcd"));
     when(request.put(anyString(), anyString())).thenReturn(request);
-    doAnswer(
-            new Answer<AsyncResult<JsonObject>>() {
-              @Override
-              public AsyncResult<JsonObject> answer(InvocationOnMock arg0) throws Throwable {
-                ((Handler<AsyncResult<JsonObject>>) arg0.getArgument(1)).handle(asyncResult);
-                return null;
-              }
-            })
-        .when(postgresService)
-        .executeQuery(anyString());
+    when(postgresService.executeQuery(anyString())).thenReturn(Future.succeededFuture(request));
+    when(postgresService.executeTransaction(anyList())).thenReturn(Future.succeededFuture(request));
+    when(postgresService.executeCountQuery(anyString())).thenReturn(Future.succeededFuture(request));
 
-    doAnswer(
-            new Answer<AsyncResult<JsonObject>>() {
-              @Override
-              public AsyncResult<JsonObject> answer(InvocationOnMock arg0) throws Throwable {
-                ((Handler<AsyncResult<JsonObject>>) arg0.getArgument(1)).handle(asyncResult);
-                return null;
-              }
-            })
-        .when(postgresService)
-        .executeCountQuery(anyString());
-
-    doAnswer(
-            new Answer<AsyncResult<JsonObject>>() {
-              @Override
-              public AsyncResult<JsonObject> answer(InvocationOnMock arg0) throws Throwable {
-                ((Handler<AsyncResult<JsonObject>>) arg0.getArgument(1)).handle(asyncResult);
-                return null;
-              }
-            })
-        .when(postgresService)
-        .executeTransaction(anyList());
     doAnswer(
             Answer ->
                 Future.succeededFuture(
@@ -157,30 +129,10 @@ public class ProductServiceTest {
     JsonObject request =
         new JsonObject().put(AUTH_INFO, auth_info).put(PRODUCT_ID, "id").put("totalHits", 1)
                         .put(RESULTS, jsonArray);
-    when(asyncResult.succeeded()).thenReturn(true);
-    when(asyncResult.result()).thenReturn(request);
       when(user.getUserId()).thenReturn("dummyProviderId");
-      doAnswer(
-            new Answer<AsyncResult<JsonObject>>() {
-              @Override
-              public AsyncResult<JsonObject> answer(InvocationOnMock arg0) throws Throwable {
-                ((Handler<AsyncResult<JsonObject>>) arg0.getArgument(1)).handle(asyncResult);
-                return null;
-              }
-            })
-        .when(postgresService)
-        .executeCountQuery(anyString());
+    when(postgresService.executeCountQuery(anyString())).thenReturn(Future.succeededFuture(request));
 
-    doAnswer(
-            new Answer<AsyncResult<JsonObject>>() {
-              @Override
-              public AsyncResult<JsonObject> answer(InvocationOnMock arg0) throws Throwable {
-                ((Handler<AsyncResult<JsonObject>>) arg0.getArgument(2)).handle(asyncResult);
-                return null;
-              }
-            })
-        .when(postgresService)
-        .executePreparedQuery(anyString(), any());
+    when(postgresService.executePreparedQuery(anyString(),any())).thenReturn(Future.succeededFuture(request));
 
     productServiceImpl.deleteProduct(
             user,
@@ -204,20 +156,7 @@ public class ProductServiceTest {
 
     lenient().when(jsonObjectMock.containsKey(RESOURCE_ID)).thenReturn(true);
     lenient().when(jsonObjectMock.getString(RESOURCE_ID)).thenReturn("resource-id-1");
-    when(asyncResult.succeeded()).thenReturn(true);
-
-    doAnswer(
-            new Answer<AsyncResult<JsonObject>>() {
-              @Override
-              public AsyncResult<JsonObject> answer(InvocationOnMock invocationOnMock)
-                  throws Throwable {
-                ((Handler<AsyncResult<JsonObject>>) invocationOnMock.getArgument(2))
-                    .handle(asyncResult);
-                return null;
-              }
-            })
-        .when(postgresService)
-        .executePreparedQuery(anyString(), any());
+    when(postgresService.executePreparedQuery(anyString(),any())).thenReturn(Future.succeededFuture(jsonObjectMock));
 
     productServiceImpl.listProducts(
             user,
@@ -235,25 +174,11 @@ public class ProductServiceTest {
   @Test
   @DisplayName("test product exists future")
   public void testProductExistsFuture(VertxTestContext testContext) {
-
-    when(asyncResult.succeeded()).thenReturn(true);
-    when(asyncResult.result()).thenReturn(jsonObjectMock);
     when(jsonObjectMock.getInteger("totalHits")).thenReturn(1);
-    Mockito.doAnswer(
-            new Answer<AsyncResult<JsonObject>>() {
-              @Override
-              public AsyncResult<JsonObject> answer(InvocationOnMock invocationOnMock)
-                  throws Throwable {
-                ((Handler<AsyncResult<JsonObject>>) invocationOnMock.getArgument(1))
-                    .handle(asyncResult);
-                return null;
-              }
-            })
-        .when(postgresService)
-        .executeCountQuery(anyString());
+    when(postgresService.executeCountQuery(anyString())).thenReturn(Future.succeededFuture(jsonObjectMock));
 
     productServiceImpl
-        .checkIfProductExists(anyString(), anyString())
+        .checkIfProductExists(UUID.randomUUID().toString(), UUID.randomUUID().toString())
         .onComplete(
             handler -> {
               if (handler.succeeded()) {

@@ -4,8 +4,8 @@ import static iudx.data.marketplace.apiserver.util.Constants.*;
 
 import io.vertx.core.json.JsonObject;
 import io.vertx.ext.web.RoutingContext;
-import iudx.data.marketplace.authenticator.model.JwtData;
-import iudx.data.marketplace.policies.User;
+import iudx.data.marketplace.authenticator.service.model.JwtData;
+import iudx.data.marketplace.policies.service.model.User;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 

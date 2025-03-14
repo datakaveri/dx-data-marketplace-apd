@@ -7,8 +7,10 @@ import io.vertx.core.eventbus.MessageConsumer;
 import io.vertx.core.json.JsonObject;
 import io.vertx.serviceproxy.ServiceBinder;
 import iudx.data.marketplace.catalogueService.CatalogueService;
-import iudx.data.marketplace.postgres.PostgresService;
-import iudx.data.marketplace.razorpay.RazorPayService;
+import iudx.data.marketplace.postgres.service.PostgresService;
+import iudx.data.marketplace.product.service.ProductService;
+import iudx.data.marketplace.product.service.ProductServiceImpl;
+import iudx.data.marketplace.razorpay.service.RazorPayService;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -17,30 +19,23 @@ public class ProductVerticle extends AbstractVerticle {
   private MessageConsumer<JsonObject> consumer;
   private ServiceBinder binder;
 
-  private PostgresService postgresService;
-  private ProductService productService;
-  private CatalogueService catService;
-  private RazorPayService razorPayService;
-  private boolean isAccountActivationCheckBeingDone;
-
   @Override
   public void start() throws Exception {
-    postgresService = PostgresService.createProxy(vertx, POSTGRES_SERVICE_ADDRESS);
-    catService = new CatalogueService(vertx, config());
-    razorPayService = RazorPayService.createProxy(vertx, RAZORPAY_SERVICE_ADDRESS);
+    PostgresService postgresService = PostgresService.createProxy(vertx, POSTGRES_SERVICE_ADDRESS);
+    CatalogueService catService = new CatalogueService(vertx, config());
+    RazorPayService razorPayService = RazorPayService.createProxy(vertx, RAZORPAY_SERVICE_ADDRESS);
 
-    isAccountActivationCheckBeingDone = config().getBoolean("isAccountActivationCheckBeingDone");
+    boolean isAccountActivationCheckBeingDone = config().getBoolean("isAccountActivationCheckBeingDone");
     if (!isAccountActivationCheckBeingDone) {
       LOGGER.warn(
           "\n\n" + "account activation check is set to false. Enable it in production" + "\n\n");
     }
-    productService =
-        new ProductServiceImpl(
-            config(),
-            postgresService,
-            catService,
-            razorPayService,
-            isAccountActivationCheckBeingDone);
+    ProductService productService = new ProductServiceImpl(
+        config(),
+        postgresService,
+        catService,
+        razorPayService,
+        isAccountActivationCheckBeingDone);
 
     binder = new ServiceBinder(vertx);
     consumer =

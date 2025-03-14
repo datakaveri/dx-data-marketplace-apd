@@ -1,0 +1,80 @@
+package iudx.data.marketplace.product.variantService;
+
+import io.vertx.codegen.annotations.GenIgnore;
+import io.vertx.codegen.annotations.ProxyGen;
+import io.vertx.codegen.annotations.VertxGen;
+import io.vertx.core.Future;
+import io.vertx.core.Vertx;
+import io.vertx.core.json.JsonObject;
+import iudx.data.marketplace.policies.service.model.User;
+
+@VertxGen
+@ProxyGen
+public interface ProductVariantService {
+
+  /**
+   * The createProxy helps the code generation blocks to generate proxy code.
+   *
+   * @param vertx which is the vertx instance
+   * @param address which is the proxy address
+   * @return ProductVariantServiceVertxEBProxy which is a service proxy
+   */
+  @GenIgnore
+  static ProductVariantService createProxy(Vertx vertx, String address) {
+    return new ProductVariantServiceVertxEBProxy(vertx, address);
+  }
+
+  /**
+   * The createProductVariant method implements the creation of a product variant on the IUDX data
+   * marketplace.
+   *
+   * @param request which is a JsonObject
+   * @return Future of json object
+   */
+  Future<JsonObject> createProductVariant(
+      User user, JsonObject request);
+
+  /**
+   * The updateProductVariant method implements the update of a product variant on the IUDX data
+   * marketplace.
+   *
+   * @param request which is a JsonObject
+   * @return Future of json object
+   */
+  Future<JsonObject> updateProductVariant(
+      User user, JsonObject request);
+
+  /**
+   * The deleteProductVariant method implements the soft delete of a product variant on the IUDX
+   * data marketplace.
+   *
+   * @param request which is a JsonObject
+   * @return Future of json object
+   */
+  Future<JsonObject> deleteProductVariant(
+      User user, JsonObject request);
+
+  /**
+   * The listProductVariant method implements the fetch of product variant(s) on the IUDX data
+   * marketplace.
+   *
+   * @param user which is the calling user Object
+   * @param request which is a JsonObject
+   * @return Future of json object
+   */
+  Future<JsonObject> listProductVariants(
+      User user, JsonObject request);
+
+  /**
+   * List purchase will fetch invoice related info, provider, consumer and product variant related
+   * information After the purchase is made. Both successful and failed payments are displayed List
+   * purchase will list all the purchases if no query parameters are given It can also list
+   * purchases based on the productId, resourceId if it is given in the query parameter
+   *
+   * @param user Provider user
+   * @param request query param if any
+   * @return Future of json object that contains the list of purchases
+   */
+  Future<JsonObject> listPurchase(
+      User user, JsonObject request);
+}

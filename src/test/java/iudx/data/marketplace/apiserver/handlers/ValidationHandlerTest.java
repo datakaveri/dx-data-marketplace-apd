@@ -10,7 +10,7 @@ import io.vertx.ext.web.RoutingContext;
 import io.vertx.junit5.VertxExtension;
 import io.vertx.junit5.VertxTestContext;
 import iudx.data.marketplace.apiserver.util.RequestType;
-import iudx.data.marketplace.authenticator.handlers.ValidationHandler;
+import iudx.data.marketplace.common.ValidationHandler;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -115,9 +115,10 @@ public class ValidationHandlerTest {
     when(routingContext.body()).thenReturn(requestBody);
     when(routingContext.body().asJsonObject()).thenReturn(req);
     when(routingContext.pathParams()).thenReturn(hashMap);
+    when(routingContext.request().headers()).thenReturn(map);
     validationHandler = new ValidationHandler(requestType);
     validationHandler.handle(routingContext);
-    verify(routingContext, times(numberOfInvocations)).request();
+    verify(routingContext, times(numberOfInvocations*2)).request();
     verify(routingContext, times(numberOfInvocations)).body();
     testContext.completeNow();
   }

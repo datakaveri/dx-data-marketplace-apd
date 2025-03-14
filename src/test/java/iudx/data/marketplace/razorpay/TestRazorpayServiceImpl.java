@@ -2,6 +2,7 @@ package iudx.data.marketplace.razorpay;
 
 import com.razorpay.*;
 import io.vertx.core.AsyncResult;
+import io.vertx.core.Future;
 import io.vertx.core.Handler;
 import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
@@ -9,8 +10,9 @@ import io.vertx.junit5.VertxExtension;
 import io.vertx.junit5.VertxTestContext;
 import iudx.data.marketplace.common.Api;
 import iudx.data.marketplace.common.ResponseUrn;
-import iudx.data.marketplace.policies.User;
-import iudx.data.marketplace.postgres.PostgresService;
+import iudx.data.marketplace.policies.service.model.User;
+import iudx.data.marketplace.postgres.service.PostgresService;
+import iudx.data.marketplace.razorpay.service.RazorPayServiceImpl;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.json.JSONArray;
@@ -33,7 +35,7 @@ import java.util.stream.Stream;
 import static iudx.data.marketplace.apiserver.util.Constants.DETAIL;
 import static iudx.data.marketplace.apiserver.util.Constants.TITLE;
 import static iudx.data.marketplace.product.util.Constants.*;
-import static iudx.data.marketplace.razorpay.Constants.*;
+import static iudx.data.marketplace.razorpay.util.Constants.*;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.*;
@@ -74,18 +76,6 @@ public class TestRazorpayServiceImpl {
     throwable = mock(RazorpayException.class);
     request = new JsonObject();
     service = new RazorPayServiceImpl(client, postgresService, jsonObjectMock);
-
-    lenient()
-        .doAnswer(
-            new Answer<AsyncResult<JsonObject>>() {
-              @Override
-              public AsyncResult<JsonObject> answer(InvocationOnMock arg2) throws Throwable {
-                ((Handler<AsyncResult<JsonObject>>) arg2.getArgument(2)).handle(asyncResult);
-                return null;
-              }
-            })
-        .when(postgresService)
-        .executePreparedQuery(anyString(), any());
     vertxTestContext.completeNow();
   }
 
@@ -553,8 +543,7 @@ public class TestRazorpayServiceImpl {
         JsonObject expected = new JsonObject()
                 .put("someKey", "someValue");
 
-        when(asyncResult.succeeded()).thenReturn(true);
-        when(asyncResult.result()).thenReturn(expected);
+      when(postgresService.executePreparedQuery(anyString(),any())).thenReturn(Future.succeededFuture(expected));
 
         service.recordPayment(request)
                 .onComplete(handler -> {
@@ -585,9 +574,7 @@ public class TestRazorpayServiceImpl {
                 .put(RAZORPAY_PAYMENT_ID, "asdjdfadfadf")
                 .put(RAZORPAY_SIGNATURE, "adfadfadfadfadfasd");
 
-        when(asyncResult.succeeded()).thenReturn(false);
-        when(asyncResult.cause()).thenReturn(throwable);
-        when(throwable.getMessage()).thenReturn("Dummy failure message from database");
+      when(postgresService.executePreparedQuery(anyString(),any())).thenReturn(Future.failedFuture("Dummy failure message from database"));
 
         service.recordPayment(request)
                 .onComplete(handler -> {

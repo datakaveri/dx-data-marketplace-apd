@@ -7,12 +7,12 @@ import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
 import io.vertx.junit5.VertxExtension;
 import io.vertx.junit5.VertxTestContext;
-import iudx.data.marketplace.auditing.AuditingService;
+import iudx.data.marketplace.auditing.service.AuditingService;
 import iudx.data.marketplace.common.Api;
-import iudx.data.marketplace.policies.CreatePolicy;
-import iudx.data.marketplace.policies.User;
-import iudx.data.marketplace.postgres.PostgresService;
-import iudx.data.marketplace.razorpay.RazorPayService;
+import iudx.data.marketplace.policies.service.CreatePolicy;
+import iudx.data.marketplace.policies.service.model.User;
+import iudx.data.marketplace.postgres.service.PostgresService;
+import iudx.data.marketplace.razorpay.service.RazorPayService;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.junit.jupiter.api.BeforeEach;
@@ -61,27 +61,6 @@ public class TestCreatePolicy {
     {
         orderId = "dummyOrderId";
         policy = new CreatePolicy(postgresService, auditingService, api);
-        lenient().doAnswer(
-                new Answer<AsyncResult<JsonObject>>() {
-                    @Override
-                    public AsyncResult<JsonObject> answer(InvocationOnMock arg1) throws Throwable {
-                        ((Handler<AsyncResult<JsonObject>>) arg1.getArgument(1)).handle(asyncResult);
-                        return null;
-                    }
-                })
-                .when(postgresService)
-                .executeQuery(anyString());
-        lenient().doAnswer(
-                        new Answer<AsyncResult<JsonObject>>() {
-                            @Override
-                            public AsyncResult<JsonObject> answer(InvocationOnMock arg1) throws Throwable {
-                                ((Handler<AsyncResult<JsonObject>>) arg1.getArgument(1)).handle(asyncResult);
-                                return null;
-                            }
-                        })
-                .when(postgresService)
-                .executeTransaction(anyList());
-
         lenient().when(auditingService.handleAuditLogs(any(User.class),any(JsonObject.class), anyString(), anyString()))
                         .thenReturn(Future.succeededFuture(aVoid));
         vertxTestContext.completeNow();
@@ -107,12 +86,12 @@ public class TestCreatePolicy {
             .put("resourceInfo", jsonArray)
             .put("providerId", "someProviderId");
     when(api.getPoliciesUrl()).thenReturn("dummyPolicyEndpoint");
-    when(asyncResult.succeeded()).thenReturn(true);
-    when(asyncResult.result()).thenReturn(jsonObjectMock);
     when(jsonObjectMock.encodePrettily()).thenReturn(jsonObject.encodePrettily());
     when(jsonObjectMock.getJsonArray(anyString())).thenReturn(jsonArrayMock);
     when(jsonArrayMock.size()).thenReturn(1);
     when(jsonArrayMock.getJsonObject(anyInt())).thenReturn(jsonObject);
+    when(postgresService.executeQuery(anyString())).thenReturn(Future.succeededFuture(jsonObjectMock));
+    when(postgresService.executeTransaction(anyList())).thenReturn(Future.succeededFuture(jsonObjectMock));
 
     policy
         .createPolicy(orderId)
@@ -153,14 +132,12 @@ public class TestCreatePolicy {
                         .put("resourceInfo", jsonArray)
                         .put("providerId", "someProviderId");
         when(api.getPoliciesUrl()).thenReturn("dummyPolicyEndpoint");
-        when(asyncResult.succeeded()).thenReturn(true, false);
-        when(asyncResult.cause()).thenReturn(throwable);
-        when(throwable.getMessage()).thenReturn("Some failure message");
-        when(asyncResult.result()).thenReturn(jsonObjectMock);
         when(jsonObjectMock.encodePrettily()).thenReturn(jsonObject.encodePrettily());
         when(jsonObjectMock.getJsonArray(anyString())).thenReturn(jsonArrayMock);
         when(jsonArrayMock.size()).thenReturn(1);
         when(jsonArrayMock.getJsonObject(anyInt())).thenReturn(jsonObject);
+      when(postgresService.executeQuery(anyString())).thenReturn(Future.succeededFuture(jsonObjectMock));
+      when(postgresService.executeTransaction(anyList())).thenReturn(Future.failedFuture("Some failure message"));
 
         policy
                 .createPolicy(orderId)
@@ -197,17 +174,15 @@ public class TestCreatePolicy {
                         .put("consumerEmailId", "someEmailId")
                         .put("resourceInfo", jsonArray)
                         .put("providerId", "someProviderId");
-        when(asyncResult.succeeded()).thenReturn(true);
-        when(asyncResult.result()).thenReturn(jsonObjectMock);
         when(jsonObjectMock.encodePrettily()).thenReturn(jsonObject.encodePrettily());
         when(jsonObjectMock.getJsonArray(anyString())).thenReturn(jsonArrayMock);
         when(jsonArrayMock.size()).thenReturn(2);
+      when(postgresService.executeQuery(anyString())).thenReturn(Future.succeededFuture(jsonObjectMock));
 
         policy
                 .createPolicy(orderId)
                 .onComplete(
                         handler -> {
-                            LOGGER.info("handler : " + handler);
                             if (handler.failed()) {
                                 verify(postgresService, times(1)).executeQuery(anyString());
                                 assertEquals("Error : No payment found for the given order", handler.cause().getMessage());
@@ -237,9 +212,8 @@ public class TestCreatePolicy {
                         .put("consumerEmailId", "someEmailId")
                         .put("resourceInfo", jsonArray)
                         .put("providerId", "someProviderId");
-        when(asyncResult.succeeded()).thenReturn(false);
-        when(asyncResult.cause()).thenReturn(throwable);
         when(throwable.getMessage()).thenReturn("Some failure message");
+      when(postgresService.executeQuery(anyString())).thenReturn(Future.failedFuture(throwable));
 
         policy
                 .createPolicy(orderId)

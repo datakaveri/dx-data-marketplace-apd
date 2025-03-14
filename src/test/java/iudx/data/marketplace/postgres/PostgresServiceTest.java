@@ -5,9 +5,10 @@ import io.vertx.core.json.JsonObject;
 import io.vertx.junit5.VertxExtension;
 import io.vertx.junit5.VertxTestContext;
 import io.vertx.pgclient.PgConnectOptions;
-import io.vertx.pgclient.PgPool;
+import io.vertx.sqlclient.Pool;
 import io.vertx.sqlclient.PoolOptions;
 import iudx.data.marketplace.configuration.Configuration;
+import iudx.data.marketplace.postgres.service.PostgresServiceImpl;
 import iudx.data.marketplace.product.util.Constants;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -77,7 +78,7 @@ public class PostgresServiceTest {
                       .setReconnectInterval(1000);
 
       PoolOptions poolOptions = new PoolOptions().setMaxSize(dbConfig.getInteger("poolSize"));
-      PgPool pool = PgPool.pool(vertx, connectOptions, poolOptions);
+      Pool pool = Pool.pool(vertx, connectOptions, poolOptions);
 
       pgService = new PostgresServiceImpl(pool);
       testContext.completeNow();

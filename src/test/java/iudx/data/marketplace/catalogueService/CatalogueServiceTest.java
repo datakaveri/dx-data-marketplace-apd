@@ -12,6 +12,7 @@ import io.vertx.ext.web.client.WebClient;
 import io.vertx.junit5.VertxExtension;
 import io.vertx.junit5.VertxTestContext;
 import iudx.data.marketplace.configuration.Configuration;
+import static iudx.data.marketplace.product.util.Constants.TYPE;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -82,7 +83,7 @@ public class CatalogueServiceTest {
     when(jsonObjectMock.getJsonArray("type").contains("iudx:Provider")).thenReturn(true);
     when(jsonObjectMock.getString("description", "")).thenReturn("new desc");
     when(jsonObjectMock.getString("ownerUserId", "")).thenReturn("new owner");
-
+    when(jsonObjectMock.getJsonArray(TYPE).contains(TYPE_RG)).thenReturn(false);
     catalogueService
         .getItemDetails("new-item-id")
         .onComplete(
@@ -106,6 +107,7 @@ public class CatalogueServiceTest {
     when(jsonArrayMock.getJsonObject(anyInt())).thenReturn(jsonObjectMock);
     when(jsonObjectMock.getJsonArray("type").contains("iudx:Provider")).thenReturn(false);
     when(jsonObjectMock.getJsonArray("type").contains("iudx:Resource")).thenReturn(true);
+    when(jsonObjectMock.getJsonArray(TYPE).contains(TYPE_RG)).thenReturn(false);
     when(jsonObjectMock.getString("label", "")).thenReturn("labelxyz");
     when(jsonObjectMock.getString("accessPolicy", "")).thenReturn("OPEN");
     when(jsonObjectMock.getString("accessPolicy", "")).thenReturn("OPEN");

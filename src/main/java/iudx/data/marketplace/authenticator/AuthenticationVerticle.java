@@ -1,5 +1,7 @@
 package iudx.data.marketplace.authenticator;
 
+import iudx.data.marketplace.authenticator.service.AuthenticationService;
+import iudx.data.marketplace.authenticator.service.JwtAuthenticationServiceImpl;
 import static iudx.data.marketplace.authenticator.util.Constants.AUTH_JWKS_PATH;
 import static iudx.data.marketplace.common.Constants.AUTH_SERVICE_ADDRESS;
 import static iudx.data.marketplace.common.Constants.JWT_LEEWAY_TIME;
@@ -26,7 +28,7 @@ import org.apache.logging.log4j.Logger;
  * <h1>Authentication Verticle</h1>
  *
  * <p>The Authentication Verticle implementation in the IUDX ACL-APD Server exposes the
- * {@link iudx.data.marketplace.authenticator.AuthenticationService } over the Vert.x Event Bus.
+ * {@link AuthenticationService } over the Vert.x Event Bus.
  *
  * @version 1.0
  * @since 2020-05-31
@@ -37,7 +39,6 @@ public class AuthenticationVerticle extends AbstractVerticle {
   private AuthenticationService jwtAuthenticationService;
   private ServiceBinder binder;
   private MessageConsumer<JsonObject> consumer;
-  private WebClient webClient;
 
   static WebClient createWebClient(Vertx vertx, JsonObject config) {
     return createWebClient(vertx, config, false);
@@ -108,7 +109,7 @@ public class AuthenticationVerticle extends AbstractVerticle {
 
   private Future<JsonObject> getJwtPublicKey(Vertx vertx, JsonObject config) {
     Promise<JsonObject> promise = Promise.promise();
-    webClient = createWebClient(vertx, config);
+    WebClient webClient = createWebClient(vertx, config);
     String authCert = config.getString("dxAuthBasePath") + AUTH_JWKS_PATH;
     webClient
         .get(443, config.getString("authHost"), authCert)

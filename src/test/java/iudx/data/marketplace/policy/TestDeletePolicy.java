@@ -7,14 +7,13 @@ import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
 import io.vertx.junit5.VertxExtension;
 import io.vertx.junit5.VertxTestContext;
-import iudx.data.marketplace.auditing.AuditingService;
+import iudx.data.marketplace.auditing.service.AuditingService;
 import iudx.data.marketplace.common.Api;
 import iudx.data.marketplace.common.HttpStatusCode;
 import iudx.data.marketplace.common.ResponseUrn;
-import iudx.data.marketplace.policies.DeletePolicy;
-import iudx.data.marketplace.policies.GetPolicy;
-import iudx.data.marketplace.policies.User;
-import iudx.data.marketplace.postgres.PostgresService;
+import iudx.data.marketplace.policies.service.DeletePolicy;
+import iudx.data.marketplace.policies.service.model.User;
+import iudx.data.marketplace.postgres.service.PostgresService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -53,17 +52,6 @@ public class TestDeletePolicy {
   public void setUp(VertxTestContext vertxTestContext) {
     policy = new DeletePolicy(postgresService, auditingService, api);
     lenient()
-        .doAnswer(
-            new Answer<AsyncResult<JsonObject>>() {
-              @Override
-              public AsyncResult<JsonObject> answer(InvocationOnMock arg2) throws Throwable {
-                ((Handler<AsyncResult<JsonObject>>) arg2.getArgument(2)).handle(asyncResult);
-                return null;
-              }
-            })
-        .when(postgresService)
-        .executePreparedQuery(anyString(), any());
-    lenient()
         .when(
             auditingService.handleAuditLogs(
                 any(User.class), any(JsonObject.class), anyString(), anyString()))
@@ -81,8 +69,6 @@ public class TestDeletePolicy {
             .put("provider_id", "dummyProviderId")
             .put("status", "ACTIVE")
             .put(RESULT, new JsonArray().add(new JsonObject().put("abcd", "abcd")));
-    when(asyncResult.succeeded()).thenReturn(true);
-    when(asyncResult.result()).thenReturn(jsonObjectMock, jsonObjectMock, jsonObject);
     when(jsonObjectMock.getJsonArray(anyString())).thenReturn(jsonArrayMock);
     when(jsonArrayMock.isEmpty()).thenReturn(false);
     when(jsonArrayMock.getJsonObject(anyInt())).thenReturn(jsonObject);
@@ -90,6 +76,7 @@ public class TestDeletePolicy {
     when(jsonObjectMock.getString(anyString())).thenReturn(policyId);
     when(provider.getUserId()).thenReturn("dummyProviderId");
     when(provider.getResourceServerUrl()).thenReturn("dummyResourceServer");
+    when(postgresService.executePreparedQuery(anyString(),any())).thenReturn(Future.succeededFuture(jsonObjectMock), Future.succeededFuture(jsonObject));
 
     policy
         .initiateDeletePolicy(jsonObjectMock, provider)
@@ -116,8 +103,6 @@ public class TestDeletePolicy {
             .put("provider_id", "dummyProviderId")
             .put("status", "INACTIVE")
             .put(RESULT, new JsonArray().add(new JsonObject().put("abcd", "abcd")));
-    when(asyncResult.succeeded()).thenReturn(true);
-    when(asyncResult.result()).thenReturn(jsonObjectMock, jsonObjectMock, jsonObject);
     when(jsonObjectMock.getJsonArray(anyString())).thenReturn(jsonArrayMock);
     when(jsonArrayMock.isEmpty()).thenReturn(false);
     when(jsonArrayMock.getJsonObject(anyInt())).thenReturn(jsonObject);
@@ -125,6 +110,7 @@ public class TestDeletePolicy {
     when(jsonObjectMock.getString(anyString())).thenReturn(policyId);
     when(provider.getUserId()).thenReturn("dummyProviderId");
     when(provider.getResourceServerUrl()).thenReturn("dummyResourceServer");
+    when(postgresService.executePreparedQuery(anyString(),any())).thenReturn(Future.succeededFuture(jsonObjectMock), Future.succeededFuture(jsonObject));
 
     policy
         .initiateDeletePolicy(jsonObjectMock, provider)
@@ -154,8 +140,6 @@ public class TestDeletePolicy {
             .put("provider_id", "someProviderId")
             .put("status", "ACTIVE")
             .put(RESULT, new JsonArray().add(new JsonObject().put("abcd", "abcd")));
-    when(asyncResult.succeeded()).thenReturn(true);
-    when(asyncResult.result()).thenReturn(jsonObjectMock, jsonObjectMock, jsonObject);
     when(jsonObjectMock.getJsonArray(anyString())).thenReturn(jsonArrayMock);
     when(jsonArrayMock.isEmpty()).thenReturn(false);
     when(jsonArrayMock.getJsonObject(anyInt())).thenReturn(jsonObject);
@@ -163,6 +147,7 @@ public class TestDeletePolicy {
     when(jsonObjectMock.getString(anyString())).thenReturn(policyId);
     when(provider.getUserId()).thenReturn("dummyProviderId");
     when(provider.getResourceServerUrl()).thenReturn("dummyResourceServer");
+    when(postgresService.executePreparedQuery(anyString(),any())).thenReturn(Future.succeededFuture(jsonObjectMock), Future.succeededFuture(jsonObject));
 
     policy
         .initiateDeletePolicy(jsonObjectMock, provider)
@@ -194,8 +179,6 @@ public class TestDeletePolicy {
             .put("provider_id", "dummyProviderId")
             .put("status", "ACTIVE")
             .put(RESULT, new JsonArray());
-    when(asyncResult.succeeded()).thenReturn(true);
-    when(asyncResult.result()).thenReturn(jsonObjectMock, jsonObjectMock, jsonObject);
     when(jsonObjectMock.getJsonArray(anyString())).thenReturn(jsonArrayMock);
     when(jsonArrayMock.isEmpty()).thenReturn(false);
     when(jsonArrayMock.getJsonObject(anyInt())).thenReturn(jsonObject);
@@ -203,6 +186,7 @@ public class TestDeletePolicy {
     when(jsonObjectMock.getString(anyString())).thenReturn(policyId);
     when(provider.getUserId()).thenReturn("dummyProviderId");
     when(provider.getResourceServerUrl()).thenReturn("dummyResourceServer");
+    when(postgresService.executePreparedQuery(anyString(),any())).thenReturn(Future.succeededFuture(jsonObjectMock), Future.succeededFuture(jsonObject));
 
     policy
         .initiateDeletePolicy(jsonObjectMock, provider)
@@ -232,10 +216,7 @@ public class TestDeletePolicy {
             .put("provider_id", "dummyProviderId")
             .put("status", "ACTIVE")
             .put(RESULT, new JsonArray());
-    when(asyncResult.succeeded()).thenReturn(true, false);
-    when(asyncResult.cause()).thenReturn(throwable);
     when(throwable.getMessage()).thenReturn("Some Failure message");
-    when(asyncResult.result()).thenReturn(jsonObjectMock, jsonObjectMock, jsonObject);
     when(jsonObjectMock.getJsonArray(anyString())).thenReturn(jsonArrayMock);
     when(jsonArrayMock.isEmpty()).thenReturn(false);
     when(jsonArrayMock.getJsonObject(anyInt())).thenReturn(jsonObject);
@@ -243,6 +224,7 @@ public class TestDeletePolicy {
     when(jsonObjectMock.getString(anyString())).thenReturn(policyId);
     when(provider.getUserId()).thenReturn("dummyProviderId");
     when(provider.getResourceServerUrl()).thenReturn("dummyResourceServer");
+    when(postgresService.executePreparedQuery(anyString(),any())).thenReturn(Future.succeededFuture(jsonObjectMock), Future.failedFuture(throwable));
 
     policy
         .initiateDeletePolicy(jsonObjectMock, provider)
@@ -273,8 +255,6 @@ public class TestDeletePolicy {
             .put("provider_id", "dummyProviderId")
             .put("status", "ACTIVE")
             .put(RESULT, new JsonArray().add(new JsonObject().put("abcd", "abcd")));
-    when(asyncResult.succeeded()).thenReturn(true);
-    when(asyncResult.result()).thenReturn(jsonObjectMock, jsonObjectMock, jsonObject);
     when(jsonObjectMock.getJsonArray(anyString())).thenReturn(jsonArrayMock);
     when(jsonArrayMock.isEmpty()).thenReturn(false);
     when(jsonArrayMock.getJsonObject(anyInt())).thenReturn(jsonObject);
@@ -282,6 +262,7 @@ public class TestDeletePolicy {
     when(jsonObjectMock.getString(anyString())).thenReturn(policyId);
     when(provider.getUserId()).thenReturn("dummyProviderId");
     when(provider.getResourceServerUrl()).thenReturn("someOtherDummyResourceServerUrl");
+    when(postgresService.executePreparedQuery(anyString(),any())).thenReturn(Future.succeededFuture(jsonObjectMock), Future.succeededFuture(jsonObject));
 
     policy
         .initiateDeletePolicy(jsonObjectMock, provider)
@@ -314,13 +295,12 @@ public class TestDeletePolicy {
             .put("provider_id", "dummyProviderId")
             .put("status", "ACTIVE")
             .put(RESULT, new JsonArray().add(new JsonObject().put("abcd", "abcd")));
-    when(asyncResult.succeeded()).thenReturn(true);
-    when(asyncResult.result()).thenReturn(jsonObjectMock, jsonObjectMock, jsonObject);
     when(jsonObjectMock.getJsonArray(anyString())).thenReturn(jsonArrayMock);
     when(jsonArrayMock.isEmpty()).thenReturn(true);
     String policyId = UUID.randomUUID().toString();
     when(jsonObjectMock.getString(anyString())).thenReturn(policyId);
     when(provider.getUserId()).thenReturn("dummyProviderId");
+    when(postgresService.executePreparedQuery(anyString(),any())).thenReturn(Future.succeededFuture(jsonObjectMock), Future.succeededFuture(jsonObject));
 
     policy
         .initiateDeletePolicy(jsonObjectMock, provider)

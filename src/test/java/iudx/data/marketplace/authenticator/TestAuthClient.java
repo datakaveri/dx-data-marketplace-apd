@@ -1,12 +1,13 @@
 package iudx.data.marketplace.authenticator;
 
 import io.vertx.core.buffer.Buffer;
-import iudx.data.marketplace.aaaService.AuthClient;
-import iudx.data.marketplace.authenticator.handlers.AuthHandler;
+import iudx.data.marketplace.dmpAuth.aaaService.AuthClient;
 import iudx.data.marketplace.apiserver.util.Role;
-import iudx.data.marketplace.authenticator.model.UserInfo;
+import iudx.data.marketplace.authenticator.handlers.authentication.AuthHandler;
+import iudx.data.marketplace.dmpAuth.UserInfo;
+import iudx.data.marketplace.authenticator.service.AuthenticationService;
 import iudx.data.marketplace.common.Api;
-import iudx.data.marketplace.policies.User;
+import iudx.data.marketplace.policies.service.model.User;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.junit.jupiter.api.Disabled;
@@ -24,7 +25,6 @@ import io.vertx.ext.web.client.HttpResponse;
 import io.vertx.ext.web.client.WebClient;
 import io.vertx.junit5.VertxExtension;
 import io.vertx.junit5.VertxTestContext;
-import io.vertx.pgclient.PgPool;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -56,7 +56,6 @@ public class TestAuthClient {
   @Mock AsyncResult<Void> voidAsyncResult;
   @Mock Throwable throwable;
   @Mock HttpResponse httpServerResponse;
-  @Mock PgPool pgPool;
   @Mock HttpRequest<io.vertx.core.buffer.Buffer> bufferHttpRequest;
   @Mock HttpResponse<io.vertx.core.buffer.Buffer> bufferHttpResponse;
   @Mock Future<HttpResponse<io.vertx.core.buffer.Buffer>> httpResponseFuture;
