@@ -66,6 +66,17 @@ public class Constants {
           + "inner join $8 as rt on dpt.resource_id = rt._id "
           + "where  pt.status='ACTIVE' AND rt.resource_server = $1";
 
+  public static final String LIST_PRODUCTS_FOR_ALL_RESOURCE_SERVERS =
+      "select pt.product_id AS \"productId\", pt.provider_name AS \"providerName\", "
+          + "rt.resource_server AS \"resourceServerUrl\",\n"
+          + " pt.modified_at AS \"updatedAt\" , "
+          + " pt.created_at AS \"createdAt\" , "
+          + "array_agg(json_build_object('id', rt._id, 'name', rt.resource_name)) as resources "
+          + "from $0 as pt "
+          + "inner join $9 as dpt on pt.product_id = dpt.product_id "
+          + "inner join $8 as rt on dpt.resource_id = rt._id "
+          + "where  pt.status='ACTIVE'";
+
   public static final String GET_PRODUCT_VARIANT_INFO =
       "select pv._id, pv.product_variant_name, pv.product_id, pv.provider_id, pv.price, m.account_id "
           + "from $0 as pv inner join $9 as m on pv.provider_id = m.provider_id "

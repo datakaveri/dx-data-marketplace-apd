@@ -128,13 +128,18 @@ public class ConsumerServiceImpl implements ConsumerService {
     String productTable = config.getJsonArray(TABLES).getString(0);
     String resourceTable = config.getJsonArray(TABLES).getString(1);
     String productResourceRelationTable = config.getJsonArray(TABLES).getString(2);
-    String resourceServerUrl = consumer.getResourceServerUrl();
 
+    /*   String resourceServerUrl = consumer.getResourceServerUrl(); */
+
+
+    /*Removing the resource server url based filter to list all the resources in catalogue page*/
     JsonObject params = new JsonObject();
-    params.put("resourceServerUrl", resourceServerUrl);
+
+    /* params.put("resourceServerUrl", resourceServerUrl); */
+
     StringBuilder query =
         new StringBuilder(
-            LIST_PRODUCTS
+            LIST_PRODUCTS_FOR_ALL_RESOURCE_SERVERS
                 .replace("$0", productTable)
                 .replace("$9", productResourceRelationTable)
                 .replace("$8", resourceTable));
@@ -142,13 +147,13 @@ public class ConsumerServiceImpl implements ConsumerService {
     if (request.containsKey("resourceId")) {
       String resourceId = request.getString("resourceId");
       params.put("resourceId", resourceId);
-      query.append(" and rt._id=$2");
+      query.append(" and rt._id=$1");
     } else if (request.containsKey("providerId")) {
       String providerId = request.getString("providerId");
       params.put("providerId", providerId);
-      query.append(" and pt.provider_id=$2");
+      query.append(" and pt.provider_id=$1");
     }
-    query.append(" group by pt.product_id, rt.resource_server");
+    query.append(" group by pt.product_id, rt.resource_server, pt.provider_name, pt.modified_at, pt.created_at");
     query.append(" order by pt.modified_at DESC");
     LOGGER.debug(query);
 

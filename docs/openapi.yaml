@@ -2938,11 +2938,13 @@ paths:
       tags:
         - Consumer-List-APIs
       summary: List products
+      description: |-
+        Lists active products for consumer based on either resource ID or provider ID, or all products are listed if no query parameters are provided.
       parameters:
         - name: token
           in: header
           description: DX Auth token to process the request
-          required: true
+          required: false
           schema:
             type: string
             pattern: '^[a-zA-Z0-9\/\@\.]*$'
