@@ -212,4 +212,7 @@ public class Constants {
       "SELECT * FROM product_variant_view P\n"
           + "WHERE P.\"productId\" = $1 \n"
           + "AND P.\"productVariantStatus\" = 'ACTIVE'\n";
+
+  public static final String FETCH_RESOURCE_SERVER_URL =  "SELECT \"resourceServerUrl\" FROM " +
+      "product_variant_view WHERE \"productVariantId\" = $1";
 }

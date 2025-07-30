@@ -61,7 +61,8 @@ public class AuthHandler implements Handler<RoutingContext> {
     LOGGER.debug("Info : path " + request.path());
 
     final String path = getNormalisedPath(request.path());
-    JsonObject authInfo = RoutingContextHelper.getAuthInfo(context);
+    JsonObject authInfo = RoutingContextHelper.getAuthInfo(context).put(API_ENDPOINT, path);
+
 
     if (path.equals(api.getVerifyUrl())) {
         authenticator.tokenIntrospect4Verify(

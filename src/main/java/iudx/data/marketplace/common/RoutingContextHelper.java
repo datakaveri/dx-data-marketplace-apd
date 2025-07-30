@@ -23,7 +23,6 @@ public class RoutingContextHelper {
 
   public static JsonObject getAuthInfo(RoutingContext routingContext) {
     return new JsonObject()
-        .put(API_ENDPOINT, getRequestPath(routingContext))
         .put(HEADER_TOKEN, getToken(routingContext))
         .put(API_METHOD, getMethod(routingContext));
   }
