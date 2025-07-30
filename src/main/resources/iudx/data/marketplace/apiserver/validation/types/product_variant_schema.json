@@ -61,8 +61,7 @@
         "type": "object",
         "default": {},
         "required": [
-          "id",
-          "capabilities"
+          "id"
         ],
         "properties": {
           "id": {

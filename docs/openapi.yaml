@@ -895,7 +895,6 @@ paths:
                           type: string
                     required:
                       - id
-                      - capabilities
                 price:
                   type: integer
                 duration:
