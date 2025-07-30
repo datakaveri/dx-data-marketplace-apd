@@ -29,10 +29,11 @@ public class ValidationHandler implements Handler<RoutingContext> {
     ValidationHandlerFactory validationFactory = new ValidationHandlerFactory();
     MultiMap parameters = context.request().params();
     JsonObject body = context.body().asJsonObject();
+    MultiMap headerParams = context.request().headers();
     Map<String, String> pathParams = context.pathParams();
     parameters.addAll(pathParams);
 
-    List<Validator> validations = validationFactory.build(requestType, parameters, body);
+    List<Validator> validations = validationFactory.build(requestType, parameters, body, headerParams);
     for (Validator validator : Optional.ofNullable(validations).orElse(Collections.emptyList())) {
       LOGGER.debug("validator : " + validator.getClass().getName());
       validator.isValid();

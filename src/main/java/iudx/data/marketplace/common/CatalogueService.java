@@ -63,6 +63,11 @@ public class CatalogueService {
                     catItemHandler.result().bodyAsJsonObject().getJsonArray("results");
                 if (!response.isEmpty()) {
                   JsonObject result = response.getJsonObject(0);
+                  if (result.getJsonArray("type").contains(TYPE_RG)) {
+                    LOGGER.error("Given id is invalid - it is group level resource");
+                    promise.fail("Given id is invalid - it is group level resource");
+                    return;
+                  }
                   if (result.getJsonArray("type").contains(TYPE_PROVIDER)) {
                     itemDetails
                         .put("type", TYPE_PROVIDER)
