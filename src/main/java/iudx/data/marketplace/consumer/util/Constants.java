@@ -208,4 +208,8 @@ public class Constants {
           + "WHERE P.\"productId\" = $1 \n"
           + "AND P.\"productVariantStatus\" = 'ACTIVE'\n"
           + "AND P.\"resourceServerUrl\" = $2\n";
+  public static final String FETCH_ACTIVE_PRODUCT_VARIANTS_WITHOUT_RS_URL =
+      "SELECT * FROM product_variant_view P\n"
+          + "WHERE P.\"productId\" = $1 \n"
+          + "AND P.\"productVariantStatus\" = 'ACTIVE'\n";
 }

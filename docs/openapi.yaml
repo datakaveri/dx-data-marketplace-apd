@@ -2946,15 +2946,8 @@ paths:
       summary: List products
       description: |-
         Lists active products for consumer based on either resource ID or provider ID, or all products are listed if no query parameters are provided.
+        This is an open endpoint as it is being displayed on catalogue dashboard.
       parameters:
-        - name: Authorization
-          in: header
-          description: DX Auth Bearer token to process the request
-          required: false
-          schema:
-            type: string
-            pattern: 'Bearer [a-zA-Z0-9_*\-*\.\/]+$'
-            maxLength: 512
         - name: resourceId
           in: query
           description: ID of the resource for listing products that contain it.
@@ -3157,16 +3150,8 @@ paths:
       description: |
         Lists all the `active` product variants of a given product. Product variant descriptors like it's ID, name, price,
         duration of product variant or expiry, and other information like provider ID, resource ID and constraints of that
-        resource, product ID and name are displayed.
+        resource, product ID and name are displayed. This is an open endpoint as it is being displayed on catalogue dashboard.
       parameters:
-        - name: Authorization
-          in: header
-          description: DX Auth Bearer token to process the request
-          required: false
-          schema:
-            type: string
-            pattern: 'Bearer [a-zA-Z0-9_*\-*\.\/]+$'
-            maxLength: 512
         - name: productId
           in: query
           description: product ID for which variants need to be fetched

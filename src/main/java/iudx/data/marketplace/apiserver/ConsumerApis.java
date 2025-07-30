@@ -100,7 +100,7 @@ public class ConsumerApis {
     router
         .get(api.getConsumerProductVariantPath())
         .handler(productVariantHandler)
-        .handler(AuthHandler.create(authenticationService, api, postgresService, authClient))
+/*  .handler(AuthHandler.create(authenticationService, api, postgresService, authClient)) */
         .handler(this::listProductVariants)
         .failureHandler(exceptionHandler);
 

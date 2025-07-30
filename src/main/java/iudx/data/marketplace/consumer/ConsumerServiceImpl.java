@@ -327,12 +327,17 @@ public class ConsumerServiceImpl implements ConsumerService {
   public ConsumerService listProductVariants(
       User user, JsonObject request, Handler<AsyncResult<JsonObject>> handler) {
     String productId = request.getString("productId");
-    String resourceServerUrl = user.getResourceServerUrl();
-
+    /* List product variants are being displayed on the catalogue dashboard and will not be filtered based on the resource server url
+    * as it is not provided with tokens */
+//    String resourceServerUrl = user.getResourceServerUrl();
+//
+//    JsonObject params =
+//        new JsonObject().put("productId", productId).put("resourceServerUrl", resourceServerUrl);
     JsonObject params =
-        new JsonObject().put("productId", productId).put("resourceServerUrl", resourceServerUrl);
+        new JsonObject().put("productId", productId);
 
-    String query = FETCH_ACTIVE_PRODUCT_VARIANTS + " ORDER BY P.\"updatedAt\" DESC";
+
+    String query = FETCH_ACTIVE_PRODUCT_VARIANTS_WITHOUT_RS_URL + " ORDER BY P.\"updatedAt\" DESC";
     LOGGER.debug("Query to list product variants : {}", query);
     pgService.executePreparedQuery(
         query,
