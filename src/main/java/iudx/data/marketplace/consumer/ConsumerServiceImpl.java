@@ -245,7 +245,7 @@ public class ConsumerServiceImpl implements ConsumerService {
             }
           } else {
             LOGGER.error("Failed to fetch product variant for id: {}", variantId);
-            handler.handle(Future.failedFuture(pgHandler.cause()));
+            handler.handle(Future.failedFuture(pgHandler.cause().getMessage()));
             return;
           }
         });

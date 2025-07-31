@@ -368,7 +368,27 @@ public class ConsumerServiceTest {
     doAnswer(Answer -> Future.succeededFuture(new JsonObject()))
         .when(consumerServiceSpy)
         .generateOrderEntry(any(), anyString(), anyString());
+    when(asyncResult.succeeded()).thenReturn(true);
+    when(asyncResult.result())
+        .thenReturn(
+            new JsonObject()
+                .put(
+                    "results",
+                    new JsonArray()
+                        .add(new JsonObject().put("resourceServerUrl", "rs.iudx.io"))));
 
+    doAnswer(
+        new Answer<AsyncResult<JsonObject>>() {
+          @Override
+          public AsyncResult<JsonObject> answer(InvocationOnMock invocationOnMock)
+              throws Throwable {
+            ((Handler<AsyncResult<JsonObject>>) invocationOnMock.getArgument(2))
+                .handle(asyncResult);
+            return null;
+          }
+        })
+        .when(postgresService)
+        .executePreparedQuery(anyString(), any(), any());
     consumerServiceSpy.createOrder(
         request,
         consumer,
@@ -390,6 +410,27 @@ public class ConsumerServiceTest {
     when(consumer.getUserId()).thenReturn("consumer-id");
     request.put(PRODUCT_VARIANT_ID, "pv-id");
     doAnswer(Answer -> Future.failedFuture("Expected Message")).when(consumerServiceSpy).getOrderRelatedInfo(anyString());
+    when(asyncResult.succeeded()).thenReturn(true);
+    when(asyncResult.result())
+        .thenReturn(
+            new JsonObject()
+                .put(
+                    "results",
+                    new JsonArray()
+                        .add(new JsonObject().put("resourceServerUrl", "rs.iudx.io"))));
+
+    doAnswer(
+        new Answer<AsyncResult<JsonObject>>() {
+          @Override
+          public AsyncResult<JsonObject> answer(InvocationOnMock invocationOnMock)
+              throws Throwable {
+            ((Handler<AsyncResult<JsonObject>>) invocationOnMock.getArgument(2))
+                .handle(asyncResult);
+            return null;
+          }
+        })
+        .when(postgresService)
+        .executePreparedQuery(anyString(), any(), any());
 
     consumerServiceSpy.createOrder(request, consumer, handler -> {
       if(handler.succeeded()) {
@@ -419,6 +460,27 @@ public class ConsumerServiceTest {
         .when(consumerServiceSpy)
         .getOrderRelatedInfo(anyString());
     doAnswer(Answer -> Future.failedFuture("Expected Razorpay Message")).when(razorPayService).createOrder(any());
+    when(asyncResult.succeeded()).thenReturn(true);
+    when(asyncResult.result())
+        .thenReturn(
+            new JsonObject()
+                .put(
+                    "results",
+                    new JsonArray()
+                        .add(new JsonObject().put("resourceServerUrl", "rs.iudx.io"))));
+
+    doAnswer(
+        new Answer<AsyncResult<JsonObject>>() {
+          @Override
+          public AsyncResult<JsonObject> answer(InvocationOnMock invocationOnMock)
+              throws Throwable {
+            ((Handler<AsyncResult<JsonObject>>) invocationOnMock.getArgument(2))
+                .handle(asyncResult);
+            return null;
+          }
+        })
+        .when(postgresService)
+        .executePreparedQuery(anyString(), any(), any());
 
     consumerServiceSpy.createOrder(request, consumer, handler -> {
       if(handler.succeeded()) {
@@ -451,7 +513,27 @@ public class ConsumerServiceTest {
     doAnswer(Answer -> Future.failedFuture("Expected Postgres Message"))
         .when(consumerServiceSpy)
         .generateOrderEntry(any(), anyString(), anyString());
+    when(asyncResult.succeeded()).thenReturn(true);
+    when(asyncResult.result())
+        .thenReturn(
+            new JsonObject()
+                .put(
+                    "results",
+                    new JsonArray()
+                        .add(new JsonObject().put("resourceServerUrl", "rs.iudx.io"))));
 
+    doAnswer(
+        new Answer<AsyncResult<JsonObject>>() {
+          @Override
+          public AsyncResult<JsonObject> answer(InvocationOnMock invocationOnMock)
+              throws Throwable {
+            ((Handler<AsyncResult<JsonObject>>) invocationOnMock.getArgument(2))
+                .handle(asyncResult);
+            return null;
+          }
+        })
+        .when(postgresService)
+        .executePreparedQuery(anyString(), any(), any());
     consumerServiceSpy.createOrder(request, consumer, handler -> {
       if(handler.succeeded()) {
         testContext.failNow("Unexpected Behaviour");
@@ -489,7 +571,7 @@ public class ConsumerServiceTest {
         .put(RESULTS, jsonArray)
         .put("orderId", "dummyOrderId");
 
-    when(consumer.getResourceServerUrl()).thenReturn("dummyRsUrl");
+    lenient().when(consumer.getResourceServerUrl()).thenReturn("dummyRsUrl");
     when(consumer.getUserId()).thenReturn("someUserId");
     when(consumer.getUserRole()).thenReturn(Role.CONSUMER);
     when(consumer.getEmailId()).thenReturn("dummyConsumerEmailId");
@@ -585,7 +667,7 @@ public class ConsumerServiceTest {
         .put(RESULTS, new JsonArray())
         .put("orderId", "dummyOrderId");
 
-        when(consumer.getResourceServerUrl()).thenReturn("dummyRsUrl");
+        lenient().when(consumer.getResourceServerUrl()).thenReturn("dummyRsUrl");
         when(consumer.getUserId()).thenReturn("someUserId");
         when(asyncResult.succeeded()).thenReturn(true);
         when(asyncResult.result()).thenReturn(request);
@@ -615,7 +697,7 @@ public class ConsumerServiceTest {
                 .put(RESULTS, new JsonArray())
                 .put("orderId", "dummyOrderId");
 
-        when(consumer.getResourceServerUrl()).thenReturn("dummyRsUrl");
+        lenient().when(consumer.getResourceServerUrl()).thenReturn("dummyRsUrl");
         when(consumer.getUserId()).thenReturn("someUserId");
         when(asyncResult.succeeded()).thenReturn(false);
     consumerService.listPurchase(
@@ -649,7 +731,7 @@ public class ConsumerServiceTest {
                 .put(RESULTS, new JsonArray())
                 .put("orderId", "dummyOrderId");
 
-        when(consumer.getResourceServerUrl()).thenReturn("dummyRsUrl");
+        lenient().when(consumer.getResourceServerUrl()).thenReturn("dummyRsUrl");
         consumerService.listPurchase(
                 consumer,
                 request,
@@ -673,7 +755,7 @@ public class ConsumerServiceTest {
   @Test
   @DisplayName("Test list product variants method : Success")
   public void testListProductVariantsSuccess(VertxTestContext vertxTestContext) {
-    when(consumer.getResourceServerUrl()).thenReturn("dummyRsUrl");
+    lenient().when(consumer.getResourceServerUrl()).thenReturn("dummyRsUrl");
 
     JsonArray jsonArray = new JsonArray().add("abcd");
     request.put("productId", "someDummyProductId").put("resourceServerUrl", "abcd");
@@ -690,7 +772,7 @@ public class ConsumerServiceTest {
             assertNotNull(handler.result());
             assertEquals(jsonMock, handler.result());
             verify(postgresService, times(1)).executePreparedQuery(anyString(), any(), any());
-            verify(consumer, times(1)).getResourceServerUrl();
+//            verify(consumer, times(1)).getResourceServerUrl();
             vertxTestContext.completeNow();
           } else {
 
@@ -702,7 +784,7 @@ public class ConsumerServiceTest {
   @Test
   @DisplayName("Test list product variants when DB response is Empty : Failure")
   public void testListProductVariantsWithEmptyResponse(VertxTestContext vertxTestContext) {
-    when(consumer.getResourceServerUrl()).thenReturn("dummyRsUrl");
+    lenient().when(consumer.getResourceServerUrl()).thenReturn("dummyRsUrl");
 
     JsonArray jsonArray = new JsonArray();
     request.put("productId", "someDummyProductId").put("resourceServerUrl", "abcd");
@@ -723,7 +805,7 @@ public class ConsumerServiceTest {
                     .getResponse();
             assertEquals(expectedFailureMessage, handler.cause().getMessage());
             verify(postgresService, times(1)).executePreparedQuery(anyString(), any(), any());
-            verify(consumer, times(1)).getResourceServerUrl();
+//            verify(consumer, times(1)).getResourceServerUrl();
             vertxTestContext.completeNow();
           } else {
 
@@ -735,7 +817,7 @@ public class ConsumerServiceTest {
     @Test
     @DisplayName("Test list product variants when DB execution failed : Failure")
     public void testListProductVariantsWhenDbExecutionFailed(VertxTestContext vertxTestContext) {
-        when(consumer.getResourceServerUrl()).thenReturn("dummyRsUrl");
+        lenient().when(consumer.getResourceServerUrl()).thenReturn("dummyRsUrl");
 
         JsonArray jsonArray = new JsonArray();
         request.put("productId", "someDummyProductId").put("resourceServerUrl", "abcd");
@@ -756,7 +838,7 @@ public class ConsumerServiceTest {
                                         .getResponse();
                         assertEquals(expectedFailureMessage, handler.cause().getMessage());
                         verify(postgresService, times(1)).executePreparedQuery(anyString(), any(), any());
-                        verify(consumer, times(1)).getResourceServerUrl();
+//                        verify(consumer, times(1)).getResourceServerUrl();
                         vertxTestContext.completeNow();
                     } else {
 

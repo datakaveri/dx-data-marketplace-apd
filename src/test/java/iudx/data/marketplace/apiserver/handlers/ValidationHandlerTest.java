@@ -33,6 +33,7 @@ public class ValidationHandlerTest {
   static HttpServerRequest httpServerRequest;
   static RequestBody requestBody;
   static MultiMap map;
+  static MultiMap headerMap;
   static int numberOfInvocations;
   JsonObject jsonObject;
   ValidationHandler validationHandler;
@@ -42,6 +43,7 @@ public class ValidationHandlerTest {
     routingContext = mock(RoutingContext.class);
     httpServerRequest = mock(HttpServerRequest.class);
     requestBody = mock(RequestBody.class);
+    headerMap = mock(MultiMap.class);
     map = MultiMap.caseInsensitiveMultiMap()
         .set("productVariantId", "695e222b-3fae-4325-8db0-3e29d01c4fc0")
         .set("productId", "urn:datakaveri.org:c1757ee9-a168-4cbf-aac7-3e4ff6faaae2:abcbd")
@@ -111,12 +113,13 @@ public class ValidationHandlerTest {
 
     when(routingContext.request()).thenReturn(httpServerRequest);
     when(routingContext.request().params()).thenReturn(reqMap);
+    when(routingContext.request().headers()).thenReturn(headerMap);
     when(routingContext.body()).thenReturn(requestBody);
     when(routingContext.body().asJsonObject()).thenReturn(req);
     when(routingContext.pathParams()).thenReturn(hashMap);
     validationHandler = new ValidationHandler(requestType);
     validationHandler.handle(routingContext);
-    verify(routingContext, times(numberOfInvocations)).request();
+    verify(routingContext, times(numberOfInvocations*2)).request();
     verify(routingContext, times(numberOfInvocations)).body();
     testContext.completeNow();
   }
