@@ -408,6 +408,7 @@ paths:
                     detail: Not Authorized
       security:
         - authorization: [ ]
+          required: true
 
       x-codeSamples:
         - lang: 'cURL'
@@ -3942,6 +3943,10 @@ components:
     authorization:
       type: http
       scheme: bearer
+      bearerFormat: JWT
+      description: |
+        DX Auth Bearer token to process the request. 
+        The token should be passed in the header as `Authorization`
   schemas:
     exampleProductPostBody:
       type: object
