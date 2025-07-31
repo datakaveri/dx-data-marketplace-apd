@@ -3132,8 +3132,6 @@ paths:
                       "title": "Not Authorized",
                       "detail": "Not Authorized"
                     }
-      security:
-        - authorization: [ ]
 
       x-codeSamples:
         - lang: 'cURL'
@@ -3315,8 +3313,7 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Unauthorized'
-      security:
-        - authorization: [ ]
+
 
       x-codeSamples:
         - lang: 'cURL'
