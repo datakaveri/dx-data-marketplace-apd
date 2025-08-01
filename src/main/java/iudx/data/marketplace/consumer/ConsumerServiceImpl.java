@@ -128,13 +128,17 @@ public class ConsumerServiceImpl implements ConsumerService {
     String productTable = config.getJsonArray(TABLES).getString(0);
     String resourceTable = config.getJsonArray(TABLES).getString(1);
     String productResourceRelationTable = config.getJsonArray(TABLES).getString(2);
-    String resourceServerUrl = consumer.getResourceServerUrl();
 
+    /*   String resourceServerUrl = consumer.getResourceServerUrl(); */
+
+    /*Removing the resource server url based filter to list all the resources in catalogue page*/
     JsonObject params = new JsonObject();
-    params.put("resourceServerUrl", resourceServerUrl);
+
+    /* params.put("resourceServerUrl", resourceServerUrl); */
+
     StringBuilder query =
         new StringBuilder(
-            LIST_PRODUCTS
+            LIST_PRODUCTS_FOR_ALL_RESOURCE_SERVERS
                 .replace("$0", productTable)
                 .replace("$9", productResourceRelationTable)
                 .replace("$8", resourceTable));
@@ -142,13 +146,14 @@ public class ConsumerServiceImpl implements ConsumerService {
     if (request.containsKey("resourceId")) {
       String resourceId = request.getString("resourceId");
       params.put("resourceId", resourceId);
-      query.append(" and rt._id=$2");
+      query.append(" and rt._id=$1");
     } else if (request.containsKey("providerId")) {
       String providerId = request.getString("providerId");
       params.put("providerId", providerId);
-      query.append(" and pt.provider_id=$2");
+      query.append(" and pt.provider_id=$1");
     }
-    query.append(" group by pt.product_id, rt.resource_server");
+    query.append(
+        " group by pt.product_id, rt.resource_server, pt.provider_name, pt.modified_at, pt.created_at");
     query.append(" order by pt.modified_at DESC");
     LOGGER.debug(query);
 
@@ -170,29 +175,80 @@ public class ConsumerServiceImpl implements ConsumerService {
   @Override
   public ConsumerService createOrder(
       JsonObject request, User user, Handler<AsyncResult<JsonObject>> handler) {
-    //    String resourceServerUrl = user.getResourceServerUrl();
 
+    /*Allow user to create order based on the product variant only if the consumer's resource server
+     * url is equivalent to item's resource server url*/
+    String consumerResourceServerUrl = user.getResourceServerUrl();
     String variantId = request.getString(PRODUCT_VARIANT_ID);
     String consumerId = user.getUserId();
-    LOGGER.debug(variantId);
+    JsonObject params = new JsonObject().put("variant", variantId);
+    pgService.executePreparedQuery(
+        FETCH_RESOURCE_SERVER_URL,
+        params,
+        pgHandler -> {
+          if (pgHandler.succeeded()) {
+            JsonArray results = pgHandler.result().getJsonArray(RESULTS);
+            if (results.isEmpty()) {
+              LOGGER.error("Product variant not found for id: {}", variantId);
+              handler.handle(
+                  Future.failedFuture(
+                      new RespBuilder()
+                          .withType(ResponseUrn.RESOURCE_NOT_FOUND_URN.getUrn())
+                          .withTitle(ResponseUrn.RESOURCE_NOT_FOUND_URN.getMessage())
+                          .withDetail("Product Variant not found")
+                          .getResponse()));
+              return;
+            }
+            String itemResourceServerUrl = results.getJsonObject(0).getString("resourceServerUrl");
+            if (!itemResourceServerUrl.equals(consumerResourceServerUrl)) {
+              LOGGER.error(
+                  "Consumer's resource server url {} does not match with item's resource server url {}",
+                  consumerResourceServerUrl,
+                  itemResourceServerUrl);
+              handler.handle(
+                  Future.failedFuture(
+                      new RespBuilder()
+                          .withType(HttpStatusCode.FORBIDDEN.getValue())
+                          .withTitle(ResponseUrn.FORBIDDEN_URN.getUrn())
+                          .withDetail(
+                              "Consumer's resource server url does not match with item's resource server url")
+                          .getResponse()));
+              return;
+            } else {
+              // Proceed with order creation
+              LOGGER.debug(variantId);
+              LOGGER.info(
+                  "Consumer's resource server url {} matches with item's resource server url {} for variantId {}",
+                  consumerResourceServerUrl,
+                  itemResourceServerUrl, variantId);
 
-    getOrderRelatedInfo(variantId)
-        .compose(
-            orderInfo ->
-                razorPayService.createOrder(orderInfo.getJsonArray(RESULTS).getJsonObject(0)))
-        .compose(x -> generateOrderEntry(x, variantId, consumerId))
-        .onComplete(
-            completeHandler -> {
-              if (completeHandler.succeeded()) {
-                LOGGER.info("order created");
-                handler.handle(
-                    Future.succeededFuture(
-                        completeHandler.result().put(DETAIL, "Order created successfully")));
-              } else {
-                LOGGER.info("order creation failed");
-                handler.handle(Future.failedFuture(completeHandler.cause()));
-              }
-            });
+              getOrderRelatedInfo(variantId)
+                  .compose(
+                      orderInfo ->
+                          razorPayService.createOrder(
+                              orderInfo.getJsonArray(RESULTS).getJsonObject(0)))
+                  .compose(x -> generateOrderEntry(x, variantId, consumerId))
+                  .onComplete(
+                      completeHandler -> {
+                        if (completeHandler.succeeded()) {
+                          LOGGER.info("order created");
+                          handler.handle(
+                              Future.succeededFuture(
+                                  completeHandler
+                                      .result()
+                                      .put(DETAIL, "Order created successfully")));
+                        } else {
+                          LOGGER.info("order creation failed");
+                          handler.handle(Future.failedFuture(completeHandler.cause()));
+                        }
+                      });
+            }
+          } else {
+            LOGGER.error("Failed to fetch product variant for id: {}", variantId);
+            handler.handle(Future.failedFuture(pgHandler.cause().getMessage()));
+            return;
+          }
+        });
 
     return this;
   }
@@ -322,12 +378,16 @@ public class ConsumerServiceImpl implements ConsumerService {
   public ConsumerService listProductVariants(
       User user, JsonObject request, Handler<AsyncResult<JsonObject>> handler) {
     String productId = request.getString("productId");
-    String resourceServerUrl = user.getResourceServerUrl();
+    /* List product variants are being displayed on the catalogue dashboard and will not be filtered based on the resource server url
+     * as it is not provided with tokens */
+    //    String resourceServerUrl = user.getResourceServerUrl();
+    //
+    //    JsonObject params =
+    //        new JsonObject().put("productId", productId).put("resourceServerUrl",
+    // resourceServerUrl);
+    JsonObject params = new JsonObject().put("productId", productId);
 
-    JsonObject params =
-        new JsonObject().put("productId", productId).put("resourceServerUrl", resourceServerUrl);
-
-    String query = FETCH_ACTIVE_PRODUCT_VARIANTS + " ORDER BY P.\"updatedAt\" DESC";
+    String query = FETCH_ACTIVE_PRODUCT_VARIANTS_WITHOUT_RS_URL + " ORDER BY P.\"updatedAt\" DESC";
     LOGGER.debug("Query to list product variants : {}", query);
     pgService.executePreparedQuery(
         query,

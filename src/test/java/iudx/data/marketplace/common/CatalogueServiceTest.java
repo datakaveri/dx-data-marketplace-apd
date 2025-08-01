@@ -80,6 +80,7 @@ public class CatalogueServiceTest {
     when(jsonObjectMock.getJsonArray(anyString())).thenReturn(jsonArrayMock);
     when(jsonArrayMock.isEmpty()).thenReturn(false);
     when(jsonArrayMock.getJsonObject(anyInt())).thenReturn(jsonObjectMock);
+    when(jsonObjectMock.getJsonArray("type").contains("iudx:ResourceGroup")).thenReturn(false);
     when(jsonObjectMock.getJsonArray("type").contains("iudx:Provider")).thenReturn(true);
     when(jsonObjectMock.getString("description", "")).thenReturn("new desc");
     when(jsonObjectMock.getString("ownerUserId", "")).thenReturn("new owner");
@@ -106,6 +107,7 @@ public class CatalogueServiceTest {
     when(jsonArrayMock.isEmpty()).thenReturn(false);
     when(jsonArrayMock.getJsonObject(anyInt())).thenReturn(jsonObjectMock);
     when(jsonObjectMock.getJsonArray("type").contains("iudx:Provider")).thenReturn(false);
+    when(jsonObjectMock.getJsonArray("type").contains("iudx:ResourceGroup")).thenReturn(false);
     when(jsonObjectMock.getJsonArray("type").contains("iudx:Resource")).thenReturn(true);
     when(jsonObjectMock.getString("label", "")).thenReturn("labelxyz");
     when(jsonObjectMock.getString("accessPolicy", "")).thenReturn("OPEN");

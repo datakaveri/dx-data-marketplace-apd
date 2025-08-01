@@ -64,13 +64,13 @@ paths:
 
       operationId: Create Product
       parameters:
-        - name: token
+        - name: Authorization
           in: header
-          description: DX Auth token to process the request
-          required: true
+          description: DX Auth Bearer token to process the request
+          required: false
           schema:
             type: string
-            pattern: '^[a-zA-Z0-9\/\@\.]*$'
+            pattern: 'Bearer [a-zA-Z0-9_*\-*\.\/]+$'
             maxLength: 512
       requestBody:
         content:
@@ -169,13 +169,13 @@ paths:
       summary: ''
       operationId: Delete Product
       parameters:
-        - name: token
+        - name: Authorization
           in: header
-          description: DX Auth token to process the request
-          required: true
+          description: DX Auth Bearer token to process the request
+          required: false
           schema:
             type: string
-            pattern: '^[a-zA-Z0-9\/\@\.]*$'
+            pattern: 'Bearer [a-zA-Z0-9_*\-*\.\/]+$'
             maxLength: 512
         - name: productId
           in: query
@@ -252,13 +252,13 @@ paths:
         - Product
       operationId: List Products
       parameters:
-        - name: token
+        - name: Authorization
           in: header
-          description: DX Auth token to process the request
-          required: true
+          description: DX Auth Bearer token to process the request
+          required: false
           schema:
             type: string
-            pattern: '^[a-zA-Z0-9\/\@\.]*$'
+            pattern: 'Bearer [a-zA-Z0-9_*\-*\.\/]+$'
             maxLength: 512
         - name: resourceId
           in: query
@@ -408,6 +408,7 @@ paths:
                     detail: Not Authorized
       security:
         - authorization: [ ]
+          required: true
 
       x-codeSamples:
         - lang: 'cURL'
@@ -429,13 +430,13 @@ paths:
         The response could be also be filtered based on productId or resourceId.
 
       parameters:
-        - name: token
+        - name: Authorization
           in: header
-          description: DX Auth token to process the request
-          required: true
+          description: DX Auth Bearer token to process the request
+          required: false
           schema:
             type: string
-            pattern: '^[a-zA-Z0-9\/\@\.]*$'
+            pattern: 'Bearer [a-zA-Z0-9_*\-*\.\/]+$'
             maxLength: 512
         - name: productId
           in: query
@@ -862,11 +863,14 @@ paths:
       description: 'Create a product variant where the body contains details about the variant such as price, duration, resources and their capabilities. Along with the name of the variant and the product it belongs to.'
       operationId: Create Product Variant
       parameters:
-        - name: token
+        - name: Authorization
           in: header
-          description: DX Auth token to process the request
+          description: DX Auth Bearer token to process the request
+          required: false
           schema:
             type: string
+            pattern: 'Bearer [a-zA-Z0-9_*\-*\.\/]+$'
+            maxLength: 512
       requestBody:
         content:
           application/json:
@@ -892,7 +896,6 @@ paths:
                           type: string
                     required:
                       - id
-                      - capabilities
                 price:
                   type: integer
                 duration:
@@ -1035,13 +1038,13 @@ paths:
         and other information like provider ID, resource ID and constraints of that resource, product ID and name are displayed.
       operationId: Get Product Variant
       parameters:
-        - name: token
+        - name: Authorization
           in: header
-          description: DX Auth token to process the request
-          required: true
+          description: DX Auth Bearer token to process the request
+          required: false
           schema:
             type: string
-            pattern: '^[a-zA-Z0-9\/\@\.]*$'
+            pattern: 'Bearer [a-zA-Z0-9_*\-*\.\/]+$'
             maxLength: 512
         - name: productId
           description: ID of the product for which product variant is to be listed
@@ -1337,11 +1340,14 @@ paths:
       summary: ''
       operationId: Update Product Variant
       parameters:
-        - name: token
+        - name: Authorization
           in: header
-          description: DX Auth token to process the request
+          description: DX Auth Bearer token to process the request
+          required: false
           schema:
             type: string
+            pattern: 'Bearer [a-zA-Z0-9_*\-*\.\/]+$'
+            maxLength: 512
       requestBody:
         content:
           application/json:
@@ -1475,11 +1481,14 @@ paths:
       summary: ''
       operationId: Delete Product Variant
       parameters:
-        - name: token
+        - name: Authorization
           in: header
-          description: IUDX Auth token to process the request
+          description: DX Auth Bearer token to process the request
+          required: false
           schema:
             type: string
+            pattern: 'Bearer [a-zA-Z0-9_*\-*\.\/]+$'
+            maxLength: 512
         - name: productVariantId
           in: query
           schema:
@@ -1574,15 +1583,14 @@ paths:
         `Note`: By creating a linked account, the provider is accepting the terms and conditions of the respective payment gateway
       operationId: post-linked-account-v1
       parameters:
-        - name: token
+        - name: Authorization
           in: header
-          description: AAA issued identity token
-          required: true
+          description: DX Auth Bearer token to process the request
+          required: false
           schema:
             type: string
-            minLength: 1
+            pattern: 'Bearer [a-zA-Z0-9_*\-*\.\/]+$'
             maxLength: 512
-            pattern: '^[a-zA-Z0-9_*\-*\.\/]+$'
       requestBody:
         description: Request body is a JsonObject containing ID whose value is the policy ID.
         content:
@@ -1791,15 +1799,14 @@ paths:
         <br>
       operationId: update-linked-account-v1
       parameters:
-        - name: token
+        - name: Authorization
           in: header
-          description: AAA issued identity token
-          required: true
+          description: DX Auth Bearer token to process the request
+          required: false
           schema:
             type: string
-            minLength: 1
+            pattern: 'Bearer [a-zA-Z0-9_*\-*\.\/]+$'
             maxLength: 512
-            pattern: '^[a-zA-Z0-9_*\-*\.\/]+$'
       requestBody:
         description: Request body is a JsonObject containing ID whose value is the policy ID.
         content:
@@ -2018,15 +2025,14 @@ paths:
         <br>
       operationId: get-linked-account-v1
       parameters:
-        - name: token
+        - name: Authorization
           in: header
-          description: AAA issued identity token
-          required: true
+          description: DX Auth Bearer token to process the request
+          required: false
           schema:
             type: string
-            minLength: 1
+            pattern: 'Bearer [a-zA-Z0-9_*\-*\.\/]+$'
             maxLength: 512
-            pattern: '^[a-zA-Z0-9_*\-*\.\/]+$'
       responses:
         '200':
           description: Linked account creation successful
@@ -2087,13 +2093,13 @@ paths:
         - Consumer-List-APIs
       summary: List resources
       parameters:
-        - name: token
+        - name: Authorization
           in: header
-          description: DX Auth token to process the request
-          required: true
+          description: DX Auth Bearer token to process the request
+          required: false
           schema:
             type: string
-            pattern: '^[a-zA-Z0-9\/\@\.]*$'
+            pattern: 'Bearer [a-zA-Z0-9_*\-*\.\/]+$'
             maxLength: 512
         - name: providerId
           in: query
@@ -2328,13 +2334,13 @@ paths:
         provider. Number of resources of the provider is added in the response along with provider details like
         ID, provider name and resource server URL to which the provider belongs
       parameters:
-        - name: token
+        - name: Authorization
           in: header
-          description: DX Auth token to process the request
-          required: true
+          description: DX Auth Bearer token to process the request
+          required: false
           schema:
             type: string
-            pattern: '^[a-zA-Z0-9\/\@\.]*$'
+            pattern: 'Bearer [a-zA-Z0-9_*\-*\.\/]+$'
             maxLength: 512
         - name: providerId
           in: query
@@ -2501,13 +2507,13 @@ paths:
         The response could be also be filtered based on productId or resourceId.
 
       parameters:
-        - name: token
+        - name: Authorization
           in: header
-          description: DX Auth token to process the request
-          required: true
+          description: DX Auth Bearer token to process the request
+          required: false
           schema:
             type: string
-            pattern: '^[a-zA-Z0-9\/\@\.]*$'
+            pattern: 'Bearer [a-zA-Z0-9_*\-*\.\/]+$'
             maxLength: 512
         - name: productId
           in: query
@@ -2938,15 +2944,10 @@ paths:
       tags:
         - Consumer-List-APIs
       summary: List products
+      description: |-
+        Lists active products for consumer based on either resource ID or provider ID, or all products are listed if no query parameters are provided.
+        This is an open endpoint as it is being displayed on catalogue dashboard.
       parameters:
-        - name: token
-          in: header
-          description: DX Auth token to process the request
-          required: true
-          schema:
-            type: string
-            pattern: '^[a-zA-Z0-9\/\@\.]*$'
-            maxLength: 512
         - name: resourceId
           in: query
           description: ID of the resource for listing products that contain it.
@@ -3132,8 +3133,6 @@ paths:
                       "title": "Not Authorized",
                       "detail": "Not Authorized"
                     }
-      security:
-        - authorization: [ ]
 
       x-codeSamples:
         - lang: 'cURL'
@@ -3149,16 +3148,8 @@ paths:
       description: |
         Lists all the `active` product variants of a given product. Product variant descriptors like it's ID, name, price,
         duration of product variant or expiry, and other information like provider ID, resource ID and constraints of that
-        resource, product ID and name are displayed.
+        resource, product ID and name are displayed. This is an open endpoint as it is being displayed on catalogue dashboard.
       parameters:
-        - name: token
-          in: header
-          description: DX Auth token to process the request
-          required: true
-          schema:
-            type: string
-            pattern: '^[a-zA-Z0-9\/\@\.]*$'
-            maxLength: 512
         - name: productId
           in: query
           description: product ID for which variants need to be fetched
@@ -3323,8 +3314,7 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Unauthorized'
-      security:
-        - authorization: [ ]
+
 
       x-codeSamples:
         - lang: 'cURL'
@@ -3441,12 +3431,14 @@ paths:
 
       operationId: post-consumer-order
       parameters:
-        - name: token
+        - name: Authorization
           in: header
-          description: DX Auth token to process the request
-          required: true
+          description: DX Auth Bearer token to process the request
+          required: false
           schema:
             type: string
+            pattern: 'Bearer [a-zA-Z0-9_*\-*\.\/]+$'
+            maxLength: 512
         - name: productVariantId
           description: ID of the product variant that could obtained from list product variant API
           required: true
@@ -3849,12 +3841,15 @@ paths:
       operationId: post-verify-payment
 
       parameters:
-        - schema:
-            type: string
+        - name: Authorization
           in: header
-          name: token
+          description: AAA issued identity token
           required: true
-          description: DX Auth token to process the request
+          schema:
+            type: string
+            pattern: '^[a-zA-Z0-9_*\-*\.\/]+$'
+            minLength: 1
+            maxLength: 512
       requestBody:
         description: 'Request expects a Order Id, Payment Id and a Payment Signature which will be verified from RazorPay'
         content:
@@ -3948,6 +3943,10 @@ components:
     authorization:
       type: http
       scheme: bearer
+      bearerFormat: JWT
+      description: |
+        DX Auth Bearer token to process the request. 
+        The token should be passed in the header as `Authorization`
   schemas:
     exampleProductPostBody:
       type: object

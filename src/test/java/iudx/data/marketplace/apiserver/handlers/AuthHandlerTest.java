@@ -264,7 +264,7 @@ public class AuthHandlerTest {
     when(httpServerRequest.path()).thenReturn(url);
     AuthHandler.authenticator = mock(AuthenticationService.class);
     when(httpServerRequest.headers()).thenReturn(map);
-    when(map.get(anyString())).thenReturn("Dummy Token");
+    when(map.get(anyString())).thenReturn("Bearer Dummy Token");
     when(asyncResult.succeeded()).thenReturn(true);
     when(asyncResult.result()).thenReturn(jsonObject);
     doAnswer(new Answer<AsyncResult<JsonObject>>() {
@@ -278,7 +278,7 @@ public class AuthHandlerTest {
     authHandler.handle(routingContext);
 
     assertEquals(path, routingContext.request().path());
-    assertEquals("Dummy Token", routingContext.request().headers().get(HEADER_TOKEN));
+    assertEquals("Bearer Dummy Token", routingContext.request().headers().get(HEADER_TOKEN));
     assertEquals("someMethod", routingContext.request().method().toString());
     verify(AuthHandler.authenticator, times(1)).tokenIntrospect(any(), any(), any());
     verify(routingContext, times(2)).body();
@@ -308,7 +308,7 @@ public class AuthHandlerTest {
     when(httpServerRequest.path()).thenReturn(api.getVerifyUrl());
     AuthHandler.authenticator = mock(AuthenticationService.class);
     when(httpServerRequest.headers()).thenReturn(map);
-    when(map.get(anyString())).thenReturn("Dummy Token");
+    when(map.get(anyString())).thenReturn("bearer Dummy Token");
     when(asyncResult.succeeded()).thenReturn(true);
     doAnswer(new Answer<AsyncResult<JsonObject>>() {
       @Override
@@ -321,7 +321,7 @@ public class AuthHandlerTest {
     authHandler.handle(routingContext);
 
     assertEquals(api.getVerifyUrl(), routingContext.request().path());
-    assertEquals("Dummy Token", routingContext.request().headers().get(HEADER_TOKEN));
+    assertEquals("bearer Dummy Token", routingContext.request().headers().get(HEADER_TOKEN));
     assertEquals("someMethod", routingContext.request().method().toString());
     verify(AuthHandler.authenticator, times(1)).tokenIntrospect4Verify(any(), any() );
     verify(routingContext, times(2)).body();

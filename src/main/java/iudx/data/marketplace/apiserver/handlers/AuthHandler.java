@@ -17,10 +17,7 @@ import io.vertx.core.json.JsonObject;
 import io.vertx.ext.web.RoutingContext;
 import iudx.data.marketplace.authenticator.AuthClient;
 import iudx.data.marketplace.authenticator.AuthenticationService;
-import iudx.data.marketplace.common.Api;
-import iudx.data.marketplace.common.HttpStatusCode;
-import iudx.data.marketplace.common.RespBuilder;
-import iudx.data.marketplace.common.ResponseUrn;
+import iudx.data.marketplace.common.*;
 import iudx.data.marketplace.policies.User;
 import iudx.data.marketplace.postgres.PostgresService;
 import org.apache.logging.log4j.LogManager;
@@ -63,19 +60,11 @@ public class AuthHandler implements Handler<RoutingContext> {
 
     LOGGER.debug("Info : path " + request.path());
 
-    String token = request.headers().get(TOKEN);
     final String path = getNormalisedPath(request.path());
-    final String method = context.request().method().toString();
+    JsonObject authInfo = RoutingContextHelper.getAuthInfo(context).put(API_ENDPOINT, path);
 
-    JsonObject authInfo =
-        new JsonObject().put(API_ENDPOINT, path).put(HEADER_TOKEN, token).put(API_METHOD, method);
 
     if (path.equals(api.getVerifyUrl())) {
-      // removes `bearer` from the token by trimming the leading and trailing spaces
-      token = request.headers().get(AUTHORIZATION_KEY);
-      if (token.trim().split(" ").length == 2) {
-        token = token.trim().split(" ")[1];
-        authInfo.put(HEADER_TOKEN, token);
         authenticator.tokenIntrospect4Verify(
             authInfo,
             handler -> {
@@ -88,9 +77,6 @@ public class AuthHandler implements Handler<RoutingContext> {
                 processAuthFailure(context, handler.cause().getMessage());
               }
             });
-      } else {
-        processAuthFailure(context, "Invalid token");
-      }
     } else { // for all the other endpoints
       checkAuth(requestJson, authInfo)
           .onSuccess(
