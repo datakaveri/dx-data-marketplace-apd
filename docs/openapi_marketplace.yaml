@@ -81,7 +81,7 @@ paths:
                 Unauthorized:
                   value:
                     type: 'urn:dx:cat:InvalidAuthorizationToken'
-                    title: Token is invalid
+                    title: Not Authorized
                     detail: failed
       description: |-
         Create a product where the body contains the name and the array of resources that will be part of the product. 
@@ -145,7 +145,7 @@ paths:
                 Unauthorized:
                   value:
                     type: 'urn:dx:cat:InvalidAuthorizationToken'
-                    title: Token is invalid
+                    title: Not Authorized
                     detail: failed
   /provider/list/products:
     summary: 'List API for provider to view all the products listed by them, or a subset of the products based on the resources they contain.'
@@ -199,7 +199,7 @@ paths:
                 Unauthorized:
                   value:
                     type: 'urn:dx:cat:InvalidAuthorizationToken'
-                    title: Token is invalid
+                    title: Not Authorized
                     detail: failed
   /provider/list/purchases:
     summary: 'List API for the provider to view all the purchases made on the products listed by them, or a subset of the purchases based on the product name.'
@@ -270,7 +270,7 @@ paths:
                 Unauthorized:
                   value:
                     type: 'urn:dx:cat:InvalidAuthorizationToken'
-                    title: Token is invalid
+                    title: Not Authorized
                     detail: failed
   /provider/product-variant:
     post:
@@ -529,7 +529,7 @@ paths:
                 Unauthorized:
                   value:
                     type: 'urn:dx:cat:InvalidAuthorizationToken'
-                    title: Token is invalid
+                    title: Not Authorized
                     detail: failed
   /consumer/list/providers:
     summary: List API for consumers to view the providers enlisted on the marketplace.
@@ -571,7 +571,7 @@ paths:
                 Unauthorized:
                   value:
                     type: 'urn:dx:cat:InvalidAuthorizationToken'
-                    title: Token is invalid
+                    title: Not Authorized
                     detail: failed
   /consumer/list/purchases:
     summary: 'List API for the consumer to view all the past purchases made by them. They can also see  the status of the payment on each '
@@ -607,7 +607,7 @@ paths:
                 Unauthorized:
                   value:
                     type: 'urn:dx:cat:InvalidAuthorizationToken'
-                    title: Token is invalid
+                    title: Not Authorized
                     detail: failed
   /consumer/list/products:
     summary: List API for the comsumer to view all the products available against a dataset.
@@ -667,7 +667,7 @@ paths:
                 Unauthorized:
                   value:
                     type: 'urn:dx:cat:InvalidAuthorizationToken'
-                    title: Token is invalid
+                    title: Not Authorized
                     detail: failed
   /product/usermaps:
     summary: CRUD APIs to map a consumer to a product after purchase is successful.
@@ -732,7 +732,7 @@ paths:
                 Unauthorized:
                   value:
                     type: 'urn:dx:cat:InvalidAuthorizationToken'
-                    title: Token is invalid
+                    title: Not Authorized
                     detail: failed
   /verify:
     post:

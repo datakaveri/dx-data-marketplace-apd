@@ -16,7 +16,7 @@ public enum ResponseUrn {
       "urn,dx:dmp:unauthorizedResource", "Access to resource is not available"),
   EXPIRED_TOKEN_URN("urn:dx:dmp:expiredAuthorizationToken", "Token has expired"),
   MISSING_TOKEN_URN("urn:dx:dmp:missingAuthorizationToken", "Token needed and not present"),
-  INVALID_TOKEN_URN("urn:dx:dmp:invalidAuthorizationToken", "Token is invalid"),
+  INVALID_TOKEN_URN("urn:dx:dmp:invalidAuthorizationToken", "Not Authorized"),
   RESOURCE_NOT_FOUND_URN("urn:dx:dmp:resourceNotFound", "Document of given id does not exist"),
   RESOURCE_ALREADY_EXISTS_URN(
       "urn:dx:dmp:resourceAlreadyExists", "Document of given id already exists"),
