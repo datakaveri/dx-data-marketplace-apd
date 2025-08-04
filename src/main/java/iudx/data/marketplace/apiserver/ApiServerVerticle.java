@@ -77,6 +77,7 @@ public class ApiServerVerticle extends AbstractVerticle {
     Set<String> allowedHeaders = new HashSet<>();
     allowedHeaders.add(HEADER_ACCEPT);
     allowedHeaders.add(HEADER_TOKEN);
+    allowedHeaders.add(AUTHORIZATION_KEY);
     allowedHeaders.add(HEADER_CONTENT_LENGTH);
     allowedHeaders.add(HEADER_CONTENT_TYPE);
     allowedHeaders.add(HEADER_HOST);
