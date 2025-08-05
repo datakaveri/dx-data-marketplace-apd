@@ -109,8 +109,7 @@ public class Constants {
   public static final int BEARER_TOKEN_MIN_LENGTH = 8;
   public static final Pattern BEARER_TOKEN_PATTERN =
       Pattern.compile("Bearer [a-zA-Z0-9_*\\-*\\.\\/]+$");
-  public static final Pattern BEARER_TOKEN_PATTERN_FOR_VERIFY =
-      Pattern.compile("bearer [a-zA-Z0-9_*\\-*\\.\\/]+$");
+
 
   // response keys
   public static final String TYPE = "type";
