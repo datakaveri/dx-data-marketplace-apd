@@ -259,7 +259,7 @@ public class ApiServerVerticle extends AbstractVerticle {
     ValidationHandler paymentFailedRequestValidationHandler =
         new ValidationHandler(RequestType.PAYMENT_FAILED_WEBHOOK);
     router
-        .post("/payments-failed")
+        .post("/payment-failed")
         .handler(this::handleWebhookSignatureValidation)
         .handler(paymentFailedRequestValidationHandler)
         .handler(this::paymentFailedRequestHandler);
