@@ -29,7 +29,7 @@ pipeline {
       steps{
         script{
         sh 'sudo update-alternatives --set java /usr/lib/jvm/java-21-openjdk-amd64/bin/java'
-          sh 'cp /home/ubuntu/configs/dmp-apd-server-config-test.json ./secrets/all-verticles-configs/config-test.json'
+          sh 'cp /home/ubuntu/configs/gdi/dmp-apd-server-config-test.json ./secrets/all-verticles-configs/config-test.json'
            catchError(buildResult: 'SUCCESS', stageResult: 'UNSTABLE') {
               sh "mvn clean test checkstyle:checkstyle pmd:pmd"
             }  
@@ -128,7 +128,7 @@ pipeline {
             triggeredBy cause: 'UserIdCause'
           }
           expression {
-            return env.GIT_BRANCH == 'origin/main';
+            return env.GIT_BRANCH == 'origin/gdi';
           }
         }
       }
@@ -137,8 +137,8 @@ pipeline {
           steps {
             script {
               docker.withRegistry( registryUri, registryCredential ) {
-                devImage.push("1.0.0-alpha-${env.GIT_HASH}")
-                deplImage.push("1.0.0-alpha-${env.GIT_HASH}")
+                devImage.push("gdi-1.0.0-alpha-${env.GIT_HASH}")
+                deplImage.push("gdi-1.0.0-alpha-${env.GIT_HASH}")
               }
             }
           }
@@ -146,7 +146,7 @@ pipeline {
         stage('Docker Swarm deployment') {
           steps {
             script {
-              sh "ssh azureuser@docker-swarm 'docker service update dmp_apd_dmp-apd --image ghcr.io/datakaveri/dmp-apd-server-depl:1.0.0-alpha-${env.GIT_HASH}'"
+              sh "ssh azureuser@docker-swarm 'docker service update dmp-apd-gdi_gdi-dmp-apd --image ghcr.io/datakaveri/dmp-apd-server-depl:gdi-1.0.0-alpha-${env.GIT_HASH}'"
               sh 'sleep 10'
             }
           }
@@ -161,7 +161,7 @@ pipeline {
           steps {
             node('built-in') {
               script{
-                sh 'newman run /var/lib/jenkins/iudx/dmp-apd/Newman/DX-Data-Marketplace-APIs.postman_collection.json -e /home/ubuntu/configs/cd/dmp-apd-postman-env.json --insecure -r htmlextra --reporter-htmlextra-export /var/lib/jenkins/iudx/dmp-apd/Newman/report/cd-report.html --reporter-htmlextra-skipSensitiveData'
+                sh 'newman run /var/lib/jenkins/iudx/dmp-apd/Newman/DX-Data-Marketplace-APIs.postman_collection.json -e /home/ubuntu/configs/gdi/dmp-apd-postman-env.json --insecure -r htmlextra --reporter-htmlextra-export /var/lib/jenkins/iudx/dmp-apd/Newman/report/cd-report.html --reporter-htmlextra-skipSensitiveData'
               }
             }
           }
@@ -186,7 +186,7 @@ pipeline {
     post{
         failure{
         script{
-            if (env.GIT_BRANCH == 'origin/main')
+            if (env.GIT_BRANCH == 'origin/gdi')
             emailext recipientProviders: [buildUser(), developers()], to: '$DMP_APD_RECIPENTS, $DEFAULT_RECIPIENTS', subject: '$PROJECT_NAME - Build # $BUILD_NUMBER - $BUILD_STATUS!', body: '''$PROJECT_NAME - Build # $BUILD_NUMBER - $BUILD_STATUS:
             Check console output at $BUILD_URL to view the results.'''
         }
