@@ -92,7 +92,7 @@ pipeline {
           script{
             startZap ([host: 'localhost', port: 8090, zapHome: '/var/lib/jenkins/tools/com.cloudbees.jenkins.plugins.customtools.CustomTool/OWASP_ZAP/ZAP_2.11.0'])
               sh 'curl http://127.0.0.1:8090/JSON/pscan/action/disableScanners/?ids=10096'
-              sh 'HTTP_PROXY=\'127.0.0.1:8090\' newman run /var/lib/jenkins/iudx/dmp-apd/Newman/DX-Data-Marketplace-APIs.postman_collection.json -e /home/ubuntu/configs/dmp-apd-postman-env.json -n 2 --insecure -r htmlextra --reporter-htmlextra-export /var/lib/jenkins/iudx/dmp-apd/Newman/report/report.html --reporter-htmlextra-skipSensitiveData'
+              sh 'HTTP_PROXY=\'127.0.0.1:8090\' newman run /var/lib/jenkins/iudx/dmp-apd/Newman/DX-Data-Marketplace-APIs.postman_collection.json -e /home/ubuntu/configs/gdi/dmp-apd-postman-env.json -n 2 --insecure -r htmlextra --reporter-htmlextra-export /var/lib/jenkins/iudx/dmp-apd/Newman/report/report.html --reporter-htmlextra-skipSensitiveData'
             runZapAttack()
           }
         }
@@ -161,7 +161,7 @@ pipeline {
           steps {
             node('built-in') {
               script{
-                sh 'newman run /var/lib/jenkins/iudx/dmp-apd/Newman/DX-Data-Marketplace-APIs.postman_collection.json -e /home/ubuntu/configs/cd/dmp-apd-postman-env.json --insecure -r htmlextra --reporter-htmlextra-export /var/lib/jenkins/iudx/dmp-apd/Newman/report/cd-report.html --reporter-htmlextra-skipSensitiveData'
+                sh 'newman run /var/lib/jenkins/iudx/dmp-apd/Newman/DX-Data-Marketplace-APIs.postman_collection.json -e /home/ubuntu/configs/gdi/dmp-apd-postman-env.json --insecure -r htmlextra --reporter-htmlextra-export /var/lib/jenkins/iudx/dmp-apd/Newman/report/cd-report.html --reporter-htmlextra-skipSensitiveData'
               }
             }
           }
