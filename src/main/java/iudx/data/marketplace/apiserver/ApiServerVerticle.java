@@ -113,6 +113,8 @@ public class ApiServerVerticle extends AbstractVerticle {
         .handler(
             CorsHandler.create("*").allowedHeaders(allowedHeaders).allowedMethods(allowedMethods));
 
+    
+
     router
         .route()
         .handler(
