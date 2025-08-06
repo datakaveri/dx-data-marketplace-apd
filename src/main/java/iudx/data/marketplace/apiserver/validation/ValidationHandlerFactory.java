@@ -147,7 +147,7 @@ public class ValidationHandlerFactory {
   private List<Validator> getVerifyPolicyValidator(JsonObject body, MultiMap header) {
     List<Validator> validators = new ArrayList<>();
     validators.add(new JsonSchemaTypeValidator(body, RequestType.VERIFY));
-    validators.add(new VerifyTokenTypeValidator(header.get(AUTHORIZATION_KEY), false));
+    validators.add(new BearerTokenTypeValidator(header.get(AUTHORIZATION_KEY), true));
 
     return validators;
   }

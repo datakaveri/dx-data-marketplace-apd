@@ -35,17 +35,12 @@ public class RoutingContextHelper {
     String token = routingContext.request().headers().get(AUTHORIZATION_KEY);
     boolean isValidBearerToken = token != null && token.trim().split(" ").length == 2;
     boolean isBearerAuthHeaderPresent = isValidBearerToken && (token.contains(HEADER_TOKEN_BEARER));
-    boolean isKcTokenPresent = isValidBearerToken && (token.contains("bearer"));
-    String[] tokenWithoutBearer = new String[] {};
-    if (isValidBearerToken) {
+    String[] tokenWithoutBearer;
       if (isBearerAuthHeaderPresent) {
         tokenWithoutBearer = (token.split(HEADER_TOKEN_BEARER));
-      } else if (isKcTokenPresent) {
-        tokenWithoutBearer = (token.split("bearer"));
+        token = tokenWithoutBearer[1].replaceAll("\\s", "");
+        return token;
       }
-      token = tokenWithoutBearer[1].replaceAll("\\s", "");
-      return token;
-    }
     return routingContext.request().headers().get(HEADER_TOKEN);
   }
 
