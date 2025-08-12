@@ -1,9 +1,9 @@
 {
 	"info": {
-		"_postman_id": "d24b8344-f53b-4478-aea9-de94c4931c8f",
+		"_postman_id": "f077c9ee-606f-4c83-950f-b7df8106341a",
 		"name": "DX-DMP-APD-V1.1.0",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
-		"_exporter_id": "17194681"
+		"_exporter_id": "23856712"
 	},
 	"item": [
 		{
@@ -178,67 +178,6 @@
 					"response": []
 				},
 				{
-					"name": "Get Provider Delegate token (via client-id, secret)",
-					"event": [
-						{
-							"listen": "test",
-							"script": {
-								"exec": [
-									"var jsonData = JSON.parse(responseBody);",
-									"postman.setEnvironmentVariable(\"providerDelegateToken\", jsonData.results.accessToken);"
-								],
-								"type": "text/javascript"
-							}
-						}
-					],
-					"request": {
-						"auth": {
-							"type": "noauth"
-						},
-						"method": "POST",
-						"header": [
-							{
-								"key": "clientId",
-								"value": "{{providerDelegateClientId}}",
-								"type": "text",
-								"description": "Client ID (UUID)"
-							},
-							{
-								"key": "clientSecret",
-								"value": "{{providerDelegateClientSecret}}",
-								"type": "text",
-								"description": "Client secret (40 chars in hexadecimal)"
-							},
-							{
-								"key": "delegationId",
-								"value": "{{providerDelegateId}}",
-								"type": "text"
-							}
-						],
-						"body": {
-							"mode": "raw",
-							"raw": "{\n    \"itemId\": \"{{itemIdForToken}}\",\n    \"itemType\": \"resource_server\",\n    \"role\": \"{{delegateRole}}\"\n}",
-							"options": {
-								"raw": {
-									"language": "json"
-								}
-							}
-						},
-						"url": {
-							"raw": "{{authEndpoint}}/{{dxAuthBasePath}}/token",
-							"host": [
-								"{{authEndpoint}}"
-							],
-							"path": [
-								"{{dxAuthBasePath}}",
-								"token"
-							]
-						},
-						"description": "This API supplies the provider delegate token."
-					},
-					"response": []
-				},
-				{
 					"name": "Get Provider Delegate token (For Forbidden condition)",
 					"event": [
 						{
@@ -297,67 +236,6 @@
 							]
 						},
 						"description": "This API supplies the provider delegate token."
-					},
-					"response": []
-				},
-				{
-					"name": "Get Consumer Delegate token (via client-id, secret)",
-					"event": [
-						{
-							"listen": "test",
-							"script": {
-								"exec": [
-									"var jsonData = JSON.parse(responseBody);",
-									"postman.setEnvironmentVariable(\"consumerDelegateToken\", jsonData.results.accessToken);"
-								],
-								"type": "text/javascript"
-							}
-						}
-					],
-					"request": {
-						"auth": {
-							"type": "noauth"
-						},
-						"method": "POST",
-						"header": [
-							{
-								"key": "clientId",
-								"value": "{{consumerDelegateClientId}}",
-								"type": "text",
-								"description": "Client ID (UUID)"
-							},
-							{
-								"key": "clientSecret",
-								"value": "{{consumerDelegateClientSecret}}",
-								"type": "text",
-								"description": "Client secret (40 chars in hexadecimal)"
-							},
-							{
-								"key": "delegationId",
-								"value": "{{consumerDelegateId}}",
-								"type": "text"
-							}
-						],
-						"body": {
-							"mode": "raw",
-							"raw": "{\n    \"itemId\": \"{{itemIdForToken}}\",\n    \"itemType\": \"resource_server\",\n    \"role\": \"{{delegateRole}}\"\n}",
-							"options": {
-								"raw": {
-									"language": "json"
-								}
-							}
-						},
-						"url": {
-							"raw": "{{authEndpoint}}/{{dxAuthBasePath}}/token",
-							"host": [
-								"{{authEndpoint}}"
-							],
-							"path": [
-								"{{dxAuthBasePath}}",
-								"token"
-							]
-						},
-						"description": "This API supplies the consumer delegate token."
 					},
 					"response": []
 				},
@@ -1232,7 +1110,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"productId\": \"{{idForCreatingProduct}}\",\n    \"resourceIds\": [\n        \"{{resourceId1}}\",\n        \"{{resourceId2}}\"\n    ]\n}",
+							"raw": "{\n    \"productId\": \"{{idForCreatingProduct}}\",\n    \"resourceIds\": [\n        \"{{resourceId1}}\"\n    ]\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -1530,13 +1408,13 @@
 							},
 							{
 								"key": "Authorization",
-								"value": "Bearer {{providerDelegateToken}}",
+								"value": "Bearer {{providerToken}}",
 								"type": "text"
 							}
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"productId\": \"testProduct\",\n    \"resourceIds\": [\n        \"{{resourceId1}}\",\n        \"{{resourceId2}}\"\n    ]\n}",
+							"raw": "{\n    \"productId\": \"testProduct\",\n    \"resourceIds\": [\n        \"{{resourceId1}}\"\n    ]\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -1617,13 +1495,13 @@
 							},
 							{
 								"key": "Authorization",
-								"value": "Bearer {{providerDelegateToken}}",
+								"value": "Bearer {{providerToken}}",
 								"type": "text"
 							}
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"productId\": \"{{productId}}\",\n    \"productVariantName\": \"variant2\",\n    \"resources\": [\n        {\n          \"id\": \"{{resourceId1}}\",\n          \"capabilities\": [\n            \"api\"\n          ]\n        },\n        {\n          \"id\": \"{{resourceId2}}\",\n          \"capabilities\": [\n            \"sub\", \"file\"\n          ]\n        }\n      ],\n      \"price\": 150,\n      \"duration\": 12\n}",
+							"raw": "{\n    \"productId\": \"{{productId}}\",\n    \"productVariantName\": \"variant2\",\n    \"resources\": [\n        {\n          \"id\": \"{{resourceId1}}\",\n          \"capabilities\": [\n            \"api\"\n          ]\n        }\n      ],\n      \"price\": 150,\n      \"duration\": 12\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -1693,7 +1571,7 @@
 							},
 							{
 								"key": "Authorization",
-								"value": "Bearer {{providerDelegateToken}}",
+								"value": "Bearer {{providerToken}}",
 								"type": "text"
 							}
 						],
@@ -1921,7 +1799,7 @@
 							},
 							{
 								"key": "Authorization",
-								"value": "Bearer {{providerDelegateToken}}",
+								"value": "Bearer {{providerToken}}",
 								"type": "text"
 							}
 						],
@@ -2006,13 +1884,13 @@
 							},
 							{
 								"key": "Authorization",
-								"value": "Bearer {{providerDelegateToken}}",
+								"value": "Bearer {{providerToken}}",
 								"type": "text"
 							}
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"productId\": \"{{productId}}\",\n    \"productVariantName\": \"variant2\",\n    \"resources\": [\n        {\n          \"id\": \"{{resourceId1}}\",\n          \"capabilities\": [\n            \"api\", \"sub\"\n          ]\n        },\n        {\n          \"id\": \"{{resourceId2}}\",\n          \"capabilities\": [\n            \"sub\", \"file\"\n          ]\n        }\n      ],\n      \"price\": 200,\n      \"duration\": 24\n}",
+							"raw": "{\n    \"productId\": \"{{productId}}\",\n    \"productVariantName\": \"variant2\",\n    \"resources\": [\n        {\n          \"id\": \"{{resourceId1}}\",\n          \"capabilities\": [\n            \"api\", \"sub\"\n          ]\n        }\n      ],\n      \"price\": 200,\n      \"duration\": 24\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -2082,7 +1960,7 @@
 							},
 							{
 								"key": "Authorization",
-								"value": "Bearer {{providerDelegateToken}}",
+								"value": "Bearer {{providerToken}}",
 								"type": "text"
 							}
 						],
@@ -2367,7 +2245,7 @@
 							},
 							{
 								"key": "Authorization",
-								"value": "Bearer {{providerDelegateToken}}",
+								"value": "Bearer {{providerToken}}",
 								"type": "text"
 							}
 						],
@@ -2440,7 +2318,7 @@
 									},
 									{
 										"key": "Authorization",
-										"value": "Bearer {{providerDelegateToken}}",
+										"value": "Bearer {{providerToken}}",
 										"type": "text"
 									}
 								],
@@ -2499,7 +2377,7 @@
 									},
 									{
 										"key": "Authorization",
-										"value": "Bearer {{providerDelegateToken}}",
+										"value": "Bearer {{providerToken}}",
 										"type": "text"
 									}
 								],
@@ -2617,7 +2495,7 @@
 									},
 									{
 										"key": "Authorization",
-										"value": "Bearer {{providerDelegateToken}}",
+										"value": "Bearer {{providerToken}}",
 										"type": "text"
 									}
 								],
@@ -2749,7 +2627,7 @@
 									},
 									{
 										"key": "Authorization",
-										"value": "Bearer {{providerDelegateToken}}",
+										"value": "Bearer {{providerToken}}",
 										"type": "text"
 									}
 								],
@@ -2814,7 +2692,7 @@
 									},
 									{
 										"key": "Authorization",
-										"value": "Bearer {{providerDelegateToken}}",
+										"value": "Bearer {{providerToken}}",
 										"type": "text"
 									}
 								],
@@ -2883,7 +2761,7 @@
 									},
 									{
 										"key": "Authorization",
-										"value": "Bearer {{providerDelegateToken}}",
+										"value": "Bearer {{providerToken}}",
 										"type": "text"
 									}
 								],
@@ -3014,7 +2892,7 @@
 									},
 									{
 										"key": "Authorization",
-										"value": "Bearer {{providerDelegateToken}}",
+										"value": "Bearer {{providerToken}}",
 										"type": "text"
 									}
 								],
@@ -3088,7 +2966,7 @@
 									},
 									{
 										"key": "Authorization",
-										"value": "Bearer {{providerDelegateToken}}",
+										"value": "Bearer {{providerToken}}",
 										"type": "text"
 									}
 								],
@@ -3153,7 +3031,7 @@
 									},
 									{
 										"key": "Authorization",
-										"value": "Bearer {{providerDelegateToken}}",
+										"value": "Bearer {{providerToken}}",
 										"type": "text"
 									}
 								],
@@ -3218,7 +3096,7 @@
 									},
 									{
 										"key": "Authorization",
-										"value": "Bearer {{providerDelegateToken}}",
+										"value": "Bearer {{providerToken}}",
 										"type": "text"
 									}
 								],
@@ -3283,7 +3161,7 @@
 									},
 									{
 										"key": "Authorization",
-										"value": "Bearer {{providerDelegateToken}}",
+										"value": "Bearer {{providerToken}}",
 										"type": "text"
 									}
 								],
@@ -3352,7 +3230,7 @@
 									},
 									{
 										"key": "Authorization",
-										"value": "Bearer {{providerDelegateToken}}",
+										"value": "Bearer {{providerToken}}",
 										"type": "text"
 									}
 								],
@@ -3482,7 +3360,7 @@
 									},
 									{
 										"key": "Authorization",
-										"value": "Bearer {{providerDelegateToken}}",
+										"value": "Bearer {{providerToken}}",
 										"type": "text"
 									}
 								],
@@ -3616,7 +3494,7 @@
 									},
 									{
 										"key": "Authorization",
-										"value": "Bearer {{providerDelegateToken}}",
+										"value": "Bearer {{providerToken}}",
 										"type": "text"
 									}
 								],
@@ -3957,7 +3835,7 @@
 						"header": [
 							{
 								"key": "Authorization",
-								"value": "{{authToken}}",
+								"value": "Bearer {{authToken}}",
 								"type": "text"
 							}
 						],
@@ -4017,7 +3895,7 @@
 						"header": [
 							{
 								"key": "Authorization",
-								"value": "{{authToken}}",
+								"value": "Bearer {{authToken}}",
 								"type": "text"
 							}
 						],
@@ -4079,7 +3957,7 @@
 						"header": [
 							{
 								"key": "Authorization",
-								"value": "{{authToken}}",
+								"value": "Bearer {{authToken}}",
 								"type": "text"
 							}
 						],
@@ -4138,7 +4016,7 @@
 						"header": [
 							{
 								"key": "Authorization",
-								"value": "{{authToken}}",
+								"value": "Bearer {{authToken}}",
 								"type": "text"
 							}
 						],
@@ -4658,7 +4536,7 @@
 							},
 							{
 								"key": "Authorization",
-								"value": "Bearer {{consumerDelegateToken}}",
+								"value": "Bearer {{consumerToken}}",
 								"type": "text"
 							}
 						],
@@ -6722,7 +6600,7 @@
 							},
 							{
 								"key": "Authorization",
-								"value": "Bearer {{providerDelegateToken}}",
+								"value": "Bearer {{providerToken}}",
 								"type": "text"
 							}
 						],
@@ -6786,7 +6664,7 @@
 							},
 							{
 								"key": "Authorization",
-								"value": "Bearer {{providerDelegateToken}}",
+								"value": "Bearer {{providerToken}}",
 								"type": "text"
 							}
 						],
@@ -6914,7 +6792,7 @@
 							},
 							{
 								"key": "Authorization",
-								"value": "Bearer {{providerDelegateToken}}",
+								"value": "Bearer {{providerToken}}",
 								"type": "text"
 							}
 						],
@@ -6983,7 +6861,7 @@
 							},
 							{
 								"key": "Authorization",
-								"value": "Bearer {{providerDelegateToken}}",
+								"value": "Bearer {{providerToken}}",
 								"type": "text"
 							}
 						],
@@ -7047,7 +6925,7 @@
 							},
 							{
 								"key": "Authorization",
-								"value": "Bearer {{providerDelegateToken}}",
+								"value": "Bearer {{providerToken}}",
 								"type": "text"
 							}
 						],
@@ -7111,7 +6989,7 @@
 							},
 							{
 								"key": "Authorization",
-								"value": "Bearer {{providerDelegateToken}}",
+								"value": "Bearer {{providerToken}}",
 								"type": "text"
 							}
 						],
