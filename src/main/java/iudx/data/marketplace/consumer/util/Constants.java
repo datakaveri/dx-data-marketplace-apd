@@ -145,12 +145,16 @@ public class Constants {
       LIST_FAILED_OR_PENDING_PAYMENTS
           + " WHERE I.consumer_id = '$1'  AND I.payment_status = 'PENDING' "
           + " AND P.\"resourceServerUrl\" = '$2'";
+  public static final String LIST_FAILED_PAYMENTS_4_CONSUMER =
+      LIST_PENDING_PAYMENTS_4_CONSUMER.replace("PENDING", "FAILED");
   public static final String LIST_PENDING_PAYMENTS_4_CONSUMER_WITH_GIVEN_PRODUCT =
       LIST_FAILED_OR_PENDING_PAYMENTS
           + " WHERE\n"
           + " P.\"productId\" = '$1'\n"
           + " AND I.consumer_id = '$2' AND I.payment_status = 'PENDING' "
           + " AND P.\"resourceServerUrl\" = '$3'";
+  public static final String LIST_FAILED_PAYMENTS_4_CONSUMER_WITH_GIVEN_PRODUCT =
+      LIST_PENDING_PAYMENTS_4_CONSUMER_WITH_GIVEN_PRODUCT.replace("PENDING", "FAILED");
   public static final String LIST_PENDING_PAYMENTS_4_CONSUMER_WITH_GIVEN_RESOURCE =
       LIST_FAILED_OR_PENDING_PAYMENTS
           + " WHERE\n"
@@ -158,21 +162,14 @@ public class Constants {
           + " )\n"
           + " AND I.consumer_id = '$2' AND I.payment_status = 'PENDING' "
           + " AND P.\"resourceServerUrl\" = '$3'";
-
+  public static final String LIST_FAILED_PAYMENTS_4_CONSUMER_WITH_GIVEN_RESOURCE =
+      LIST_PENDING_PAYMENTS_4_CONSUMER_WITH_GIVEN_RESOURCE.replace("PENDING", "FAILED");
   public static final String LIST_PENDING_PAYMENTS_4_CONSUMER_WITH_GIVEN_ORDER =
       LIST_FAILED_OR_PENDING_PAYMENTS
           + " WHERE \n"
           + " I.order_id = $1  "
           + " AND I.consumer_id = '$2' AND I.payment_status = 'PENDING' "
           + " AND P.\"resourceServerUrl\" = '$3'";
-
-  public static final String LIST_FAILED_PAYMENTS_4_CONSUMER =
-      LIST_PENDING_PAYMENTS_4_CONSUMER.replace("PENDING", "FAILED");
-  public static final String LIST_FAILED_PAYMENTS_4_CONSUMER_WITH_GIVEN_PRODUCT =
-      LIST_PENDING_PAYMENTS_4_CONSUMER_WITH_GIVEN_PRODUCT.replace("PENDING", "FAILED");
-  public static final String LIST_FAILED_PAYMENTS_4_CONSUMER_WITH_GIVEN_RESOURCE =
-      LIST_PENDING_PAYMENTS_4_CONSUMER_WITH_GIVEN_RESOURCE.replace("PENDING", "FAILED");
-
   public static final String LIST_FAILED_PAYMENTS_4_CONSUMER_WITH_GIVEN_ORDER =
       LIST_PENDING_PAYMENTS_4_CONSUMER_WITH_GIVEN_ORDER.replace("PENDING", "FAILED");
 
@@ -213,6 +210,7 @@ public class Constants {
           + "WHERE P.\"productId\" = $1 \n"
           + "AND P.\"productVariantStatus\" = 'ACTIVE'\n";
 
-  public static final String FETCH_RESOURCE_SERVER_URL =  "SELECT \"resourceServerUrl\" FROM " +
+  public static final String FETCH_RESOURCE_SERVER_URL =  "SELECT \"resourceServerUrl\" FROM "
+      +
       "product_variant_view WHERE \"productVariantId\" = $1";
 }

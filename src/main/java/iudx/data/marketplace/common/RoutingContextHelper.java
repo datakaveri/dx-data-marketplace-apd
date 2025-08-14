@@ -10,7 +10,6 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 public class RoutingContextHelper {
-  private static final Logger LOGGER = LogManager.getLogger(RoutingContextHelper.class);
   private static final String JWT_DATA = "jwtData";
 
   public static void setUser(RoutingContext routingContext, User user) {
@@ -34,13 +33,13 @@ public class RoutingContextHelper {
     /* TODO: later, 401 error is thrown if the token does not contain Bearer keyword */
     String token = routingContext.request().headers().get(AUTHORIZATION_KEY);
     boolean isValidBearerToken = token != null && token.trim().split(" ").length == 2;
-    boolean isBearerAuthHeaderPresent = isValidBearerToken && (token.contains(HEADER_TOKEN_BEARER));
+    boolean isBearerAuthHeaderPresent = isValidBearerToken && token.contains(HEADER_TOKEN_BEARER);
     String[] tokenWithoutBearer;
-      if (isBearerAuthHeaderPresent) {
-        tokenWithoutBearer = (token.split(HEADER_TOKEN_BEARER));
-        token = tokenWithoutBearer[1].replaceAll("\\s", "");
-        return token;
-      }
+    if (isBearerAuthHeaderPresent) {
+      tokenWithoutBearer = token.split(HEADER_TOKEN_BEARER);
+      token = tokenWithoutBearer[1].replaceAll("\\s", "");
+      return token;
+    }
     return routingContext.request().headers().get(HEADER_TOKEN);
   }
 

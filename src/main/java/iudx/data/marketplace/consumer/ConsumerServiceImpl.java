@@ -220,7 +220,8 @@ public class ConsumerServiceImpl implements ConsumerService {
               LOGGER.info(
                   "Consumer's resource server url {} matches with item's resource server url {} for variantId {}",
                   consumerResourceServerUrl,
-                  itemResourceServerUrl, variantId);
+                  itemResourceServerUrl,
+                  variantId);
 
               getOrderRelatedInfo(variantId)
                   .compose(
@@ -378,7 +379,8 @@ public class ConsumerServiceImpl implements ConsumerService {
   public ConsumerService listProductVariants(
       User user, JsonObject request, Handler<AsyncResult<JsonObject>> handler) {
     String productId = request.getString("productId");
-    /* List product variants are being displayed on the catalogue dashboard and will not be filtered based on the resource server url
+    /* List product variants are being displayed on the catalogue
+     dashboard and will not be filtered based on the resource server url
      * as it is not provided with tokens */
     //    String resourceServerUrl = user.getResourceServerUrl();
     //

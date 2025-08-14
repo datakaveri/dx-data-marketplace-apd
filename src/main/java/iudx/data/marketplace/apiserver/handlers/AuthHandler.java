@@ -63,20 +63,19 @@ public class AuthHandler implements Handler<RoutingContext> {
     final String path = getNormalisedPath(request.path());
     JsonObject authInfo = RoutingContextHelper.getAuthInfo(context).put(API_ENDPOINT, path);
 
-
     if (path.equals(api.getVerifyUrl())) {
-        authenticator.tokenIntrospect4Verify(
-            authInfo,
-            handler -> {
-              if (handler.succeeded()) {
-                LOGGER.info("User verified successfully");
-                context.data().put(AUTH_INFO, authInfo);
-                context.next();
-              } else {
-                LOGGER.error("User verification failed : {}", handler.cause().getMessage());
-                processAuthFailure(context, handler.cause().getMessage());
-              }
-            });
+      authenticator.tokenIntrospect4Verify(
+          authInfo,
+          handler -> {
+            if (handler.succeeded()) {
+              LOGGER.info("User verified successfully");
+              context.data().put(AUTH_INFO, authInfo);
+              context.next();
+            } else {
+              LOGGER.error("User verification failed : {}", handler.cause().getMessage());
+              processAuthFailure(context, handler.cause().getMessage());
+            }
+          });
     } else { // for all the other endpoints
       checkAuth(requestJson, authInfo)
           .onSuccess(
