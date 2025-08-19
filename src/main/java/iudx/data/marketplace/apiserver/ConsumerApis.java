@@ -100,7 +100,7 @@ public class ConsumerApis {
     router
         .get(api.getConsumerProductVariantPath())
         .handler(productVariantHandler)
-/*  .handler(AuthHandler.create(authenticationService, api, postgresService, authClient)) */
+        /*  .handler(AuthHandler.create(authenticationService, api, postgresService, authClient)) */
         .handler(this::listProductVariants)
         .failureHandler(exceptionHandler);
 
@@ -278,7 +278,7 @@ public class ConsumerApis {
             .setStatusCode(statusCode)
             .end(result.toString());
         break;
-      default: //204
+      default: // 204
         routingContext
             .response()
             .putHeader(CONTENT_TYPE, APPLICATION_JSON)

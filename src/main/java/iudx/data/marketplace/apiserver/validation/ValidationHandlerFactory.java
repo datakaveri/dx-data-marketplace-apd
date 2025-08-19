@@ -16,7 +16,10 @@ public class ValidationHandlerFactory {
 
   /*TODO: set required to true for Bearer Authorization header later */
   public List<Validator> build(
-      final RequestType requestType, final MultiMap parameters, final JsonObject body, MultiMap header) {
+      final RequestType requestType,
+      final MultiMap parameters,
+      final JsonObject body,
+      MultiMap header) {
     LOGGER.debug("getValidation4Context() started for : " + requestType);
     LOGGER.debug("type : " + requestType);
     List<Validator> validator = null;
@@ -92,7 +95,8 @@ public class ValidationHandlerFactory {
     return validators;
   }
 
-  private List<Validator> getConsumerProductVariantValidator(MultiMap parameters, final MultiMap header) {
+  private List<Validator> getConsumerProductVariantValidator(
+      MultiMap parameters, final MultiMap header) {
     List<Validator> validators = new ArrayList<>();
 
     validators.add(new ProductIdTypeValidator(parameters.get("productId"), true));
@@ -120,7 +124,8 @@ public class ValidationHandlerFactory {
     return validators;
   }
 
-  private List<Validator> getPostLinkedAccountValidator(JsonObject body, RequestType requestType, final MultiMap header) {
+  private List<Validator> getPostLinkedAccountValidator(
+      JsonObject body, RequestType requestType, final MultiMap header) {
     List<Validator> validators = new ArrayList<>();
     validators.add(new JsonSchemaTypeValidator(body, requestType));
     validators.add(new BearerTokenTypeValidator(header.get(AUTHORIZATION_KEY), false));
@@ -128,7 +133,8 @@ public class ValidationHandlerFactory {
     return validators;
   }
 
-  private List<Validator> getPutLinkedAccountValidator(JsonObject body, RequestType requestType, final MultiMap header) {
+  private List<Validator> getPutLinkedAccountValidator(
+      JsonObject body, RequestType requestType, final MultiMap header) {
     List<Validator> validators = new ArrayList<>();
     validators.add(new JsonSchemaTypeValidator(body, requestType));
     validators.add(new BearerTokenTypeValidator(header.get(AUTHORIZATION_KEY), false));
@@ -160,7 +166,8 @@ public class ValidationHandlerFactory {
     return validators;
   }
 
-  private List<Validator> getResourceIdValidators(final MultiMap parameters, final MultiMap header) {
+  private List<Validator> getResourceIdValidators(
+      final MultiMap parameters, final MultiMap header) {
     List<Validator> validators = new ArrayList<>();
 
     validators.add(new UuidTypeValidator(parameters.get("resourceId"), false));
@@ -170,7 +177,8 @@ public class ValidationHandlerFactory {
     return validators;
   }
 
-  private List<Validator> getProviderIdValidators(final MultiMap parameters, final MultiMap header) {
+  private List<Validator> getProviderIdValidators(
+      final MultiMap parameters, final MultiMap header) {
     List<Validator> validators = new ArrayList<>();
     validators.add(new BearerTokenTypeValidator(header.get(AUTHORIZATION_KEY), false));
 
@@ -179,7 +187,10 @@ public class ValidationHandlerFactory {
   }
 
   private List<Validator> getProductValidators(
-      final MultiMap parameters, final JsonObject body, final RequestType requestType, final MultiMap header) {
+      final MultiMap parameters,
+      final JsonObject body,
+      final RequestType requestType,
+      final MultiMap header) {
     List<Validator> validators = new ArrayList<>();
 
     if (body == null || body.isEmpty()) {
@@ -193,7 +204,10 @@ public class ValidationHandlerFactory {
   }
 
   private List<Validator> getProductVariantValidators(
-      final MultiMap parameters, final JsonObject body, final RequestType requestType, final MultiMap header) {
+      final MultiMap parameters,
+      final JsonObject body,
+      final RequestType requestType,
+      final MultiMap header) {
     List<Validator> validators = new ArrayList<>();
 
     if (body == null || body.isEmpty()) {
@@ -206,14 +220,16 @@ public class ValidationHandlerFactory {
     return validators;
   }
 
-  private List<Validator> getDeleteProductVariantValidators(final MultiMap parameters, final MultiMap header) {
+  private List<Validator> getDeleteProductVariantValidators(
+      final MultiMap parameters, final MultiMap header) {
     List<Validator> validators = new ArrayList<>();
     validators.add(new UuidTypeValidator(parameters.get(PRODUCT_VARIANT_ID), true));
     validators.add(new BearerTokenTypeValidator(header.get(AUTHORIZATION_KEY), false));
     return validators;
   }
 
-  private List<Validator> listProductVariantValidators(final MultiMap parameters, final MultiMap header) {
+  private List<Validator> listProductVariantValidators(
+      final MultiMap parameters, final MultiMap header) {
     List<Validator> validators = new ArrayList<>();
     validators.add(new ProductIdTypeValidator(parameters.get(PRODUCT_ID), true));
     validators.add(new BearerTokenTypeValidator(header.get(AUTHORIZATION_KEY), false));
