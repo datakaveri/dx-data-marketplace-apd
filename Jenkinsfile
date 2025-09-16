@@ -139,18 +139,9 @@ pipeline {
 
         stage('Continuous Deployment') {
           when {
-            allOf {
-              anyOf {
-                changeset "docker/**"
-                changeset "docs/**"
-                changeset "pom.xml"
-                changeset "src/main/**"
-                triggeredBy cause: 'UserIdCause'
-              }
               expression {
                 return env.GIT_BRANCH == 'origin/main';
               }
-            }
           }
           stages {
             stage('Push Images') {
