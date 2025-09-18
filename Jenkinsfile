@@ -14,182 +14,194 @@ pipeline {
       label 'slave1'
     }
   }
-  stages {
 
-    stage('Build images') {
-      steps{
-        script {
-          devImage = docker.build( devRegistry, "-f ./docker/dev.dockerfile .")
-          deplImage = docker.build( deplRegistry, "-f ./docker/depl.dockerfile .")
-        }
-      }
-    }
-
-    stage('Unit Tests and Code Coverage Test'){
-      steps{
-        script{
-        sh 'sudo update-alternatives --set java /usr/lib/jvm/java-21-openjdk-amd64/bin/java'
-          sh 'cp /home/ubuntu/configs/dmp-apd-server-config-test.json ./secrets/all-verticles-configs/config-test.json'
-           catchError(buildResult: 'SUCCESS', stageResult: 'UNSTABLE') {
-              sh "mvn clean test checkstyle:checkstyle pmd:pmd"
-            }  
-        }
-        
-      }
-      post{
-      always {
-
-        xunit (
-          thresholds: [ skipped(failureThreshold: '0'), failed(failureThreshold: '40') ],
-          tools: [ JUnit(pattern: 'target/surefire-reports/*.xml') ]
-        )
-        jacoco classPattern: 'target/classes', execPattern: 'target/jacoco.exec', sourcePattern: 'src/main/java', exclusionPattern:'iudx/data/marketplace/apiserver/ApiServerVerticle.class, **/*VertxEBProxy.class, **/*Constants.class, **/*VertxProxyHandler.class, **/*Verticle.class, **/JwtDataConverter.class, iudx/data/marketplace/apiserver/ProviderApis.class, iudx/data/marketplace/apiserver/ConsumerApis.class,iudx/data/marketplace/deploy/*.class, **/*Service.class, **/PolicyServiceImpl.class, **/package-info.class'
-        
-        recordIssues(
-          enabledForFailure: true,
-          skipBlames: true,
-          qualityGates: [[threshold:0, type: 'TOTAL', unstable: false]],
-          tool: checkStyle(pattern: 'target/checkstyle-result.xml')
-        )
-        recordIssues(
-          enabledForFailure: true,
-          skipBlames: true,
-          qualityGates: [[threshold:0, type: 'TOTAL', unstable: false]],
-          tool: pmdParser(pattern: 'target/pmd.xml')
-        )
-      }
-        failure{
-          error "Test failure. Stopping pipeline execution!"
-        }
-        cleanup{
-          script{
-            sh 'sudo rm -rf target/'
-            sh 'sudo update-alternatives --set java /usr/lib/jvm/java-11-openjdk-amd64/bin/java'
-          }
-        }        
-      }
-    }
-    stage('Start DMP-APD-SERVER for Performance/Integration Testing'){
-      steps{
-        script{
-          sh 'scp src/test/resources/DX-Data-Marketplace-APIs.postman_collection.json jenkins@jenkins-master:/var/lib/jenkins/iudx/dmp-apd/Newman/'
-          sh 'docker compose -f docker-compose.test.yml up -d integTest'
-          sh 'sleep 45'
-        }
-      }
-      post{
-        failure{
-          script{
-            sh 'docker compose -f docker-compose.test.yml down --remove-orphans'
-          }
-        }
-      }
-    }
-
-    stage('Integration tests & OWASP ZAP pen test'){
-      steps{
-        node('built-in') {
-          script{
-            startZap ([host: 'localhost', port: 8090, zapHome: '/var/lib/jenkins/tools/com.cloudbees.jenkins.plugins.customtools.CustomTool/OWASP_ZAP/ZAP_2.11.0'])
-              sh 'curl http://127.0.0.1:8090/JSON/pscan/action/disableScanners/?ids=10096'
-              sh 'HTTP_PROXY=\'127.0.0.1:8090\' newman run /var/lib/jenkins/iudx/dmp-apd/Newman/DX-Data-Marketplace-APIs.postman_collection.json -e /home/ubuntu/configs/dmp-apd-postman-env.json -n 2 --insecure -r htmlextra --reporter-htmlextra-export /var/lib/jenkins/iudx/dmp-apd/Newman/report/report.html --reporter-htmlextra-skipSensitiveData'
-            runZapAttack()
-          }
-        }
-      }
-      post{
-        always{
-          node('built-in') {
-            publishHTML([allowMissing: false, alwaysLinkToLastBuild: true, keepAll: true, reportDir: '/var/lib/jenkins/iudx/dmp-apd/Newman/report/', reportFiles: 'report.html', reportTitles: '', reportName: 'Integration Test Report'])
-            script{
-              archiveZap failHighAlerts: 1, failMediumAlerts: 1, failLowAlerts: 1
-            }  
-          }
-        }
-        failure{
-          error "Test failure. Stopping pipeline execution!"
-        }
-        cleanup{
-          script{
-            sh 'docker compose -f docker-compose.test.yml down --remove-orphans'
-          }
-        }
-      }
-    }
-
-    stage('Continuous Deployment') {
+  stages{
+    stage('Conditional Execution') {
       when {
-        allOf {
-          anyOf {
-            changeset "docker/**"
-            changeset "docs/**"
-            changeset "pom.xml"
-            changeset "src/main/**"
-            triggeredBy cause: 'UserIdCause'
-          }
+        anyOf {
+          triggeredBy 'UserIdCause'
           expression {
-            return env.GIT_BRANCH == 'origin/main';
+            def comment = env.ghprbCommentBody?.trim()
+            return comment && comment.toLowerCase() != "null"
           }
+          changeset "docker/**"
+          changeset "docs/**"
+          changeset "pom.xml"
+          changeset "src/main/**"
         }
       }
       stages {
-        stage('Push Images') {
+        stage('Trivy Code Scan (Dependencies)') {
           steps {
+            sh 'trivy fs --scanners vuln,secret,misconfig --output trivy-fs-report.txt .'
+          }
+        }
+        stage('Build images') {
+          steps{
             script {
-              docker.withRegistry( registryUri, registryCredential ) {
-                devImage.push("1.0.0-alpha-${env.GIT_HASH}")
-                deplImage.push("1.0.0-alpha-${env.GIT_HASH}")
-              }
+              devImage = docker.build( devRegistry, "-f ./docker/dev.dockerfile .")
+              deplImage = docker.build( deplRegistry, "-f ./docker/depl.dockerfile .")
             }
           }
         }
-        stage('Docker Swarm deployment') {
-          steps {
-            script {
-              sh "ssh azureuser@docker-swarm 'docker service update dmp_apd_dmp-apd --image ghcr.io/datakaveri/dmp-apd-server-depl:1.0.0-alpha-${env.GIT_HASH}'"
-              sh 'sleep 10'
+
+        stage('Unit Tests and Code Coverage Test'){
+          steps{
+            script{
+            sh 'sudo update-alternatives --set java /usr/lib/jvm/java-21-openjdk-amd64/bin/java'
+              sh 'cp /home/ubuntu/configs/dmp-apd-server-config-test.json ./secrets/all-verticles-configs/config-test.json'
+              catchError(buildResult: 'SUCCESS', stageResult: 'UNSTABLE') {
+                  sh "mvn clean test checkstyle:checkstyle pmd:pmd"
+                }  
+            }
+            
+          }
+          post{
+          always {
+
+            xunit (
+              thresholds: [ skipped(failureThreshold: '0'), failed(failureThreshold: '40') ],
+              tools: [ JUnit(pattern: 'target/surefire-reports/*.xml') ]
+            )
+            jacoco classPattern: 'target/classes', execPattern: 'target/jacoco.exec', sourcePattern: 'src/main/java', exclusionPattern:'iudx/data/marketplace/apiserver/ApiServerVerticle.class, **/*VertxEBProxy.class, **/*Constants.class, **/*VertxProxyHandler.class, **/*Verticle.class, **/JwtDataConverter.class, iudx/data/marketplace/apiserver/ProviderApis.class, iudx/data/marketplace/apiserver/ConsumerApis.class,iudx/data/marketplace/deploy/*.class, **/*Service.class, **/PolicyServiceImpl.class, **/package-info.class'
+            
+            recordIssues(
+              enabledForFailure: true,
+              skipBlames: true,
+              qualityGates: [[threshold:0, type: 'TOTAL', unstable: false]],
+              tool: checkStyle(pattern: 'target/checkstyle-result.xml')
+            )
+            recordIssues(
+              enabledForFailure: true,
+              skipBlames: true,
+              qualityGates: [[threshold:0, type: 'TOTAL', unstable: false]],
+              tool: pmdParser(pattern: 'target/pmd.xml')
+            )
+          }
+            failure{
+              error "Test failure. Stopping pipeline execution!"
+            }
+            cleanup{
+              script{
+                sh 'sudo rm -rf target/'
+                sh 'sudo update-alternatives --set java /usr/lib/jvm/java-11-openjdk-amd64/bin/java'
+              }
+            }        
+          }
+        }
+        stage('Start DMP-APD-SERVER for Performance/Integration Testing'){
+          steps{
+            script{
+              sh 'scp src/test/resources/DX-Data-Marketplace-APIs.postman_collection.json jenkins@jenkins-master:/var/lib/jenkins/iudx/dmp-apd/Newman/'
+              sh 'docker compose -f docker-compose.test.yml up -d integTest'
+              sh 'sleep 45'
             }
           }
           post{
             failure{
-              error "Failed to deploy image in Docker Swarm"
+              script{
+                sh 'docker compose -f docker-compose.test.yml down --remove-orphans'
+              }
             }
-          }          
+          }
         }
 
-        stage('Integration test on Swarm deployment') {
-          steps {
+        stage('Integration tests & OWASP ZAP pen test'){
+          steps{
             node('built-in') {
               script{
-                sh 'newman run /var/lib/jenkins/iudx/dmp-apd/Newman/DX-Data-Marketplace-APIs.postman_collection.json -e /home/ubuntu/configs/cd/dmp-apd-postman-env.json --insecure -r htmlextra --reporter-htmlextra-export /var/lib/jenkins/iudx/dmp-apd/Newman/report/cd-report.html --reporter-htmlextra-skipSensitiveData'
+                startZap ([host: 'localhost', port: 8090, zapHome: '/var/lib/jenkins/tools/com.cloudbees.jenkins.plugins.customtools.CustomTool/OWASP_ZAP/ZAP_2.11.0'])
+                  sh 'curl http://127.0.0.1:8090/JSON/pscan/action/disableScanners/?ids=10096'
+                  sh 'HTTP_PROXY=\'127.0.0.1:8090\' newman run /var/lib/jenkins/iudx/dmp-apd/Newman/DX-Data-Marketplace-APIs.postman_collection.json -e /home/ubuntu/configs/dmp-apd-postman-env.json -n 2 --insecure -r htmlextra --reporter-htmlextra-export /var/lib/jenkins/iudx/dmp-apd/Newman/report/report.html --reporter-htmlextra-skipSensitiveData'
+                runZapAttack()
               }
             }
           }
           post{
             always{
               node('built-in') {
+                publishHTML([allowMissing: false, alwaysLinkToLastBuild: true, keepAll: true, reportDir: '/var/lib/jenkins/iudx/dmp-apd/Newman/report/', reportFiles: 'report.html', reportTitles: '', reportName: 'Integration Test Report'])
                 script{
-                  publishHTML([allowMissing: false, alwaysLinkToLastBuild: true, keepAll: true, reportDir: '/var/lib/jenkins/iudx/dmp-apd/Newman/report/', reportFiles: 'cd-report.html', reportTitles: '', reportName: 'Swarm Integration Test Report'])
-                }
+                  archiveZap failHighAlerts: 1, failMediumAlerts: 1, failLowAlerts: 1
+                }  
               }
             }
             failure{
               error "Test failure. Stopping pipeline execution!"
             }
+            cleanup{
+              script{
+                sh 'docker compose -f docker-compose.test.yml down --remove-orphans'
+              }
+            }
           }
+        }
 
+        stage('Continuous Deployment') {
+          when {
+              expression {
+                return env.GIT_BRANCH == 'origin/main';
+              }
+          }
+          stages {
+            stage('Push Images') {
+              steps {
+                script {
+                  docker.withRegistry( registryUri, registryCredential ) {
+                    devImage.push("1.2.0-alpha-${env.GIT_HASH}")
+                    deplImage.push("1.2.0-alpha-${env.GIT_HASH}")
+                  }
+                }
+              }
+            }
+            stage('Docker Swarm deployment') {
+              steps {
+                script {
+                  sh "ssh azureuser@docker-swarm 'docker service update dmp_apd_dmp-apd --image ghcr.io/datakaveri/dmp-apd-server-depl:1.2.0-alpha-${env.GIT_HASH}'"
+                  sh 'sleep 10'
+                }
+              }
+              post{
+                failure{
+                  error "Failed to deploy image in Docker Swarm"
+                }
+              }          
+            }
+
+            stage('Integration test on Swarm deployment') {
+              steps {
+                node('built-in') {
+                  script{
+                    sh 'newman run /var/lib/jenkins/iudx/dmp-apd/Newman/DX-Data-Marketplace-APIs.postman_collection.json -e /home/ubuntu/configs/cd/dmp-apd-postman-env.json --insecure -r htmlextra --reporter-htmlextra-export /var/lib/jenkins/iudx/dmp-apd/Newman/report/cd-report.html --reporter-htmlextra-skipSensitiveData'
+                  }
+                }
+              }
+              post{
+                always{
+                  node('built-in') {
+                    script{
+                      publishHTML([allowMissing: false, alwaysLinkToLastBuild: true, keepAll: true, reportDir: '/var/lib/jenkins/iudx/dmp-apd/Newman/report/', reportFiles: 'cd-report.html', reportTitles: '', reportName: 'Swarm Integration Test Report'])
+                    }
+                  }
+                }
+                failure{
+                  error "Test failure. Stopping pipeline execution!"
+                }
+              }
+
+            }
+          }
         }
       }
-    }
-  }
 
-    post{
-        failure{
-        script{
-            if (env.GIT_BRANCH == 'origin/main')
-            emailext recipientProviders: [buildUser(), developers()], to: '$DMP_APD_RECIPENTS, $DEFAULT_RECIPIENTS', subject: '$PROJECT_NAME - Build # $BUILD_NUMBER - $BUILD_STATUS!', body: '''$PROJECT_NAME - Build # $BUILD_NUMBER - $BUILD_STATUS:
-            Check console output at $BUILD_URL to view the results.'''
+      post{
+          failure{
+          script{
+              if (env.GIT_BRANCH == 'origin/main')
+              emailext recipientProviders: [buildUser(), developers()], to: '$DMP_APD_RECIPENTS, $DEFAULT_RECIPIENTS', subject: '$PROJECT_NAME - Build # $BUILD_NUMBER - $BUILD_STATUS!', body: '''$PROJECT_NAME - Build # $BUILD_NUMBER - $BUILD_STATUS:
+              Check console output at $BUILD_URL to view the results.'''
+            }
+          }
         }
-    }
- }
+  }
 }
