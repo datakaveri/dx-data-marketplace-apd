@@ -28,6 +28,7 @@ pipeline {
           changeset "docs/**"
           changeset "pom.xml"
           changeset "src/main/**"
+          changeset "Jenkinsfile"
         }
       }
       stages {
