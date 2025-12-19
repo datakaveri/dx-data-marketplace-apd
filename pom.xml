@@ -12,7 +12,7 @@
         <vertx.version>4.5.11</vertx.version>
         <openjdk.version>21</openjdk.version>
         <junit-jupiter-engine.version>5.11.3</junit-jupiter-engine.version>
-        <apache-log4j2.version>2.24.2</apache-log4j2.version>
+        <apache-log4j2.version>2.25.3</apache-log4j2.version>
         <jacoco-maven-plugin.version>0.8.12</jacoco-maven-plugin.version>
         <checkstyle.version>10.20.1</checkstyle.version>
         <maven-compiler-plugin.version>3.13.0</maven-compiler-plugin.version>
